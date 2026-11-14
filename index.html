@@ -91,6 +91,7 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #accPanel .hwho{flex:1;min-width:0}
 #accPanel .hnm{margin:0;font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #accPanel .hem{margin:2px 0 0;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#accPanel .hid{margin:6px 0 0;font-size:12.5px;font-weight:600;color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;cursor:pointer;user-select:all}
 #accPanel .hsync{margin:12px 0 0;font-size:12.5px;color:var(--muted);line-height:1.4}
 #accPanel .herr{margin:10px 0 0;font-size:13px;color:#f0a0a0;line-height:1.4}
 #accPanel .obtn{display:block;width:100%;margin-top:12px;min-height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--gold);background:transparent;color:var(--gold2);font:inherit;font-size:14px;cursor:pointer}
@@ -8341,6 +8342,45 @@ A.logout = async () => {
   try{ const { a, auth } = await init(); await auth.signOut(a); }catch(e){}
   A.error = null; emit();
 };
+/* ===== ID AKUN (dibuat sistem) =====
+   Setiap akun Google yang masuk pertama kali dibuatkan ID sendiri oleh sistem, berurutan dan tidak pernah sama: ST-000001, ST-000002, dst.
+   Disimpan di users/{uid}.accountId; nomor urut diambil lewat transaksi dari meta/counter, jadi dua orang tidak mungkin dapat ID yang sama.
+   ID yang sudah terbentuk tidak berubah lagi (login ulang / ganti perangkat memakai ID yang sama). */
+const PROF = (() => {
+  const key = u => "st_sync_acc_" + u;
+  const fmt = n => "ST-" + String(n).padStart(6, "0");
+  let doing = null, doingUid = null;
+  async function ensure(u){
+    try{ const c = localStorage.getItem(key(u.uid)); if(c && A.user && A.user.uid === u.uid){ A.accountId = c; emit(); } }catch(e){}
+    if(navigator.onLine === false) return;
+    if(doing && doingUid === u.uid) return doing;
+    doingUid = u.uid;
+    doing = (async () => {
+      try{
+        const { m, db } = await A.getDb();
+        const uref = m.doc(db, "users", u.uid), cref = m.doc(db, "meta", "counter");
+        const id = await m.runTransaction(db, async tx => {
+          const us = await tx.get(uref);
+          const cur = us.exists() ? us.data().accountId : null;
+          const base = { email: String(u.email || ""), name: String(u.displayName || ""), lastLogin: Date.now() };
+          if(cur){ tx.set(uref, base, { merge: true }); return cur; }
+          const cs = await tx.get(cref);
+          const n = (cs.exists() ? (+cs.data().n || 0) : 0) + 1;
+          const nid = fmt(n);
+          tx.set(cref, { n });
+          tx.set(uref, Object.assign({ accountId: nid, createdAt: Date.now() }, base), { merge: true });
+          return nid;
+        });
+        try{ localStorage.setItem(key(u.uid), id); }catch(e){}
+        if(A.user && A.user.uid === u.uid){ A.accountId = id; emit(); }
+      }catch(e){ console.warn("id akun gagal:", e && (e.code || e.message)); }
+      finally{ doing = null; }
+    })();
+    return doing;
+  }
+  return { ensure };
+})();
+A.accountId = null;
 /* ===== SINKRON DATA KE AKUN GOOGLE (Cloud Firestore) =====
    Seluruh data aplikasi di localStorage (pengaturan, riwayat, hasil semua menu) disimpan di satu dokumen: users/{uid}.
    Cuma jalan saat sudah masuk dan online. Tanpa masuk, aplikasi memakai localStorage seperti biasa. */
@@ -8448,7 +8488,14 @@ const SY = (() => {
   addEventListener("pagehide", tick);
   return { start, stop, now: async () => { if(uid && merged && navigator.onLine !== false) await Promise.race([run(), new Promise(r => setTimeout(r, 5000))]); } };
 })();
-A.onChange(x => { try{ if(x.user) SY.start(x.user.uid); else if(A.ready) SY.stop(); }catch(e){} });
+let lastUid = null;
+A.onChange(x => {
+  try{ if(x.user) SY.start(x.user.uid); else if(A.ready) SY.stop(); }catch(e){}
+  try{
+    const id = x.user ? x.user.uid : null;
+    if(id !== lastUid){ lastUid = id; if(id) PROF.ensure(x.user); else A.accountId = null; }
+  }catch(e){}
+});
 /* pulihkan sesi masuk bila ada internet; gagal diam-diam bila offline */
 if(navigator.onLine !== false) init().catch(() => {});
 </script>
@@ -8458,8 +8505,8 @@ if(navigator.onLine !== false) init().catch(() => {});
 (function(){
   const btn = document.getElementById("accBtn"), pan = document.getElementById("accPanel"); if(!btn || !pan) return;
   const T = {
-    id:{acct:"Akun", login:"Masuk dengan Google", logout:"Keluar", off:"Tidak ada koneksi internet. Coba lagi setelah online.", fail:"Gagal masuk. Coba lagi.", cancel:"Masuk dibatalkan.", sy:"Menyinkronkan data…", sok:"Data tersimpan di akun Google kamu.", soff:"Menunggu koneksi internet untuk menyinkronkan.", serr:"Gagal menyinkronkan. Akan dicoba lagi."},
-    en:{acct:"Account", login:"Sign in with Google", logout:"Sign out", off:"No internet connection. Try again once you are online.", fail:"Sign-in failed. Please try again.", cancel:"Sign-in cancelled.", sy:"Syncing data…", sok:"Your data is saved to your Google account.", soff:"Waiting for an internet connection to sync.", serr:"Sync failed. Will retry."}
+    id:{idl:"ID Akun", acct:"Akun", login:"Masuk dengan Google", logout:"Keluar", off:"Tidak ada koneksi internet. Coba lagi setelah online.", fail:"Gagal masuk. Coba lagi.", cancel:"Masuk dibatalkan.", sy:"Menyinkronkan data…", sok:"Data tersimpan di akun Google kamu.", soff:"Menunggu koneksi internet untuk menyinkronkan.", serr:"Gagal menyinkronkan. Akan dicoba lagi."},
+    en:{idl:"Account ID", acct:"Account", login:"Sign in with Google", logout:"Sign out", off:"No internet connection. Try again once you are online.", fail:"Sign-in failed. Please try again.", cancel:"Sign-in cancelled.", sy:"Syncing data…", sok:"Your data is saved to your Google account.", soff:"Waiting for an internet connection to sync.", serr:"Sync failed. Will retry."}
   };
   const G = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
   const ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.6 4.5-5.5 8-5.5s6.5 1.9 8 5.5"/></svg>';
@@ -8480,7 +8527,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(u){
       const row = mk("div", "hrow");
       if(u.photoURL){ const im = mk("img", "hav"); im.alt = ""; im.referrerPolicy = "no-referrer"; im.src = u.photoURL; row.appendChild(im); }
-      const w = mk("div", "hwho"); w.appendChild(mk("p", "hnm", u.displayName || "")); w.appendChild(mk("p", "hem", u.email || "")); row.appendChild(w);
+      const w = mk("div", "hwho"); w.appendChild(mk("p", "hnm", u.displayName || "")); w.appendChild(mk("p", "hem", u.email || "")); if(a.accountId){ const di = mk("p", "hid", t.idl + ": " + a.accountId); di.title = a.accountId; w.appendChild(di); } row.appendChild(w);
       pan.appendChild(row);
       if(a.sync) pan.appendChild(mk("p", "hsync", a.sync === "sync" ? t.sy : a.sync === "ok" ? t.sok : a.sync === "off" ? t.soff : t.serr));
       const o = mk("button", "obtn", t.logout); o.type = "button";
