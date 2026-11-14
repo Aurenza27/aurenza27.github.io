@@ -75,32 +75,48 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 .logo{flex:none;width:48px;height:48px;border-radius:22%;object-fit:contain;filter:drop-shadow(0 3px 8px rgba(30,100,255,.35))}
 .ablogo{display:block;width:84px;height:84px;margin:0 auto 14px;object-fit:contain;filter:drop-shadow(0 6px 16px rgba(30,100,255,.4))}
 .hdt{min-width:0;text-align:center}
-/* ===== Blok Akun di paling atas Pengaturan ===== */
+/* ===== Blok Akun (Pengaturan) dan halaman Profil ===== */
 #spAcc{margin:0 0 10px;padding:10px 12px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}
 #spAcc .atl{margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:.16em;color:var(--gold2)}
 #spAcc .gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:46px;padding:0 16px;border-radius:12px;border:1px solid #fff;background:#fff;color:#1f1f1f;font:600 15px var(--ui);cursor:pointer}
 #spAcc .gbtn:disabled{opacity:.6;cursor:default}
-#spAcc .hrow{display:flex;align-items:center;gap:12px}
-#spAcc .hav{flex:none;width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--bg2)}
-#spAcc .hwho{flex:1;min-width:0}
-#spAcc .hnm{margin:0;font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#spAcc .hem{margin:2px 0 0;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#spAcc .hid{margin:6px 0 0;font-size:12.5px;font-weight:600;color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;user-select:all}
+#spAcc .prof{display:flex;align-items:center;gap:12px;width:100%;margin:0;padding:6px;text-align:left;font:inherit;color:var(--text);background:transparent;border:1px solid transparent;border-radius:12px;cursor:pointer}
+#spAcc .prof:hover{border-color:var(--line);background:rgba(255,255,255,.03)}
+#spAcc .prof::after{content:"›";margin-left:auto;color:var(--muted);font-size:20px;line-height:1}
+#spAcc .hav,#svProfile .hav{flex:none;width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--bg2)}
+#spAcc .hwho,#svProfile .hwho{flex:1;min-width:0}
+#spAcc .hnm,#svProfile .hnm{margin:0;font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#spAcc .hsub{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.idrow{display:flex;align-items:center;gap:6px;margin:8px 0 0}
+.idrow .hid{margin:0;min-width:0;font-size:11px;font-weight:600;color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;user-select:all}
+.idrow .cpy{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--gold2);cursor:pointer}
+.idrow .cpy svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.idrow .cpy.done{color:#8fd9a8;border-color:#8fd9a8}
 #spAcc .hsync{margin:12px 0 0;font-size:12.5px;color:var(--muted);line-height:1.4}
-#spAcc .herr{margin:10px 0 0;font-size:13px;color:#f0a0a0;line-height:1.4}
+#spAcc .herr,#svProfile .herr{margin:10px 0 0;font-size:13px;color:#f0a0a0;line-height:1.4}
 #spAcc .obtn{display:block;width:100%;margin-top:12px;min-height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--gold);background:transparent;color:var(--gold2);font:inherit;font-size:14px;cursor:pointer}
-#spAcc .ebtn{flex:none;min-height:34px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--gold2);font:inherit;font-size:13px;cursor:pointer}
-#spAcc .ebox{margin-top:12px}
-#spAcc .ebox label{display:block;margin:0 0 6px;font-size:12.5px;color:var(--muted)}
-#spAcc .ebox input{display:block;width:100%;min-height:42px;padding:0 12px;font:inherit;font-size:15px;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;box-sizing:border-box}
-#spAcc .ebox input:focus{outline:2px solid var(--gold2);outline-offset:1px}
-#spAcc .erow{display:flex;gap:8px;margin-top:10px}
-#spAcc .erow button{flex:1;min-height:40px;border-radius:12px;font:inherit;font-size:14px;cursor:pointer;border:1px solid var(--gold);background:transparent;color:var(--gold2)}
-#spAcc .erow .ok{background:var(--gold);color:#1a1405;font-weight:600}
-#spAcc .erow button:disabled{opacity:.6;cursor:default}
-#spAcc .eidn{margin:8px 0 0;font-size:12px;color:var(--muted);line-height:1.4}
-#spAcc .eok{margin:10px 0 0;font-size:13px;color:#8fd9a8}
-#spAcc .gbtn:focus-visible,#spAcc .obtn:focus-visible,#spAcc .ebtn:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#svProfile .pav{display:flex;flex-direction:column;align-items:center;gap:10px;margin:4px 0 14px}
+#svProfile .pav .big{width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--gold2)}
+#svProfile .pav .big svg{width:48px;height:48px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#svProfile .prow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#svProfile .pbtn,#svProfile .ebtn{min-height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--gold2);font:inherit;font-size:13px;cursor:pointer}
+#svProfile .pbtn:disabled,#svProfile .ebtn:disabled{opacity:.6;cursor:default}
+#svProfile .fld{margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+#svProfile .fld .fl{margin:0 0 4px;font-size:11.5px;color:var(--muted)}
+#svProfile .fld .fv{margin:0;font-size:14.5px;color:var(--text);word-break:break-all}
+#svProfile .fld .top{display:flex;align-items:center;gap:8px}
+#svProfile .fld .top .fv{flex:1;min-width:0}
+#svProfile .fld .idrow{margin:0}
+#svProfile .ebox{margin-top:8px}
+#svProfile .ebox input{display:block;width:100%;min-height:42px;padding:0 12px;font:inherit;font-size:15px;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;box-sizing:border-box}
+#svProfile .ebox input:focus{outline:2px solid var(--gold2);outline-offset:1px}
+#svProfile .erow{display:flex;gap:8px;margin-top:10px}
+#svProfile .erow button{flex:1;min-height:40px;border-radius:12px;font:inherit;font-size:14px;cursor:pointer;border:1px solid var(--gold);background:transparent;color:var(--gold2)}
+#svProfile .erow .ok{background:var(--gold);color:#1a1405;font-weight:600}
+#svProfile .erow button:disabled{opacity:.6;cursor:default}
+#svProfile .eidn{margin:4px 0 0;font-size:12px;color:var(--muted);line-height:1.4}
+#svProfile .eok{margin:10px 0 0;font-size:13px;color:#8fd9a8;text-align:center}
+#spAcc .gbtn:focus-visible,#spAcc .obtn:focus-visible,#spAcc .prof:focus-visible,#svProfile .pbtn:focus-visible,#svProfile .ebtn:focus-visible,.idrow .cpy:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
 /* ===== Lonceng notifikasi ===== */
 #bellBtn{position:absolute;top:0;left:0;width:44px;height:44px;padding:0;flex:none;overflow:visible}
 #bellBtn svg{width:22px;height:22px;transform-origin:50% 3px}
@@ -391,6 +407,7 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
     <p class="abp" id="spPow">Powered by Aurenza27</p>
     <p class="abp" id="spFol"></p>
   </div>
+  <div id="svProfile" hidden><div id="spProfBody"></div></div>
   <div id="svGloss" hidden>
     <div class="glbar"><input type="search" id="glQ" autocomplete="off" spellcheck="false"></div>
     <div id="glList"></div>
@@ -759,6 +776,7 @@ const PIC = {
   lang:GI('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'),
   reset:GI('<path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/>')
 };
+PIC.user = GI('<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.6 4.5-5.5 8-5.5s6.5 1.9 8 5.5"/>');
 PIC.mail = GI('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6.5L20.5 7"/>');
 PIC.heart = GI('<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>');
 PIC.info = GI('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>');
@@ -908,8 +926,8 @@ const AP = {
   id:{theme:"Tema", themes:["Biru malam","Hitam pekat","Kabut asap","Kabut laut","Langit berbintang","Asap sinematik"], size:"Ukuran huruf", sizes:["Kecil","Sedang","Besar"], font:"Mode font", fonts:["Serif klasik","Sans-serif"], anim:["Animasi: nyala","Animasi: mati"]},
   en:{theme:"Theme", themes:["Midnight blue","Pure black","Smoke","Sea fog","Starry sky","Cinematic smoke"], size:"Font size", sizes:["Small","Medium","Large"], font:"Font mode", fonts:["Classic serif","Sans-serif"], anim:["Animation: on","Animation: off"]}
 };
-Object.assign(TT.id, {bk:"Kembali", glq:"Cari istilah…", gle:"Istilah tidak ditemukan.", g:{sound:"Suara", play:"Pemutaran", lang:"Bahasa", about:"Tentang", look:"Tampilan", gloss:"Istilah", saran:"Kotak Saran"}});
-Object.assign(TT.en, {bk:"Back", glq:"Search terms…", gle:"No terms found.", g:{sound:"Sound", play:"Playback", lang:"Language", about:"About", look:"Appearance", gloss:"Glossary", saran:"Suggestion Box"}});
+Object.assign(TT.id, {bk:"Kembali", glq:"Cari istilah…", gle:"Istilah tidak ditemukan.", g:{sound:"Suara", play:"Pemutaran", lang:"Bahasa", about:"Tentang", look:"Tampilan", gloss:"Istilah", saran:"Kotak Saran", profile:"Profil"}});
+Object.assign(TT.en, {bk:"Back", glq:"Search terms…", gle:"No terms found.", g:{sound:"Sound", play:"Playback", lang:"Language", about:"About", look:"Appearance", gloss:"Glossary", saran:"Suggestion Box", profile:"Profile"}});
 const GL = {"id": [["Primbon & kalender Jawa", [["Primbon", "", "Kumpulan pengetahuan tradisional Jawa yang diwariskan turun-temurun, dicatat dalam kitab dan tutur lisan. Isinya perhitungan hari baik, watak, jodoh, rezeki, dan pertanda. Menu Jawa di aplikasi ini merujuk pada primbon.", ""], ["Pasaran", "Pancawara", "Siklus lima hari Jawa: Legi, Pahing, Pon, Wage, dan Kliwon, yang berputar terus tanpa jeda. Dipadukan dengan hari tujuh (Minggu sampai Sabtu) untuk membentuk weton.", ""], ["Saptawara", "Hari", "Siklus tujuh hari, Minggu sampai Sabtu, sama dengan pekan pada kalender biasa.", ""], ["Weton", "", "Gabungan hari dan pasaran saat lahir, misalnya Senin Legi. Kata ini berasal dari \"wetu\" yang berarti keluar atau lahir. Weton yang sama kembali setiap 35 hari.", "Contoh: Senin Legi"], ["Neptu", "", "Nilai angka hari dan pasaran. Hari: Minggu 5, Senin 4, Selasa 3, Rabu 7, Kamis 8, Jumat 6, Sabtu 9. Pasaran: Legi 5, Pahing 9, Pon 7, Wage 4, Kliwon 8. Neptu weton adalah jumlah keduanya.", "Contoh: Senin Legi = 4 + 5 = 9"], ["Selapan", "Wetonan", "Siklus 35 hari (7 hari × 5 pasaran) ketika weton yang sama kembali. Hari kembalinya weton disebut wetonan.", ""], ["Wuku", "", "Satu dari 30 pekan dalam kalender pawukon. Tiap wuku berumur 7 hari, dimulai dari Sinta dan berakhir di Watugunung. Setiap wuku punya dewa pelindung dan gambaran watak sendiri.", ""], ["Pawukon", "", "Kalender Jawa kuno berumur 210 hari (30 wuku × 7 hari). Perputarannya tidak mengikuti bulan maupun matahari, sehingga berjalan sendiri terhadap kalender biasa.", ""], ["Sanghyang", "", "Gelar untuk dewa dalam tradisi Jawa. Pada pawukon, tiap wuku dinaungi satu Sanghyang yang diyakini membentuk wataknya, misalnya Sanghyang Kala.", ""], ["Guru, Ratu, Rogoh, Sempoyong", "Hasil hari baik", "Empat hasil dari perhitungan hari baik di aplikasi: neptu weton lahir ditambah neptu hari yang dicek, lalu dibagi 4. Sisa 1 (Guru) dan 2 (Ratu) berarti baik, sisa 3 (Rogoh) kurang baik, sisa 0 (Sempoyong) sebaiknya dihindari.", ""]]], ["Shio & Tionghoa", [["Shio", "", "Dua belas hewan penanda tahun: Tikus, Kerbau, Macan, Kelinci, Naga, Ular, Kuda, Kambing, Monyet, Ayam, Anjing, dan Babi. Shio ditentukan oleh tahun Imlek, bukan 1 Januari, jadi kelahiran Januari atau Februari bisa masuk shio tahun sebelumnya.", ""], ["Imlek", "Tahun Baru Imlek", "Awal tahun pada kalender Tionghoa yang berdasar bulan dan matahari. Tanggalnya berubah setiap tahun, antara 21 Januari dan 20 Februari, dan menjadi batas pergantian shio.", ""], ["Wu Xing", "Lima unsur", "Lima unsur Tionghoa: Kayu, Api, Tanah, Logam, dan Air. Unsur sebuah tahun ditentukan dari angka terakhir tahun Imlek: 0 dan 1 Logam, 2 dan 3 Air, 4 dan 5 Kayu, 6 dan 7 Api, 8 dan 9 Tanah.", ""], ["Cabang hari", "Dizhi", "Dua belas cabang bumi yang urutannya sama dengan 12 shio, dari Tikus sampai Babi. Selain tahun, setiap hari juga punya cabang. Cabang hari dipakai untuk menilai cocok atau bentroknya sebuah hari dengan shiomu.", ""], ["Liu He & Liu Chong", "Harmonis & bentrok", "Liu He berarti enam harmoni: pasangan shio yang serasi, yaitu Tikus-Kerbau, Macan-Babi, Kelinci-Anjing, Naga-Ayam, Ular-Monyet, dan Kuda-Kambing. Liu Chong berarti enam bentrok: pasangan shio yang berseberangan di lingkaran dua belas, seperti Tikus-Kuda.", ""], ["Angka He Tu", "", "Angka yang dipasangkan dengan tiap unsur menurut diagram He Tu: Air 1 dan 6, Api 2 dan 7, Kayu 3 dan 8, Logam 4 dan 9, Tanah 5 dan 10. Dipakai untuk menentukan angka hoki.", ""]]], ["Numerologi", [["Numerologi", "", "Sistem yang mengaitkan angka dari tanggal lahir dan huruf nama dengan watak dan siklus hidup. Aplikasi ini memakai sistem Pythagoras.", ""], ["Sistem Pythagoras", "", "Cara memberi nilai pada huruf: A J S = 1, B K T = 2, C L U = 3, D M V = 4, E N W = 5, F O X = 6, G P Y = 7, H Q Z = 8, I R = 9. Nilai huruf dijumlahkan lalu direduksi.", ""], ["Reduksi", "", "Menjumlahkan digit berulang-ulang sampai tersisa satu angka dari 1 sampai 9.", "Contoh: 1987 → 1+9+8+7 = 25 → 2+5 = 7"], ["Angka master", "11, 22", "Angka 11 dan 22 tidak direduksi lagi karena dianggap membawa makna khusus. Sebagian aliran juga memasukkan 33.", ""], ["Life Path", "Watak utama", "Angka dari tanggal, bulan, dan tahun lahir lengkap. Menggambarkan watak dasar dan arah hidup.", ""], ["Expression", "Kemampuan", "Angka dari seluruh huruf nama lengkap. Menggambarkan bakat dan cara kamu menampilkan diri. Pakai nama lengkap sesuai akta supaya lebih akurat.", ""], ["Soul Urge", "Keinginan hati", "Angka dari huruf vokal (A, E, I, O, U) dalam nama. Menggambarkan hal yang sebenarnya paling kamu inginkan.", ""], ["Personality", "Kepribadian", "Angka dari huruf konsonan dalam nama. Menggambarkan kesan yang ditangkap orang lain saat mengenalmu.", ""], ["Birthday", "Bakat lahir", "Angka dari tanggal lahir saja, tanpa bulan dan tahun. Menggambarkan sifat khas yang kamu bawa sejak lahir.", ""], ["Maturity", "Arah hidup", "Hasil penjumlahan Life Path dan Expression. Menggambarkan sifat dan tujuan yang makin terasa di usia dewasa.", ""], ["Personal Year", "Tahun pribadi", "Angka siklus tahun berjalan, dihitung dari hari dan bulan lahir ditambah tahun yang sedang berlangsung. Berganti setiap tahun dan memberi gambaran suasana serta tema tahun itu.", ""]]], ["Khodam", [["Khodam", "", "Berasal dari bahasa Arab khadim yang berarti pelayan atau pembantu. Dalam kepercayaan populer di Indonesia, khodam dimaknai sebagai pendamping gaib. Menu Cek Khodam mengaitkan namamu dengan sosok khodam.", ""], ["Nilai jummal", "Hisab jummal", "Sistem angka untuk huruf Arab (alif = 1, ba = 2, jim = 3, dan seterusnya sampai ghain = 1000). Menu Cek Khodam memakainya untuk menghitung nilai namamu.", ""], ["Unsur nama", "Tanah, Api, Angin, Air", "Empat unsur yang dikaitkan dengan huruf nama. Unsur yang paling dominan memengaruhi khodam yang keluar.", ""]]], ["Tri Hoki", [["Tri Hoki", "", "Menu yang memadukan tiga tradisi, yaitu Jawa, Tionghoa, dan Numerologi, untuk menunjukkan hari baik, angka hoki, dan warna hoki.", ""], ["Hari baik", "", "Tanggal yang dinilai cocok menurut tiap tradisi. Jawa memakai neptu, Tionghoa memakai cabang hari, dan Numerologi memakai angka harian.", ""], ["Gabungan", "", "Perpaduan versi aplikasi: hasil yang cocok di minimal 2 dari 3 tradisi, misalnya warna yang sama muncul di dua perhitungan.", ""]]], ["Kesehatan: BMI & Kalori", [["IMT", "BMI", "Indeks massa tubuh: berat badan (kg) dibagi tinggi badan (m) kuadrat. Dipakai untuk menyaring kategori berat badan, tetapi tidak mengukur lemak tubuh maupun sebarannya.", "Contoh: 60 kg, 160 cm → 60 ÷ 2,56 = 23,4"], ["Kategori IMT", "Kemenkes RI", "Menurut Kemenkes: berat badan kurang di bawah 18,5; normal 18,5–22,9; berat badan lebih 23,0–24,9; obesitas I 25,0–29,9; obesitas II mulai 30,0. Berlaku untuk dewasa.", ""], ["Kriteria Asia-Pasifik", "", "Batas IMT yang dipakai Kemenkes. Batas berat badan lebih (23,0) lebih rendah daripada WHO (25,0), karena risiko penyakit metabolik pada orang Asia cenderung muncul di IMT yang lebih rendah.", ""], ["BMR", "Energi basal", "Basal Metabolic Rate: energi minimum yang dibutuhkan tubuh saat istirahat total untuk fungsi dasar seperti napas, detak jantung, dan suhu tubuh. Dihitung dengan persamaan Schofield (FAO/WHO/UNU) dari jenis kelamin, usia, dan berat badan.", ""], ["PAL", "Tingkat aktivitas", "Physical Activity Level: faktor pengali BMR menurut aktivitas harian. Di aplikasi ini: ringan 1,53; sedang 1,76; berat 2,25.", ""], ["Kebutuhan energi harian", "TEE", "Total energi yang dibutuhkan sehari untuk mempertahankan berat badan sekarang, yaitu BMR × PAL.", ""], ["kkal", "Kilokalori", "Satuan energi pada makanan dan kebutuhan harian. Dalam percakapan sehari-hari sering disebut kalori.", ""], ["Defisit dan surplus", "", "Defisit: asupan lebih rendah dari kebutuhan, berat badan cenderung turun. Surplus: asupan lebih tinggi, berat badan cenderung naik. Panduan umum: selisih 500 kkal per hari ≈ 0,45 kg per minggu.", ""], ["Galat baku", "SEE", "Ukuran selisih wajar antara hasil persamaan dan nilai sebenarnya. Karena itu angka BMR dan kebutuhan energi adalah perkiraan, bukan angka pasti.", ""], ["Z-score WHO", "", "Cara menilai pertumbuhan anak dan remaja dengan membandingkannya ke kurva WHO, dilakukan tenaga kesehatan. Menu BMI & Kalori hanya untuk dewasa 18 tahun ke atas.", ""]]], ["Kesehatan: Kehamilan", [["HPHT", "LMP", "Hari pertama haid terakhir. Titik awal hitungan usia kehamilan, bukan tanggal pembuahan.", ""], ["HPL", "EDD", "Hari perkiraan lahir. Hanya perkiraan: sebagian besar bayi lahir di sekitar tanggal ini, bukan tepat pada harinya. Bila ada USG trimester pertama, pakai HPL dari dokter.", ""], ["Aturan Naegele", "", "Cara menghitung HPL: HPHT + 280 hari (40 minggu) untuk siklus 28 hari, lalu digeser sebesar (panjang siklus − 28) hari. Mengasumsikan siklus teratur.", "Contoh: siklus 30 hari → tanggal digeser +2 hari"], ["Usia kehamilan", "", "Lama kehamilan sejak HPHT, ditulis dalam minggu dan hari.", "Contoh: 12 minggu 3 hari"], ["Trimester", "", "Tiga tahap kehamilan. Pada jadwal ANC: trimester 1 minggu 0–12, trimester 2 minggu 13–24, trimester 3 minggu 25–40. Pada Tanggal Penting memakai batas ACOG (trimester 2 mulai minggu 14, trimester 3 mulai minggu 28), jadi bisa berbeda satu minggu.", ""], ["ANC", "Antenatal care", "Pemeriksaan kehamilan rutin oleh tenaga kesehatan. Minimal 6 kali: 1× di trimester 1, 2× di trimester 2, 3× di trimester 3, termasuk minimal 2 kali diperiksa dokter dengan USG.", ""], ["USG", "Ultrasonografi", "Pemeriksaan gambar dengan gelombang suara. USG trimester pertama paling akurat untuk menentukan usia kehamilan dan HPL.", ""], ["hCG", "", "Human chorionic gonadotropin, hormon kehamilan yang dideteksi tes urin. Tes sebelum haid terlambat lebih sering memberi hasil negatif palsu.", ""], ["Early, full, late, post-term", "", "Kategori usia saat lahir menurut ACOG: early term minggu 37–38, full term minggu 39–40, late term minggu 41, post-term mulai minggu 42. Aplikasi menampilkan tanggal mulai tiap kategori.", ""], ["Kenaikan berat badan hamil", "IOM 2009", "Anjuran kenaikan berat badan selama hamil menurut IMT sebelum hamil (Institute of Medicine / National Research Council 2009). Hanya untuk kehamilan tunggal.", ""]]]], "en": [["Primbon & Javanese calendar", [["Primbon", "", "A body of traditional Javanese knowledge passed down through generations, kept in books and oral tradition. It covers auspicious days, character, compatibility, fortune, and omens. The Javanese menus in this app draw on primbon.", ""], ["Pasaran", "Pancawara", "The Javanese five-day cycle: Legi, Pahing, Pon, Wage, and Kliwon, turning continuously without a break. Combined with the seven-day week (Sunday to Saturday), it forms the weton.", ""], ["Saptawara", "Day", "The seven-day cycle, Sunday to Saturday, the same as the week on the ordinary calendar.", ""], ["Weton", "", "The combination of weekday and pasaran at birth, for example Monday Legi. The word comes from \"wetu\", meaning to come out or to be born. The same weton returns every 35 days.", "Example: Monday Legi"], ["Neptu", "", "The number value of a weekday and a pasaran. Days: Sunday 5, Monday 4, Tuesday 3, Wednesday 7, Thursday 8, Friday 6, Saturday 9. Pasaran: Legi 5, Pahing 9, Pon 7, Wage 4, Kliwon 8. The weton neptu is the sum of the two.", "Example: Monday Legi = 4 + 5 = 9"], ["Selapan", "Wetonan", "The 35-day cycle (7 days × 5 pasaran) after which the same weton returns. The day it returns is called wetonan.", ""], ["Wuku", "", "One of the 30 weeks in the pawukon calendar. Each wuku lasts 7 days, from Sinta to Watugunung. Every wuku has its own patron deity and character profile.", ""], ["Pawukon", "", "The ancient Javanese calendar of 210 days (30 wuku × 7 days). It follows neither the moon nor the sun, so it runs independently of the ordinary calendar.", ""], ["Sanghyang", "", "A title for a deity in Javanese tradition. In the pawukon, each wuku is watched over by one Sanghyang, believed to shape its character, for example Sanghyang Kala.", ""], ["Guru, Ratu, Rogoh, Sempoyong", "Lucky-day results", "The four outcomes of the lucky-day count in the app: the neptu of the birth weton plus the neptu of the checked day, divided by 4. Remainder 1 (Guru) and 2 (Ratu) mean good, remainder 3 (Rogoh) is so-so, and remainder 0 (Sempoyong) is best avoided.", ""]]], ["Zodiac & Chinese tradition", [["Shio", "Chinese zodiac", "Twelve animals that mark the years: Rat, Ox, Tiger, Rabbit, Dragon, Snake, Horse, Goat, Monkey, Rooster, Dog, and Pig. The sign follows the Lunar New Year, not 1 January, so a birth in January or February may fall under the previous year's animal.", ""], ["Lunar New Year", "Imlek", "The start of the year on the Chinese calendar, which follows both moon and sun. Its date changes every year, between 21 January and 20 February, and it is the point where the zodiac animal changes.", ""], ["Wu Xing", "Five elements", "The five Chinese elements: Wood, Fire, Earth, Metal, and Water. A year's element comes from the last digit of the lunar year: 0 and 1 Metal, 2 and 3 Water, 4 and 5 Wood, 6 and 7 Fire, 8 and 9 Earth.", ""], ["Day branch", "Dizhi", "The twelve earthly branches, in the same order as the 12 animals, from Rat to Pig. Besides years, every day also has a branch. The day branch is used to judge whether a day suits or clashes with your sign.", ""], ["Liu He & Liu Chong", "Harmony & clash", "Liu He means six harmonies: compatible animal pairs, namely Rat-Ox, Tiger-Pig, Rabbit-Dog, Dragon-Rooster, Snake-Monkey, and Horse-Goat. Liu Chong means six clashes: pairs of animals opposite each other on the circle of twelve, such as Rat-Horse.", ""], ["He Tu numbers", "", "The numbers paired with each element in the He Tu diagram: Water 1 and 6, Fire 2 and 7, Wood 3 and 8, Metal 4 and 9, Earth 5 and 10. Used to pick lucky numbers.", ""]]], ["Numerology", [["Numerology", "", "A system that links numbers from a birth date and the letters of a name to character and life cycles. This app uses the Pythagorean system.", ""], ["Pythagorean system", "", "A way of giving letters a value: A J S = 1, B K T = 2, C L U = 3, D M V = 4, E N W = 5, F O X = 6, G P Y = 7, H Q Z = 8, I R = 9. Letter values are added and then reduced.", ""], ["Reduction", "", "Adding the digits again and again until a single number from 1 to 9 remains.", "Example: 1987 → 1+9+8+7 = 25 → 2+5 = 7"], ["Master numbers", "11, 22", "The numbers 11 and 22 are not reduced further because they are seen as carrying special meaning. Some schools also include 33.", ""], ["Life Path", "Main character", "The number from the full day, month, and year of birth. It describes basic character and direction in life.", ""], ["Expression", "Ability", "The number from all the letters of the full name. It describes talents and how you present yourself. Use the full name as on your birth certificate for better accuracy.", ""], ["Soul Urge", "Heart's desire", "The number from the vowels (A, E, I, O, U) in the name. It describes what you truly want most.", ""], ["Personality", "Outer impression", "The number from the consonants in the name. It describes the impression others get when they meet you.", ""], ["Birthday", "Birth talent", "The number from the day of birth alone, without month and year. It describes a trait you carry from birth.", ""], ["Maturity", "Life direction", "The sum of Life Path and Expression. It describes traits and goals that grow stronger in adulthood.", ""], ["Personal Year", "", "The number of the current yearly cycle, worked out from the birth day and month plus the year in progress. It changes every year and describes the mood and theme of that year.", ""]]], ["Khodam", [["Khodam", "", "From the Arabic khadim, meaning servant or helper. In popular belief in Indonesia, a khodam is understood as an unseen companion. The Cek Khodam menu links your name to a khodam figure.", ""], ["Jummal value", "Hisab jummal", "A number system for Arabic letters (alif = 1, ba = 2, jim = 3, and so on up to ghain = 1000). The Cek Khodam menu uses it to work out the value of your name.", ""], ["Name element", "Earth, Fire, Wind, Water", "Four elements linked to the letters of a name. The most dominant element influences which khodam comes out.", ""]]], ["Tri Hoki", [["Tri Hoki", "", "A menu that combines three traditions, Javanese, Chinese, and Numerology, to show lucky days, lucky numbers, and lucky colors.", ""], ["Lucky day", "", "A date judged suitable under each tradition. The Javanese one uses neptu, the Chinese one uses the day branch, and Numerology uses the daily number.", ""], ["Combined", "", "The app's own blend: results that fit in at least 2 of the 3 traditions, for example a color that appears in two of the calculations.", ""]]], ["Health: BMI & Calories", [["BMI", "IMT", "Body mass index: weight (kg) divided by height (m) squared. Used to screen weight categories, but it does not measure body fat or where it sits.", "Example: 60 kg, 160 cm → 60 ÷ 2.56 = 23.4"], ["BMI categories", "Indonesian MoH", "Per the Indonesian MoH: underweight below 18.5; normal 18.5–22.9; overweight 23.0–24.9; obese class I 25.0–29.9; obese class II from 30.0. For adults.", ""], ["Asia-Pacific criteria", "", "The BMI cut-offs the Indonesian MoH uses. Its overweight cut-off (23.0) is lower than WHO's (25.0), because metabolic disease risk in Asian populations tends to appear at a lower BMI.", ""], ["BMR", "Basal energy", "Basal Metabolic Rate: the minimum energy your body needs at complete rest for basic functions such as breathing, heartbeat, and body temperature. Calculated with the Schofield equation (FAO/WHO/UNU) from sex, age, and weight.", ""], ["PAL", "Activity level", "Physical Activity Level: a multiplier applied to BMR for daily activity. In this app: light 1.53; moderate 1.76; heavy 2.25.", ""], ["Daily energy need", "TEE", "Total energy needed per day to keep your current weight, which is BMR × PAL.", ""], ["kcal", "Kilocalorie", "The unit of energy in food and daily needs. In everyday speech it is often just called a calorie.", ""], ["Deficit and surplus", "", "Deficit: intake below your need, weight tends to fall. Surplus: intake above your need, weight tends to rise. General guide: a gap of 500 kcal per day ≈ 0.45 kg per week.", ""], ["Standard error", "SEE", "A measure of the usual gap between an equation's result and the true value. This is why BMR and energy figures are estimates, not exact numbers.", ""], ["WHO z-score", "", "A way to assess growth in children and teens by comparing against WHO growth curves, done by health professionals. The BMI & Calories menu is for adults 18 and over only.", ""]]], ["Health: Pregnancy", [["LMP", "HPHT", "The first day of your last menstrual period. The starting point for counting gestational age, not the date of conception.", ""], ["EDD", "HPL", "Estimated due date. Only an estimate: most babies arrive around this date, not exactly on it. If you had a first-trimester ultrasound, use the due date from your doctor.", ""], ["Naegele's rule", "", "How the due date is calculated: LMP + 280 days (40 weeks) for a 28-day cycle, then shifted by (cycle length − 28) days. Assumes regular cycles.", "Example: 30-day cycle → dates shift +2 days"], ["Gestational age", "", "How far along the pregnancy is since the LMP, written in weeks and days.", "Example: 12 weeks 3 days"], ["Trimester", "", "The three stages of pregnancy. In the checkup schedule: trimester 1 weeks 0–12, trimester 2 weeks 13–24, trimester 3 weeks 25–40. Key Dates uses ACOG boundaries (trimester 2 from week 14, trimester 3 from week 28), so the two can differ by one week.", ""], ["ANC", "Antenatal care", "Routine pregnancy checkups by a health professional. At least 6 visits: 1 in trimester 1, 2 in trimester 2, 3 in trimester 3, including at least 2 seen by a doctor with ultrasound.", ""], ["Ultrasound", "USG", "An imaging exam using sound waves. A first-trimester ultrasound is the most accurate way to date a pregnancy and set the due date.", ""], ["hCG", "", "Human chorionic gonadotropin, the pregnancy hormone that urine tests detect. A test taken before your period is late more often gives a false negative.", ""], ["Early, full, late, post-term", "", "Birth-timing categories per ACOG: early term weeks 37–38, full term weeks 39–40, late term week 41, post-term from week 42. The app shows the start date of each category.", ""], ["Pregnancy weight gain", "IOM 2009", "Recommended weight gain during pregnancy by pre-pregnancy BMI (Institute of Medicine / National Research Council 2009). For a single pregnancy only.", ""]]]]};
 let glLang = "";
 function buildGloss(){
@@ -949,7 +967,7 @@ const SR = {
   en:{info:"Got a suggestion, feedback, or a menu idea? Write it below and send it. No login needed.", ph:"Write your suggestion here…", send:"Send suggestion", subj:"Suggestion for Satu Titik", empty:"Please write your suggestion first.", sending:"Sending…", queued:"You are offline. Your suggestion is saved and will be sent automatically once you are back online.", ok:"Thank you! Your suggestion has been sent.", fail:"Could not send (check your internet connection). Try again, or send via your email app.", mail:"Send via email app"}
 };
 let spView = "";
-const SPV = {"":"sv0", sound:"svSound", play:"svPlay", lang:"svLang", about:"svAbout", look:"svLook", gloss:"svGloss", saran:"svSaran"}, SPI = {sound:"sound", play:"auto", look:"look", lang:"lang", about:"info", gloss:"book", saran:"mail"};
+const SPV = {"":"sv0", sound:"svSound", play:"svPlay", lang:"svLang", about:"svAbout", look:"svLook", gloss:"svGloss", saran:"svSaran", profile:"svProfile"}, SPI = {sound:"sound", play:"auto", look:"look", lang:"lang", about:"info", gloss:"book", saran:"mail", profile:"user"};
 function showView(v){ spView = v; paintPanel(); }
 function paintPanel(){
   const t = TT[S.lang], pb = (id, k, on, a) => { put(id, k, on ? a[0] : a[1]); $(id).setAttribute("aria-pressed", String(!!on)); };
@@ -8677,7 +8695,7 @@ async function init(){
   if(F) return F;
   const [app, auth] = await Promise.all([import(BASE + "firebase-app.js"), import(BASE + "firebase-auth.js")]);
   const ai = app.initializeApp(firebaseConfig), a = auth.getAuth(ai);
-  auth.onAuthStateChanged(a, u => { A.user = u; if(!u){ A.username = null; A.usernameUid = null; } A.ready = true; emit(); });
+  auth.onAuthStateChanged(a, u => { A.user = u; if(!u){ A.username = null; A.usernameUid = null; A.photo = null; A.photoUid = null; } A.ready = true; emit(); });
   try{ await auth.getRedirectResult(a); }catch(e){}
   return F = { a, auth, ai };
 }
@@ -8715,11 +8733,12 @@ A.logout = async () => {
 const PROF = (() => {
   const key = u => "st_sync_acc_" + u;
   const fmt = n => "ST-" + String(n).padStart(6, "0");
-  const unKey = u => "st_sync_un_" + u;
+  const unKey = u => "st_sync_un_" + u, phKey = u => "st_sync_ph_" + u;
   let doing = null, doingUid = null;
   async function ensure(u){
     try{ const c = localStorage.getItem(key(u.uid)); if(c && A.user && A.user.uid === u.uid){ A.accountId = c; emit(); } }catch(e){}
     try{ const c = localStorage.getItem(unKey(u.uid)); if(c && A.user && A.user.uid === u.uid){ A.username = c; A.usernameUid = u.uid; emit(); } }catch(e){}
+    try{ const c = localStorage.getItem(phKey(u.uid)); if(c && A.user && A.user.uid === u.uid){ A.photo = c; A.photoUid = u.uid; emit(); } }catch(e){}
     if(navigator.onLine === false) return;
     if(doing && doingUid === u.uid) return doing;
     doingUid = u.uid;
@@ -8731,35 +8750,37 @@ const PROF = (() => {
           const us = await tx.get(uref);
           const cur = us.exists() ? us.data().accountId : null;
           const unm = us.exists() && us.data().username ? String(us.data().username) : "";
+          const phv = us.exists() && us.data().photo ? String(us.data().photo) : "";
           const base = { email: String(u.email || ""), name: String(u.displayName || ""), lastLogin: Date.now() };
-          if(cur){ tx.set(uref, base, { merge: true }); return { id: cur, fresh: false, un: unm }; }
+          if(cur){ tx.set(uref, base, { merge: true }); return { id: cur, fresh: false, un: unm, ph: phv }; }
           const cs = await tx.get(cref);
           const n = (cs.exists() ? (+cs.data().n || 0) : 0) + 1;
           const nid = fmt(n);
           tx.set(cref, { n });
           tx.set(uref, Object.assign({ accountId: nid, accountNo: n, createdAt: Date.now() }, base), { merge: true });
-          return { id: nid, fresh: true, un: unm };
+          return { id: nid, fresh: true, un: unm, ph: phv };
         });
         const id = res.id;
-        try{ await m.setDoc(m.doc(db, "accountIds", id), { uid: u.uid, name: String(res.un || u.displayName || ""), photo: String(u.photoURL || ""), at: Date.now() }, { merge: true }); }catch(e){ console.warn("direktori id gagal:", e && (e.code || e.message)); }
+        try{ await m.setDoc(m.doc(db, "accountIds", id), { uid: u.uid, name: String(res.un || u.displayName || ""), photo: String(res.ph || u.photoURL || ""), at: Date.now() }, { merge: true }); }catch(e){ console.warn("direktori id gagal:", e && (e.code || e.message)); }
         try{ localStorage.setItem(key(u.uid), id); }catch(e){}
         if(res.fresh && window.satuTitikNotif) window.satuTitikNotif.add({ id: "acc_" + u.uid, type: "account",
           title: { id: "Akun siap dipakai", en: "Your account is ready" },
           body: { id: "ID akunmu " + id + ". Berikan ID ini ke admin turnamen agar kamu bisa ditambahkan sebagai moderator.", en: "Your account ID is " + id + ". Give it to a tournament admin so you can be added as a moderator." } });
         if(res.un){ try{ localStorage.setItem(unKey(u.uid), res.un); }catch(e){} }
-        if(A.user && A.user.uid === u.uid){ A.accountId = id; if(res.un){ A.username = res.un; A.usernameUid = u.uid; } emit(); }
+        try{ if(res.ph) localStorage.setItem(phKey(u.uid), res.ph); else localStorage.removeItem(phKey(u.uid)); }catch(e){}
+        if(A.user && A.user.uid === u.uid){ A.accountId = id; if(res.un){ A.username = res.un; A.usernameUid = u.uid; } A.photo = res.ph || null; A.photoUid = u.uid; emit(); }
       }catch(e){ console.warn("id akun gagal:", e && (e.code || e.message)); }
       finally{ doing = null; }
     })();
     return doing;
   }
-  return { ensure, unKey };
+  return { ensure, unKey, phKey };
 })();
 A.accountId = null;
 /* ===== USERNAME AKUN =====
    Username boleh diubah pemilik akun (3 sampai 20 karakter: huruf, angka, spasi, titik, garis bawah, strip). ID Akun (ST-xxxxxx) tidak bisa diubah dari aplikasi.
    Disimpan di users/{uid}.username dan disalin ke direktori accountIds/{ID}.name supaya admin turnamen melihat nama yang sama. */
-A.username = null; A.usernameUid = null;
+A.username = null; A.usernameUid = null; A.photo = null; A.photoUid = null;
 A.cleanUsername = v => String(v == null ? "" : v).replace(/\s+/g, " ").trim();
 A.checkUsername = v => {
   const n = A.cleanUsername(v);
@@ -8778,6 +8799,26 @@ A.setUsername = async v => {
   try{ localStorage.setItem(PROF.unKey(u.uid), n); }catch(e){}
   if(A.user && A.user.uid === u.uid){ A.username = n; A.usernameUid = u.uid; emit(); }
   return n;
+};
+/* Foto profil Satu Titik: gambar kecil (JPEG persegi, data URL) di users/{uid}.photo; "Hapus foto" mengembalikan ke foto Google */
+A.setPhoto = async dataUrl => {
+  const u = A.user; if(!u) throw new Error("nologin");
+  if(typeof dataUrl !== "string" || !/^data:image\/jpeg;base64,/.test(dataUrl) || dataUrl.length > 100000) throw new Error("fail");
+  if(navigator.onLine === false) throw new Error("offline");
+  const { m, db } = await A.getDb();
+  await m.setDoc(m.doc(db, "users", u.uid), { photo: dataUrl }, { merge: true });
+  if(A.accountId){ try{ await m.setDoc(m.doc(db, "accountIds", A.accountId), { photo: dataUrl }, { merge: true }); }catch(e){ console.warn("direktori foto gagal:", e && (e.code || e.message)); } }
+  try{ localStorage.setItem(PROF.phKey(u.uid), dataUrl); }catch(e){}
+  if(A.user && A.user.uid === u.uid){ A.photo = dataUrl; A.photoUid = u.uid; emit(); }
+};
+A.clearPhoto = async () => {
+  const u = A.user; if(!u) throw new Error("nologin");
+  if(navigator.onLine === false) throw new Error("offline");
+  const { m, db } = await A.getDb();
+  await m.setDoc(m.doc(db, "users", u.uid), { photo: m.deleteField() }, { merge: true });
+  if(A.accountId){ try{ await m.setDoc(m.doc(db, "accountIds", A.accountId), { photo: String(u.photoURL || "") }, { merge: true }); }catch(e){} }
+  try{ localStorage.removeItem(PROF.phKey(u.uid)); }catch(e){}
+  if(A.user && A.user.uid === u.uid){ A.photo = null; A.photoUid = u.uid; emit(); }
 };
 /* ===== SINKRON DATA KE AKUN GOOGLE (Cloud Firestore) =====
    Seluruh data aplikasi di localStorage (pengaturan, riwayat, hasil semua menu) disimpan di satu dokumen: users/{uid}.
@@ -9025,53 +9066,82 @@ if(navigator.onLine !== false) init().catch(() => {});
 
 
 <script>
-/* ===== Akun Google di dalam Pengaturan (paling atas, judul "Akun") — memakai window.satuTitikAuth yang sama dengan ikon akun di beranda ===== */
+/* ===== Akun di Pengaturan: blok "Akun" (login, ID, keluar) + halaman Profil (ubah foto, ubah username, lihat email) =====
+   Memakai window.satuTitikAuth. Profil hanya terbuka setelah user mengetuk baris profil di blok Akun. */
 (function(){
-  const box = document.getElementById("spAccBody"), ttl = document.getElementById("spAccT"); if(!box || !ttl) return;
+  const box = document.getElementById("spAccBody"), ttl = document.getElementById("spAccT"), pv = document.getElementById("spProfBody"); if(!box || !ttl || !pv) return;
   const T = {
-    id:{ttl:"Akun", edit:"Ubah", unl:"Username", save:"Simpan", cancel2:"Batal", saving:"Menyimpan…", saved:"Username diperbarui.", idn:"ID Akun tidak bisa diubah.", short:"Username minimal 3 karakter.", long:"Username maksimal 20 karakter.", chars:"Hanya huruf, angka, spasi, titik, garis bawah, dan strip.", idl:"ID Akun", login:"Masuk dengan Google", logout:"Keluar", off:"Tidak ada koneksi internet. Coba lagi setelah online.", fail:"Gagal masuk. Coba lagi.", cancel:"Masuk dibatalkan.", sy:"Menyinkronkan data…", sok:"Data tersimpan di akun Google kamu.", soff:"Menunggu koneksi internet untuk menyinkronkan.", serr:"Gagal menyinkronkan. Akan dicoba lagi."},
-    en:{ttl:"Account", edit:"Edit", unl:"Username", save:"Save", cancel2:"Cancel", saving:"Saving…", saved:"Username updated.", idn:"The Account ID cannot be changed.", short:"Username must be at least 3 characters.", long:"Username must be at most 20 characters.", chars:"Letters, numbers, spaces, dots, underscores and dashes only.", idl:"Account ID", login:"Sign in with Google", logout:"Sign out", off:"No internet connection. Try again once you are online.", fail:"Sign-in failed. Please try again.", cancel:"Sign-in cancelled.", sy:"Syncing data…", sok:"Your data is saved to your Google account.", soff:"Waiting for an internet connection to sync.", serr:"Sync failed. Will retry."}
+    id:{ttl:"Akun", prof:"Lihat profil", edit:"Ubah", unl:"Username", eml:"Email", save:"Simpan", cancel2:"Batal", saving:"Menyimpan…", saved:"Username diperbarui.", idn:"ID Akun tidak bisa diubah.",
+        short:"Username minimal 3 karakter.", long:"Username maksimal 20 karakter.", chars:"Hanya huruf, angka, spasi, titik, garis bawah, dan strip.",
+        idl:"ID Akun", cpy:"Salin ID Akun", cpd:"ID Akun disalin", photoBtn:"Ubah foto", photoDel:"Hapus foto", photoOk:"Foto profil diperbarui.", photoRm:"Foto dikembalikan ke foto Google.", photoBusy:"Memproses foto…",
+        type:"File harus berupa gambar (JPG atau PNG).", big:"Ukuran gambar maksimal 10 MB.",
+        login:"Masuk dengan Google", logout:"Keluar", off:"Tidak ada koneksi internet. Coba lagi setelah online.", fail:"Gagal. Coba lagi.", cancel:"Masuk dibatalkan.", sy:"Menyinkronkan data…", sok:"Data tersimpan di akun Google kamu.", soff:"Menunggu koneksi internet untuk menyinkronkan.", serr:"Gagal menyinkronkan. Akan dicoba lagi."},
+    en:{ttl:"Account", prof:"View profile", edit:"Edit", unl:"Username", eml:"Email", save:"Save", cancel2:"Cancel", saving:"Saving…", saved:"Username updated.", idn:"The Account ID cannot be changed.",
+        short:"Username must be at least 3 characters.", long:"Username must be at most 20 characters.", chars:"Letters, numbers, spaces, dots, underscores and dashes only.",
+        idl:"Account ID", cpy:"Copy Account ID", cpd:"Account ID copied", photoBtn:"Change photo", photoDel:"Remove photo", photoOk:"Profile photo updated.", photoRm:"Photo reverted to your Google photo.", photoBusy:"Processing photo…",
+        type:"The file must be an image (JPG or PNG).", big:"The image must be 10 MB or smaller.",
+        login:"Sign in with Google", logout:"Sign out", off:"No internet connection. Try again once you are online.", fail:"Failed. Please try again.", cancel:"Sign-in cancelled.", sy:"Syncing data…", sok:"Your data is saved to your Google account.", soff:"Waiting for an internet connection to sync.", serr:"Sync failed. Will retry."}
   };
   const G = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
+  const I_COPY = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
+  const I_OK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const I_USER = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.6 4.5-5.5 8-5.5s6.5 1.9 8 5.5"/></svg>';
   const lang = () => (typeof S !== "undefined" && S && S.lang === "en") ? "en" : "id";
-  let busy = false, editing = false, eMsg = "", eErr = "", eVal = "", eBusy = false;
+  let busy = false, editing = false, eMsg = "", eErr = "", eVal = "", eBusy = false, pBusy = false, pMsg = "", pErr = "", copied = false, cTimer = 0;
   function mk(tag, cls, txt){ const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
   const unameOf = (a, u) => (a.username && a.usernameUid === u.uid) ? a.username : (u.displayName || "");
-  function paint(){
-    const a = window.satuTitikAuth || {}, t = T[lang()], u = a.user;
-    if(!u){ editing = false; eMsg = eErr = ""; }
-    ttl.textContent = t.ttl; box.textContent = "";
+  const photoOf = (a, u) => (a.photo && a.photoUid === u.uid) ? a.photo : (u.photoURL || "");
+  const hasOwnPhoto = (a, u) => !!(a.photo && a.photoUid === u.uid);
+  function avatar(src, cls){ if(!src) return null; const im = mk("img", cls); im.alt = ""; im.referrerPolicy = "no-referrer"; im.src = src; return im; }
+
+  /* salin ID: ketuk ikon, langsung tersalin; ikon berubah jadi centang sebentar */
+  async function copyText(txt){
+    try{ await navigator.clipboard.writeText(txt); return true; }catch(e){}
+    try{ const ta = document.createElement("textarea"); ta.value = txt; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;top:0;left:0;opacity:0"; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, txt.length); const ok = document.execCommand("copy"); ta.remove(); return ok; }catch(e){ return false; }
+  }
+  function idRow(a, t){
+    const r = mk("div", "idrow"); if(!a.accountId) return null;
+    const tx = mk("p", "hid", t.idl + ": " + a.accountId); tx.title = a.accountId;
+    const b = mk("button", "cpy"); b.type = "button"; b.innerHTML = copied ? I_OK : I_COPY; b.classList.toggle("done", copied);
+    b.title = b.ariaLabel = copied ? t.cpd : t.cpy; b.setAttribute("aria-label", b.title);
+    b.addEventListener("click", async e => {
+      e.stopPropagation();
+      if(await copyText(a.accountId)){ copied = true; clearTimeout(cTimer); cTimer = setTimeout(() => { copied = false; paint(); }, 1600); paint(); }
+    });
+    r.append(tx, b); return r;
+  }
+
+  /* foto: potong persegi tengah, kecilkan ke 192 px, simpan sebagai JPEG kecil */
+  function toAvatar(file){
+    return new Promise((res, rej) => {
+      if(!file || !/^image\//.test(file.type)) return rej(new Error("type"));
+      if(file.size > 10 * 1048576) return rej(new Error("big"));
+      const url = URL.createObjectURL(file), im = new Image();
+      im.onload = () => {
+        try{
+          const N = 192, c = document.createElement("canvas"); c.width = c.height = N;
+          const x = c.getContext("2d"), m = Math.min(im.naturalWidth, im.naturalHeight), sx = (im.naturalWidth - m) / 2, sy = (im.naturalHeight - m) / 2;
+          x.fillStyle = "#fff"; x.fillRect(0, 0, N, N); x.drawImage(im, sx, sy, m, m, 0, 0, N, N);
+          let q = .85, d = c.toDataURL("image/jpeg", q);
+          while(d.length > 70000 && q > .4){ q -= .1; d = c.toDataURL("image/jpeg", q); }
+          URL.revokeObjectURL(url); res(d);
+        }catch(e){ URL.revokeObjectURL(url); rej(e); }
+      };
+      im.onerror = () => { URL.revokeObjectURL(url); rej(new Error("type")); };
+      im.src = url;
+    });
+  }
+  const errText = (e, t) => (e && e.message === "offline") ? t.off : (e && t[e.message]) ? t[e.message] : t.fail;
+
+  function paintMain(a, t){
+    const u = a.user; ttl.textContent = t.ttl; box.textContent = "";
     if(u){
-      const row = mk("div", "hrow");
-      if(u.photoURL){ const im = mk("img", "hav"); im.alt = ""; im.referrerPolicy = "no-referrer"; im.src = u.photoURL; row.appendChild(im); }
-      const w = mk("div", "hwho"); w.appendChild(mk("p", "hnm", unameOf(a, u))); w.appendChild(mk("p", "hem", u.email || ""));
-      if(a.accountId){ const di = mk("p", "hid", t.idl + ": " + a.accountId); di.title = a.accountId; w.appendChild(di); }
-      row.appendChild(w);
-      if(!editing){ const eb = mk("button", "ebtn", t.edit); eb.type = "button"; eb.setAttribute("aria-label", t.edit + " " + t.unl);
-        eb.addEventListener("click", () => { editing = true; eMsg = eErr = ""; eVal = unameOf(a, u); paint(); const i = document.getElementById("spUnIn"); if(i){ i.focus(); i.select(); } }); row.appendChild(eb); }
-      box.appendChild(row);
-      if(editing){
-        const eb = mk("div", "ebox"), lb = mk("label", null, t.unl); lb.htmlFor = "spUnIn";
-        const inp = mk("input"); inp.id = "spUnIn"; inp.type = "text"; inp.maxLength = 20; inp.autocomplete = "off"; inp.spellcheck = false; inp.value = eVal; inp.disabled = eBusy;
-        inp.addEventListener("input", () => { eVal = inp.value; });
-        const er = mk("div", "erow"), ok = mk("button", "ok", eBusy ? t.saving : t.save), cn = mk("button", null, t.cancel2);
-        ok.type = cn.type = "button"; ok.disabled = cn.disabled = eBusy;
-        const go = async () => {
-          if(eBusy) return; const x = window.satuTitikAuth; if(!x) return;
-          const bad = x.checkUsername ? x.checkUsername(eVal) : ""; if(bad){ eErr = t[bad] || t.fail; paint(); return; }
-          eBusy = true; eErr = ""; paint();
-          try{ await x.setUsername(eVal); editing = false; eMsg = t.saved; }
-          catch(e){ eErr = (e && e.message === "offline") ? t.off : (e && t[e.message]) ? t[e.message] : t.fail; }
-          eBusy = false; paint();
-        };
-        ok.addEventListener("click", go);
-        cn.addEventListener("click", () => { editing = false; eErr = ""; paint(); });
-        inp.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); go(); } else if(e.key === "Escape"){ e.stopPropagation(); editing = false; eErr = ""; paint(); } });
-        er.append(ok, cn); eb.append(lb, inp, er); box.appendChild(eb);
-        box.appendChild(mk("p", "eidn", t.idn));
-        if(eErr) box.appendChild(mk("p", "herr", eErr));
-        const keep = eErr; if(keep) inp.focus();
-      } else if(eMsg){ box.appendChild(mk("p", "eok", eMsg)); }
+      const pb = mk("button", "prof"); pb.type = "button"; pb.setAttribute("aria-label", t.prof);
+      const im = avatar(photoOf(a, u), "hav"); if(im) pb.appendChild(im);
+      const w = mk("div", "hwho"); w.appendChild(mk("p", "hnm", unameOf(a, u))); w.appendChild(mk("p", "hsub", t.prof)); pb.appendChild(w);
+      pb.addEventListener("click", () => { editing = false; eErr = eMsg = pErr = pMsg = ""; if(typeof showView === "function") showView("profile"); });
+      box.appendChild(pb);
+      const ir = idRow(a, t); if(ir) box.appendChild(ir);
       if(a.sync) box.appendChild(mk("p", "hsync", a.sync === "sync" ? t.sy : a.sync === "ok" ? t.sok : a.sync === "off" ? t.soff : t.serr));
       const o = mk("button", "obtn", t.logout); o.type = "button";
       o.addEventListener("click", async () => { const x = window.satuTitikAuth; if(x){ try{ await x.logout(); }catch(e){} } paint(); });
@@ -9088,6 +9158,87 @@ if(navigator.onLine !== false) init().catch(() => {});
       box.appendChild(b);
       if(a.error) box.appendChild(mk("p", "herr", a.error === "offline" ? t.off : a.error === "cancel" ? t.cancel : t.fail));
     }
+  }
+
+  function paintProfile(a, t){
+    const u = a.user; pv.textContent = ""; if(!u) return;
+    /* foto */
+    const pav = mk("div", "pav"), src = photoOf(a, u), big = src ? avatar(src, "big") : null;
+    if(big) pav.appendChild(big); else { const d = mk("div", "big"); d.innerHTML = I_USER; pav.appendChild(d); }
+    const prow = mk("div", "prow"), fin = mk("input"); fin.type = "file"; fin.accept = "image/*"; fin.hidden = true;
+    const up = mk("button", "pbtn", pBusy ? t.photoBusy : t.photoBtn); up.type = "button"; up.disabled = pBusy;
+    up.addEventListener("click", () => fin.click());
+    fin.addEventListener("change", async () => {
+      const f = fin.files && fin.files[0]; fin.value = ""; if(!f) return;
+      const x = window.satuTitikAuth; if(!x) return;
+      pBusy = true; pErr = pMsg = ""; paint();
+      try{ const d = await toAvatar(f); await x.setPhoto(d); pMsg = t.photoOk; }
+      catch(e){ pErr = errText(e, t); }
+      pBusy = false; paint();
+    });
+    prow.append(up, fin);
+    if(hasOwnPhoto(a, u)){
+      const dl = mk("button", "pbtn", t.photoDel); dl.type = "button"; dl.disabled = pBusy;
+      dl.addEventListener("click", async () => {
+        const x = window.satuTitikAuth; if(!x) return;
+        pBusy = true; pErr = pMsg = ""; paint();
+        try{ await x.clearPhoto(); pMsg = t.photoRm; }catch(e){ pErr = errText(e, t); }
+        pBusy = false; paint();
+      });
+      prow.appendChild(dl);
+    }
+    pav.appendChild(prow); pv.appendChild(pav);
+    if(pErr) pv.appendChild(mk("p", "herr", pErr)); else if(pMsg) pv.appendChild(mk("p", "eok", pMsg));
+
+    /* username */
+    const fu = mk("div", "fld"); fu.appendChild(mk("p", "fl", t.unl));
+    if(!editing){
+      const top = mk("div", "top"); top.appendChild(mk("p", "fv", unameOf(a, u)));
+      const eb = mk("button", "ebtn", t.edit); eb.type = "button"; eb.setAttribute("aria-label", t.edit + " " + t.unl);
+      eb.addEventListener("click", () => { editing = true; eMsg = eErr = ""; eVal = unameOf(a, u); paint(); const i = document.getElementById("spUnIn"); if(i){ i.focus(); i.select(); } });
+      top.appendChild(eb); fu.appendChild(top);
+      if(eMsg) fu.appendChild(mk("p", "eok", eMsg));
+    } else {
+      const eb = mk("div", "ebox"), inp = mk("input"); inp.id = "spUnIn"; inp.type = "text"; inp.maxLength = 20; inp.autocomplete = "off"; inp.spellcheck = false; inp.value = eVal; inp.disabled = eBusy;
+      inp.setAttribute("aria-label", t.unl);
+      inp.addEventListener("input", () => { eVal = inp.value; });
+      const er = mk("div", "erow"), ok = mk("button", "ok", eBusy ? t.saving : t.save), cn = mk("button", null, t.cancel2);
+      ok.type = cn.type = "button"; ok.disabled = cn.disabled = eBusy;
+      const go = async () => {
+        if(eBusy) return; const x = window.satuTitikAuth; if(!x) return;
+        const bad = x.checkUsername ? x.checkUsername(eVal) : ""; if(bad){ eErr = t[bad] || t.fail; paint(); return; }
+        eBusy = true; eErr = ""; paint();
+        try{ await x.setUsername(eVal); editing = false; eMsg = t.saved; }
+        catch(e){ eErr = errText(e, t); }
+        eBusy = false; paint();
+      };
+      ok.addEventListener("click", go);
+      cn.addEventListener("click", () => { editing = false; eErr = ""; paint(); });
+      inp.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); go(); } else if(e.key === "Escape"){ e.stopPropagation(); editing = false; eErr = ""; paint(); } });
+      er.append(ok, cn); eb.append(inp, er); fu.appendChild(eb);
+      if(eErr) fu.appendChild(mk("p", "herr", eErr));
+    }
+    pv.appendChild(fu);
+
+    /* email: hanya dilihat di halaman profil */
+    const fe = mk("div", "fld"); fe.appendChild(mk("p", "fl", t.eml)); fe.appendChild(mk("p", "fv", u.email || "-")); pv.appendChild(fe);
+
+    /* ID akun: hanya dilihat dan disalin, tidak bisa diubah */
+    const fi = mk("div", "fld"), ir = idRow(a, t);
+    if(ir){ fi.appendChild(mk("p", "fl", t.idl)); fi.appendChild(ir); fi.appendChild(mk("p", "eidn", t.idn)); pv.appendChild(fi); }
+  }
+
+  function paint(){
+    const a = window.satuTitikAuth || {}, t = T[lang()];
+    /* jaga fokus dan posisi kursor saat kolom username sedang diketik */
+    const ae = document.activeElement, keep = ae && ae.id === "spUnIn" ? [ae.selectionStart, ae.selectionEnd] : null;
+    if(!a.user){
+      editing = false; eMsg = eErr = pMsg = pErr = "";
+      if(typeof spView !== "undefined" && spView === "profile" && typeof showView === "function") showView("");
+    }
+    paintMain(a, t); paintProfile(a, t);
+    const n = document.getElementById("spN"); if(n && typeof spView !== "undefined" && spView === "profile") n.hidden = true;
+    if(keep){ const i = document.getElementById("spUnIn"); if(i){ i.focus(); try{ i.setSelectionRange(keep[0], keep[1]); }catch(e){} } }
   }
   /* ikut berganti bahasa dan tampil ulang setiap panel Pengaturan digambar ulang */
   const pp = window.paintPanel;
