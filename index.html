@@ -7980,7 +7980,7 @@ const roleOf = () => { const r = remOf(); if(r) return r.role; const t = cur(); 
    Turnamen online disimpan di Firestore: tournaments/{kode}. Pengikut: tournaments/{kode}/followers/{uid}. Aturan keamanan: lihat firestore.rules. */
 const SESS = uid();
 try{ const NN = window.parent && window.parent.satuTitikNotif; if(NN && NN.mine) NN.mine[SESS] = 1; }catch(e){}
-const metaOf = t => ({name:String(t.name || ""), sport:String(t.sport || "other"), fmt:String(t.fmt || "league")});
+const metaOf = t => { const c = tcfg(t); return {name:String(t.name || ""), sport:String(t.sport || "other"), fmt:String(t.fmt || "league"), cfg:{id:c.id, com:c.com, like:c.like}}; };
 const ON = {
   fb:null, pushed:{}, meta:{}, unsub:{}, counts:{}, status:"", later:false, busy:false, uidNow:null, qUnsub:null, tm:0, invUnsub:null, invOut:[], prof:{}, profBusy:{},
   dirty:(() => { try{ return JSON.parse(localStorage.getItem("st_sync_ttdirty") || "{}") || {}; }catch(e){ return {}; } })(),
@@ -9219,7 +9219,7 @@ const PROF = (() => {
         try{ localStorage.setItem(key(u.uid), id); }catch(e){}
         if(res.fresh && window.satuTitikNotif) window.satuTitikNotif.add({ id: "acc_" + u.uid, type: "account",
           title: { id: "Akun siap dipakai", en: "Your account is ready" },
-          body: { id: "ID akunmu " + id + ". Berikan ID ini ke admin turnamen agar kamu bisa ditambahkan sebagai moderator.", en: "Your account ID is " + id + ". Give it to a tournament admin so you can be added as a moderator." } });
+          body: { id: "ID akunmu " + id, en: "Your account ID is " + id } });
         if(res.un){ try{ localStorage.setItem(unKey(u.uid), res.un); }catch(e){} }
         try{ if(res.ph) localStorage.setItem(phKey(u.uid), res.ph); else localStorage.removeItem(phKey(u.uid)); }catch(e){}
         if(A.user && A.user.uid === u.uid){ A.accountId = id; if(res.un){ A.username = res.un; A.usernameUid = u.uid; } A.photo = res.ph || null; A.photoUid = u.uid; emit(); }
