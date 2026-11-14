@@ -8033,22 +8033,34 @@ const ON = {
   joined(){ const j = load("joined", []); return Array.isArray(j) ? j.filter(x => typeof x === "string") : []; },
   setJoined(a){ save("joined", Array.from(new Set(a))); }
 };
-/* admin: samakan ownerName di server dengan username Satu Titik (bukan nama Google); dicoba ulang sampai berhasil */
-function syncOwnerName(oid, owner, curName){
+/* Nama admin = username Satu Titik. Disimpan di DATA turnamen (t.adm, ikut terkirim lewat field d yang memang boleh ditulis admin),
+   jadi tidak bergantung pada aturan Firestore untuk field ownerName. Pengikut/moderator membacanya dari sini. */
+function admName(x){
+  try{
+    const mm = typeof x.d === "string" ? x.d.match(/"adm":("(?:[^"\\]|\\.)*")/) : null;
+    const v = mm ? String(JSON.parse(mm[1])).trim() : "";
+    if(v) return v;
+  }catch(e){}
+  return String(x.ownerName || "");
+}
+function syncOwnerName(){
   try{
     const u0 = ON.user(), a0 = ON.A();
-    if(!u0 || owner !== u0.uid || !a0 || !a0.username || a0.usernameUid !== u0.uid) return;
-    const nm = String(a0.username); ON.nmFail = ON.nmFail || {};
-    if(nm === String(curName || "") || ON.nmSent[oid] === nm || (ON.nmFail[oid] || 0) >= 5) return;
-    ON.nmSent[oid] = nm;
-    ON.lib().then(({m, db:f}) => m.updateDoc(m.doc(f, "tournaments", oid), po({ownerName:nm}))).then(() => { if(ON.meta[oid]) ON.meta[oid].ownerName = nm; }).catch(() => { delete ON.nmSent[oid]; ON.nmFail[oid] = (ON.nmFail[oid] || 0) + 1; });
+    if(!u0 || !a0 || !a0.username || a0.usernameUid !== u0.uid) return;
+    const nm = String(a0.username).trim(); let ch = false;
+    db.list.forEach(t => {
+      if(!t.oid || t.adm === nm) return;
+      const mt = ON.meta[t.oid]; if(mt && mt.owner && mt.owner !== u0.uid) return;   /* hanya turnamen milik akun ini */
+      t.adm = nm; ON.dirty[t.oid] = true; ch = true;
+    });
+    if(ch){ save("data", db); ON.saveDirty(); clearTimeout(ON.tm); ON.tm = setTimeout(flush, 300); }
   }catch(e){}
 }
-setInterval(() => { try{ db.list.forEach(t => { const mt = t.oid && ON.meta[t.oid]; if(mt) syncOwnerName(t.oid, mt.owner, mt.ownerName); }); }catch(e){} }, 10000);
+setInterval(syncOwnerName, 5000); setTimeout(syncOwnerName, 1500);
 const roleTxt = r => r === "admin" ? "ADMIN" : r === "mod" ? L("MODERATOR", "MODERATOR") : r === "follower" ? L("PENGIKUT", "FOLLOWER") : "";
 const newCode = () => { const c = "abcdefghjkmnpqrstuvwxyz23456789"; let s = ""; const a = new Uint32Array(10); (window.crypto || {getRandomValues:x => x.forEach((_, i) => x[i] = Math.random() * 4e9)}).getRandomValues(a); a.forEach(n => s += c[n % c.length]); return s; };
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rj) => setTimeout(() => rj({code:"timeout"}), ms || 15000))]);
-const ONVER = "online-v8";
+const ONVER = "online-v9";
 /* Firestore dimuat di Beranda (jendela induk); objek data harus dibuat dari Object milik induk, kalau tidak ditolak ("custom Object object") */
 const po = src => {
   let P = window; try{ if(window.parent && window.parent !== window && window.parent.Object) P = window.parent; }catch(e){}
@@ -8084,8 +8096,8 @@ function applyDoc(oid, x){
   if(!x) return;
   if(typeof x.d === "string") ON.srv[oid] = x.d;
   /* nama admin yang tampil ke moderator dan pengikut = username Satu Titik; perbarui di server bila admin menggantinya */
-  syncOwnerName(oid, x.owner, x.ownerName);
-  const role = roleFrom(x); let own = db.list.find(t => t.oid === oid);
+  syncOwnerName();
+  const role = roleFrom(x), oname = admName(x); let own = db.list.find(t => t.oid === oid);
   /* turnamen lokal milik akun Google lain (sisa dari akun sebelumnya di perangkat ini): lepas dari daftar akun ini */
   if(own && ON.user() && x.owner !== ON.user().uid){
     db.list = db.list.filter(t => t !== own); save("data", db); delete ON.dirty[oid]; ON.saveDirty();
@@ -8094,21 +8106,21 @@ function applyDoc(oid, x){
     rerender(); return;
   }
   const prev = JSON.stringify(ON.meta[oid] || {}) + (REM[oid] ? REM[oid].role : "");
-  ON.meta[oid] = {owner:x.owner, ownerName:x.ownerName || "", mods:(x.modIds || []).slice(), u:x.u || 0};
+  ON.meta[oid] = {owner:x.owner, ownerName:oname, mods:(x.modIds || []).slice(), u:x.u || 0};
   let changed = false;
   if(x.by !== SESS && typeof x.d === "string" && ON.pushed[oid] !== x.d && !ON.dirty[oid]){
     let t = null; try{ t = JSON.parse(x.d); }catch(e){}
     if(t){
       t.oid = oid; ON.pushed[oid] = x.d;
       if(own){ Object.keys(own).forEach(k => delete own[k]); Object.assign(own, t); save("data", db); }
-      else REM[oid] = {t, d:x.d, role, owner:x.owner, ownerName:x.ownerName || "", mods:ON.meta[oid].mods};
+      else REM[oid] = {t, d:x.d, role, owner:x.owner, ownerName:oname, mods:ON.meta[oid].mods};
       changed = true;
     }
   } else if(!own){
     if(REM[oid]){ REM[oid].role = role; REM[oid].mods = ON.meta[oid].mods; }
-    else if(typeof x.d === "string"){ try{ const t = JSON.parse(x.d); t.oid = oid; ON.pushed[oid] = x.d; REM[oid] = {t, d:x.d, role, owner:x.owner, ownerName:x.ownerName || "", mods:ON.meta[oid].mods}; changed = true; }catch(e){} }
+    else if(typeof x.d === "string"){ try{ const t = JSON.parse(x.d); t.oid = oid; ON.pushed[oid] = x.d; REM[oid] = {t, d:x.d, role, owner:x.owner, ownerName:oname, mods:ON.meta[oid].mods}; changed = true; }catch(e){} }
   }
-  if(REM[oid]){ REM[oid].role = role; if(x.ownerName) REM[oid].ownerName = x.ownerName; }
+  if(REM[oid]){ REM[oid].role = role; if(oname) REM[oid].ownerName = oname; }
   if(changed || prev !== JSON.stringify(ON.meta[oid]) + (REM[oid] ? REM[oid].role : "")) rerender();
 }
 function watch(oid){
@@ -8286,6 +8298,8 @@ function paintOnline(box, t){
   p.append(el("b", "", "STATUS : " + roleTxt(role)), el("p", "hint", st));
   if(role === "admin"){
     p.append(el("p", "hint", L("Status Kamu sebagai admin, kamu bisa mengelola semuanya, menambah atau menghapus moderator, dan menghapus turnamen.", "Your status is admin: you can manage everything, add or remove moderators, and delete the tournament.")));
+    { const A1 = ON.A(), un = A1 && A1.username && A1.usernameUid === (ON.user() || {}).uid ? A1.username : "";
+      p.append(el("p", "hint", L("Nama admin yang dilihat pengikut: ", "Admin name shown to followers: ") + (t.adm || L("(belum terkirim)", "(not sent yet)")) + " · " + L("username terdeteksi: ", "username detected: ") + (un || L("TIDAK", "NO")) + " · [" + ONVER + "]"));  /* diagnostik */ }
     const code = el("div", "code", t.oid); p.append(el("span", "label", L("KODE TURNAMEN", "TOURNAMENT CODE")), code);
     const row = el("div", "row"); row.append(mkBtn(L("Salin kode", "Copy code"), "btn ghost sm grow", () => { try{ navigator.clipboard.writeText(t.oid).then(() => toast(L("Kode disalin.", "Code copied."))); }catch(e){ toast(t.oid); } }), mkBtn(L("Bagikan undangan", "Share invite"), "btn ghost sm grow", () => shareCode(t)));
     p.append(row);
