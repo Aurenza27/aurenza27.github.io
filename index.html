@@ -7189,7 +7189,7 @@ const L = (i, e) => lang === "en" ? e : i;
 const el = (t, c, x) => { const e = document.createElement(t); if(c) e.className = c; if(x !== undefined) e.textContent = x; return e; };
 const clean = (n, m) => String(n || "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, m || 40);
 let toastT = 0;
-function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2200); }
+function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), Math.max(2200, String(m).length * 90)); }
 
 /* ===== PENGATURAN DARI PANEL HOME =====
    Home menulis kunci tt_fx / tt_music / tt_read / tt_auto / tt_gap / tt_vol / tt_mvol / tt_follow / tt_lang dan mengendalikan
@@ -7671,7 +7671,8 @@ const errTxt = e => {
   if(navigator.onLine === false) return L("Sedang offline.", "You are offline.");
   if(c === "timeout" || c === "unavailable") return L("Server tidak merespons (" + c + "). Cek koneksi, dan pastikan database Cloud Firestore sudah dibuat di Firebase Console.", "The server did not respond (" + c + "). Check your connection and that a Cloud Firestore database exists in the Firebase Console.");
   if(c === "nofb") return L("Fitur online belum siap. Muat ulang aplikasi lalu coba lagi.", "Online feature is not ready. Reload the app and try again.");
-  return L("Gagal terhubung ke server", "Could not reach the server") + (c ? " (" + c.slice(0, 60) + ")" : "") + ".";
+  const msg = e && e.message ? String(e.message).replace(/^Firebase:\s*/i, "").replace(/\s+/g, " ").slice(0, 160) : "";
+  return L("Gagal terhubung ke server", "Could not reach the server") + (c ? " (" + c.slice(0, 60) + ")" : "") + (msg && msg !== c ? ": " + msg : ".");
 };
 function rerender(){
   const a = document.activeElement;
