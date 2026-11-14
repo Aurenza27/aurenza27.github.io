@@ -8360,7 +8360,7 @@ function paintOnline(box, t){
     ? L("Status Kamu sebagai moderator, kamu bisa mengisi skor dan jadwal, tetapi tidak bisa menghapus turnamen. Perubahan langsung terlihat oleh semua.", "Your status is moderator: you can enter scores and fixtures, but you cannot delete the tournament. Changes show up for everyone instantly.")
     : L("Status Kamu sebagai pengikut, kamu hanya bisa melihat, tampilan diperbarui otomatis.", "Your status is follower: you can only view, and the view updates automatically.");
   const ad = el("p", "hint");
-  if(r && r.ownerName){ ad.append(el("b", "", "Admin"), el("br"), el("b", "", r.ownerName), "\u00a0\u00a0" + stTxt); }   /* nama = username akun Satu Titik milik admin */
+  if(r && r.ownerName){ ad.append(el("b", "", "(Admin " + r.ownerName + ")"), el("br"), stTxt); }   /* nama = username akun Satu Titik milik admin */
   else ad.textContent = stTxt;
   p.append(ad);
   if(role === "follower") p.append(el("p", "hint", L("Untuk berhenti mengikuti, buka tab Beranda.", "To unfollow, open the Home tab.")));
