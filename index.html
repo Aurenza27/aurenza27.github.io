@@ -4130,7 +4130,14 @@ const onMvol = e => {
   applyMusicVol(true);
 };
 $("mvol").addEventListener("input", onMvol); $("mvol").addEventListener("change", onMvol);
-addEventListener("pointerdown", () => { if(music && !mT) musicStart(); }, {once:true, capture:true});
+/* musik langsung diputar begitu menu dibuka (tanpa menunggu ketukan); bila browser masih menahan audio, lanjutkan di sentuhan pertama */
+try{ if(music && !mT) musicStart(); }catch(e){}
+(function(){
+  const kick = () => { try{ if(!music) return; if(!mT) musicStart(); if(actx && actx.state === "suspended") actx.resume(); }catch(e){} };
+  ["pointerdown", "touchend", "click", "keydown"].forEach(ev => addEventListener(ev, kick, true));
+  document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") kick(); });
+  setTimeout(kick, 400);
+})();
 /* panel pengaturan (sama seperti TH Analytics): ketuk ⚙️ untuk buka/tutup (pilihan diingat), tarik ⚙️ atau "Geser panel" untuk memindah (posisi diingat), klik dua kali area kosong/pegangan panel = kembali ke posisi awal */
 (function(){
   const el = $("side"), tog = $("sideTog"), body = $("sbody"), KEY = "kh_side", OKEY = "kh_sideopen";
@@ -4822,7 +4829,14 @@ $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; s
 $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paintStatic(); if(cur) render(cur.b, cur.c); toast(L("Bahasa: Indonesia", "Language: English")); });
 $("nm").addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); addQueue(); } });
 $("nm").addEventListener("input", () => { $("err").textContent = ""; paintInput(); });
-addEventListener("pointerdown", () => { if(music && !mT) musicStart(); }, {once:true, capture:true});
+/* musik langsung diputar begitu menu dibuka (tanpa menunggu ketukan); bila browser masih menahan audio, lanjutkan di sentuhan pertama */
+try{ if(music && !mT) musicStart(); }catch(e){}
+(function(){
+  const kick = () => { try{ if(!music) return; if(!mT) musicStart(); if(actx && actx.state === "suspended") actx.resume(); }catch(e){} };
+  ["pointerdown", "touchend", "click", "keydown"].forEach(ev => addEventListener(ev, kick, true));
+  document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") kick(); });
+  setTimeout(kick, 400);
+})();
 /* panel pengaturan: ketuk ⚙️ buka/tutup, tarik ⚙️ atau "Geser panel" untuk memindah (diingat), klik dua kali area kosong panel = posisi awal */
 (function(){
   const el_ = $("side"), tog = $("sideTog"), body = $("sbody");
@@ -5522,7 +5536,14 @@ $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; s
 $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paintStatic(); if(cur) render(cur.b, cur.c); toast(L("Bahasa: Indonesia", "Language: English")); });
 $("nm").addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); addQueue(); } });
 $("nm").addEventListener("input", () => { $("err").textContent = ""; paintInput(); });
-addEventListener("pointerdown", () => { if(music && !mT) musicStart(); }, {once:true, capture:true});
+/* musik langsung diputar begitu menu dibuka (tanpa menunggu ketukan); bila browser masih menahan audio, lanjutkan di sentuhan pertama */
+try{ if(music && !mT) musicStart(); }catch(e){}
+(function(){
+  const kick = () => { try{ if(!music) return; if(!mT) musicStart(); if(actx && actx.state === "suspended") actx.resume(); }catch(e){} };
+  ["pointerdown", "touchend", "click", "keydown"].forEach(ev => addEventListener(ev, kick, true));
+  document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") kick(); });
+  setTimeout(kick, 400);
+})();
 /* panel pengaturan: ketuk ⚙️ buka/tutup, tarik ⚙️ atau "Geser panel" untuk memindah (diingat), klik dua kali area kosong panel = posisi awal */
 (function(){
   const el_ = $("side"), tog = $("sideTog"), body = $("sbody");
@@ -6020,7 +6041,14 @@ $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id
   body.addEventListener("dblclick", e => { if(e.target !== body && !e.target.closest(".grip")) return; el_.style.left = el_.style.top = el_.style.right = ""; el_.classList.remove("moved"); try{ localStorage.removeItem(LS("side")); }catch(_){} toast(L("Posisi panel dikembalikan", "Panel position reset")); });
   addEventListener("resize", fit);
 })();
-addEventListener("pointerdown", () => { if(music && !mT) musicStart(); }, {once:true, capture:true});
+/* musik langsung diputar begitu menu dibuka (tanpa menunggu ketukan); bila browser masih menahan audio, lanjutkan di sentuhan pertama */
+try{ if(music && !mT) musicStart(); }catch(e){}
+(function(){
+  const kick = () => { try{ if(!music) return; if(!mT) musicStart(); if(actx && actx.state === "suspended") actx.resume(); }catch(e){} };
+  ["pointerdown", "touchend", "click", "keydown"].forEach(ev => addEventListener(ev, kick, true));
+  document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") kick(); });
+  setTimeout(kick, 400);
+})();
 $("a").addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); $("b").focus(); } });
 $("b").addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); addQueue(); } });
 ["a", "b"].forEach(i => $(i).addEventListener("input", () => { $("err").textContent = ""; paintIn(i); }));
@@ -7135,6 +7163,9 @@ input:disabled,select:disabled{opacity:.55;cursor:not-allowed;-webkit-text-fill-
   tr.q td{background:#eee}
   .m input{border:0;background:transparent;color:#000}
 }
+.badge{font-size:10px;letter-spacing:.12em;padding:2px 8px;border-radius:999px;border:1px solid var(--gold);color:var(--gold2);font-style:normal;vertical-align:middle}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:22px;letter-spacing:.2em;text-align:center;padding:10px;border:1px dashed var(--gold);border-radius:12px;color:var(--gold2);user-select:all}
+.grow{flex:1}.ro *{pointer-events:none}.ro .keep,.ro .keep *{pointer-events:auto}
 </style>
 </head>
 <body>
@@ -7246,7 +7277,9 @@ let db = load("data", null);
 if(!db || !Array.isArray(db.list)) db = {v:1, list:[]};
 let dirty = false;
 function persist(){
+  if(remOf() && remOf().role === "follower"){ const r = remOf(); try{ r.t = JSON.parse(r.d); r.t.oid = curId.slice(2); }catch(e){} paint(); return; }
   if(!save("data", db)) toast(L("Penyimpanan penuh atau diblokir. Ekspor cadangan sekarang.", "Storage is full or blocked. Export a backup now."));
+  touchOnline();
 }
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
@@ -7606,7 +7639,257 @@ function setOpts(p, d, fld){         /* pilihan format pertandingan saat membuat
 
 /* ===== TAMPILAN ===== */
 let view = "list", curId = null, tab = "sched", draft = null;
-const cur = () => db.list.find(x => x.id === curId);
+const REM = {};   /* turnamen milik orang lain (moderator/pengikut): oid -> {t, d, role, owner, ownerName, mods} */
+const isRem = () => typeof curId === "string" && curId.startsWith("r:");
+const remOf = () => isRem() ? REM[curId.slice(2)] : null;
+const cur = () => isRem() ? (REM[curId.slice(2)] || {}).t : db.list.find(x => x.id === curId);
+const roleOf = () => { const r = remOf(); if(r) return r.role; const t = cur(); return t && t.oid ? "admin" : "local"; };
+
+/* ===== ONLINE (Firebase) =====
+   Admin = pembuat turnamen. Moderator = diundang lewat email Google, boleh mengisi skor/jadwal. Pengikut = masuk dengan kode, hanya melihat (real-time).
+   Turnamen online disimpan di Firestore: tournaments/{kode}. Pengikut: tournaments/{kode}/followers/{uid}. Aturan keamanan: lihat firestore.rules. */
+const SESS = uid();
+const ON = {
+  fb:null, pushed:{}, meta:{}, unsub:{}, counts:{}, status:"", later:false, busy:false, uidNow:null, qUnsub:null, tm:0,
+  dirty:(() => { try{ return JSON.parse(localStorage.getItem("st_sync_ttdirty") || "{}") || {}; }catch(e){ return {}; } })(),
+  A(){ try{ return window.parent && window.parent !== window ? (window.parent.satuTitikAuth || null) : null; }catch(e){ return null; } },
+  user(){ const A = ON.A(); return (A && A.user) || null; },
+  email(){ const u = ON.user(); return u && u.email ? u.email.toLowerCase() : ""; },
+  async lib(){ if(ON.fb) return ON.fb; const A = ON.A(); if(!A || !A.getDb) throw new Error("nofb"); return ON.fb = await A.getDb(); },
+  saveDirty(){ try{ localStorage.setItem("st_sync_ttdirty", JSON.stringify(ON.dirty)); }catch(e){} },
+  joined(){ const j = load("joined", []); return Array.isArray(j) ? j.filter(x => typeof x === "string") : []; },
+  setJoined(a){ save("joined", Array.from(new Set(a))); }
+};
+const roleTxt = r => r === "admin" ? "ADMIN" : r === "mod" ? L("MODERATOR", "MODERATOR") : r === "follower" ? L("PENGIKUT", "FOLLOWER") : "";
+const newCode = () => { const c = "abcdefghjkmnpqrstuvwxyz23456789"; let s = ""; const a = new Uint32Array(10); (window.crypto || {getRandomValues:x => x.forEach((_, i) => x[i] = Math.random() * 4e9)}).getRandomValues(a); a.forEach(n => s += c[n % c.length]); return s; };
+const errTxt = e => e && e.code === "permission-denied" ? L("Izin ditolak. Pastikan aturan Firestore sudah dipasang dan kamu punya hak akses.", "Permission denied. Make sure the Firestore rules are installed and you have access.") : navigator.onLine === false ? L("Sedang offline.", "You are offline.") : L("Gagal terhubung ke server.", "Could not reach the server.");
+function rerender(){
+  const a = document.activeElement;
+  if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)){ ON.later = true; return; }
+  if(view === "new") return;
+  if(view === "detail" && !cur()){ view = "list"; curId = null; }
+  paint();
+}
+addEventListener("focusout", () => { if(ON.later){ ON.later = false; setTimeout(rerender, 80); } });
+function roleFrom(x){ const u = ON.user(); if(u && x.owner === u.uid) return "admin"; return (x.modEmails || []).includes(ON.email()) ? "mod" : "follower"; }
+/* terapkan data dokumen server ke tampilan lokal */
+function applyDoc(oid, x){
+  if(!x) return;
+  const role = roleFrom(x), own = db.list.find(t => t.oid === oid);
+  const prev = JSON.stringify(ON.meta[oid] || {}) + (REM[oid] ? REM[oid].role : "");
+  ON.meta[oid] = {owner:x.owner, ownerName:x.ownerName || "", mods:(x.modEmails || []).slice(), u:x.u || 0};
+  let changed = false;
+  if(x.by !== SESS && typeof x.d === "string" && ON.pushed[oid] !== x.d && !ON.dirty[oid]){
+    let t = null; try{ t = JSON.parse(x.d); }catch(e){}
+    if(t){
+      t.oid = oid; ON.pushed[oid] = x.d;
+      if(own){ Object.keys(own).forEach(k => delete own[k]); Object.assign(own, t); save("data", db); }
+      else REM[oid] = {t, d:x.d, role, owner:x.owner, ownerName:x.ownerName || "", mods:ON.meta[oid].mods};
+      changed = true;
+    }
+  } else if(!own){
+    if(REM[oid]){ REM[oid].role = role; REM[oid].mods = ON.meta[oid].mods; }
+    else if(typeof x.d === "string"){ try{ const t = JSON.parse(x.d); t.oid = oid; ON.pushed[oid] = x.d; REM[oid] = {t, d:x.d, role, owner:x.owner, ownerName:x.ownerName || "", mods:ON.meta[oid].mods}; changed = true; }catch(e){} }
+  }
+  if(REM[oid]) REM[oid].role = role;
+  if(changed || prev !== JSON.stringify(ON.meta[oid]) + (REM[oid] ? REM[oid].role : "")) rerender();
+}
+function watch(oid){
+  if(ON.unsub[oid] || !ON.user()) return;
+  ON.lib().then(({m, db:f}) => {
+    if(ON.unsub[oid]) return;
+    ON.unsub[oid] = m.onSnapshot(m.doc(f, "tournaments", oid), snap => {
+      if(snap.metadata.hasPendingWrites) return;
+      if(!snap.exists()){
+        const own = db.list.find(t => t.oid === oid);
+        if(own){ delete own.oid; delete ON.dirty[oid]; ON.saveDirty(); save("data", db); }
+        if(REM[oid]){ delete REM[oid]; ON.setJoined(ON.joined().filter(i => i !== oid)); toast(L("Sebuah turnamen yang kamu ikuti sudah dihapus admin.", "A tournament you follow was deleted by its admin.")); }
+        if(ON.unsub[oid]){ try{ ON.unsub[oid](); }catch(e){} delete ON.unsub[oid]; }
+        rerender(); return;
+      }
+      applyDoc(oid, snap.data());
+    }, () => {});
+  }).catch(() => {});
+}
+function unwatchAll(){
+  Object.keys(ON.unsub).forEach(k => { try{ ON.unsub[k](); }catch(e){} }); ON.unsub = {};
+  if(ON.qUnsub){ try{ ON.qUnsub(); }catch(e){} ON.qUnsub = null; }
+  Object.keys(REM).forEach(k => delete REM[k]); ON.meta = {};
+}
+async function startOnline(){
+  const u = ON.user(), id = u ? u.uid : null;
+  if(id === ON.uidNow) return;
+  unwatchAll(); ON.uidNow = id;
+  if(!id){ rerender(); return; }
+  db.list.forEach(t => { if(t.oid) watch(t.oid); });
+  ON.joined().forEach(watch);
+  try{
+    const {m, db:f} = await ON.lib();
+    if(ON.email()) ON.qUnsub = m.onSnapshot(m.query(m.collection(f, "tournaments"), m.where("modEmails", "array-contains", ON.email())), snap => snap.docs.forEach(d => { watch(d.id); }), () => {});
+  }catch(e){}
+  flush(); rerender();
+}
+/* kirim perubahan lokal (admin & moderator) ke server */
+async function flush(){
+  if(ON.busy || !ON.user() || navigator.onLine === false) return;
+  const items = db.list.filter(t => t.oid).concat(Object.keys(REM).filter(k => REM[k].role !== "follower").map(k => REM[k].t));
+  if(!items.some(t => ON.dirty[t.oid])) return;
+  ON.busy = true;
+  try{
+    const {m, db:f} = await ON.lib();
+    for(const t of items){
+      if(!ON.dirty[t.oid]) continue;
+      try{
+        const d = JSON.stringify(t);
+        if(d.length > 900000){ toast(L("Data turnamen terlalu besar untuk disinkronkan.", "Tournament data is too large to sync.")); delete ON.dirty[t.oid]; continue; }
+        if(ON.pushed[t.oid] !== d) await m.updateDoc(m.doc(f, "tournaments", t.oid), {name:t.name, sport:t.sport, fmt:t.fmt, d, u:Date.now(), by:SESS});
+        ON.pushed[t.oid] = d; delete ON.dirty[t.oid]; ON.status = "ok";
+      }catch(e){
+        if(e && (e.code === "permission-denied" || e.code === "not-found")){ delete ON.dirty[t.oid]; ON.status = "denied"; if(e.code === "not-found" && db.list.find(x => x === t)){ delete t.oid; save("data", db); } }
+        else ON.status = "err";
+      }
+    }
+  }catch(e){ ON.status = "err"; }
+  ON.saveDirty(); ON.busy = false;
+}
+function touchOnline(){
+  try{
+    db.list.forEach(t => { if(t.oid) ON.dirty[t.oid] = true; });
+    const r = remOf(); if(r && r.role !== "follower") ON.dirty[r.t.oid] = true;
+    ON.saveDirty(); clearTimeout(ON.tm); ON.tm = setTimeout(flush, 700);
+  }catch(e){}
+}
+setInterval(flush, 20000); addEventListener("online", flush); addEventListener("pagehide", () => { try{ flush(); }catch(e){} });
+try{ const A0 = ON.A(); if(A0 && A0.onChange){ const off = A0.onChange(() => { startOnline(); }); addEventListener("pagehide", () => { try{ off(); }catch(e){} unwatchAll(); }); } }catch(e){}
+
+/* ===== aksi ===== */
+async function goOnline(t){
+  const u = ON.user(); if(!u) return;
+  const oid = newCode(); t.oid = oid;
+  try{
+    const {m, db:f} = await ON.lib(), d = JSON.stringify(t);
+    await m.setDoc(m.doc(f, "tournaments", oid), {owner:u.uid, ownerName:u.displayName || u.email || "", modEmails:[], name:t.name, sport:t.sport, fmt:t.fmt, d, u:Date.now(), by:SESS, created:Date.now()});
+    ON.pushed[oid] = d; save("data", db); watch(oid); toast(L("Turnamen sekarang online.", "Tournament is now online.")); paint();
+  }catch(e){ delete t.oid; toast(errTxt(e)); }
+}
+async function stopOnline(t){
+  const oid = t.oid; if(!oid) return;
+  try{
+    const {m, db:f} = await ON.lib(); await m.deleteDoc(m.doc(f, "tournaments", oid));
+    delete t.oid; delete ON.dirty[oid]; ON.saveDirty(); if(ON.unsub[oid]){ try{ ON.unsub[oid](); }catch(e){} delete ON.unsub[oid]; }
+    save("data", db); toast(L("Turnamen kembali lokal. Pengikut tidak bisa melihatnya lagi.", "Tournament is local again. Followers can no longer see it.")); paint();
+  }catch(e){ toast(errTxt(e)); }
+}
+async function setMods(t, email, add){
+  try{
+    const {m, db:f} = await ON.lib();
+    await m.updateDoc(m.doc(f, "tournaments", t.oid), {modEmails: add ? m.arrayUnion(email) : m.arrayRemove(email)});
+    const mt = ON.meta[t.oid] = ON.meta[t.oid] || {mods:[]}; mt.mods = add ? Array.from(new Set((mt.mods || []).concat(email))) : (mt.mods || []).filter(x => x !== email);
+    paint();
+  }catch(e){ toast(errTxt(e)); }
+}
+async function followCode(code){
+  code = (code || "").trim().toLowerCase(); const u = ON.user();
+  if(!u || !/^[a-z0-9]{6,20}$/.test(code)){ toast(L("Kode tidak valid.", "Invalid code.")); return false; }
+  try{
+    const {m, db:f} = await ON.lib(), snap = await m.getDoc(m.doc(f, "tournaments", code));
+    if(!snap.exists()){ toast(L("Turnamen dengan kode itu tidak ditemukan.", "No tournament with that code.")); return false; }
+    const x = snap.data();
+    if(x.owner !== u.uid) await m.setDoc(m.doc(f, "tournaments", code, "followers", u.uid), {n:u.displayName || "", t:Date.now()});
+    if(!db.list.some(t => t.oid === code)) ON.setJoined(ON.joined().concat(code));
+    watch(code); applyDoc(code, x); toast(L("Berhasil mengikuti turnamen.", "Now following the tournament.")); return true;
+  }catch(e){ toast(errTxt(e)); return false; }
+}
+async function unfollow(oid){
+  const u = ON.user(); if(!u) return;
+  try{
+    const {m, db:f} = await ON.lib(); await m.deleteDoc(m.doc(f, "tournaments", oid, "followers", u.uid));
+    ON.setJoined(ON.joined().filter(i => i !== oid)); if(ON.unsub[oid]){ try{ ON.unsub[oid](); }catch(e){} delete ON.unsub[oid]; }
+    delete REM[oid]; view = "list"; curId = null; paint(); toTop(); toast(L("Berhenti mengikuti.", "Unfollowed."));
+  }catch(e){ toast(errTxt(e)); }
+}
+/* pengikut hanya melihat: kunci semua kontrol kecuali yang bertanda .keep */
+function lockRO(box){
+  box.classList.add("ro");
+  box.querySelectorAll("input,select,textarea,button").forEach(e => { if(!e.closest(".keep")) e.disabled = true; });
+}
+const mkBtn = (txt, cls, fn) => { const b = el("button", cls, txt); b.type = "button"; b.onclick = fn; return b; };
+const loginBtn = p => p.append(mkBtn(L("Masuk dengan Google", "Sign in with Google"), "btn sm keep", () => { const A = ON.A(); if(A && A.login) A.login(); else toast(L("Buka dari Beranda untuk masuk.", "Open from Home to sign in.")); }));
+function shareCode(t){
+  const msg = L("Ikuti turnamen \"" + t.name + "\" di Satu Titik. Menu Turnamen > Ikuti, kode: " + t.oid, "Follow the tournament \"" + t.name + "\" on Satu Titik. Tournament menu > Follow, code: " + t.oid);
+  if(navigator.share){ navigator.share({text:msg}).catch(() => {}); return; }
+  try{ navigator.clipboard.writeText(msg).then(() => toast(L("Pesan undangan disalin.", "Invite message copied."))); }catch(e){ toast(t.oid); }
+}
+function paintOnline(box, t){
+  const u = ON.user(), r = remOf(), role = roleOf(), p = el("div", "panel stack keep");
+  p.append(el("span", "label", "🌐 ONLINE"));
+  if(!u){
+    p.append(el("p", "hint", L("Masuk dengan akun Google untuk memakai fitur online: admin, moderator, dan pengikut.", "Sign in with Google to use online features: admin, moderators and followers.")));
+    loginBtn(p); box.append(p); return;
+  }
+  const st = ON.status === "err" ? L("⚠️ Sinkron gagal, dicoba lagi otomatis.", "⚠️ Sync failed, retrying.") : ON.status === "denied" ? L("⚠️ Perubahan ditolak server.", "⚠️ Changes rejected by the server.") : navigator.onLine === false ? L("📴 Offline.", "📴 Offline.") : L("☁️ Tersinkron.", "☁️ Synced.");
+  if(role === "local"){
+    p.append(el("p", "hint", L("Turnamen ini masih lokal. Jadikan online agar bisa dikelola bersama moderator dan diikuti orang lain secara real-time. Kamu menjadi admin.", "This tournament is still local. Take it online to share management with moderators and let others follow live. You become the admin.")));
+    p.append(mkBtn(L("Jadikan turnamen online", "Take tournament online"), "btn", () => goOnline(t)));
+    box.append(p); return;
+  }
+  const mt = ON.meta[t.oid] || (r ? {mods:r.mods, ownerName:r.ownerName} : {mods:[]});
+  p.append(el("b", "", roleTxt(role)), el("p", "hint", st));
+  if(role === "admin"){
+    p.append(el("p", "hint", L("Admin: kelola semuanya, tambah atau hapus moderator, dan hapus turnamen.", "Admin: manage everything, add or remove moderators, and delete the tournament.")));
+    const code = el("div", "code", t.oid); p.append(el("span", "label", L("KODE TURNAMEN", "TOURNAMENT CODE")), code);
+    const row = el("div", "row"); row.append(mkBtn(L("Salin kode", "Copy code"), "btn ghost sm grow", () => { try{ navigator.clipboard.writeText(t.oid).then(() => toast(L("Kode disalin.", "Code copied."))); }catch(e){ toast(t.oid); } }), mkBtn(L("Bagikan undangan", "Share invite"), "btn ghost sm grow", () => shareCode(t)));
+    p.append(row);
+    const fc = el("p", "hint", L("Pengikut: ", "Followers: ") + (ON.counts[t.oid] === undefined ? "…" : ON.counts[t.oid])); p.append(fc);
+    ON.lib().then(({m, db:f}) => m.getCountFromServer(m.collection(f, "tournaments", t.oid, "followers"))).then(c => { ON.counts[t.oid] = c.data().count; fc.textContent = L("Pengikut: ", "Followers: ") + ON.counts[t.oid]; }).catch(() => {});
+    box.append(p);
+    const mp = el("div", "panel stack keep");
+    mp.append(el("span", "label", L("MODERATOR", "MODERATORS")), el("p", "hint", L("Moderator (diundang lewat email Google) bisa mengisi skor dan jadwal, tetapi tidak bisa menghapus turnamen atau mengatur moderator.", "Moderators (invited by Google email) can enter scores and fixtures, but cannot delete the tournament or manage moderators.")));
+    (mt.mods || []).forEach(em => { const rw = el("div", "row"); rw.append(el("span", "grow", em), mkBtn(L("Hapus", "Remove"), "btn ghost sm danger", () => { if(confirm(L("Cabut akses moderator " + em + "?", "Remove moderator " + em + "?"))) setMods(t, em, false); })); mp.append(rw); });
+    if(!(mt.mods || []).length) mp.append(el("p", "hint", L("Belum ada moderator.", "No moderators yet.")));
+    const ar = el("div", "row"), ei = el("input"); ei.type = "email"; ei.placeholder = L("email Google moderator", "moderator's Google email"); ei.maxLength = 80; ei.autocapitalize = "off";
+    ar.append(ei, mkBtn(L("Tambah", "Add"), "btn sm", () => {
+      const v = ei.value.trim().toLowerCase();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){ toast(L("Email tidak valid.", "Invalid email.")); return; }
+      if(v === ON.email()){ toast(L("Kamu sudah admin.", "You are already the admin.")); return; }
+      if((mt.mods || []).length >= 20){ toast(L("Maksimal 20 moderator.", "At most 20 moderators.")); return; }
+      setMods(t, v, true);
+    }));
+    mp.append(ar); box.append(mp);
+    const dp = el("div", "panel stack keep");
+    dp.append(mkBtn(L("Matikan online (jadikan lokal lagi)", "Turn online off (make local again)"), "btn ghost sm danger", () => { if(confirm(L("Hapus turnamen dari server? Data tetap ada di perangkatmu, tetapi moderator dan pengikut tidak bisa mengaksesnya lagi.", "Remove the tournament from the server? Your local copy stays, but moderators and followers lose access."))) stopOnline(t); }));
+    box.append(dp); return;
+  }
+  p.append(el("p", "hint", (r && r.ownerName ? L("Admin: ", "Admin: ") + r.ownerName + ". " : "") + (role === "mod" ? L("Kamu moderator: bisa mengisi skor dan jadwal; perubahan langsung terlihat oleh semua.", "You are a moderator: you can enter scores and fixtures; changes show up for everyone instantly.") : L("Kamu pengikut: hanya bisa melihat, tampilan diperbarui otomatis.", "You are a follower: view only, the view updates automatically."))));
+  if(role === "follower") p.append(mkBtn(L("Berhenti mengikuti", "Unfollow"), "btn ghost sm danger", () => { if(confirm(L("Berhenti mengikuti turnamen ini?", "Unfollow this tournament?"))) unfollow(t.oid); }));
+  box.append(p);
+}
+function paintOnlineList(m){
+  const u = ON.user(), p = el("div", "panel stack keep");
+  p.append(el("span", "label", L("🌐 TURNAMEN ONLINE", "🌐 ONLINE TOURNAMENTS")));
+  if(!u){
+    p.append(el("p", "hint", L("Masuk dengan Google untuk mengelola turnamen bersama (admin dan moderator) atau mengikuti turnamen orang lain.", "Sign in with Google to run tournaments together (admin and moderators) or follow other people's tournaments.")));
+    loginBtn(p);
+  } else {
+    p.append(el("p", "hint", L("Punya kode turnamen? Masukkan untuk mengikuti perkembangannya.", "Have a tournament code? Enter it to follow along.")));
+    const r = el("div", "row"), i = el("input"); i.placeholder = L("Kode turnamen", "Tournament code"); i.maxLength = 20; i.autocapitalize = "off"; i.autocomplete = "off";
+    const go = async () => { if(!i.value.trim()) return; go.disabled = true; const ok = await followCode(i.value); go.disabled = false; if(ok){ i.value = ""; rerender(); } };
+    const gb = mkBtn(L("Ikuti", "Follow"), "btn sm", go); r.append(i, gb); p.append(r);
+    i.onkeydown = e => { if(e.key === "Enter") go(); };
+  }
+  m.append(p);
+  Object.keys(REM).sort((a, b) => (REM[b].t.created || 0) - (REM[a].t.created || 0)).forEach(oid => {
+    const x = REM[oid], t = x.t, b = el("button", "tcard"); b.type = "button";
+    const done = t.matches.filter(q => q.sa !== null && q.sb !== null).length + (t.ko ? t.ko.flat().filter(q => !q.bye && q.sa !== null && q.sb !== null).length : 0);
+    const all = t.matches.length + (t.ko ? t.ko.flat().filter(q => !q.bye).length : 0);
+    const tx = el("div"), nm = el("b", "", t.name); nm.append(" ", el("span", "badge", roleTxt(x.role)));
+    tx.append(nm, el("small", "", sp(t)[lang] + " · " + FMT[t.fmt][lang] + " · " + t.teams.length + L(" tim", " teams") + " · " + done + "/" + all));
+    b.append(el("span", "ic", sp(t).ic), tx);
+    b.onclick = () => { curId = "r:" + oid; tab = t.fmt === "ko" ? "bracket" : "sched"; view = "detail"; paint(); toTop(); };
+    m.append(b);
+  });
+}
+
 function paint(){
   document.documentElement.lang = lang;
   $("sub").textContent = L("Atur turnamen olahraga atau eSports: jadwal, skor, klasemen, dan bagan.", "Run a sports or eSports tournament: fixtures, scores, standings, and bracket.");
@@ -7620,24 +7903,30 @@ function paintList(m){
   const nb = el("button", "btn", L("➕ Buat turnamen", "➕ New tournament")); nb.type = "button";
   nb.onclick = () => { draft = null; view = "new"; paint(); toTop(); };
   m.append(nb);
-  if(!db.list.length) m.append(el("p", "hint", L("Belum ada turnamen. Buat yang pertama, lalu data tersimpan otomatis di perangkat ini.", "No tournaments yet. Create your first; it saves automatically on this device.")));
+
   db.list.slice().sort((a, b) => b.created - a.created).forEach(t => {
     const b = el("button", "tcard"); b.type = "button";
     const done = t.matches.filter(x => x.sa !== null && x.sb !== null).length + (t.ko ? t.ko.flat().filter(x => !x.bye && x.sa !== null && x.sb !== null).length : 0);
     const all = t.matches.length + (t.ko ? t.ko.flat().filter(x => !x.bye).length : 0);
-    const tx = el("div"); tx.append(el("b", "", t.name), el("small", "", sp(t)[lang] + " · " + FMT[t.fmt][lang] + " · " + t.teams.length + L(" tim", " teams") + " · " + done + "/" + all));
+    const tx = el("div"); tx.append(el("b", "", (t.oid ? "🌐 " : "") + t.name), el("small", "", sp(t)[lang] + " · " + FMT[t.fmt][lang] + " · " + t.teams.length + L(" tim", " teams") + " · " + done + "/" + all));
     b.append(el("span", "ic", sp(t).ic), tx);
     b.onclick = () => { curId = t.id; tab = t.fmt === "ko" ? "bracket" : "sched"; view = "detail"; paint(); toTop(); };
     m.append(b);
   });
+  paintOnlineList(m);
   const bk = el("div", "panel stack");
-  bk.append(el("span", "label", L("💾 CADANGAN DATA", "💾 DATA BACKUP")), el("p", "hint", L("Data hanya tersimpan di browser ini. Ekspor berkala supaya aman bila data browser terhapus.", "Data lives only in this browser. Export regularly in case browser data is cleared.")));
+  bk.append(el("span", "label", L("💾 CADANGAN DATA", "💾 DATA BACKUP")));
   const r = el("div", "row");
   const ex = el("button", "btn ghost sm grow", L("Ekspor", "Export")); ex.type = "button"; ex.onclick = exportAll;
   const im = el("button", "btn ghost sm grow", L("Impor", "Import")); im.type = "button";
   const f = el("input"); f.type = "file"; f.accept = "application/json,.json"; f.hidden = true;
   im.onclick = () => f.click(); f.onchange = () => importAll(f.files[0]);
   r.append(ex, im, f); bk.append(r); m.append(bk);
+  const nt = el("div", "stack");
+  nt.append(el("b", "", L("Ekspor & Impor Data", "Export & Import Data")),
+    el("p", "hint", L("Gunakan fitur Ekspor untuk mencadangkan dan menyimpan data aplikasi ke perangkat Anda.", "Use Export to back up and save the app data to your device.")),
+    el("p", "hint", L("Gunakan fitur Impor untuk memasukkan kembali data yang telah diekspor ke dalam aplikasi.", "Use Import to load previously exported data back into the app.")));
+  m.append(nt);
 }
 function download(name, blob){
   const a = el("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click();
@@ -7655,7 +7944,7 @@ function importAll(file){
       const j = JSON.parse(rd.result);
       if(!j || !Array.isArray(j.list) || j.list.some(t => !t || typeof t.name !== "string" || !Array.isArray(t.teams) || !Array.isArray(t.matches))) throw 0;
       const have = new Set(db.list.map(t => t.id)); let n = 0;
-      j.list.forEach(t => { if(!have.has(t.id)){ db.list.push(t); n++; } });
+      j.list.forEach(t => { if(!have.has(t.id)){ delete t.oid; db.list.push(t); n++; } });
       persist(); paint(); toast(L(n + " turnamen diimpor.", n + " tournament(s) imported."));
     }catch(e){ toast(L("Berkas cadangan tidak valid.", "Invalid backup file.")); }
   };
@@ -7723,16 +8012,18 @@ function paintDetail(m){
   const t = cur(); if(!t){ view = "list"; return paintList(m); }
   const hd = el("div", "dhead");
   const back = el("button", "btn ghost sm", "‹"); back.type = "button"; back.setAttribute("aria-label", L("Kembali", "Back")); back.onclick = () => { view = "list"; paint(); toTop(); };
-  hd.append(back, el("h2", "", sp(t).ic + " " + t.name)); m.append(hd);
+  const rl = roleOf(), h2 = el("h2", "", sp(t).ic + " " + t.name); if(rl !== "local") h2.append(" ", el("span", "badge", roleTxt(rl)));
+  hd.append(back, h2); m.append(hd);
   const ch = champion(t);
   if(ch !== null){ const c = el("div", "champ"); c.append(el("div", "label", L("🏆 JUARA", "🏆 CHAMPION")), el("div", "big", t.teams[ch])); m.append(c); }
-  const tabs = [["sched", L("Jadwal", "Fixtures"), t.fmt !== "ko"], ["table", L("Klasemen", "Table"), t.fmt !== "ko"], ["bracket", L("Bagan", "Bracket"), t.fmt !== "league"], ["players", L("Pemain", "Players"), true], ["more", L("Lainnya", "More"), true]].filter(x => x[2]);
+  const tabs = [["sched", L("Jadwal", "Fixtures"), t.fmt !== "ko"], ["table", L("Klasemen", "Table"), t.fmt !== "ko"], ["bracket", L("Bagan", "Bracket"), t.fmt !== "league"], ["players", L("Pemain", "Players"), true], ["online", "🌐 Online", true], ["more", L("Lainnya", "More"), true]].filter(x => x[2]);
   if(!tabs.some(x => x[0] === tab)) tab = tabs[0][0];
   const tb = el("div", "tabs"); tb.setAttribute("role", "tablist");
   tabs.forEach(x => { const b = el("button", "tab", x[1]); b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(tab === x[0])); b.onclick = () => { tab = x[0]; paint(); }; tb.append(b); });
   m.append(tb);
   const box = el("div", "stack"); m.append(box);
-  if(tab === "sched") paintSched(box, t); else if(tab === "table") paintTable(box, t); else if(tab === "bracket") paintBracket(box, t); else if(tab === "players") paintPlayers(box, t); else paintMore(box, t);
+  if(tab === "sched") paintSched(box, t); else if(tab === "table") paintTable(box, t); else if(tab === "bracket") paintBracket(box, t); else if(tab === "players") paintPlayers(box, t); else if(tab === "online") paintOnline(box, t); else paintMore(box, t);
+  if(tab !== "online" && rl === "follower") lockRO(box);
 }
 function tn(t, i, cls){ return el("div", "tn " + (cls || ""), i === null ? L("Menunggu", "TBD") : t.teams[i]); }
 function paintSched(box, t){
@@ -7798,7 +8089,7 @@ function paintTable(box, t){
   });
   box.append(el("p", "hint", (isSet(t) ? rankHint(t) : L("Urutan: poin, selisih gol, gol masuk, lalu nama. ", "Order: points, goal difference, goals for, then name. ")) + (t.fmt === "group" ? L("Baris berwarna lolos ke babak gugur.", "Highlighted rows advance to the knockout stage.") : "")));
   const r = el("div", "row no-print");
-  const sh = el("button", "btn ghost sm grow", L("🖼️ Bagikan gambar", "🖼️ Share image")); sh.type = "button"; sh.onclick = () => shareImage(t);
+  const sh = el("button", "btn ghost sm grow keep", L("🖼️ Bagikan gambar", "🖼️ Share image")); sh.type = "button"; sh.onclick = () => shareImage(t);
   const pr = el("button", "btn ghost sm grow", L("🖨️ Cetak", "🖨️ Print")); pr.type = "button"; pr.onclick = () => { try{ window.print(); }catch(e){ toast(L("Cetak tidak tersedia.", "Print is not available.")); } };
   r.append(sh, pr); box.append(r);
 }
@@ -7908,9 +8199,8 @@ function paintMore(box, t){
     if(t.fmt === "ko") t.ko.forEach(r => r.forEach(m => { m.sa = m.sb = m.pw = null; m.gs = null; m.wo = null; m.lock = null; m.live = null; })); else if(t.fmt === "group") t.ko = null;
     if(t.ko) propagate(t); persist(); paint(); toast(L("Skor dikosongkan.", "Scores cleared.")); };
   const del = el("button", "btn ghost sm danger", L("Hapus turnamen", "Delete tournament")); del.type = "button";
-  del.onclick = () => { if(!confirm(L("Hapus turnamen ini secara permanen?", "Delete this tournament permanently?"))) return; db.list = db.list.filter(x => x.id !== t.id); persist(); view = "list"; paint(); toTop(); };
-  a.append(ex, rs, del); box.append(a);
-  box.append(el("p", "hint", L("Menu ini berjalan penuh di perangkatmu tanpa akun dan tanpa internet, jadi tidak ada link pendaftaran online atau moderator bersama.", "This menu runs entirely on your device with no account and no internet, so there are no online registration links or shared moderators.")));
+  del.onclick = () => { if(!confirm(L("Hapus turnamen ini secara permanen?", "Delete this tournament permanently?"))) return; if(t.oid){ try{ ON.lib().then(({m, db:f}) => m.deleteDoc(m.doc(f, "tournaments", t.oid))).catch(() => {}); }catch(e){} } db.list = db.list.filter(x => x.id !== t.id); persist(); view = "list"; paint(); toTop(); };
+  if(roleOf() === "mod") a.append(ex, rs); else a.append(ex, rs, del); box.append(a);
 }
 
 /* ===== GAMBAR UNTUK DIBAGIKAN (kanvas -> PNG) ===== */
@@ -7955,6 +8245,7 @@ function shareImage(t){
 $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); paint(); });
 musicSync();
 paint();
+try{ startOnline(); }catch(e){}
 </scr@@ipt>
 </body>
 </html>
@@ -8005,6 +8296,7 @@ A.login = async () => {
   }catch(e){ A.error = navigator.onLine === false ? "offline" : "fail"; }
   emit();
 };
+A.getDb = async () => { const m = await import(BASE + "firebase-firestore.js"); const f = await init(); return { m, db: m.getFirestore(f.ai) }; };
 A.logout = async () => {
   try{ const { a, auth } = await init(); await auth.signOut(a); }catch(e){}
   A.error = null; emit();
