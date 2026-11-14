@@ -99,6 +99,7 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 .idrow .cpy svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .idrow .cpy.done{color:#8fd9a8;border-color:#8fd9a8}
 #spAcc .hsync{margin:10px 0 0;font-size:12.5px;color:var(--muted);line-height:1.4}
+#spProfBody .hsync{margin:4px 0 14px;font-size:12.5px;color:var(--muted);line-height:1.4}
 #spAcc .herr,#svProfile .herr{margin:10px 0 0;font-size:13px;color:#f0a0a0;line-height:1.4}
 #svProfile .obtn{display:block;width:100%;margin-top:6px;min-height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--gold);background:transparent;color:var(--gold2);font:inherit;font-size:14px;cursor:pointer}
 #svProfile .pav{display:flex;flex-direction:column;align-items:center;gap:10px;margin:4px 0 14px}
@@ -7411,6 +7412,73 @@ img.av{display:block;object-fit:cover}
 .tg{flex:none;display:inline-block;font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
 .tg.wait{color:var(--gold2);border-color:var(--gold)}
 .tg.no{color:var(--bad);border-color:rgba(229,123,114,.5)}
+/* ===== beranda turnamen ===== */
+.hm-hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;padding:18px 16px 16px;background:radial-gradient(120% 100% at 100% 0%,rgba(212,169,79,.18),transparent 58%),linear-gradient(180deg,var(--bg2),var(--card))}
+.hm-top{display:flex;gap:14px;align-items:center}
+.hm-ic{flex:none;width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-size:30px;background:rgba(212,169,79,.12);border:1px solid rgba(212,169,79,.4)}
+.hm-name{margin:0;font-size:20px;line-height:1.2;color:var(--gold2);overflow-wrap:anywhere}
+.hm-meta{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
+.hm-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.hm-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;letter-spacing:.04em;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.hm-chip.run{color:var(--ok);border-color:rgba(95,208,197,.5);background:rgba(95,208,197,.08)}
+.hm-chip.end{color:var(--gold2);border-color:var(--gold);background:rgba(212,169,79,.1)}
+.hm-chip.role{color:var(--gold2);border-color:var(--gold);letter-spacing:.12em;font-size:10.5px}
+.hm-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(95,208,197,.6);animation:hmPulse 1.8s infinite}
+@keyframes hmPulse{70%{box-shadow:0 0 0 7px rgba(95,208,197,0)}100%{box-shadow:0 0 0 0 rgba(95,208,197,0)}}
+.hm-prog{margin-top:14px}
+.hm-bar{height:6px;border-radius:99px;background:color-mix(in srgb,var(--text) 12%,transparent);overflow:hidden}
+.hm-bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .4s}
+.hm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.hm-stat{border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center;background:color-mix(in srgb,var(--bg) 45%,transparent)}
+.hm-stat b{display:block;font-size:18px;color:var(--gold2);line-height:1.1}
+.hm-stat span{display:block;margin-top:4px;font-size:10.5px;letter-spacing:.06em;color:var(--muted)}
+.hm-row{display:flex;gap:10px;align-items:center}
+.hm-own{flex:1;font-size:13.5px;line-height:1.35;color:var(--gold2)}
+.hm-follow{flex:1;min-height:46px;border-radius:13px;border:1px solid var(--gold);background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1408;font:inherit;font-size:14px;font-weight:700;letter-spacing:.04em;cursor:pointer}
+.hm-follow.on{background:transparent;color:var(--gold2)}
+.hm-follow:disabled{opacity:.6;cursor:default}
+.hm-follow:active:not(:disabled){transform:scale(.98)}
+.hm-sm{display:block;color:var(--muted);font-size:11.5px;line-height:1.4}
+.hm-vote{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 10px;border-radius:13px;border:1px solid var(--line);background:transparent;color:var(--text);font:inherit;font-size:14px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.hm-vote:active:not(:disabled){transform:scale(.98)}
+.hm-vote:disabled{cursor:default}
+.hm-ico{display:inline-flex}
+.hm-ico svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hm-vn{font-weight:700}
+.hm-vl{font-size:12.5px;color:var(--muted)}
+.hm-vote.on .hm-vl{color:inherit}
+.hm-vote.up.on{border-color:var(--ok);color:var(--ok);background:rgba(95,208,197,.12)}
+.hm-vote.dn.on{border-color:var(--bad);color:var(--bad);background:rgba(229,123,114,.12)}
+.hm-vote.on svg{fill:currentColor;fill-opacity:.25}
+.hm-sent{display:flex;height:4px;border-radius:99px;overflow:hidden;background:color-mix(in srgb,var(--text) 12%,transparent)}
+.hm-sent .up{background:var(--ok)}.hm-sent .dn{background:var(--bad)}
+.hm-sec{margin:12px 0 2px;font-size:11px;letter-spacing:.18em;color:var(--muted)}
+.hm-ppl{display:flex;align-items:center;gap:12px;padding:8px 0}
+.hm-ppl .pn{white-space:normal;overflow-wrap:anywhere}
+.hm-you{font-size:10.5px;font-weight:400;letter-spacing:.06em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 7px;vertical-align:middle}
+.hm-role{flex:none;font-size:10px;letter-spacing:.12em;padding:2px 8px;border-radius:999px;border:1px solid;font-weight:400}
+.hm-role.admin{color:var(--gold2);border-color:var(--gold);background:rgba(212,169,79,.1)}
+.hm-role.mod{color:var(--ok);border-color:rgba(95,208,197,.5);background:rgba(95,208,197,.08)}
+.hm-compose{display:flex;flex-direction:column;gap:8px}
+.hm-in{min-height:64px;resize:none;line-height:1.45;font-size:15px}
+.hm-cbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hm-cnt{color:var(--muted);font-size:12px}
+.hm-cbar .btn:disabled{opacity:.5;cursor:default}
+.hm-lock{border:1px dashed var(--line);border-radius:12px;padding:12px;font-size:13px;line-height:1.45;color:var(--muted);text-align:center}
+.hm-list{display:flex;flex-direction:column}
+.hm-c{display:flex;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.hm-c:first-child{border-top:0}
+.hm-cb{flex:1;min-width:0}
+.hm-ch{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hm-cn{font-size:13.5px;font-weight:700;overflow-wrap:anywhere}
+.hm-ct{font-size:11.5px;color:var(--muted)}
+.hm-cx{margin:4px 0 0;font-size:14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.hm-del{margin-left:auto;width:28px;height:28px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);font:inherit;font-size:12px;cursor:pointer}
+.hm-del:hover,.hm-del:active{border-color:rgba(229,123,114,.5);color:var(--bad)}
+.hm-empty{text-align:center;padding:14px 0 6px;color:var(--muted);font-size:13px}
+.hm-empty p{margin:6px 0 0}
+.hm-eic{font-size:28px;opacity:.8}
+.av.sm{width:32px;height:32px;font-size:13px}
 </style>
 </head>
 <body>
@@ -7993,7 +8061,7 @@ function unwatchAll(){
   Object.keys(ON.unsub).forEach(k => { try{ ON.unsub[k](); }catch(e){} }); ON.unsub = {};
   if(ON.qUnsub){ try{ ON.qUnsub(); }catch(e){} ON.qUnsub = null; }
   if(ON.invUnsub){ try{ ON.invUnsub(); }catch(e){} ON.invUnsub = null; } ON.invOut = [];
-  Object.keys(REM).forEach(k => delete REM[k]); ON.meta = {};
+  Object.keys(REM).forEach(k => delete REM[k]); ON.meta = {}; stopHome();
 }
 async function startOnline(){
   const u = ON.user(), id = u ? u.uid : null, key = id ? id + "|" + ON.accountId() : null;
@@ -8204,7 +8272,7 @@ function paintOnline(box, t){
     box.append(dp); return;
   }
   p.append(el("p", "hint", (r && r.ownerName ? L("Admin: ", "Admin: ") + r.ownerName + ". " : "") + (role === "mod" ? L("Kamu moderator: bisa mengisi skor dan jadwal; perubahan langsung terlihat oleh semua.", "You are a moderator: you can enter scores and fixtures; changes show up for everyone instantly.") : L("Kamu pengikut: hanya bisa melihat, tampilan diperbarui otomatis.", "You are a follower: view only, the view updates automatically."))));
-  if(role === "follower") p.append(mkBtn(L("Berhenti mengikuti", "Unfollow"), "btn ghost sm danger", () => { if(confirm(L("Berhenti mengikuti turnamen ini?", "Unfollow this tournament?"))) unfollow(t.oid); }));
+  if(role === "follower") p.append(el("p", "hint", L("Untuk berhenti mengikuti, buka tab Beranda.", "To unfollow, open the Home tab.")));
   box.append(p);
 }
 function paintOnlineList(m){
@@ -8228,9 +8296,219 @@ function paintOnlineList(m){
     const tx = el("div"), nm = el("b", "", t.name); nm.append(" ", el("span", "badge", roleTxt(x.role)));
     tx.append(nm, el("small", "", sp(t)[lang] + " · " + FMT[t.fmt][lang] + " · " + t.teams.length + L(" tim", " teams") + " · " + done + "/" + all));
     b.append(el("span", "ic", sp(t).ic), tx);
-    b.onclick = () => { curId = "r:" + oid; tab = t.fmt === "ko" ? "bracket" : "sched"; view = "detail"; paint(); toTop(); };
+    b.onclick = () => { curId = "r:" + oid; tab = "home"; view = "detail"; paint(); toTop(); };
     m.append(b);
   });
+}
+
+/* ===== BERANDA TURNAMEN: ikuti, suka / tidak suka, komentar, panitia =====
+   Data online (Firestore): tournaments/{kode}/votes/{uid} = {v:1|-1, t}; tournaments/{kode}/comments/{id} = {u, a, n, x, t};
+   tournaments/{kode}/followers/{uid}. Komentar, suka, dan ikuti hanya untuk admin, moderator, dan pengikut
+   (dijaga juga oleh aturan Firestore: lihat firestore.rules). */
+const HS = {oid:null, un:[], up:0, down:0, mine:0, vBusy:false, fBusy:false, com:[], cReady:false, cErr:false, following:null, fcount:null, draft:"", posting:false, lastPost:0, max:50, ui:{}};
+const SVG_UP = "M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z";
+const SVG_DN = "M17 14V2M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z";
+const hmIcon = d => { const s = el("span", "hm-ico"); s.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '"/></svg>'; return s; };
+const fmtN = n => n >= 1000 ? (Math.round(n / 100) / 10) + L("rb", "k") : String(n);
+function ago(ts){
+  const s = Math.max(0, (Date.now() - (+ts || 0)) / 1000); if(s < 60) return L("baru saja", "just now");
+  const mi = Math.floor(s / 60); if(mi < 60) return L(mi + " mnt lalu", mi + "m ago");
+  const h = Math.floor(mi / 60); if(h < 24) return L(h + " jam lalu", h + "h ago");
+  const d = Math.floor(h / 24); if(d < 30) return L(d + " hari lalu", d + "d ago");
+  try{ return new Date(ts).toLocaleDateString(lang === "en" ? "en-GB" : "id-ID", {day:"numeric", month:"short", year:"numeric"}); }catch(e){ return ""; }
+}
+function stopHome(){ HS.un.forEach(f => { try{ f(); }catch(e){} }); HS.un = []; HS.oid = null; HS.ui = {}; }
+function homeLive(){ try{ if(view !== "detail" || tab !== "home") return; if(HS.ui.act && HS.ui.act.isConnected) fillAct(); if(HS.ui.list && HS.ui.list.isConnected) fillComments(); if(HS.ui.fc && HS.ui.fc.isConnected) HS.ui.fc.textContent = HS.fcount === null ? "…" : fmtN(HS.fcount); }catch(e){} }
+function countFollowers(oid){
+  ON.lib().then(({m, db:f}) => m.getCountFromServer(m.collection(f, "tournaments", oid, "followers"))).then(c => { if(HS.oid === oid){ HS.fcount = c.data().count; ON.counts[oid] = HS.fcount; homeLive(); } }).catch(() => {});
+}
+function startHome(oid){
+  if(HS.oid === oid) return;
+  stopHome(); Object.assign(HS, {oid, up:0, down:0, mine:0, vBusy:false, fBusy:false, com:[], cReady:false, cErr:false, following:null, fcount:ON.counts[oid] === undefined ? null : ON.counts[oid]});
+  const u = ON.user(); if(!u) return;
+  ON.lib().then(({m, db:f}) => {
+    if(HS.oid !== oid) return;
+    const sub = (q, ok, bad) => { try{ HS.un.push(m.onSnapshot(q, s => { if(HS.oid === oid) ok(s); }, e => { if(HS.oid === oid) bad(e); })); }catch(e){} };
+    sub(m.collection(f, "tournaments", oid, "votes"), snap => {
+      let up = 0, dn = 0, mine = 0;
+      snap.forEach(d => { const v = d.data().v; if(v === 1) up++; else if(v === -1) dn++; if(d.id === u.uid) mine = v === 1 ? 1 : v === -1 ? -1 : 0; });
+      HS.up = up; HS.down = dn; HS.mine = mine; homeLive();
+    }, () => {});
+    sub(m.query(m.collection(f, "tournaments", oid, "comments"), m.orderBy("t", "desc"), m.limit(HS.max)), snap => {
+      HS.com = snap.docs.map(d => Object.assign({id:d.id}, d.data())); HS.cReady = true; HS.cErr = false; homeLive();
+    }, () => { HS.cReady = true; HS.cErr = true; homeLive(); });
+    sub(m.doc(f, "tournaments", oid, "followers", u.uid), snap => { HS.following = snap.exists(); homeLive(); }, () => { HS.following = false; homeLive(); });
+    countFollowers(oid);
+  }).catch(() => {});
+}
+async function toggleFollow(t){
+  const u = ON.user(), oid = t.oid, role = roleOf(); if(!u || !oid || HS.fBusy) return;
+  if(navigator.onLine === false){ toast(L("Sedang offline.", "You are offline.")); return; }
+  if(HS.following){
+    if(!confirm(L("Berhenti mengikuti turnamen ini?", "Unfollow this tournament?"))) return;
+    if(role === "follower"){ unfollow(oid); return; }
+    HS.fBusy = true;
+    try{
+      const {m, db:f} = await ON.lib(); await withTimeout(m.deleteDoc(m.doc(f, "tournaments", oid, "followers", u.uid)));
+      ON.setJoined(ON.joined().filter(i => i !== oid)); HS.following = false; toast(L("Berhenti mengikuti.", "Unfollowed.")); countFollowers(oid);
+    }catch(e){ toast(errTxt(e)); }
+  } else {
+    HS.fBusy = true;
+    try{
+      const {m, db:f} = await ON.lib(); await withTimeout(m.setDoc(m.doc(f, "tournaments", oid, "followers", u.uid), po({n:String(ON.nm(u)), t:Date.now()})));
+      if(!db.list.some(x => x.oid === oid)) ON.setJoined(ON.joined().concat(oid));
+      HS.following = true; toast(L("Berhasil mengikuti turnamen.", "Now following the tournament.")); countFollowers(oid);
+    }catch(e){ toast(errTxt(e)); }
+  }
+  HS.fBusy = false; homeLive();
+}
+async function setVote(t, v){
+  const u = ON.user(); if(!u || HS.vBusy || !t.oid) return;
+  if(navigator.onLine === false){ toast(L("Sedang offline.", "You are offline.")); return; }
+  const next = HS.mine === v ? 0 : v; HS.vBusy = true;
+  try{
+    const {m, db:f} = await ON.lib(), ref = m.doc(f, "tournaments", t.oid, "votes", u.uid);
+    if(next === 0) await withTimeout(m.deleteDoc(ref)); else await withTimeout(m.setDoc(ref, po({v:next, t:Date.now()})));
+  }catch(e){ toast(errTxt(e)); }
+  HS.vBusy = false; homeLive();
+}
+function fillAct(){
+  const box = HS.ui.act, t = cur(); if(!box || !t || !t.oid) return;
+  const role = roleOf(), u = ON.user(); box.textContent = "";
+  if(!u){ box.append(el("p", "hint", L("Masuk dengan Google untuk mengikuti, menilai, dan berkomentar.", "Sign in with Google to follow, rate and comment."))); loginBtn(box); return; }
+  const fr = el("div", "hm-row");
+  if(role === "admin"){
+    fr.append(el("div", "hm-own", L("👑 Kamu admin turnamen ini", "👑 You are the admin of this tournament")), mkBtn(L("Bagikan", "Share"), "btn ghost sm", () => shareCode(t)));
+  } else {
+    const fb = el("button", "hm-follow" + (HS.following ? " on" : "")); fb.type = "button"; fb.disabled = HS.following === null || HS.fBusy;
+    fb.textContent = HS.following === null ? "…" : HS.following ? L("✓ Mengikuti", "✓ Following") : L("＋ Ikuti turnamen", "＋ Follow tournament");
+    if(HS.following) fb.setAttribute("aria-label", L("Mengikuti. Ketuk untuk berhenti mengikuti", "Following. Tap to unfollow"));
+    fb.onclick = () => toggleFollow(t); fr.append(fb);
+  }
+  box.append(fr);
+  if(HS.following) box.append(el("small", "hm-sm", L("Ketuk tombol di atas untuk berhenti mengikuti.", "Tap the button above to unfollow.")));
+  const vr = el("div", "hm-row"), mkV = (v, label, cnt) => {
+    const b = el("button", "hm-vote " + (v === 1 ? "up" : "dn") + (HS.mine === v ? " on" : "")); b.type = "button"; b.disabled = HS.vBusy;
+    b.setAttribute("aria-pressed", String(HS.mine === v)); b.setAttribute("aria-label", label + " (" + cnt + ")");
+    b.append(hmIcon(v === 1 ? SVG_UP : SVG_DN), el("span", "hm-vn", fmtN(cnt)), el("span", "hm-vl", label)); b.onclick = () => setVote(t, v); return b;
+  };
+  vr.append(mkV(1, L("Suka", "Like"), HS.up), mkV(-1, L("Tidak suka", "Dislike"), HS.down)); box.append(vr);
+  const tot = HS.up + HS.down;
+  if(tot > 0){
+    const sb = el("div", "hm-sent"), a = el("span", "up"), b = el("span", "dn"); a.style.width = (HS.up / tot * 100) + "%"; b.style.width = (HS.down / tot * 100) + "%"; sb.append(a, b);
+    sb.setAttribute("role", "img"); sb.setAttribute("aria-label", Math.round(HS.up / tot * 100) + "% " + L("suka", "like")); box.append(sb);
+  }
+}
+async function delComment(t, c){
+  if(!confirm(L("Hapus komentar ini?", "Delete this comment?"))) return;
+  try{ const {m, db:f} = await ON.lib(); await withTimeout(m.deleteDoc(m.doc(f, "tournaments", t.oid, "comments", c.id))); }catch(e){ toast(errTxt(e)); }
+}
+function fillComments(){
+  const box = HS.ui.list, t = cur(); if(!box || !t || !t.oid) return;
+  const n = HS.com.length; if(HS.ui.cnt) HS.ui.cnt.textContent = L("KOMENTAR", "COMMENTS") + (HS.cReady && !HS.cErr ? " · " + n + (n >= HS.max ? "+" : "") : "");
+  box.textContent = "";
+  if(!ON.user()) return;
+  if(!HS.cReady){ box.append(el("p", "hint", L("Memuat komentar…", "Loading comments…"))); return; }
+  if(HS.cErr){ box.append(el("p", "err", L("Komentar tidak bisa dimuat. Pastikan aturan Firestore sudah diperbarui.", "Comments could not be loaded. Make sure the Firestore rules are updated."))); return; }
+  if(!n){ const e = el("div", "hm-empty"); e.append(el("div", "hm-eic", "💬"), el("p", "", L("Belum ada komentar. Jadilah yang pertama!", "No comments yet. Be the first!"))); box.append(e); return; }
+  const role = roleOf(), mt = ON.meta[t.oid] || {}, me = ON.user();
+  HS.com.forEach(c => {
+    const rr = c.u && mt.owner && c.u === mt.owner ? "admin" : (c.a && (mt.mods || []).includes(c.a)) ? "mod" : "";
+    const row = el("div", "hm-c"), av = mkAv({name:c.n}), body = el("div", "hm-cb"), hd = el("div", "hm-ch");
+    av.classList.add("sm");
+    hd.append(el("span", "hm-cn", c.n || L("Pengguna", "User")));
+    if(rr) hd.append(el("span", "hm-role " + rr, rr === "admin" ? "ADMIN" : "MOD"));
+    hd.append(el("span", "hm-ct", ago(c.t)));
+    if((me && c.u === me.uid) || role === "admin" || role === "mod"){
+      const d = el("button", "hm-del", "✕"); d.type = "button"; d.setAttribute("aria-label", L("Hapus komentar", "Delete comment")); d.onclick = () => delComment(t, c); hd.append(d);
+    }
+    body.append(hd, el("p", "hm-cx", String(c.x || ""))); row.append(av, body); box.append(row);
+  });
+  if(n >= HS.max) box.append(el("p", "hint", L("Menampilkan " + HS.max + " komentar terbaru.", "Showing the latest " + HS.max + " comments.")));
+}
+async function postComment(t, ta, send){
+  const u = ON.user(); if(!u || HS.posting) return;
+  const x = ta.value.replace(/\r/g, "").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "").replace(/\n{3,}/g, "\n\n").trim().slice(0, 300);
+  if(!x) return;
+  if(!ON.accountId()){ toast(L("Akunmu belum siap. Coba lagi sebentar.", "Your account is not ready yet. Try again in a moment.")); return; }
+  if(Date.now() - HS.lastPost < 3000){ toast(L("Tunggu sebentar sebelum mengirim lagi.", "Wait a moment before posting again.")); return; }
+  if(navigator.onLine === false){ toast(L("Sedang offline.", "You are offline.")); return; }
+  HS.posting = true; send.disabled = true;
+  try{
+    const {m, db:f} = await ON.lib();
+    await withTimeout(m.addDoc(m.collection(f, "tournaments", t.oid, "comments"), po({u:String(u.uid), a:String(ON.accountId()), n:clean(ON.nm(u), 40) || L("Pengguna", "User"), x, t:Date.now()})));
+    HS.lastPost = Date.now(); HS.draft = ""; ta.value = ""; ta.dispatchEvent(new Event("input"));
+  }catch(e){ toast(errTxt(e)); }
+  HS.posting = false; send.disabled = !ta.value.trim();
+}
+function buildComposer(t){
+  const w = el("div", "hm-compose"), u = ON.user(), role = roleOf();
+  if(!u || role === "local"){ w.append(el("div", "hm-lock", L("🔒 Hanya admin, moderator, dan pengikut yang bisa berkomentar.", "🔒 Only the admin, moderators and followers can comment."))); return w; }
+  const ta = el("textarea", "hm-in"), cnt = el("small", "hm-cnt"), send = el("button", "btn sm", L("Kirim", "Post")), bar = el("div", "hm-cbar");
+  ta.maxLength = 300; ta.rows = 2; ta.value = HS.draft; ta.placeholder = L("Tulis komentar…", "Write a comment…"); ta.setAttribute("aria-label", L("Komentar", "Comment"));
+  send.type = "button";
+  const upd = () => { cnt.textContent = ta.value.length + "/300"; send.disabled = HS.posting || !ta.value.trim(); };
+  ta.oninput = () => { HS.draft = ta.value; upd(); };
+  ta.onkeydown = e => { if(e.key === "Enter" && (e.ctrlKey || e.metaKey) && !send.disabled){ e.preventDefault(); send.click(); } };
+  send.onclick = () => postComment(t, ta, send);
+  bar.append(cnt, send); w.append(ta, bar, el("small", "hm-sm", L("Hanya admin, moderator, dan pengikut yang bisa berkomentar.", "Only the admin, moderators and followers can comment."))); upd(); return w;
+}
+function progressOf(t){
+  const ko = t.ko ? t.ko.flat().filter(x => !x.bye) : [];
+  return {done:t.matches.filter(x => x.sa !== null && x.sb !== null).length + ko.filter(x => x.sa !== null && x.sb !== null).length, all:t.matches.length + ko.length};
+}
+function paintHero(t, live){
+  const pg = progressOf(t), ch = champion(t), st = ch !== null ? "end" : pg.done === 0 ? "new" : "run";
+  const h = el("div", "hm-hero"), top = el("div", "hm-top"), tx = el("div"); tx.style.minWidth = 0;
+  tx.append(el("h3", "hm-name", t.name), el("p", "hm-meta", sp(t)[lang] + " · " + FMT[t.fmt][lang]));
+  top.append(el("div", "hm-ic", sp(t).ic), tx); h.append(top);
+  const chips = el("div", "hm-chips"), sc = el("span", "hm-chip " + st); if(st === "run") sc.append(el("i", "hm-dot"));
+  sc.append(st === "end" ? L("Selesai", "Finished") : st === "run" ? L("Sedang berjalan", "In progress") : L("Belum dimulai", "Not started"));
+  chips.append(sc); chips.append(el("span", "hm-chip", live ? "🌐 Online" : L("📁 Lokal", "📁 Local")));
+  const rl = roleOf(); if(rl !== "local") chips.append(el("span", "hm-chip role", roleTxt(rl)));
+  h.append(chips);
+  const pr = el("div", "hm-prog"), bar = el("div", "hm-bar"), fill = el("span"), pc = pg.all ? Math.round(pg.done / pg.all * 100) : 0;
+  fill.style.width = pc + "%"; bar.append(fill); bar.setAttribute("role", "progressbar"); bar.setAttribute("aria-valuemin", "0"); bar.setAttribute("aria-valuemax", "100"); bar.setAttribute("aria-valuenow", String(pc));
+  pr.append(bar); h.append(pr);
+  const g = el("div", "hm-stats"), cell = (v, l) => { const c = el("div", "hm-stat"), b = el("b", "", v); c.append(b, el("span", "", l)); return [c, b]; };
+  const c1 = cell(String(t.teams.length), L("Tim", "Teams")), c2 = cell(pg.done + "/" + pg.all, L("Laga selesai", "Matches played")), c3 = cell(live ? (HS.fcount === null ? "…" : fmtN(HS.fcount)) : "–", L("Pengikut", "Followers"));
+  if(live) HS.ui.fc = c3[1];
+  g.append(c1[0], c2[0], c3[0]); h.append(g);
+  return h;
+}
+function paintCrew(box, t){
+  const r = remOf(), u = ON.user(), role = roleOf(), mt = ON.meta[t.oid] || (r ? {mods:r.mods, ownerName:r.ownerName} : {mods:[]});
+  const p = el("div", "panel keep"), person = (pr, sub, chip, me) => {
+    const row = el("div", "hm-ppl"), w = el("div", "grow"), nm = el("p", "pn", (pr && pr.name) || sub || "-"); w.style.minWidth = 0;
+    if(me) nm.append(" ", el("span", "hm-you", L("Kamu", "You")));
+    w.append(nm); if(sub && pr && pr.name) w.append(el("p", "pi", sub)); row.append(mkAv(pr), w); if(chip) row.append(chip); return row;
+  };
+  p.append(el("span", "label", L("PANITIA TURNAMEN", "TOURNAMENT ORGANIZERS")));
+  p.append(el("div", "hm-sec", "ADMIN"));
+  let an = mt.ownerName || (r && r.ownerName) || "", photo = "";
+  if(role === "admin" && u){ an = ON.nm(u) || an; const A = ON.A(); photo = (A && A.photo && A.photoUid === u.uid) ? A.photo : (u.photoURL || ""); }
+  p.append(person({name:an || L("Admin", "Admin"), photo}, "", el("span", "hm-role admin", "ADMIN"), role === "admin"));
+  const mods = (mt.mods || []);
+  p.append(el("div", "hm-sec", L("MODERATOR", "MODERATORS") + (mods.length ? " · " + mods.length : "")));
+  if(!mods.length) p.append(el("p", "hint", L("Belum ada moderator.", "No moderators yet.")));
+  mods.forEach(id => { needProf(id); const pr = ON.prof[id]; p.append(person(pr ? pr : {name:id}, id, el("span", "hm-role mod", "MOD"), id === ON.accountId())); });
+  box.append(p);
+}
+function paintHome(box, t){
+  const role = roleOf(), live = !!t.oid && role !== "local";
+  if(live) startHome(t.oid); else stopHome();
+  HS.ui = {};
+  box.append(paintHero(t, live));
+  if(!live){
+    const p = el("div", "panel stack keep");
+    p.append(el("span", "label", L("🌐 FITUR ONLINE", "🌐 ONLINE FEATURES")), el("p", "hint", L("Jadikan turnamen ini online untuk membuka tombol ikuti, suka dan tidak suka, komentar, serta panitia (admin dan moderator).", "Take this tournament online to unlock follow, like and dislike, comments, and the organizers (admin and moderators).")));
+    p.append(mkBtn(L("Buka tab Online", "Open the Online tab"), "btn ghost sm", () => { tab = "online"; paint(); }));
+    box.append(p); return;
+  }
+  const act = el("div", "panel stack keep hm-act"); HS.ui.act = act; box.append(act); fillAct();
+  paintCrew(box, t);
+  const cp = el("div", "panel stack keep"), cnt = el("span", "label"), list = el("div", "hm-list");
+  HS.ui.cnt = cnt; HS.ui.list = list; cp.append(cnt, buildComposer(t), list); box.append(cp); fillComments();
 }
 
 function paint(){
@@ -8238,6 +8516,7 @@ function paint(){
   $("sub").textContent = L("Atur turnamen olahraga atau eSports: jadwal, skor, klasemen, dan bagan.", "Run a sports or eSports tournament: fixtures, scores, standings, and bracket.");
   $("langBtn").textContent = lang === "en" ? "English" : "Indonesia"; paintSide();
   const m = $("main"); m.textContent = "";
+  if(view !== "detail") stopHome();
   if(view === "list") paintList(m); else if(view === "new") paintNew(m); else paintDetail(m);
 }
 function toTop(){ try{ window.scrollTo({top:0}); }catch(e){} }
@@ -8253,7 +8532,7 @@ function paintList(m){
     const all = t.matches.length + (t.ko ? t.ko.flat().filter(x => !x.bye).length : 0);
     const tx = el("div"); tx.append(el("b", "", (t.oid ? "🌐 " : "") + t.name), el("small", "", sp(t)[lang] + " · " + FMT[t.fmt][lang] + " · " + t.teams.length + L(" tim", " teams") + " · " + done + "/" + all));
     b.append(el("span", "ic", sp(t).ic), tx);
-    b.onclick = () => { curId = t.id; tab = t.fmt === "ko" ? "bracket" : "sched"; view = "detail"; paint(); toTop(); };
+    b.onclick = () => { curId = t.id; tab = "home"; view = "detail"; paint(); toTop(); };
     m.append(b);
   });
   paintOnlineList(m);
@@ -8338,7 +8617,7 @@ function paintNew(m){
     if(d.fmt !== "ko" && SPORTS[d.sport].set && d.pts[0] <= d.pts[2]) return void (err.textContent = L("Poin menang harus lebih besar dari poin kalah.", "Win points must exceed loss points."));
     if(d.fmt !== "ko" && !SPORTS[d.sport].set && d.pts[0] === d.pts[2] && d.pts[1] === d.pts[2]) return void (err.textContent = L("Poin menang, seri, dan kalah tidak boleh sama semua.", "Win, draw and loss points cannot all be equal."));
     const t = create({name, sport:d.sport, fmt:d.fmt, best:SPORTS[d.sport].set ? d.best : 0, stb:!!d.stb && d.sport === "padel" && d.best === 3, pts:d.pts.slice(), draw:d.fmt === "ko" ? true : d.draw, dbl:d.fmt === "ko" ? false : d.dbl, teams, groups:d.groups, q:d.q});
-    db.list.push(t); persist(); curId = t.id; tab = t.fmt === "ko" ? "bracket" : "sched"; view = "detail"; draft = null; paint(); toTop();
+    db.list.push(t); persist(); curId = t.id; tab = "home"; view = "detail"; draft = null; paint(); toTop();
     toast(L("Turnamen dibuat.", "Tournament created."));
   };
   m.append(back, p, err, go);
@@ -8355,18 +8634,20 @@ function paintDetail(m){
   const t = cur(); if(!t){ view = "list"; return paintList(m); }
   const hd = el("div", "dhead");
   const back = el("button", "btn ghost sm", "‹"); back.type = "button"; back.setAttribute("aria-label", L("Kembali", "Back")); back.onclick = () => { view = "list"; paint(); toTop(); };
-  const rl = roleOf(), h2 = el("h2", "", sp(t).ic + " " + t.name); if(rl !== "local") h2.append(" ", el("span", "badge", roleTxt(rl)));
+  const rl = roleOf(), h2 = el("h2", "");
   hd.append(back, h2); m.append(hd);
   const ch = champion(t);
   if(ch !== null){ const c = el("div", "champ"); c.append(el("div", "label", L("🏆 JUARA", "🏆 CHAMPION")), el("div", "big", t.teams[ch])); m.append(c); }
-  const tabs = [["sched", L("Jadwal", "Fixtures"), t.fmt !== "ko"], ["table", L("Klasemen", "Table"), t.fmt !== "ko"], ["bracket", L("Bagan", "Bracket"), t.fmt !== "league"], ["players", L("Pemain", "Players"), true], ["online", "🌐 Online", true], ["more", L("Lainnya", "More"), true]].filter(x => x[2]);
+  const tabs = [["home", L("🏠 Beranda", "🏠 Home"), true], ["sched", L("Jadwal", "Fixtures"), t.fmt !== "ko"], ["table", L("Klasemen", "Table"), t.fmt !== "ko"], ["bracket", L("Bagan", "Bracket"), t.fmt !== "league"], ["players", L("Pemain", "Players"), true], ["online", "🌐 Online", true], ["more", L("Lainnya", "More"), true]].filter(x => x[2]);
   if(!tabs.some(x => x[0] === tab)) tab = tabs[0][0];
+  h2.append(tab === "home" ? L("🏠 Beranda turnamen", "🏠 Tournament home") : sp(t).ic + " " + t.name); if(rl !== "local") h2.append(" ", el("span", "badge", roleTxt(rl)));
+  if(tab !== "home") stopHome();
   const tb = el("div", "tabs"); tb.setAttribute("role", "tablist");
   tabs.forEach(x => { const b = el("button", "tab", x[1]); b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(tab === x[0])); b.onclick = () => { tab = x[0]; paint(); }; tb.append(b); });
   m.append(tb);
   const box = el("div", "stack"); m.append(box);
-  if(tab === "sched") paintSched(box, t); else if(tab === "table") paintTable(box, t); else if(tab === "bracket") paintBracket(box, t); else if(tab === "players") paintPlayers(box, t); else if(tab === "online") paintOnline(box, t); else paintMore(box, t);
-  if(tab !== "online" && rl === "follower") lockRO(box);
+  if(tab === "home") paintHome(box, t); else if(tab === "sched") paintSched(box, t); else if(tab === "table") paintTable(box, t); else if(tab === "bracket") paintBracket(box, t); else if(tab === "players") paintPlayers(box, t); else if(tab === "online") paintOnline(box, t); else paintMore(box, t);
+  if(tab !== "online" && tab !== "home" && rl === "follower") lockRO(box);
 }
 function tn(t, i, cls){ return el("div", "tn " + (cls || ""), i === null ? L("Menunggu", "TBD") : t.teams[i]); }
 function paintSched(box, t){
@@ -9225,7 +9506,6 @@ if(navigator.onLine !== false) init().catch(() => {});
       pb.addEventListener("click", () => { editing = false; eErr = eMsg = pErr = pMsg = ""; if(typeof showView === "function") showView("profile"); });
       box.appendChild(pb);
       const ir = idRow(a, t); if(ir) box.appendChild(ir);
-      if(a.sync) box.appendChild(mk("p", "hsync", a.sync === "sync" ? t.sy : a.sync === "ok" ? t.sok : a.sync === "off" ? t.soff : t.serr));
     } else {
       const b = mk("button", "gbtn"); b.type = "button"; b.disabled = busy;
       b.innerHTML = G; b.appendChild(mk("span", null, t.login));
@@ -9306,6 +9586,8 @@ if(navigator.onLine !== false) init().catch(() => {});
     /* ID akun: hanya dilihat dan disalin, tidak bisa diubah */
     const fi = mk("div", "fld"), ir = idRow(a, t, true);
     if(ir){ fi.appendChild(mk("p", "fl", t.idl)); fi.appendChild(ir); pv.appendChild(fi); }
+    /* status sinkron data ("Data tersimpan di akun Google kamu") ada di halaman Profil */
+    if(a.sync) pv.appendChild(mk("p", "hsync", a.sync === "sync" ? t.sy : a.sync === "ok" ? t.sok : a.sync === "off" ? t.soff : t.serr));
     /* Keluar akun ada di halaman Profil */
     const lo = mk("button", "obtn", t.logout); lo.type = "button";
     lo.addEventListener("click", async () => { const x = window.satuTitikAuth; if(x){ try{ await x.logout(); }catch(e){} } paint(); });
