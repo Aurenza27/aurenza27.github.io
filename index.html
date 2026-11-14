@@ -7532,6 +7532,33 @@ button:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
 .opts{display:flex;flex-wrap:wrap;gap:6px}
 .opt{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--text);font:inherit;font-size:13px;cursor:pointer}
 .opt[aria-pressed=true]{border-color:var(--gold);color:var(--gold2);background:rgba(212,169,79,.12)}
+/* pemilih cabang olahraga: daftar yang bisa digulir, dilipat per kelompok, dan diminimalkan */
+.spk{display:flex;flex-direction:column;gap:8px}
+.spk-tr{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:8px 14px 8px 10px;border-radius:14px;border:1px solid var(--line);background:var(--inp);color:var(--text);font:inherit;text-align:left;cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.spk-tr:hover{border-color:rgba(212,169,79,.5)}
+.spk-tr[aria-expanded=true]{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,169,79,.14)}
+.spk-tr:focus-visible,.spk-gh:focus-visible,.spk-it:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.spk-ic{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:rgba(212,169,79,.12);border:1px solid rgba(212,169,79,.28);font-size:21px;line-height:1}
+.spk-ic.sm{width:34px;height:34px;font-size:18px;border-radius:10px}
+.spk-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.spk-tx b{font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spk-tx small{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.spk-ch{flex:none;width:8px;height:8px;margin:0 4px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translate(-2px,-2px);transition:transform .22s}
+[aria-expanded=true]>.spk-ch{transform:rotate(-135deg) translate(-2px,-2px)}
+.spk-pn,.spk-gp{display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .24s ease,visibility 0s .24s}
+.spk-pn.open,.spk-gp.open{grid-template-rows:1fr;visibility:visible;transition:grid-template-rows .24s ease,visibility 0s}
+.spk-in,.spk-gin{min-height:0;overflow:hidden}
+.spk-sc{max-height:min(52vh,380px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;border:1px solid var(--line);border-radius:14px;background:var(--inp);padding:0 4px 4px}
+.spk-gh{position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:6px 8px;border:0;border-radius:10px;background:var(--inp);color:var(--gold2);font:inherit;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-align:left;cursor:pointer}
+.spk-gi{font-size:15px;letter-spacing:0}
+.spk-gt{flex:1;min-width:0}
+.spk-gn{padding:1px 9px;border:1px solid var(--line);border-radius:999px;font-size:11px;font-weight:400;letter-spacing:0;color:var(--muted)}
+.spk-it{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;padding:6px 10px;margin:2px 0;border:1px solid transparent;border-radius:11px;background:transparent;color:var(--text);font:inherit;font-size:15px;text-align:left;cursor:pointer}
+.spk-it:hover{background:rgba(255,255,255,.04)}
+.spk-it[aria-pressed=true]{background:rgba(212,169,79,.12);border-color:rgba(212,169,79,.4);color:var(--gold2)}
+.spk-nm{flex:1;min-width:0}
+.spk-ok{flex:none;width:18px;color:var(--gold2);font-weight:700;text-align:center}
+@media (prefers-reduced-motion:reduce){.spk-pn,.spk-gp,.spk-ch,.spk-tr{transition:none}}
 .hint{margin:0;font-size:12px;color:var(--muted);line-height:1.5;font-style:italic}
 .err{margin:0;min-height:0;color:var(--bad);font-size:13px;line-height:1.4}
 .err:empty{display:none}
@@ -7852,6 +7879,12 @@ const SPORTS = {
   other:{ic:"🏅", id:"Lainnya", en:"Other", pts:[3,1,0], draw:true}
 };
 const sp = t => SPORTS[t.sport] || SPORTS.other;
+const SPORT_GROUPS = [
+  {k:"ball", ic:"⚽", id:"Olahraga bola", en:"Ball sports", items:["football","futsal","handball","basket","volley"]},
+  {k:"racket", ic:"🏸", id:"Olahraga raket", en:"Racket sports", items:["tennis","tabletennis","badminton","padel"]},
+  {k:"esport", ic:"🎮", id:"eSports", en:"eSports", items:["esports"]},
+  {k:"other", ic:"🏅", id:"Lainnya", en:"Other", items:["other"]}
+];
 const FMT = {
   league:{id:"Liga (semua lawan semua)", en:"League (round robin)"},
   ko:{id:"Gugur (kalah tersingkir)", en:"Knockout"},
@@ -8928,6 +8961,41 @@ function importAll(file){
   rd.readAsText(file);
 }
 
+
+/* pemilih cabang olahraga: tombol ringkas yang bisa dibuka/ditutup, daftar bergulir, tiap kelompok bisa dilipat */
+function sportPicker(d, onPick){
+  d.spC = d.spC || {};
+  const grpOf = k => SPORT_GROUPS.find(g => g.items.includes(k)) || SPORT_GROUPS[SPORT_GROUPS.length - 1];
+  const cur = SPORTS[d.sport] || SPORTS.other, lid = "spkl" + Math.random().toString(36).slice(2, 7);
+  const wrap = el("div", "fld"), lab = el("span", "", L("Cabang olahraga", "Sport")); lab.id = lid;
+  const root = el("div", "spk");
+  const tr = el("button", "spk-tr"); tr.type = "button"; tr.setAttribute("aria-expanded", String(!!d.spOpen)); tr.setAttribute("aria-labelledby", lid + " " + lid + "v");
+  const tx = el("span", "spk-tx"), nmB = el("b", "", cur[lang]); nmB.id = lid + "v"; tx.append(nmB, el("small", "", grpOf(d.sport)[lang]));
+  tr.append(el("span", "spk-ic", cur.ic), tx, el("span", "spk-ch"));
+  const pn = el("div", "spk-pn" + (d.spOpen ? " open" : "")), inn = el("div", "spk-in"), sc = el("div", "spk-sc");
+  SPORT_GROUPS.forEach(g => {
+    const open = !d.spC[g.k], box = el("div", "spk-g");
+    const gh = el("button", "spk-gh"); gh.type = "button"; gh.setAttribute("aria-expanded", String(open));
+    gh.append(el("span", "spk-gi", g.ic), el("span", "spk-gt", g[lang]), el("span", "spk-gn", String(g.items.length)), el("span", "spk-ch"));
+    const gp = el("div", "spk-gp" + (open ? " open" : "")), gin = el("div", "spk-gin");
+    g.items.forEach(k => {
+      const sx = SPORTS[k], ob = el("button", "spk-it"); ob.type = "button"; ob.setAttribute("aria-pressed", String(d.sport === k));
+      ob.append(el("span", "spk-ic sm", sx.ic), el("span", "spk-nm", sx[lang]), el("span", "spk-ok", d.sport === k ? "✓" : ""));
+      ob.onclick = () => { d.spOpen = false; onPick(k); };
+      gin.append(ob);
+    });
+    gp.append(gin);
+    gh.onclick = () => { d.spC[g.k] = !d.spC[g.k]; const o = !d.spC[g.k]; gp.classList.toggle("open", o); gh.setAttribute("aria-expanded", String(o)); };
+    box.append(gh, gp); sc.append(box);
+  });
+  inn.append(sc); pn.append(inn);
+  const toggle = v => { d.spOpen = v; pn.classList.toggle("open", v); tr.setAttribute("aria-expanded", String(v)); };
+  tr.onclick = () => toggle(!d.spOpen);
+  root.onkeydown = e => { if(e.key === "Escape" && d.spOpen){ toggle(false); tr.focus(); } };
+  root.append(tr, pn); wrap.append(lab, root);
+  return wrap;
+}
+
 function paintNew(m){
   if(!draft) draft = {name:"", sport:"football", fmt:"league", teams:"", dbl:false, groups:2, q:2, pts:SPORTS.football.pts.slice(), draw:true};
   const d = draft;
@@ -8935,16 +9003,13 @@ function paintNew(m){
   const p = el("div", "panel stack");
   const fld = (label, node) => { const f = el("label", "fld"); f.append(el("span", "", label), node); return f; };
   const nm = el("input"); nm.maxLength = 60; nm.placeholder = L("Contoh: Piala RT 05", "e.g. Neighborhood Cup"); nm.value = d.name; nm.oninput = () => { d.name = nm.value; };
-  const sel = el("select");
-  Object.keys(SPORTS).forEach(k => { const o = el("option", "", SPORTS[k].ic + " " + SPORTS[k][lang]); o.value = k; sel.append(o); });
-  sel.value = d.sport;
-  sel.onchange = () => { d.sport = sel.value; d.pts = SPORTS[d.sport].pts.slice(); d.draw = SPORTS[d.sport].draw; d.best = SPORTS[d.sport].best || 0; d.stb = false; paint(); };
+  const sel = sportPicker(d, k => { d.sport = k; d.pts = SPORTS[d.sport].pts.slice(); d.draw = SPORTS[d.sport].draw; d.best = SPORTS[d.sport].best || 0; d.stb = false; paint(); });
   const fm = el("div", "opts");
   Object.keys(FMT).forEach(k => { const b = el("button", "opt", FMT[k][lang]); b.type = "button"; b.setAttribute("aria-pressed", String(d.fmt === k)); b.onclick = () => { d.fmt = k; paint(); }; fm.append(b); });
   const ta = el("textarea"); ta.placeholder = L("Satu nama tim per baris (minimal 2)", "One team name per line (min. 2)"); ta.value = d.teams; ta.oninput = () => { d.teams = ta.value; cnt.textContent = teamList().length + L(" tim", " teams"); };
   const cnt = el("small", "hint"); const teamList = () => { const seen = new Set(), out = []; d.teams.split("\n").forEach(x => { const n = clean(x); if(n && !seen.has(n.toLowerCase())){ seen.add(n.toLowerCase()); out.push(n); } }); return out; };
   cnt.textContent = teamList().length + L(" tim", " teams");
-  p.append(fld(L("Nama turnamen", "Tournament name"), nm), fld(L("Cabang olahraga", "Sport"), sel), fld(L("Format", "Format"), fm));
+  p.append(fld(L("Nama turnamen", "Tournament name"), nm), sel, fld(L("Format", "Format"), fm));
   setOpts(p, d, fld);
   p.append(fld(L("Daftar tim", "Teams"), ta), cnt);
   if(d.fmt !== "ko"){
