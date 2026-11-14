@@ -7664,7 +7664,7 @@ const ON = {
 const roleTxt = r => r === "admin" ? "ADMIN" : r === "mod" ? L("MODERATOR", "MODERATOR") : r === "follower" ? L("PENGIKUT", "FOLLOWER") : "";
 const newCode = () => { const c = "abcdefghjkmnpqrstuvwxyz23456789"; let s = ""; const a = new Uint32Array(10); (window.crypto || {getRandomValues:x => x.forEach((_, i) => x[i] = Math.random() * 4e9)}).getRandomValues(a); a.forEach(n => s += c[n % c.length]); return s; };
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rj) => setTimeout(() => rj({code:"timeout"}), ms || 15000))]);
-const ONVER = "online-v7";
+const ONVER = "online-v8";
 /* Firestore dimuat di Beranda (jendela induk); objek data harus dibuat dari Object milik induk, kalau tidak ditolak ("custom Object object") */
 const po = src => {
   let P = window; try{ if(window.parent && window.parent !== window && window.parent.Object) P = window.parent; }catch(e){}
@@ -7698,7 +7698,14 @@ function roleFrom(x){ const u = ON.user(); if(u && x.owner === u.uid) return "ad
 /* terapkan data dokumen server ke tampilan lokal */
 function applyDoc(oid, x){
   if(!x) return;
-  const role = roleFrom(x), own = db.list.find(t => t.oid === oid);
+  const role = roleFrom(x); let own = db.list.find(t => t.oid === oid);
+  /* turnamen lokal milik akun Google lain (sisa dari akun sebelumnya di perangkat ini): lepas dari daftar akun ini */
+  if(own && ON.user() && x.owner !== ON.user().uid){
+    db.list = db.list.filter(t => t !== own); save("data", db); delete ON.dirty[oid]; ON.saveDirty();
+    if(ON.unsub[oid]){ try{ ON.unsub[oid](); }catch(e){} delete ON.unsub[oid]; }
+    if(curId === own.id){ view = "list"; curId = null; }
+    rerender(); return;
+  }
   const prev = JSON.stringify(ON.meta[oid] || {}) + (REM[oid] ? REM[oid].role : "");
   ON.meta[oid] = {owner:x.owner, ownerName:x.ownerName || "", mods:(x.modEmails || []).slice(), u:x.u || 0};
   let changed = false;
@@ -8330,6 +8337,7 @@ function fsOpen(m, ai){
 }
 A.getDb = async () => { const m = await import(BASE + "firebase-firestore.js"); const f = await init(); return { m, db: fsOpen(m, f.ai) }; };
 A.logout = async () => {
+  try{ await SY.now(); }catch(e){}   /* kirim perubahan terakhir ke cloud sebelum keluar */
   try{ const { a, auth } = await init(); await auth.signOut(a); }catch(e){}
   A.error = null; emit();
 };
@@ -8408,14 +8416,17 @@ const SY = (() => {
       await lib();
       if(!merged){
         set("sync");
-        const first = localStorage.getItem(M_UID) !== uid;
+        const prevUid = localStorage.getItem(M_UID), first = prevUid !== uid;
+        let wiped = false;
+        /* pindah ke akun Google LAIN di perangkat yang sama: buang data lokal milik akun sebelumnya (masih aman di cloud-nya) supaya tidak bocor ke akun ini */
+        if(first && prevUid){ Object.keys(scan()).forEach(k => { try{ localStorage.removeItem(k); }catch(e){} }); wiped = true; }
         if(first){ wr(M_H, {}); wr(M_TS, {}); try{ localStorage.setItem(M_UID, uid); }catch(e){} seen = {}; }
         mark(scan(), first);
         const r = await merge(first);
         await push(scan(), r.force);
         merged = true; set("ok");
-        if(r.applied){
-          let t = 0; try{ t = +sessionStorage.getItem("st_sync_rl") || 0; }catch(e){}
+        if(r.applied || wiped){
+          let t = 0; try{ t = wiped ? 0 : (+sessionStorage.getItem("st_sync_rl") || 0); }catch(e){}
           if(Date.now() - t > 20000){ try{ sessionStorage.setItem("st_sync_rl", String(Date.now())); }catch(e){} location.reload(); }
         }
       } else {
@@ -8435,7 +8446,7 @@ const SY = (() => {
   addEventListener("online", tick);
   document.addEventListener("visibilitychange", () => { if(document.hidden) tick(); });
   addEventListener("pagehide", tick);
-  return { start, stop };
+  return { start, stop, now: async () => { if(uid && merged && navigator.onLine !== false) await Promise.race([run(), new Promise(r => setTimeout(r, 5000))]); } };
 })();
 A.onChange(x => { try{ if(x.user) SY.start(x.user.uid); else if(A.ready) SY.stop(); }catch(e){} });
 /* pulihkan sesi masuk bila ada internet; gagal diam-diam bila offline */
