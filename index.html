@@ -8009,7 +8009,9 @@ let view = "list", curId = null, tab = "sched", draft = null;
 const REM = {};   /* turnamen milik orang lain (moderator/pengikut): oid -> {t, d, role, owner, ownerName, mods} */
 const isRem = () => typeof curId === "string" && curId.startsWith("r:");
 const remOf = () => isRem() ? REM[curId.slice(2)] : null;
-const cur = () => isRem() ? (REM[curId.slice(2)] || {}).t : db.list.find(x => x.id === curId);
+/* turnamen online milik akun hanya terlihat saat akun masuk; setelah keluar (guest) disembunyikan, datanya tetap aman di akun */
+const vis = t => !t.oid || !!(ON.user && ON.user());
+const cur = () => isRem() ? (REM[curId.slice(2)] || {}).t : db.list.find(x => x.id === curId && vis(x));
 const roleOf = () => { const r = remOf(); if(r) return r.role; const t = cur(); return t && t.oid ? "admin" : "local"; };
 
 /* ===== ONLINE (Firebase) =====
@@ -8690,7 +8692,7 @@ function paintList(m){
   nb.onclick = () => { draft = null; view = "new"; paint(); toTop(); };
   m.append(nb);
 
-  db.list.slice().sort((a, b) => b.created - a.created).forEach(t => {
+  db.list.filter(vis).sort((a, b) => b.created - a.created).forEach(t => {
     const b = el("button", "tcard"); b.type = "button";
     const done = t.matches.filter(x => x.sa !== null && x.sb !== null).length + (t.ko ? t.ko.flat().filter(x => !x.bye && x.sa !== null && x.sb !== null).length : 0);
     const all = t.matches.length + (t.ko ? t.ko.flat().filter(x => !x.bye).length : 0);
@@ -8719,8 +8721,9 @@ function download(name, blob){
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
 }
 function exportAll(){
-  if(!db.list.length){ toast(L("Belum ada data untuk diekspor.", "Nothing to export yet.")); return; }
-  download("turnamen-cadangan.json", new Blob([JSON.stringify(db)], {type:"application/json"})); toast(L("Cadangan diunduh.", "Backup downloaded."));
+  const shown = db.list.filter(vis);
+  if(!shown.length){ toast(L("Belum ada data untuk diekspor.", "Nothing to export yet.")); return; }
+  download("turnamen-cadangan.json", new Blob([JSON.stringify({v:db.v, list:shown})], {type:"application/json"})); toast(L("Cadangan diunduh.", "Backup downloaded."));
 }
 function importAll(file){
   if(!file) return;
