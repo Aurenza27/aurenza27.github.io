@@ -1,49 +1,121 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kebijakan Privasi - Satu Titik</title>
+<meta name="robots" content="index,follow">
 <style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:0 auto;padding:24px 16px;line-height:1.65;color:#1c1c1e;background:#fff}
-  h1{font-size:1.6rem} h2{font-size:1.15rem;margin-top:1.6em}
-  .meta{color:#666;font-size:.9rem}
-  @media (prefers-color-scheme:dark){body{background:#111;color:#eee}.meta{color:#aaa}}
+:root{color-scheme:dark light}
+body{margin:0;background:#0b0d12;color:#ece7da;font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:1.7rem;margin:.2em 0 .1em;color:#f0cf86}
+h2{font-size:1.15rem;margin:1.8em 0 .4em;color:#d4a94f}
+p,li{color:#d8d3c6}
+a{color:#f0cf86}
+.meta{color:#8d93a3;font-size:.9rem}
+table{border-collapse:collapse;width:100%;font-size:.93rem;margin:.6em 0}
+th,td{border:1px solid #2a3040;padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#141821;color:#f0cf86}
+.box{background:#141821;border:1px solid #2a3040;border-radius:10px;padding:12px 14px;margin:1em 0}
+hr{border:0;border-top:1px solid #2a3040;margin:2.4em 0}
+@media (prefers-color-scheme:light){
+  body{background:#fbf9f4;color:#222}
+  h1{color:#7a5a12}h2{color:#8a6a1a}p,li{color:#333}a{color:#7a5a12}
+  th{background:#efe9da;color:#4a3a10}th,td{border-color:#d8d0bc}.box{background:#f3eee0;border-color:#d8d0bc}
+}
 </style>
 </head>
 <body>
-<h1>Kebijakan Privasi - Satu Titik</h1>
-<p class="meta">Nama paket: com.aurenza27.satutitik<br>Pengembang: AURENZA27<br>Terakhir diperbarui: 14 November 2026</p>
+<main>
 
-<p>Aplikasi "Satu Titik" dibuat untuk hiburan semata. Kebijakan ini menjelaskan data apa yang diproses aplikasi dan bagaimana data tersebut digunakan.</p>
+<h1>Kebijakan Privasi</h1>
+<p class="meta">Aplikasi: <strong>Satu Titik</strong> (com.aurenza27.satutitik) &middot; Pengembang: AURENZA27<br>
+Berlaku sejak 14 November 2026 &middot; <a href="#english">English version below</a></p>
 
-<h2>1. Data yang kami kumpulkan</h2>
-<p>Kami tidak meminta Anda membuat akun dan tidak mengumpulkan data pribadi di server kami. Nama, tanggal lahir, atau data lain yang Anda ketik pada menu-menu di dalam aplikasi hanya diproses di perangkat Anda untuk menampilkan hasil.</p>
+<p>Kebijakan ini menjelaskan data apa yang dipakai Satu Titik, untuk apa, dan pilihan Anda. Intinya: menu primbon dan kesehatan berjalan di perangkat Anda dan <strong>tidak perlu akun</strong>. Akun hanya dibutuhkan untuk fitur <strong>Turnamen online</strong>.</p>
 
-<h2>2. Penyimpanan di perangkat dan mode offline</h2>
-<p>Aplikasi menyimpan pengaturan (misalnya bahasa, tema, status musik dan volume) serta riwayat hasil di penyimpanan lokal perangkat Anda. Data ini tidak dikirim ke server kami. Aplikasi juga menyimpan salinan dirinya di perangkat agar dapat dibuka tanpa internet. Bila Anda mengirim saran saat tidak ada internet, pesan disimpan sementara di perangkat dan dikirim otomatis ketika internet tersambung kembali. Anda dapat menghapusnya dengan menghapus data aplikasi atau mencopot pemasangan aplikasi.</p>
+<h2>1. Data yang tersimpan hanya di perangkat Anda</h2>
+<p>Disimpan di penyimpanan lokal peramban/aplikasi (localStorage) dan tidak dikirim ke server kami:</p>
+<ul>
+<li>Pengaturan: tema, ukuran huruf, bahasa, volume, musik, animasi.</li>
+<li>Isian dan hasil menu: nama, tanggal lahir, tinggi/berat badan, tanggal haid terakhir, dan hasil hitungan pada menu Khodam, Tri Hoki, Watak, Jodoh, BMI &amp; Kalori, dan Kehamilan. <strong>Data kesehatan ini diproses di perangkat Anda dan tidak kami kirim ke mana pun.</strong></li>
+<li>Skor, riwayat, dan data turnamen yang Anda buat dalam mode lokal.</li>
+</ul>
+<p>Anda dapat menghapusnya kapan saja lewat Pengaturan aplikasi Android &rarr; Satu Titik &rarr; Penyimpanan &rarr; Hapus data, atau dengan mencopot pemasangan aplikasi.</p>
+
+<h2>2. Data akun dan Turnamen online (opsional)</h2>
+<p>Bila Anda masuk dengan Google untuk memakai Turnamen online, kami memakai layanan Google Firebase (Authentication dan Cloud Firestore). Data yang disimpan:</p>
+<table>
+<tr><th>Data</th><th>Tujuan</th></tr>
+<tr><td>ID pengguna Firebase (UID)</td><td>Mengenali akun Anda dan mengatur hak akses.</td></tr>
+<tr><td>Nama tampilan dan foto profil Google</td><td>Ditampilkan pada profil, undangan moderator, dan turnamen. Nama dan foto juga masuk ke direktori ID akun sehingga orang lain yang mengetahui ID akun Anda dapat melihat pratinjau nama dan foto saat mengundang Anda sebagai moderator.</td></tr>
+<tr><td>ID akun Satu Titik (contoh ST-000001)</td><td>Pengenal publik agar Anda bisa diundang sebagai moderator.</td></tr>
+<tr><td>Data turnamen (nama, olahraga/eSports, jadwal, skor, klasemen, daftar moderator)</td><td>Menjalankan dan membagikan turnamen. Pengguna lain yang masuk dapat membuka turnamen bila mengetahui kodenya.</td></tr>
+<tr><td>Undangan moderator dan daftar pengikut turnamen</td><td>Mengelola undangan dan notifikasi dalam aplikasi.</td></tr>
+</table>
+<p>Alamat email Google Anda diproses oleh Firebase Authentication untuk proses masuk, tetapi tidak kami tampilkan kepada pengguna lain. Kami tidak menjual data Anda dan tidak memakainya untuk iklan.</p>
 
 <h2>3. Layanan pihak ketiga</h2>
 <ul>
-  <li><strong>Kotak saran (Web3Forms):</strong> jika Anda mengirim saran lewat kotak saran, isi pesan Anda dikirim melalui layanan Web3Forms kepada kami. Jangan menulis data pribadi atau sensitif di pesan tersebut.</li>
-  <li><strong>Waktu server (WorldTimeAPI):</strong> aplikasi dapat mengambil waktu UTC dari layanan ini. Layanan tersebut dapat menerima alamat IP perangkat Anda sebagaimana permintaan internet pada umumnya.</li>
-  <li><strong>Hosting (GitHub Pages):</strong> berkas aplikasi disajikan melalui GitHub Pages. Saat aplikasi memuat atau memperbarui berkasnya, GitHub dapat menerima alamat IP perangkat Anda sebagaimana permintaan internet pada umumnya.</li>
-  <li><strong>Donasi (Saweria):</strong> tautan donasi membuka situs Saweria di luar aplikasi. Pemrosesan data di sana tunduk pada kebijakan Saweria.</li>
+<li><strong>Google Firebase / Google Sign-In</strong>: untuk akun dan basis data online. Server Google dapat berada di luar Indonesia. Lihat <a href="https://policies.google.com/privacy" rel="noopener">kebijakan privasi Google</a> dan <a href="https://firebase.google.com/support/privacy" rel="noopener">privasi Firebase</a>. Pustaka Firebase dimuat dari <code>gstatic.com</code>.</li>
+<li><strong>Web3Forms</strong> (api.web3forms.com): hanya bila Anda mengirim saran lewat formulir masukan. Yang dikirim adalah isi pesan yang Anda ketik. Jangan menulis data pribadi atau data kesehatan di dalamnya. Lihat <a href="https://web3forms.com/privacy" rel="noopener">kebijakan Web3Forms</a>.</li>
+<li><strong>WorldTimeAPI</strong> (worldtimeapi.org): dipakai sebagai cadangan untuk mengambil jam internet. Seperti setiap permintaan internet, alamat IP perangkat terlihat oleh layanan ini. Tidak ada data pribadi yang dikirim.</li>
+<li><strong>Saweria</strong>: tautan dukungan membuka situs saweria.co di peramban. Transaksi sepenuhnya di bawah kebijakan Saweria.</li>
+<li><strong>Suara bacaan</strong> memakai mesin text-to-speech bawaan perangkat Anda.</li>
+</ul>
+<p>Satu Titik <strong>tidak</strong> memakai iklan, pelacak analitik, atau SDK iklan, dan tidak meminta izin lokasi, kamera, mikrofon, atau kontak.</p>
+
+<h2>4. Penyimpanan, keamanan, dan penghapusan</h2>
+<ul>
+<li>Data akun dan turnamen online disimpan di Cloud Firestore dan dilindungi aturan akses (Security Rules) sehingga data pribadi hanya dapat dibaca pemiliknya.</li>
+<li>Koneksi ke Firebase memakai HTTPS.</li>
+<li><strong>Penghapusan data:</strong> kirim email ke alamat di bawah dari akun Google yang Anda pakai, sebutkan ID akun (ST-xxxxxx). Kami akan menghapus profil, ID akun, undangan, dan turnamen milik Anda dalam waktu wajar, paling lambat 30 hari. Anda juga dapat menghapus turnamen milik Anda sendiri langsung dari aplikasi.</li>
 </ul>
 
-<h2>4. Informasi kesehatan</h2>
-<p>Menu pada kategori medis hanya memberikan perkiraan umum dan bukan saran, diagnosis, atau pengobatan medis. Konsultasikan dengan tenaga kesehatan profesional untuk keputusan medis. Data yang Anda masukkan tidak disimpan di server kami.</p>
+<h2>5. Anak-anak</h2>
+<p>Satu Titik berperingkat usia 12+ dan tidak ditujukan untuk anak di bawah 12 tahun. Fitur akun dan Turnamen online sebaiknya dipakai oleh pengguna yang sudah memenuhi batas usia akun Google di wilayahnya. Bila Anda orang tua dan mengetahui anak Anda membuat akun, hubungi kami untuk penghapusan.</p>
 
-<h2>5. Hiburan semata</h2>
-<p>Hasil pada menu bertema ramalan, kepribadian, dan sejenisnya dibuat untuk hiburan dan tidak dapat dijadikan dasar keputusan penting.</p>
-
-<h2>6. Anak-anak</h2>
-<p>Aplikasi ini tidak ditujukan bagi anak di bawah 12 tahun dan kami tidak dengan sengaja mengumpulkan data dari mereka.</p>
+<h2>6. Penafian</h2>
+<div class="box">
+<p><strong>Primbon</strong> (Khodam, Tri Hoki, Watak, Jodoh) dibuat untuk hiburan dan bukan dasar keputusan penting.<br>
+<strong>Menu kesehatan</strong> (BMI &amp; Kalori, Kehamilan) hanya memberi perkiraan umum, bukan saran, diagnosis, atau pengobatan medis. Konsultasikan dengan tenaga kesehatan profesional.</p>
+</div>
 
 <h2>7. Perubahan kebijakan</h2>
-<p>Kebijakan ini dapat diperbarui sewaktu-waktu. Tanggal pembaruan terbaru tercantum di bagian atas halaman.</p>
+<p>Perubahan akan dipublikasikan di halaman ini dengan tanggal berlaku yang baru.</p>
 
 <h2>8. Kontak</h2>
-<p>Pertanyaan tentang kebijakan ini dapat dikirim ke: <strong>titikhilangs27@gmail.com</strong></p>
+<p>Email: <a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a></p>
+
+<hr>
+
+<h1 id="english">Privacy Policy (English)</h1>
+<p class="meta">App: <strong>Satu Titik</strong> (com.aurenza27.satutitik) &middot; Developer: AURENZA27 &middot; Effective 14 November 2026</p>
+
+<p><strong>Summary.</strong> The primbon and health menus run on your device and need no account. An account is only needed for the optional <strong>online Tournament</strong> feature.</p>
+
+<h2>On-device data</h2>
+<p>Settings, the values you type into menus (name, birth date, height/weight, last menstrual period) and their results are stored locally on your device (localStorage) and are not sent to our servers. Clear them via Android Settings &rarr; Apps &rarr; Satu Titik &rarr; Storage, or by uninstalling the app.</p>
+
+<h2>Account and online Tournament (optional)</h2>
+<p>If you sign in with Google, we use Google Firebase (Authentication and Cloud Firestore) and store: your Firebase user ID, display name and profile photo, your Satu Titik account ID (e.g. ST-000001), tournament data you create, moderator invitations and follower lists. Your name and photo appear in an account-ID directory, so someone who knows your account ID can preview them when inviting you as a moderator. Your email is processed by Firebase Authentication only for sign-in and is not shown to other users. We do not sell data or use it for advertising.</p>
+
+<h2>Third parties</h2>
+<p>Google Firebase / Google Sign-In (accounts and database; libraries loaded from gstatic.com), Web3Forms (only if you send feedback; only the message text is sent; do not include personal or health data), WorldTimeAPI (backup internet clock; your IP address is visible to the service as with any request), Saweria (support link, opens saweria.co). Text-to-speech uses your device's built-in engine. The app has no ads, analytics trackers, and requests no location, camera, microphone or contacts permission.</p>
+
+<h2>Deletion</h2>
+<p>Email <a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a> from your Google account with your account ID (ST-xxxxxx) to request deletion of your profile, account ID, invitations and tournaments; we will act within 30 days. You can also delete tournaments you own from within the app.</p>
+
+<h2>Children</h2>
+<p>The app is rated 12+ and is not directed to children under 12.</p>
+
+<h2>Disclaimer</h2>
+<p>Primbon menus are for entertainment only. Health menus give general estimates only and are not medical advice, diagnosis or treatment; consult a qualified health professional.</p>
+
+<h2>Contact</h2>
+<p><a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a></p>
+
+</main>
 </body>
 </html>
