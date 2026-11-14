@@ -540,6 +540,8 @@ const badgeSeen = (() => {
      dipakai otomatis. Bila tidak ada (misalnya saat offline/pengembangan), dipakai hitungan "pertama kali dilihat". */
 let clockOffset = 0, remoteRelease = {};
 const nowMs = () => Date.now() + clockOffset;
+let clockSynced = false;   /* true setelah jam server berhasil dibaca */
+window.stClock = {now: () => nowMs(), synced: () => clockSynced};   /* dipakai semua menu (STime) */
 const badgeOn = id => {
   const rel = remoteRelease[id] ? new Date(remoteRelease[id] + "T00:00:00").getTime() : (BADGE[id] ? BADGE_RELEASE.getTime() : badgeSeen[id]);
   return rel > 0 && nowMs() < rel + BADGE_DAYS * DAY;
@@ -592,12 +594,18 @@ const Net = {
     try{
       let t = 0;
       if(/^https?:$/.test(location.protocol)){
-        try{ const r = await get(location.href.split("#")[0], 4000); const d = Date.parse(r.headers.get("date")); if(d) t = d; }catch(e){}
+        try{
+          const u0 = location.href.split("#")[0], t0 = Date.now();
+          const r = await get(u0 + (u0.indexOf("?") < 0 ? "?" : "&") + "_st=" + t0, 4000), rtt = Date.now() - t0;
+          const d = Date.parse(r.headers.get("date")), age = Math.max(0, +r.headers.get("age") || 0);
+          /* header Date dibulatkan ke detik (rata-rata hilang 0,5 dtk) dan tiba setelah setengah RTT */
+          if(d) t = d + age * 1000 + 500 + rtt / 2;
+        }catch(e){}
       }
       if(!t){
         try{ const r = await get("https://worldtimeapi.org/api/timezone/Etc/UTC", 4000); const j = await r.json(); if(j.unixtime) t = j.unixtime * 1000; }catch(e){}
       }
-      if(t) clockOffset = t - Date.now();
+      if(t){ clockOffset = t - Date.now(); clockSynced = true; }
     }catch(e){}
     try{
       if(/^https?:$/.test(location.protocol)){
@@ -1191,8 +1199,44 @@ $("srSend").addEventListener("click", async () => {
   b.disabled = false;
 });
 $("sbReset").addEventListener("click", () => setS(Object.assign({}, DEF)));
+/* ===== STime: tanggal dan jam hasil menu, mengikuti jam server (stClock milik Beranda) ===== */
+function stHelper(){
+  var P = null; try{ P = parent.stClock; }catch(e){}
+  function loc(){
+    try{ if(typeof lang === "string") return lang === "en" ? "en" : "id"; }catch(e){}
+    return /^en/i.test(document.documentElement.lang || "") ? "en" : "id";
+  }
+  var W = window.STime = {
+    now: function(){ try{ return P ? P.now() : Date.now(); }catch(e){ return Date.now(); } },
+    synced: function(){ try{ return !!(P && P.synced()); }catch(e){ return false; } },
+    fmt: function(ts){
+      var d = new Date(+ts); if(isNaN(d.getTime())) return "";
+      var l = loc() === "en" ? "en-GB" : "id-ID";
+      try{
+        return d.toLocaleDateString(l, {weekday:"long", day:"numeric", month:"long", year:"numeric"}) + " \u00b7 " +
+          d.toLocaleTimeString(l, {hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false, timeZoneName:"short"});
+      }catch(e){ return d.toString(); }
+    },
+    text: function(ts, label){
+      var en = loc() === "en";
+      return (label || (en ? "Generated: " : "Dibuat: ")) + W.fmt(ts) + (W.synced() ? "" : (en ? " (device clock)" : " (jam perangkat)"));
+    },
+    el: function(ts){
+      var e = document.createElement("div"); e.className = "ststamp";
+      if(ts) e.textContent = "\ud83d\udd52 " + W.text(ts); else e.hidden = true;
+      return e;
+    },
+    paint: function(e, ts){
+      if(!e) return;
+      if(!ts){ e.hidden = true; e.textContent = ""; return; }
+      e.hidden = false; e.textContent = "\ud83d\udd52 " + W.text(ts);
+    }
+  };
+}
+const ST_CSS = '<style id="stCss">.ststamp{margin:10px 0 0;text-align:center;font-size:11px;line-height:1.45;opacity:.72;font-variant-numeric:tabular-nums;letter-spacing:.01em}.ststamp[hidden]{display:none}.mtime{margin:-2px 6px 8px;text-align:right;font-size:10.5px;line-height:1.3;opacity:.65;font-variant-numeric:tabular-nums}.tdate{display:block;margin-top:2px;font-size:11px;opacity:.75;font-variant-numeric:tabular-nums}</style>';
+const ST_HELPER = ST_CSS + "<scr" + "ipt>(" + stHelper.toString() + ")();<\/scr" + "ipt>";
 function menuSrc(m){
-  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>", i = s.indexOf("</head>");
+  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER, i = s.indexOf("</head>");
   return i < 0 ? css + s : s.slice(0, i) + css + s.slice(i);
 }
 writeKeys(S); paintPanel();
@@ -1763,6 +1807,7 @@ body.hasqa.hasbar .scrollchip{bottom:calc(228px + env(safe-area-inset-bottom,0px
       <div class="big"><span id="rFinal">0</span><small>/100</small></div>
     </div>
     <div class="revisit" data-i18n="revisit">🔄 Cek lagi namamu besok untuk melihat perkembangan statistikmu</div>
+    <div class="ststamp" id="rTime" hidden></div>
     <div class="wm">TITIK HILANGS</div>
   </article>
 
@@ -2530,6 +2575,7 @@ function run(name, no, vip){
   $("actions").classList.remove("show");
   $("loader").style.display = "block"; $("loadTxt").textContent = "ANALYZING...";
   current = make(name, vip); if(no) current.no = no;
+  current.at = STime.now();
   current._auto = viaAuto;
   buzz(40);
   clearInterval(tickT); tickT = setInterval(()=>beep(520,.06,0,.05), 300);
@@ -2587,6 +2633,7 @@ function fillCard(r0, instant){
   $("rScore").hidden = !r.no;
   $("rFinal").textContent = r.score;
   $("rVerdict").textContent = r.verdict;
+  STime.paint($("rTime"), r0.at);
   $("rSpec").textContent = r.spec;
   const v = !!r.vip;
   $("card").classList.toggle("vip", v);
@@ -2665,7 +2712,7 @@ function buildText(r0){
   if(r.vip) s += "\n" + tx("btSupport") + ": " + r.spec2;
   s += "\n\n" + L.map(x => sLabel(x.key) + ": " + r[x.key] + "%").join("\n");
   if(r.vip) s += "\n\n" + tx("btStrong") + ": " + r.strong.label + " " + r.strong.v + "%\n" + tx("btWeak") + ": " + r.weak.label + " " + r.weak.v + "%\n" + tx("btCase") + ": " + r.kasus;
-  return s + "\n\n" + tx("btFinal") + ": " + r.score + "/100\n\n- Titik Hilangs";
+  return s + "\n\n" + tx("btFinal") + ": " + r.score + "/100" + (r0.at ? "\n🕒 " + STime.text(r0.at) : "") + "\n\n- Titik Hilangs";
 }
 async function copyText(text){
   try{ if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; } }catch(e){}
@@ -3388,6 +3435,7 @@ dt{font-size:10px;margin-top:12px}
         <dt data-i18n="hrLbl"></dt><dd id="cHr"></dd>
       </dl>
       <div class="quote" id="cMsg"></div>
+      <div class="ststamp" id="cTime" hidden></div>
       <div class="acts">
         <button class="btn ghost sm" id="replayBtn" type="button" data-i18n="replayBtn"></button>
       </div>
@@ -3858,6 +3906,7 @@ function fillCard(c, still){
   $("cRel").textContent = tx("rel")[c.rel];
   $("cHr").textContent = tx("hr")[c.hr];
   $("cMsg").textContent = "“" + tx("msg")[c.msg] + "”";
+  STime.paint($("cTime"), c.at);
   $("chkBox").hidden = true; $("res").hidden = false; card.hidden = false; document.body.classList.add("hascard");
   if(still){ $("cBar").style.width = c.power + "%"; return; }
   $("cBar").style.width = "0";
@@ -3876,7 +3925,7 @@ function clearScreen(){
 }
 function showAgain(name){
   if(checking){ toast(tx("busyNow")); return; }
-  current = compute(name); fillCard(current, false);
+  current = compute(name); { const be = board.find(e => norm(e.name) === norm(name)); if(be && be.at) current.at = be.at; } fillCard(current, false);
   try{ window.scrollTo({top:0, behavior:"smooth"}); }catch(e){}
 }
 
@@ -4097,7 +4146,7 @@ function schedule(ms){
   timer = setTimeout(runNext, ms);
 }
 function record(c){
-  const key = norm(c.name), row = {name:c.name, kh:c.kh, power:c.power, rar:c.rar};
+  const key = norm(c.name), row = {name:c.name, kh:c.kh, power:c.power, rar:c.rar, at:c.at};
   board = board.filter(e => norm(e.name) !== key); board.push({...row});
   board.sort((a, b) => b.power - a.power); board = board.slice(0, 5); save("kh_board2", board);
   renderBoard();
@@ -4114,7 +4163,7 @@ function runCheck(name){
   $("card").hidden = false; $("res").hidden = true; $("chkBox").hidden = false; document.body.classList.add("hascard");
   $("chkTxt").textContent = tx("checking", {name:c.name});
   checkT = setTimeout(() => {
-    checking = false; current = c; fillCard(c, false); record(c);
+    checking = false; c.at = STime.now(); current = c; fillCard(c, false); record(c);
     if(readOn) setTimeout(() => { if(current === c) speak(speakText(c), () => { scrollToEnd(c); finish(); }); else if(busy) finish(); }, 700);
     else finish();
   }, 2200);
@@ -4227,7 +4276,7 @@ function checkNow(){
 function copyResult(){
   if(!current) return;
   const c = current;
-  const t = tx("copy", {name:c.name, kh:c.kh, rar:tx("rar")[c.rar], p:c.power, el:tx("el")[c.el], pro:tx("pro")[c.pro], wk:c.wk >= 0 ? tx("wk")[c.wk] : "—", con:tx("con")[c.con], org:tx("org")[c.org], rel:tx("rel")[c.rel], hr:tx("hr")[c.hr], msg:tx("msg")[c.msg]});
+  const t = tx("copy", {name:c.name, kh:c.kh, rar:tx("rar")[c.rar], p:c.power, el:tx("el")[c.el], pro:tx("pro")[c.pro], wk:c.wk >= 0 ? tx("wk")[c.wk] : "—", con:tx("con")[c.con], org:tx("org")[c.org], rel:tx("rel")[c.rel], hr:tx("hr")[c.hr], msg:tx("msg")[c.msg]}) + (c.at ? "\n🕒 " + STime.text(c.at) : "");
   const fallback = () => {
     try{ const a = document.createElement("textarea"); a.value = t; a.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(a); a.select(); const ok = document.execCommand("copy"); a.remove(); toast(tx(ok ? "copied" : "copyFail")); }
     catch(e){ toast(tx("copyFail")); }
@@ -4817,11 +4866,12 @@ function summary(c){
   const t = c.nxt[0];
   return {tg:c.tw.name, j:JL[t.r], jGood:t.jw, cl:t.cl, he:t.he, pd:t.pd, nGood:t.nm};
 }
-function render(b, c){
-  cur = {b, c};
+function render(b, c, at0){
+  cur = {b, c, at:at0 || STime.now()};
   const card = $("card"); card.textContent = "";
   const who = (b.name ? b.name + " · " : "") + b.d + " " + MON3[b.m - 1] + " " + b.y;
   card.appendChild(el("div", "who", who));
+  card.appendChild(STime.el(cur.at));
   const big = el("div", "big", c.w.name + " · " + L("Shio ", "Zodiac ") + tr(SHIO[c.si]) + " " + tr(UN[c.un]));
   big.appendChild(el("small", "", "neptu " + c.nep + " · " + L("tahun Imlek ", "lunar year ") + c.cy + " · " + L("angka watak ", "life path ") + c.lp));
   card.appendChild(big);
@@ -4889,7 +4939,7 @@ function plain(){
     L("Warna hoki: Jawa ", "Lucky colors: Javanese ") + jn(c.jwC.map(tr)) + L(" · Tionghoa ", " · Chinese ") + jn(c.cnC.map(tr)) + L(" · Numerologi ", " · Numerology ") + jn(c.nmC.map(tr)) + L(" · Gabungan ", " · Combined ") + jn(c.mixC.map(tr));
 }
 function copyText(){
-  const t = plain(), ok1 = L("Hasil disalin", "Result copied"), no1 = L("Gagal menyalin", "Copy failed");
+  const t = plain() + (cur && cur.at ? "\n🕒 " + STime.text(cur.at) : ""), ok1 = L("Hasil disalin", "Result copied"), no1 = L("Gagal menyalin", "Copy failed");
   const fb = () => { try{ const a = document.createElement("textarea"); a.value = t; a.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(a); a.select(); const ok = document.execCommand("copy"); a.remove(); toast(ok ? ok1 : no1); }catch(e){ toast(no1); } };
   try{ navigator.clipboard.writeText(t).then(() => toast(ok1), fb); }catch(e){ fb(); }
 }
@@ -5093,7 +5143,7 @@ $("vol").addEventListener("input", onVol);
 $("vol").addEventListener("change", () => { if(cur && soundOn){ speak(); } else if(cur){ speak(true); } });
 $("autoBtn").addEventListener("click", () => { autoOn = !autoOn; save("auto", autoOn); paintStatic(); if(!autoOn) clearAuto(); else if(queue.length && cur) startNext(); });
 $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; save("gap", gapI); paintStatic(); if(timer) startNext(); });
-$("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paintStatic(); if(cur) render(cur.b, cur.c); toast(L("Bahasa: Indonesia", "Language: English")); });
+$("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paintStatic(); if(cur) render(cur.b, cur.c, cur.at); toast(L("Bahasa: Indonesia", "Language: English")); });
 $("nm").addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); addQueue(); } });
 $("nm").addEventListener("input", () => { $("err").textContent = ""; paintInput(); });
 /* musik langsung diputar begitu menu dibuka (tanpa menunggu ketukan); bila browser masih menahan audio, lanjutkan di sentuhan pertama */
@@ -5510,11 +5560,12 @@ function chips(a){
 }
 function section(title){ const s = el("div", "sec"); s.appendChild(el("h3", "", title)); return s; }
 
-function render(b, c){
-  cur = {b, c};
+function render(b, c, at0){
+  cur = {b, c, at:at0 || STime.now()};
   const card = $("card"); card.textContent = "";
   const who = b.only ? b.name : (b.name ? b.name + " · " : "") + b.d + " " + MON3[b.m - 1] + " " + b.y;
   card.appendChild(el("div", "who", who));
+  card.appendChild(STime.el(cur.at));
   const big = el("div", "big", c.only ? L("Profil Nama", "Name Profile") : c.w.name + " · Wuku " + c.wk);
   big.appendChild(el("small", "", c.only ? L("dihitung dari huruf nama", "worked out from the name letters") : "neptu " + c.nep + " · " + L("angka watak ", "life path ") + c.lp));
   card.appendChild(big);
@@ -5587,7 +5638,7 @@ function plain(){
     "Wuku " + c.wk + " · " + (wd[0].indexOf("Dewi") === 0 ? "" : L("Dewa ", "Deity ")) + wd[0] + ". " + L("Kelebihan: ", "Strengths: ") + wd[2] + (wd[3] ? ". " + L("Perlu dijaga: ", "Watch out for: ") + wd[3] : "") + ".";
 }
 function copyText(){
-  const t = plain(), ok1 = L("Hasil disalin", "Result copied"), no1 = L("Gagal menyalin", "Copy failed");
+  const t = plain() + (cur && cur.at ? "\n🕒 " + STime.text(cur.at) : ""), ok1 = L("Hasil disalin", "Result copied"), no1 = L("Gagal menyalin", "Copy failed");
   const fb = () => { try{ const a = document.createElement("textarea"); a.value = t; a.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(a); a.select(); const ok = document.execCommand("copy"); a.remove(); toast(ok ? ok1 : no1); }catch(e){ toast(no1); } };
   try{ navigator.clipboard.writeText(t).then(() => toast(ok1), fb); }catch(e){ fb(); }
 }
@@ -5800,7 +5851,7 @@ $("vol").addEventListener("input", onVol);
 $("vol").addEventListener("change", () => { if(cur && soundOn){ speak(); } else if(cur){ speak(true); } });
 $("autoBtn").addEventListener("click", () => { autoOn = !autoOn; save("auto", autoOn); paintStatic(); if(!autoOn) clearAuto(); else if(queue.length && cur) startNext(); });
 $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; save("gap", gapI); paintStatic(); if(timer) startNext(); });
-$("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paintStatic(); if(cur) render(cur.b, cur.c); toast(L("Bahasa: Indonesia", "Language: English")); });
+$("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paintStatic(); if(cur) render(cur.b, cur.c, cur.at); toast(L("Bahasa: Indonesia", "Language: English")); });
 $("nm").addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); addQueue(); } });
 $("nm").addEventListener("input", () => { $("err").textContent = ""; paintInput(); });
 /* musik langsung diputar begitu menu dibuka (tanpa menunggu ketukan); bila browser masih menahan audio, lanjutkan di sentuhan pertama */
@@ -6091,7 +6142,8 @@ function paintIn(i){ const v = $(i).value, h = $(i + "Hl"), k = v.indexOf("_"); 
 const el = (t, c, x) => { const e = document.createElement(t); if(c) e.className = c; if(x !== undefined) e.textContent = x; return e; };
 const row = (k, v) => { const r = el("div", "row"); r.append(el("span", "", k), el("b", "", v)); return r; };
 const card = (t, rows, res) => { const c = el("div", "panel"); c.append(el("h3", "", t), ...rows, el("p", "res", res)); return c; };
-function show(ra, rb){
+function show(ra, rb, at0){
+  const at = at0 || STime.now();
   const o = $("out"); curWj = null;
   const A = person(ra), B = person(rb), parts = [], cards = [], miss = [], cmp = (x, y) => x === y ? 90 : grp(x) === grp(y) ? 80 : 55;
   const wOK = A.full && B.full, cOK = A.y && B.y;
@@ -6116,8 +6168,8 @@ function show(ra, rb){
   const vd = all >= 80 ? L("Sangat cocok 💖", "A great match 💖") : all >= 65 ? L("Cocok 💞", "A good match 💞") : all >= 50 ? L("Cukup cocok, perlu saling menyesuaikan", "Fairly good, needs mutual adjustment") : L("Banyak tantangan, butuh banyak pengertian", "Many challenges, needs lots of understanding");
   const acc = parts.length === 3 ? L("Akurasi: tinggi (data lengkap)", "Accuracy: high (complete data)") : parts.length === 2 ? L("Akurasi: sedang", "Accuracy: medium") : L("Akurasi: dasar (hanya nama)", "Accuracy: basic (names only)");
   const top = el("div", "panel score"), br = el("div", "bar"), bi = el("i"), tip = el("p", "tiny", acc + (miss.length ? ". " + L("Belum dihitung: ", "Not counted: ") + miss.join(", ") + ". " + L("Lengkapi tanggal lahir untuk hasil lebih akurat.", "Add the birth dates for a more accurate result.") : "")); bi.style.width = all + "%"; br.append(bi); tip.style.marginTop = "10px";
-  top.append(el("h3", "", A.nm + " & " + B.nm), el("div", "big", all + "%"), el("div", "vd", vd), br, tip);
-  cur = {ra, rb, A, B, all, vd, wj:curWj};
+  top.append(el("h3", "", A.nm + " & " + B.nm), el("div", "big", all + "%"), el("div", "vd", vd), br, tip, STime.el(at));
+  cur = {ra, rb, A, B, all, vd, wj:curWj, at};
   const rd = el("button", "ghost", L("🔊 BACAKAN", "🔊 READ ALOUD")); rd.type = "button"; rd.addEventListener("click", () => speak(true));
   o.textContent = ""; o.append(top, ...cards, rd); o.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard");
   o.classList.remove("pop"); void o.offsetWidth; o.classList.add("pop");
@@ -6281,7 +6333,7 @@ $("vol").addEventListener("input", onVol);
 $("vol").addEventListener("change", () => { if(cur && soundOn){ speak(); } else if(cur){ speak(true); } });
 $("autoBtn").addEventListener("click", () => { autoOn = !autoOn; save("auto", autoOn); paint(); if(!autoOn) clearAuto(); else if(queue.length && cur) startNext(); });
 $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; save("gap", gapI); paint(); if(timer) startNext(); });
-$("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paint(); if(cur) show(cur.ra, cur.rb); toast(L("Bahasa: Indonesia", "Language: English")); });
+$("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paint(); if(cur) show(cur.ra, cur.rb, cur.at); toast(L("Bahasa: Indonesia", "Language: English")); });
 /* panel pengaturan: ketuk ⚙️ buka/tutup, tarik ⚙️ atau "Geser panel" untuk memindah (diingat), klik dua kali area kosong panel = posisi awal */
 (function(){
   const el_ = $("side"), tog = $("sideTog"), body = $("sbody");
@@ -6573,7 +6625,8 @@ const kg = n => fx(n, 1) + " kg", dec = v => String(v).replace(".", lang === "en
 const dur = w => { const mo = Math.max(1, Math.round(w / 4.345)); return L("± " + w + " minggu", "~ " + w + " weeks") + (w > 8 ? L(" (≈ " + mo + " bulan)", " (≈ " + mo + " months)") : ""); };
 const sec = (ic, t, sub) => { const f = document.createDocumentFragment(), h = el("h3", "sec", ic + " " + t); f.append(h); if(sub) f.append(el("p", "sec-sub", sub)); return f; };
 const tile = (lbl, val, unit, hl) => { const t = el("div", "tile" + (hl ? " hl" : "")); t.append(el("small", "", lbl), el("b", "", val), el("em", "", unit)); return t; };
-function show(p){
+function show(p, at0){
+  const at = at0 || STime.now();
   const o = $("out"), c = calc(p), pl = plan(p, c), nm = p.nm || L("Kamu", "You"), ki = KEM.indexOf(c.k), wi = WHO.indexOf(c.w), kl = L(c.k[1], c.k[2]);
   /* 1. hero: angka IMT, status Kemenkes, dan batang skala berwarna (batas Kemenkes 18,5; 23; 25; 30) */
   const hero = el("div", "panel hero"), cc = COL[ki];
@@ -6585,7 +6638,7 @@ function show(p){
   [18.5, 23, 25, 30].forEach(v => { const t = el("span", "tk", dec(v)); t.style.left = pos(v) + "%"; g.append(t); });
   const meta = el("div", "meta");
   meta.append(el("span", "", (p.sx === "P" ? L("Perempuan", "Female") : L("Laki-laki", "Male")) + " · " + p.ag + L(" th", " y")), el("span", "", fx(p.ht, p.ht % 1 ? 1 : 0) + " cm"), el("span", "", fx(p.wt, p.wt % 1 ? 1 : 0) + " kg"));
-  hero.append(el("div", "who", nm), el("div", "big", fx(c.b, 1)), el("div", "unit", L("IMT · kg/m²", "BMI · kg/m²")), el("div", "chip", kl), g, meta);
+  hero.append(el("div", "who", nm), el("div", "big", fx(c.b, 1)), el("div", "unit", L("IMT · kg/m²", "BMI · kg/m²")), el("div", "chip", kl), g, meta, STime.el(at));
   /* 2. klasifikasi */
   const cls = el("div", "panel"), duo = el("div", "duo"), t1 = el("div", "tl"), t2 = el("div", "tl");
   t1.style.setProperty("--cc", cc); t2.style.setProperty("--cc", WCOL[wi]);
@@ -6634,7 +6687,7 @@ function show(p){
     : L("Target dibatasi batas bawah aman (tidak di bawah BMR dan minimal " + (p.sx === "P" ? "1.200" : "1.500") + " kkal), jadi defisitnya lebih kecil dari 500 kkal dan waktunya lebih lama.", "The target is held at the safe minimum (not below BMR and at least " + (p.sx === "P" ? "1,200" : "1,500") + " kcal), so the deficit is under 500 kcal and it takes longer.")));
   kcard.append(el("p", "fine", L("Panduan umum, bukan standar resmi Kemenkes atau WHO: selisih 500 kkal per hari ≈ 0,45 kg per minggu (1 kg ≈ 7.700 kkal). Hasil nyata berbeda tiap orang. Konsultasikan ke dokter atau ahli gizi sebelum mengubah pola makan, terutama bila punya penyakit, sedang hamil, atau menyusui.",
     "General guidance, not an official Indonesian MoH or WHO standard: a 500 kcal daily gap ≈ 0.45 kg per week (1 kg ≈ 7,700 kcal). Real results vary. Talk to a doctor or dietitian before changing your diet, especially with a medical condition, pregnancy or breastfeeding.")));
-  cur = {p, c, nm, pl};
+  cur = {p, c, nm, pl, at};
   const rd = el("button", "ghost", L("🔊 BACAKAN", "🔊 READ ALOUD")); rd.type = "button"; rd.addEventListener("click", () => speak(true));
   o.textContent = ""; o.append(hero, cls, wcard, ecard, kcard, rd); o.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard");
   o.classList.remove("pop"); void o.offsetWidth; o.classList.add("pop");
@@ -6758,7 +6811,7 @@ $("vol").addEventListener("input", onVol);
 $("vol").addEventListener("change", () => { if(cur && soundOn){ speak(); } else if(cur){ speak(true); } });
 $("autoBtn").addEventListener("click", () => { autoOn = !autoOn; save("auto", autoOn); paint(); if(!autoOn) clearAuto(); else if(queue.length && cur) startNext(); });
 $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; save("gap", gapI); paint(); if(timer) startNext(); });
-$("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paint(); if(cur) show(cur.p); toast(L("Bahasa: Indonesia", "Language: English")); });
+$("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paint(); if(cur) show(cur.p, cur.at); toast(L("Bahasa: Indonesia", "Language: English")); });
 /* panel pengaturan: ketuk ⚙️ buka/tutup, tarik ⚙️ atau "Geser panel" untuk memindah (diingat), klik dua kali area kosong panel = posisi awal */
 (function(){
   const el_ = $("side"), tog = $("sideTog"), body = $("sbody");
@@ -7065,7 +7118,8 @@ function wgain(p, c){
 const sec = (ic, t, sub) => { const f = document.createDocumentFragment(), h = el("h3", "sec", ic + " " + t); f.append(h); if(sub) f.append(el("p", "sec-sub", sub)); return f; };
 const tile = (lbl, val, unit, hl) => { const t = el("div", "tile" + (hl ? " hl" : "")); t.append(el("small", "", lbl), el("b", "", val), el("em", "", unit)); return t; };
 const k1 = n => fx(n, n % 1 ? 1 : 0);
-function show(p){
+function show(p, at0){
+  const at = at0 || STime.now();
   const o = $("out"), c = calc(p), wg = wgain(p, c), nm = p.nm || L("Kamu", "You");
   /* 1. hero: usia kehamilan, trimester, batang skala 0-40 minggu */
   const hero = el("div", "panel hero"), cc = TC[c.tri];
@@ -7078,7 +7132,7 @@ function show(p){
   const meta = el("div", "meta");
   meta.append(el("span", "", L("HPL ", "Due ") + fmtD(c.edd)), el("span", "", c.left >= 0 ? L("Sisa " + c.left + " hari", c.left + " days to go") : L("Lewat " + (-c.left) + " hari", (-c.left) + " days past due")));
   hero.append(el("div", "who", nm + " · " + L("USIA KEHAMILAN", "GESTATIONAL AGE")), el("div", "big", String(c.w)), el("div", "unit", L("MINGGU + ", "WEEKS + ") + c.r + L(" HARI", c.r === 1 ? " DAY" : " DAYS")),
-    el("div", "chip", L("TRIMESTER ", "TRIMESTER ") + (c.tri + 1)), g, meta);
+    el("div", "chip", L("TRIMESTER ", "TRIMESTER ") + (c.tri + 1)), g, meta, STime.el(at));
   /* 2. tes kehamilan (hanya di awal kehamilan) */
   let tcard = null;
   if(c.d < 70){
@@ -7137,7 +7191,7 @@ function show(p){
   /* 6. tanda bahaya */
   const wcd = el("div", "panel");
   wcd.append(sec("🚨", L("TANDA BAHAYA", "WARNING SIGNS")), el("p", "warn", L("Segera ke fasilitas kesehatan bila ada perdarahan dari jalan lahir, nyeri perut hebat, muntah terus-menerus sampai tidak bisa makan atau minum, demam tinggi, sakit kepala hebat dengan pandangan kabur atau bengkak mendadak di wajah dan tangan, keluar air ketuban, atau gerakan janin berkurang atau hilang.", "Go to a health facility right away if you have vaginal bleeding, severe abdominal pain, constant vomiting so you can't eat or drink, high fever, a severe headache with blurred vision or sudden swelling of the face and hands, leaking amniotic fluid, or reduced or absent baby movements.")));
-  cur = {p, c, nm, wg};
+  cur = {p, c, nm, wg, at};
   const rd = el("button", "ghost", L("🔊 BACAKAN", "🔊 READ ALOUD")); rd.type = "button"; rd.addEventListener("click", () => speak(true));
   o.textContent = ""; o.append(hero); if(tcard) o.append(tcard); o.append(dcard, acard); if(wcard) o.append(wcard); o.append(wcd, rd); o.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard");
   o.classList.remove("pop"); void o.offsetWidth; o.classList.add("pop");
@@ -7270,7 +7324,7 @@ $("vol").addEventListener("input", onVol);
 $("vol").addEventListener("change", () => { if(cur && soundOn){ speak(); } else if(cur){ speak(true); } });
 $("autoBtn").addEventListener("click", () => { autoOn = !autoOn; save("auto", autoOn); paint(); if(!autoOn) clearAuto(); else if(queue.length && cur) startNext(); });
 $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; save("gap", gapI); paint(); if(timer) startNext(); });
-$("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paint(); if(cur) show(cur.p); toast(L("Bahasa: Indonesia", "Language: English")); });
+$("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paint(); if(cur) show(cur.p, cur.at); toast(L("Bahasa: Indonesia", "Language: English")); });
 /* panel pengaturan: ketuk ⚙️ buka/tutup, tarik ⚙️ atau "Geser panel" untuk memindah (diingat), klik dua kali area kosong panel = posisi awal */
 (function(){
   const el_ = $("side"), tog = $("sideTog"), body = $("sbody");
@@ -7643,7 +7697,13 @@ window.__setAnim = v => { animOn = !!v; save("anim", animOn); applyAnim(); };
 let db = load("data", null);
 if(!db || !Array.isArray(db.list)) db = {v:1, list:[]};
 let dirty = false;
+const stDone = m => m && !m.bye && m.sa !== null && m.sa !== undefined && m.sb !== null && m.sb !== undefined;
+function stStamp(t){      /* cap waktu server saat skor pertama kali lengkap; hapus cap bila skor dikosongkan */
+  if(!t) return;
+  [].concat(t.matches || [], t.ko ? t.ko.flat() : []).forEach(m => { if(!m || m.bye) return; if(stDone(m)){ if(!m.at) m.at = STime.now(); } else if(m.at) delete m.at; });
+}
 function persist(){
+  try{ db.list.forEach(stStamp); const r0 = remOf(); if(r0 && r0.t && r0.role !== "follower") stStamp(r0.t); }catch(e){}
   if(remOf() && remOf().role === "follower"){ const r = remOf(); try{ r.t = JSON.parse(r.d); r.t.oid = curId.slice(2); }catch(e){} paint(); return; }
   if(!save("data", db)) toast(L("Penyimpanan penuh atau diblokir. Ekspor cadangan sekarang.", "Storage is full or blocked. Export a backup now."));
   touchOnline();
@@ -7722,7 +7782,7 @@ function koName(r, total){
 function champion(t){ const R = t.ko; if(!R || !R.length) return null; const f = R[R.length - 1][0]; return f ? winner(f) : null; }
 
 function create(o){
-  const t = {id:uid(), name:o.name, sport:o.sport, best:o.best || 0, stb:!!o.stb, fmt:o.fmt, pts:o.pts, draw:o.draw, dbl:o.dbl, teams:o.teams, groups:o.groups, q:o.q, matches:[], gr:null, ko:null, players:[], created:Date.now()};
+  const t = {id:uid(), name:o.name, sport:o.sport, best:o.best || 0, stb:!!o.stb, fmt:o.fmt, pts:o.pts, draw:o.draw, dbl:o.dbl, teams:o.teams, groups:o.groups, q:o.q, matches:[], gr:null, ko:null, players:[], created:STime.now()};
   const idx = t.teams.map((_, i) => i);
   if(t.fmt === "league") t.matches = mkMatches(idx, 0, t.dbl);
   else if(t.fmt === "ko") t.ko = buildKO(idx);
@@ -8201,7 +8261,7 @@ async function goOnline(t){
   const oid = newCode(); t.oid = oid;
   try{
     const {m, db:f} = await ON.lib(), d = JSON.stringify(t);
-    await withTimeout(m.setDoc(m.doc(f, "tournaments", oid), po(Object.assign({owner:String(u.uid), ownerName:String(ON.nm(u) || u.email || ""), modIds:[], d, u:Date.now(), by:SESS, created:Date.now()}, metaOf(t)))));
+    await withTimeout(m.setDoc(m.doc(f, "tournaments", oid), po(Object.assign({owner:String(u.uid), ownerName:String(ON.nm(u) || u.email || ""), modIds:[], d, u:Date.now(), by:SESS, created:STime.now()}, metaOf(t)))));
     ON.pushed[oid] = d; save("data", db); watch(oid); toast(L("Turnamen sekarang online.", "Tournament is now online.")); paint();
   }catch(e){ delete t.oid; toast(errTxt(e)); paint(); }
 }
@@ -8387,7 +8447,7 @@ function paintOnlineList(m){
     const done = t.matches.filter(q => q.sa !== null && q.sb !== null).length + (t.ko ? t.ko.flat().filter(q => !q.bye && q.sa !== null && q.sb !== null).length : 0);
     const all = t.matches.length + (t.ko ? t.ko.flat().filter(q => !q.bye).length : 0);
     const tx = el("div"), nm = el("b", "", t.name); nm.append(" ", el("span", "badge", roleTxt(x.role)));
-    tx.append(nm, el("small", "", sp(t)[lang] + " · " + FMT[t.fmt][lang] + " · " + t.teams.length + L(" tim", " teams") + " · " + done + "/" + all));
+    tx.append(nm, el("small", "", sp(t)[lang] + " · " + FMT[t.fmt][lang] + " · " + t.teams.length + L(" tim", " teams") + " · " + done + "/" + all), createdLine(t));
     b.append(el("span", "ic", sp(t).ic), tx);
     b.onclick = () => { curId = "r:" + oid; tab = "home"; view = "detail"; paint(); toTop(); };
     m.append(b);
@@ -8618,7 +8678,7 @@ function progressOf(t){
 function paintHero(t, live){
   const pg = progressOf(t), ch = champion(t), st = ch !== null ? "end" : pg.done === 0 ? "new" : "run";
   const h = el("div", "hm-hero"), top = el("div", "hm-top"), tx = el("div"); tx.style.minWidth = 0;
-  tx.append(el("h3", "hm-name", t.name), el("p", "hm-meta", sp(t)[lang] + " · " + FMT[t.fmt][lang]));
+  tx.append(el("h3", "hm-name", t.name), el("p", "hm-meta", sp(t)[lang] + " · " + FMT[t.fmt][lang]), t.created ? el("p", "hm-meta", "🕒 " + L("Dibuat: ", "Created: ") + STime.fmt(t.created)) : "");
   top.append(el("div", "hm-ic", sp(t).ic), tx); h.append(top);
   const chips = el("div", "hm-chips"), sc = el("span", "hm-chip " + st); if(st === "run") sc.append(el("i", "hm-dot"));
   sc.append(st === "end" ? L("Selesai", "Finished") : st === "run" ? L("Sedang berjalan", "In progress") : L("Belum dimulai", "Not started"));
@@ -8696,7 +8756,7 @@ function paintList(m){
     const b = el("button", "tcard"); b.type = "button";
     const done = t.matches.filter(x => x.sa !== null && x.sb !== null).length + (t.ko ? t.ko.flat().filter(x => !x.bye && x.sa !== null && x.sb !== null).length : 0);
     const all = t.matches.length + (t.ko ? t.ko.flat().filter(x => !x.bye).length : 0);
-    const tx = el("div"); tx.append(el("b", "", (t.oid ? "🌐 " : "") + t.name), el("small", "", sp(t)[lang] + " · " + FMT[t.fmt][lang] + " · " + t.teams.length + L(" tim", " teams") + " · " + done + "/" + all));
+    const tx = el("div"); tx.append(el("b", "", (t.oid ? "🌐 " : "") + t.name), el("small", "", sp(t)[lang] + " · " + FMT[t.fmt][lang] + " · " + t.teams.length + L(" tim", " teams") + " · " + done + "/" + all), createdLine(t));
     b.append(el("span", "ic", sp(t).ic), tx);
     b.onclick = () => { curId = t.id; tab = "home"; view = "detail"; paint(); toTop(); };
     m.append(b);
@@ -8817,6 +8877,8 @@ function paintDetail(m){
   if(tab !== "online" && tab !== "home" && rl === "follower") lockRO(box);
 }
 function tn(t, i, cls){ return el("div", "tn " + (cls || ""), i === null ? L("Menunggu", "TBD") : t.teams[i]); }
+function mtime(mm){ return mm && mm.at ? el("div", "mtime", "🕒 " + STime.fmt(mm.at)) : ""; }
+function createdLine(t){ return t && t.created ? el("small", "tdate", "🕒 " + L("Dibuat ", "Created ") + STime.fmt(t.created)) : ""; }
 function paintSched(box, t){
   const hasStage = t.fmt === "group";
   const groups = hasStage ? t.gr.map((_, g) => g) : [0];
@@ -8826,14 +8888,14 @@ function paintSched(box, t){
     const ms = t.matches.filter(x => x.g === g); let last = 0;
     ms.forEach(mm => {
       if(mm.rd !== last){ last = mm.rd; p.append(el("div", "rd", L("Putaran ", "Round ") + mm.rd)); }
-      if(isSet(t)){ p.append(setCard(t, mm)); return; }
+      if(isSet(t)){ p.append(setCard(t, mm), mtime(mm)); return; }
       if(mm.live){ p.append(genLive(t, mm, false)); return; }
       const row = el("div", "m"), a = mm.sa, b = mm.sb;
       row.append(tn(t, mm.a, "r " + (a !== null && a > b ? "w" : "")),
         numIn(a, v => setScore(t, mm, v, mm.sb)), el("div", "dash", "-"), numIn(b, v => setScore(t, mm, mm.sa, v)),
         tn(t, mm.b, b !== null && b > a ? "w" : ""));
       lockRow(mm, row);
-      p.append(row);
+      p.append(row, mtime(mm));
     });
     box.append(p);
   });

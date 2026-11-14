@@ -1,10 +1,10 @@
-/* Satu Titik - service worker (v3)
+/* Satu Titik - service worker (v4)
    Tujuan: aplikasi tetap bisa dibuka tanpa internet, tapi unduhan awal kecil.
    - File inti (index.html, ikon, manifest) disimpan saat pemasangan.
    - Musik (folder media/) diunduh di latar belakang setelah aplikasi terbuka
      (halaman mengirim pesan "precache-media"), lalu dibaca dari cache saat offline.
    - Naikkan VERSION setiap kali file inti atau daftar media berubah. */
-const VERSION = "v3";
+const VERSION = "v4";
 const CORE = "satutitik-core-" + VERSION;
 const MEDIA = "satutitik-media-" + VERSION;
 const SDK = "satutitik-sdk-" + VERSION;
@@ -123,6 +123,8 @@ self.addEventListener("fetch", e => {
   if(url.origin !== self.location.origin) return;                 /* Firestore, API lain: biarkan lewat */
   if(url.pathname.indexOf("/.well-known/") !== -1) return;        /* assetlinks.json: jangan disimpan */
   if(url.pathname.endsWith("/sw.js")) return;
+  /* permintaan jam server (?_st=...): selalu ke jaringan, jangan dijawab atau disimpan cache, supaya header Date-nya asli */
+  if(url.searchParams.has("_st")) return;
 
   if(url.pathname.indexOf("/media/") !== -1){ e.respondWith(mediaFetch(req)); return; }
   if(req.mode === "navigate" || req.destination === "document"){ e.respondWith(pageFetch(req)); return; }
