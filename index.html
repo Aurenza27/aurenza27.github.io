@@ -7394,6 +7394,10 @@ td.pt{font-weight:700;color:var(--gold2)}
 .bm span{overflow-wrap:anywhere}
 .bm .w{color:var(--gold2);font-weight:700}
 .bm .tbd{color:var(--muted);font-style:italic}
+.lgd{padding:2px 4px 0;font-size:13px;color:var(--muted)}
+.lgd .lgt{display:block;margin-bottom:6px;color:var(--gold2);font-weight:600;letter-spacing:.02em}
+.lgd .lgr{display:flex;gap:6px;line-height:1.7}
+.lgd .lga{flex:none;min-width:3.2em;font-weight:600;color:var(--text)}
 .champ{border:1px solid var(--gold);border-radius:16px;padding:16px;text-align:center;background:linear-gradient(180deg,var(--bg2),var(--card));box-shadow:0 0 28px rgba(212,169,79,.18)}
 .champ .big{font-size:22px;font-weight:700;color:var(--gold2);margin-top:4px;overflow-wrap:anywhere}
 .pl{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
@@ -8837,7 +8841,19 @@ function paintTable(box, t){
     });
     p.append(tbl); box.append(p);
   });
-  box.append(el("p", "hint", (isSet(t) ? rankHint(t) : L("Urutan: poin, selisih gol, gol masuk, lalu nama. ", "Order: points, goal difference, goals for, then name. ")) + (t.fmt === "group" ? L("Baris berwarna lolos ke babak gugur.", "Highlighted rows advance to the knockout stage.") : "")));
+  /* keterangan singkatan kolom: mengikuti cabang olahraga dan bahasa */
+  const set = isSet(t), diff = ["football", "futsal", "handball"].includes(t.sport) ? L("Selisih Gol", "Goal Difference") : L("Selisih Skor", "Score Difference");
+  const lg = el("div", "lgd");
+  lg.append(el("b", "lgt", L("Keterangan :", "Legend :")));
+  (set
+    ? [[L("M", "W"), L("Menang", "Win")], [L("K", "L"), L("Kalah", "Loss")],
+       [t.sport === "padel" ? "Set" : L("Gim", "Gm"), t.sport === "padel" ? L("Set menang - kalah", "Sets won - lost") : L("Gim menang - kalah", "Games won - lost")],
+       ["+/-", t.sport === "padel" ? L("Selisih game", "Game difference") : L("Selisih poin", "Point difference")]]
+    : [[L("M", "W"), L("Menang", "Win")], [L("S", "D"), L("Seri", "Draw")], [L("K", "L"), L("Kalah", "Loss")], [L("SG", "GD"), diff]]
+  ).forEach(x => { const r = el("div", "lgr"); r.append(el("span", "lga", x[0]), el("span", "", ": " + x[1])); lg.append(r); });
+  box.append(lg);
+  const note = ((isSet(t) ? rankHint(t) : "") + (t.fmt === "group" ? L("Baris berwarna lolos ke babak gugur.", "Highlighted rows advance to the knockout stage.") : "")).trim();
+  if(note) box.append(el("p", "hint", note));
   const r = el("div", "row no-print");
   const sh = el("button", "btn ghost sm grow keep", L("🖼️ Bagikan gambar", "🖼️ Share image")); sh.type = "button"; sh.onclick = () => shareImage(t);
   const pr = el("button", "btn ghost sm grow", L("🖨️ Cetak", "🖨️ Print")); pr.type = "button"; pr.onclick = () => { try{ window.print(); }catch(e){ toast(L("Cetak tidak tersedia.", "Print is not available.")); } };
