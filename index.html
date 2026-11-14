@@ -8291,7 +8291,7 @@ function paintOnline(box, t){
   if(role === "local"){
     p.append(el("p", "hint", L("Turnamen ini masih lokal. Jadikan online agar bisa dikelola bersama moderator dan diikuti orang lain secara real-time. Kamu menjadi admin.", "This tournament is still local. Take it online to share management with moderators and let others follow live. You become the admin.")));
     p.append(mkBtn(L("Jadikan turnamen online", "Take tournament online"), "btn", () => goOnline(t)));
-    const dg = el("p", "hint", "[" + ONVER + "] " + (lastErr ? L("Detail error: ", "Error detail: ") + lastErr : "")); dg.style.userSelect = "all"; dg.style.overflowWrap = "anywhere"; p.append(dg);
+    const dg = el("p", "hint", (lastErr ? L("Detail error: ", "Error detail: ") + lastErr : "")); dg.hidden = !lastErr; dg.style.userSelect = "all"; dg.style.overflowWrap = "anywhere"; p.append(dg);
     box.append(p); return;
   }
   const mt = ON.meta[t.oid] || (r ? {mods:r.mods, ownerName:r.ownerName} : {mods:[]});
@@ -8299,7 +8299,7 @@ function paintOnline(box, t){
   if(role === "admin"){
     p.append(el("p", "hint", L("Status Kamu sebagai admin, kamu bisa mengelola semuanya, menambah atau menghapus moderator, dan menghapus turnamen.", "Your status is admin: you can manage everything, add or remove moderators, and delete the tournament.")));
     { const A1 = ON.A(), un = A1 && A1.username && A1.usernameUid === (ON.user() || {}).uid ? A1.username : "";
-      p.append(el("p", "hint", L("Nama admin yang dilihat pengikut: ", "Admin name shown to followers: ") + (t.adm || L("(belum terkirim)", "(not sent yet)")) + " · " + L("username terdeteksi: ", "username detected: ") + (un || L("TIDAK", "NO")) + " · [" + ONVER + "]"));  /* diagnostik */ }
+      const dgx = el("p", "hint", L("Nama admin yang dilihat pengikut: ", "Admin name shown to followers: ") + (t.adm || L("(belum terkirim)", "(not sent yet)")) + " · " + L("username terdeteksi: ", "username detected: ") + (un || L("TIDAK", "NO")) + " · [" + ONVER + "]"); dgx.hidden = true; p.append(dgx); /* disembunyikan */ }
     const code = el("div", "code", t.oid); p.append(el("span", "label", L("KODE TURNAMEN", "TOURNAMENT CODE")), code);
     const row = el("div", "row"); row.append(mkBtn(L("Salin kode", "Copy code"), "btn ghost sm grow", () => { try{ navigator.clipboard.writeText(t.oid).then(() => toast(L("Kode disalin.", "Code copied."))); }catch(e){ toast(t.oid); } }), mkBtn(L("Bagikan undangan", "Share invite"), "btn ghost sm grow", () => shareCode(t)));
     p.append(row);
@@ -9064,7 +9064,7 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
 /* ===== PUSAT NOTIFIKASI (lonceng di beranda) =====
    Penyimpanan: localStorage "st_notif" (ikut tersinkron ke akun Google bersama data lain). Sumber notifikasi ada di blok Firebase (undangan, update turnamen, pengumuman versi). */
 (function(){
-  const APP_VER = "1.0.2"; window.satuTitikVer = APP_VER;   /* naikkan angka ini setiap kali merilis index.html baru */
+  const APP_VER = "1.0.0"; window.satuTitikVer = APP_VER;   /* naikkan angka ini setiap kali merilis index.html baru */
   const KEY = "st_notif", SEEN = "st_notif_seen", MAX = 60, SEEN_MAX = 400;
   const rd = (k, d) => { try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } };
   const wr = (k, v) => { try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} };
