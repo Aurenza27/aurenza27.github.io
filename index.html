@@ -7649,6 +7649,7 @@ const roleOf = () => { const r = remOf(); if(r) return r.role; const t = cur(); 
    Admin = pembuat turnamen. Moderator = diundang lewat email Google, boleh mengisi skor/jadwal. Pengikut = masuk dengan kode, hanya melihat (real-time).
    Turnamen online disimpan di Firestore: tournaments/{kode}. Pengikut: tournaments/{kode}/followers/{uid}. Aturan keamanan: lihat firestore.rules. */
 const SESS = uid();
+const metaOf = t => ({name:String(t.name || ""), sport:String(t.sport || "other"), fmt:String(t.fmt || "league")});
 const ON = {
   fb:null, pushed:{}, meta:{}, unsub:{}, counts:{}, status:"", later:false, busy:false, uidNow:null, qUnsub:null, tm:0,
   dirty:(() => { try{ return JSON.parse(localStorage.getItem("st_sync_ttdirty") || "{}") || {}; }catch(e){ return {}; } })(),
@@ -7751,7 +7752,7 @@ async function flush(){
       try{
         const d = JSON.stringify(t);
         if(d.length > 900000){ toast(L("Data turnamen terlalu besar untuk disinkronkan.", "Tournament data is too large to sync.")); delete ON.dirty[t.oid]; continue; }
-        if(ON.pushed[t.oid] !== d) await m.updateDoc(m.doc(f, "tournaments", t.oid), {name:t.name, sport:t.sport, fmt:t.fmt, d, u:Date.now(), by:SESS});
+        if(ON.pushed[t.oid] !== d) await m.updateDoc(m.doc(f, "tournaments", t.oid), Object.assign({d, u:Date.now(), by:SESS}, metaOf(t)));
         ON.pushed[t.oid] = d; delete ON.dirty[t.oid]; ON.status = "ok";
       }catch(e){
         if(e && (e.code === "permission-denied" || e.code === "not-found")){ delete ON.dirty[t.oid]; ON.status = "denied"; if(e.code === "not-found" && db.list.find(x => x === t)){ delete t.oid; save("data", db); } }
@@ -7777,7 +7778,7 @@ async function goOnline(t){
   const oid = newCode(); t.oid = oid;
   try{
     const {m, db:f} = await ON.lib(), d = JSON.stringify(t);
-    await withTimeout(m.setDoc(m.doc(f, "tournaments", oid), {owner:u.uid, ownerName:u.displayName || u.email || "", modEmails:[], name:t.name, sport:t.sport, fmt:t.fmt, d, u:Date.now(), by:SESS, created:Date.now()}));
+    await withTimeout(m.setDoc(m.doc(f, "tournaments", oid), Object.assign({owner:String(u.uid), ownerName:String(u.displayName || u.email || ""), modEmails:[], d, u:Date.now(), by:SESS, created:Date.now()}, metaOf(t))));
     ON.pushed[oid] = d; save("data", db); watch(oid); toast(L("Turnamen sekarang online.", "Tournament is now online.")); paint();
   }catch(e){ delete t.oid; toast(errTxt(e)); }
 }
@@ -8309,7 +8310,7 @@ A.login = async () => {
 let FSDB = null;
 function fsOpen(m, ai){
   if(FSDB) return FSDB;
-  try{ FSDB = m.initializeFirestore(ai, { experimentalAutoDetectLongPolling: true }); }
+  try{ FSDB = m.initializeFirestore(ai, { experimentalAutoDetectLongPolling: true, ignoreUndefinedProperties: true }); }
   catch(e){ FSDB = m.getFirestore(ai); }
   return FSDB;
 }
