@@ -8033,6 +8033,18 @@ const ON = {
   joined(){ const j = load("joined", []); return Array.isArray(j) ? j.filter(x => typeof x === "string") : []; },
   setJoined(a){ save("joined", Array.from(new Set(a))); }
 };
+/* admin: samakan ownerName di server dengan username Satu Titik (bukan nama Google); dicoba ulang sampai berhasil */
+function syncOwnerName(oid, owner, curName){
+  try{
+    const u0 = ON.user(), a0 = ON.A();
+    if(!u0 || owner !== u0.uid || !a0 || !a0.username || a0.usernameUid !== u0.uid) return;
+    const nm = String(a0.username); ON.nmFail = ON.nmFail || {};
+    if(nm === String(curName || "") || ON.nmSent[oid] === nm || (ON.nmFail[oid] || 0) >= 5) return;
+    ON.nmSent[oid] = nm;
+    ON.lib().then(({m, db:f}) => m.updateDoc(m.doc(f, "tournaments", oid), po({ownerName:nm}))).then(() => { if(ON.meta[oid]) ON.meta[oid].ownerName = nm; }).catch(() => { delete ON.nmSent[oid]; ON.nmFail[oid] = (ON.nmFail[oid] || 0) + 1; });
+  }catch(e){}
+}
+setInterval(() => { try{ db.list.forEach(t => { const mt = t.oid && ON.meta[t.oid]; if(mt) syncOwnerName(t.oid, mt.owner, mt.ownerName); }); }catch(e){} }, 10000);
 const roleTxt = r => r === "admin" ? "ADMIN" : r === "mod" ? L("MODERATOR", "MODERATOR") : r === "follower" ? L("PENGIKUT", "FOLLOWER") : "";
 const newCode = () => { const c = "abcdefghjkmnpqrstuvwxyz23456789"; let s = ""; const a = new Uint32Array(10); (window.crypto || {getRandomValues:x => x.forEach((_, i) => x[i] = Math.random() * 4e9)}).getRandomValues(a); a.forEach(n => s += c[n % c.length]); return s; };
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rj) => setTimeout(() => rj({code:"timeout"}), ms || 15000))]);
@@ -8071,14 +8083,8 @@ function roleFrom(x){ const u = ON.user(); if(u && x.owner === u.uid) return "ad
 function applyDoc(oid, x){
   if(!x) return;
   if(typeof x.d === "string") ON.srv[oid] = x.d;
-  /* nama admin yang tampil ke moderator dan pengikut = username Satu Titik; perbarui di server bila admin menggantinya (tanpa mengubah cap waktu update) */
-  try{
-    const u0 = ON.user(), a0 = ON.A();
-    if(u0 && x.owner === u0.uid && !ON.nmSent[oid] && a0 && a0.username && a0.usernameUid === u0.uid && String(a0.username) !== String(x.ownerName || "")){
-      ON.nmSent[oid] = 1;
-      ON.lib().then(({m, db:f}) => m.updateDoc(m.doc(f, "tournaments", oid), po({ownerName:String(a0.username)}))).catch(() => {});
-    }
-  }catch(e){}
+  /* nama admin yang tampil ke moderator dan pengikut = username Satu Titik; perbarui di server bila admin menggantinya */
+  syncOwnerName(oid, x.owner, x.ownerName);
   const role = roleFrom(x); let own = db.list.find(t => t.oid === oid);
   /* turnamen lokal milik akun Google lain (sisa dari akun sebelumnya di perangkat ini): lepas dari daftar akun ini */
   if(own && ON.user() && x.owner !== ON.user().uid){
