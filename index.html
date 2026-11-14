@@ -8267,7 +8267,7 @@ function paintOnline(box, t){
   const mt = ON.meta[t.oid] || (r ? {mods:r.mods, ownerName:r.ownerName} : {mods:[]});
   p.append(el("b", "", "STATUS : " + roleTxt(role)), el("p", "hint", st));
   if(role === "admin"){
-    p.append(el("p", "hint", L("Status kamu sebagai admin, kamu bisa mengelola semuanya, menambah atau menghapus moderator, dan menghapus turnamen.", "You are the admin: you can manage everything, add or remove moderators, and delete the tournament.")));
+    p.append(el("p", "hint", L("Status Kamu sebagai admin, kamu bisa mengelola semuanya, menambah atau menghapus moderator, dan menghapus turnamen.", "You are the admin: you can manage everything, add or remove moderators, and delete the tournament.")));
     const code = el("div", "code", t.oid); p.append(el("span", "label", L("KODE TURNAMEN", "TOURNAMENT CODE")), code);
     const row = el("div", "row"); row.append(mkBtn(L("Salin kode", "Copy code"), "btn ghost sm grow", () => { try{ navigator.clipboard.writeText(t.oid).then(() => toast(L("Kode disalin.", "Code copied."))); }catch(e){ toast(t.oid); } }), mkBtn(L("Bagikan undangan", "Share invite"), "btn ghost sm grow", () => shareCode(t)));
     p.append(row);
@@ -8324,7 +8324,7 @@ function paintOnline(box, t){
     dp.append(mkBtn(L("Matikan online (jadikan lokal lagi)", "Turn online off (make local again)"), "btn ghost sm danger", () => { if(confirm(L("Hapus turnamen dari server? Data tetap ada di perangkatmu, tetapi moderator dan pengikut tidak bisa mengaksesnya lagi.", "Remove the tournament from the server? Your local copy stays, but moderators and followers lose access."))) stopOnline(t); }));
     box.append(dp); return;
   }
-  p.append(el("p", "hint", (r && r.ownerName ? L("Admin: ", "Admin: ") + r.ownerName + ". " : "") + (role === "mod" ? L("Status kamu sebagai moderator, kamu bisa mengisi skor dan jadwal, tetapi tidak bisa menghapus turnamen. Perubahan langsung terlihat oleh semua.", "You are a moderator: you can enter scores and fixtures, but you cannot delete the tournament. Changes show up for everyone instantly.") : L("Status Kamu sebagai pengikut, kamu hanya bisa melihat, tampilan diperbarui otomatis.", "You are a follower: you can only view, and the view updates automatically."))));
+  p.append(el("p", "hint", (r && r.ownerName ? "Admin : " + r.ownerName + "\u00a0\u00a0" : "") + (role === "mod" ? L("Status Kamu sebagai moderator, kamu bisa mengisi skor dan jadwal, tetapi tidak bisa menghapus turnamen. Perubahan langsung terlihat oleh semua.", "You are a moderator: you can enter scores and fixtures, but you cannot delete the tournament. Changes show up for everyone instantly.") : L("Status Kamu sebagai pengikut, kamu hanya bisa melihat, tampilan diperbarui otomatis.", "You are a follower: you can only view, and the view updates automatically."))));
   if(role === "follower") p.append(el("p", "hint", L("Untuk berhenti mengikuti, buka tab Beranda.", "To unfollow, open the Home tab.")));
   box.append(p);
 }
