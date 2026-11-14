@@ -1,7 +1,7 @@
 /* Satu Titik - service worker (v3)
    Tujuan: aplikasi tetap bisa dibuka tanpa internet, tapi unduhan awal kecil.
    - File inti (index.html, ikon, manifest) disimpan saat pemasangan.
-   - Video dan musik (folder media/) diunduh di latar belakang setelah aplikasi terbuka
+   - Musik (folder media/) diunduh di latar belakang setelah aplikasi terbuka
      (halaman mengirim pesan "precache-media"), lalu dibaca dari cache saat offline.
    - Naikkan VERSION setiap kali file inti atau daftar media berubah. */
 const VERSION = "v3";
@@ -22,7 +22,6 @@ const CORE_FILES = [
   "favicon-64.png"
 ];
 const MEDIA_FILES = [
-  "media/bg-video.mp4",
   "media/musik-medis.mp3",
   "media/musik-detektif.mp3"
 ];
