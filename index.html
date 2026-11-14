@@ -7664,8 +7664,12 @@ const ON = {
 const roleTxt = r => r === "admin" ? "ADMIN" : r === "mod" ? L("MODERATOR", "MODERATOR") : r === "follower" ? L("PENGIKUT", "FOLLOWER") : "";
 const newCode = () => { const c = "abcdefghjkmnpqrstuvwxyz23456789"; let s = ""; const a = new Uint32Array(10); (window.crypto || {getRandomValues:x => x.forEach((_, i) => x[i] = Math.random() * 4e9)}).getRandomValues(a); a.forEach(n => s += c[n % c.length]); return s; };
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rj) => setTimeout(() => rj({code:"timeout"}), ms || 15000))]);
+const ONVER = "online-v6";
+/* Firestore dimuat di Beranda (jendela induk); objek data harus dibuat dari Object milik induk, kalau tidak ditolak ("custom Object object") */
+const po = src => { let O = Object; try{ if(window.parent && window.parent !== window && window.parent.Object) O = window.parent.Object; }catch(e){} return Object.assign(new O(), src); };
+let lastErr = "";
 const errTxt = e => {
-  try{ console.warn("turnamen online:", e); }catch(x){}
+  try{ console.warn("turnamen online:", e); lastErr = JSON.stringify({code:e && e.code, name:e && e.name, message:e && e.message, str:String(e)}).slice(0, 400); }catch(x){}
   const c = e && (e.code || e.message) ? String(e.code || e.message).replace(/^firestore\//, "") : "";
   if(c === "permission-denied") return L("Izin ditolak. Pastikan aturan Firestore sudah dipasang (Publish) dan Cloud Firestore sudah diaktifkan.", "Permission denied. Make sure the Firestore rules are published and Cloud Firestore is enabled.");
   if(navigator.onLine === false) return L("Sedang offline.", "You are offline.");
@@ -7753,7 +7757,7 @@ async function flush(){
       try{
         const d = JSON.stringify(t);
         if(d.length > 900000){ toast(L("Data turnamen terlalu besar untuk disinkronkan.", "Tournament data is too large to sync.")); delete ON.dirty[t.oid]; continue; }
-        if(ON.pushed[t.oid] !== d) await m.updateDoc(m.doc(f, "tournaments", t.oid), Object.assign({d, u:Date.now(), by:SESS}, metaOf(t)));
+        if(ON.pushed[t.oid] !== d) await m.updateDoc(m.doc(f, "tournaments", t.oid), po(Object.assign({d, u:Date.now(), by:SESS}, metaOf(t))));
         ON.pushed[t.oid] = d; delete ON.dirty[t.oid]; ON.status = "ok";
       }catch(e){
         if(e && (e.code === "permission-denied" || e.code === "not-found")){ delete ON.dirty[t.oid]; ON.status = "denied"; if(e.code === "not-found" && db.list.find(x => x === t)){ delete t.oid; save("data", db); } }
@@ -7779,9 +7783,9 @@ async function goOnline(t){
   const oid = newCode(); t.oid = oid;
   try{
     const {m, db:f} = await ON.lib(), d = JSON.stringify(t);
-    await withTimeout(m.setDoc(m.doc(f, "tournaments", oid), Object.assign({owner:String(u.uid), ownerName:String(u.displayName || u.email || ""), modEmails:[], d, u:Date.now(), by:SESS, created:Date.now()}, metaOf(t))));
+    await withTimeout(m.setDoc(m.doc(f, "tournaments", oid), po(Object.assign({owner:String(u.uid), ownerName:String(u.displayName || u.email || ""), modEmails:[], d, u:Date.now(), by:SESS, created:Date.now()}, metaOf(t)))));
     ON.pushed[oid] = d; save("data", db); watch(oid); toast(L("Turnamen sekarang online.", "Tournament is now online.")); paint();
-  }catch(e){ delete t.oid; toast(errTxt(e)); }
+  }catch(e){ delete t.oid; toast(errTxt(e)); paint(); }
 }
 async function stopOnline(t){
   const oid = t.oid; if(!oid) return;
@@ -7794,7 +7798,7 @@ async function stopOnline(t){
 async function setMods(t, email, add){
   try{
     const {m, db:f} = await ON.lib();
-    await m.updateDoc(m.doc(f, "tournaments", t.oid), {modEmails: add ? m.arrayUnion(email) : m.arrayRemove(email)});
+    await m.updateDoc(m.doc(f, "tournaments", t.oid), po({modEmails: add ? m.arrayUnion(email) : m.arrayRemove(email)}));
     const mt = ON.meta[t.oid] = ON.meta[t.oid] || {mods:[]}; mt.mods = add ? Array.from(new Set((mt.mods || []).concat(email))) : (mt.mods || []).filter(x => x !== email);
     paint();
   }catch(e){ toast(errTxt(e)); }
@@ -7806,7 +7810,7 @@ async function followCode(code){
     const {m, db:f} = await ON.lib(), snap = await withTimeout(m.getDoc(m.doc(f, "tournaments", code)));
     if(!snap.exists()){ toast(L("Turnamen dengan kode itu tidak ditemukan.", "No tournament with that code.")); return false; }
     const x = snap.data();
-    if(x.owner !== u.uid) await m.setDoc(m.doc(f, "tournaments", code, "followers", u.uid), {n:u.displayName || "", t:Date.now()});
+    if(x.owner !== u.uid) await m.setDoc(m.doc(f, "tournaments", code, "followers", u.uid), po({n:String(u.displayName || ""), t:Date.now()}));
     if(!db.list.some(t => t.oid === code)) ON.setJoined(ON.joined().concat(code));
     watch(code); applyDoc(code, x); toast(L("Berhasil mengikuti turnamen.", "Now following the tournament.")); return true;
   }catch(e){ toast(errTxt(e)); return false; }
@@ -7842,6 +7846,7 @@ function paintOnline(box, t){
   if(role === "local"){
     p.append(el("p", "hint", L("Turnamen ini masih lokal. Jadikan online agar bisa dikelola bersama moderator dan diikuti orang lain secara real-time. Kamu menjadi admin.", "This tournament is still local. Take it online to share management with moderators and let others follow live. You become the admin.")));
     p.append(mkBtn(L("Jadikan turnamen online", "Take tournament online"), "btn", () => goOnline(t)));
+    const dg = el("p", "hint", "[" + ONVER + "] " + (lastErr ? L("Detail error: ", "Error detail: ") + lastErr : "")); dg.style.userSelect = "all"; dg.style.overflowWrap = "anywhere"; p.append(dg);
     box.append(p); return;
   }
   const mt = ON.meta[t.oid] || (r ? {mods:r.mods, ownerName:r.ownerName} : {mods:[]});
