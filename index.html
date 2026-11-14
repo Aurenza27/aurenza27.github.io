@@ -7478,6 +7478,23 @@ img.av{display:block;object-fit:cover}
 .hm-empty{text-align:center;padding:14px 0 6px;color:var(--muted);font-size:13px}
 .hm-empty p{margin:6px 0 0}
 .hm-eic{font-size:28px;opacity:.8}
+.hm-idrow{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--muted)}
+.hm-idrow code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--gold2);letter-spacing:.06em;overflow-wrap:anywhere}
+.hm-cp{flex:none;width:26px;height:26px;padding:0;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.hm-cp:hover,.hm-cp:active{border-color:var(--gold);color:var(--gold2)}
+.hm-cp svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hm-set{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.hm-set span{font-size:14px;line-height:1.35}
+.hm-sw{flex:none;position:relative;width:44px;height:26px;border-radius:999px;border:1px solid var(--line);background:var(--inp);cursor:pointer;padding:0}
+.hm-sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:transform .18s,background .18s}
+.hm-sw[aria-checked="true"]{border-color:var(--gold);background:rgba(212,169,79,.18)}
+.hm-sw[aria-checked="true"]::after{transform:translateX(18px);background:var(--gold2)}
+.hm-rep{margin-left:36px;border-top:0;padding-top:2px}
+.hm-rq{margin:2px 0 0;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.hm-rb{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;padding:4px 0 0;cursor:pointer}
+.hm-rb:hover,.hm-rb:active{color:var(--gold2)}
+.hm-rbar{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:5px 6px 5px 10px}
+.hm-rbar b{color:var(--text);font-weight:700;overflow-wrap:anywhere}
 .av.sm{width:32px;height:32px;font-size:13px}
 </style>
 </head>
@@ -8305,11 +8322,67 @@ function paintOnlineList(m){
    Data online (Firestore): tournaments/{kode}/votes/{uid} = {v:1|-1, t}; tournaments/{kode}/comments/{id} = {u, a, n, x, t};
    tournaments/{kode}/followers/{uid}. Komentar, suka, dan ikuti hanya untuk admin, moderator, dan pengikut
    (dijaga juga oleh aturan Firestore: lihat firestore.rules). */
-const HS = {oid:null, un:[], up:0, down:0, mine:0, vBusy:false, fBusy:false, com:[], cReady:false, cErr:false, following:null, fcount:null, draft:"", posting:false, lastPost:0, max:50, ui:{}};
+const HS = {oid:null, un:[], up:0, down:0, mine:0, vBusy:false, fBusy:false, com:[], cReady:false, cErr:false, following:null, fcount:null, draft:"", reply:null, posting:false, lastPost:0, max:50, ui:{}};
 const SVG_UP = "M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z";
 const SVG_DN = "M17 14V2M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z";
 const hmIcon = d => { const s = el("span", "hm-ico"); s.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '"/></svg>'; return s; };
 const fmtN = n => n >= 1000 ? (Math.round(n / 100) / 10) + L("rb", "k") : String(n);
+const tcfg = t => { const c = (t && t.cfg) || {}; return {id:c.id === true, com:c.com !== false, like:c.like !== false}; };
+function copyTxt(v, ok){
+  const done = () => toast(ok), fb = () => { try{ const a = document.createElement("textarea"); a.value = v; a.style.cssText = "position:fixed;opacity:0"; document.body.append(a); a.select(); document.execCommand("copy"); a.remove(); done(); }catch(e){ toast(v); } };
+  try{ navigator.clipboard.writeText(v).then(done, fb); }catch(e){ fb(); }
+}
+/* ===== FILTER BAHASA KOTOR: kata kasar diganti bintang (*) =====
+   Cocok per kata utuh (tidak kena kata biasa seperti "asuransi" atau "coklat"), tahan huruf berulang (anjiiing),
+   angka pengganti huruf (4nj1ng), dan sensor bintang (anj***, f*ck). */
+const BW = "anjing bangsat bajingan babi kontol memek jembut tai tahi kampret keparat brengsek asu jancok goblok tolol bego dongo gendeng sinting bodoh idiot oon benalu ngentot ngehe jancuk pukimak kimak sialan setan dajjal laknat anjir njir njing cok cuk asw yatim mampus modar norak alay lebay menjijikkan memalukan menyebalkan julid pecundang pengemis bngst gblk tll kntl mmk fuck shit bitch asshole bastard motherfucker bullshit stupid dumbass moron".split(" ");
+const BP = ["cacat otak", "otak udang", "otak kosong", "tidak punya otak", "miskin akhlak", "sampah masyarakat", "manusia tidak berguna", "tidak tahu diri", "mulut ember", "muka tembok", "beban hidup", "kurang ajar", "tai kucing", "tidak waras", "haus perhatian", "cari sensasi", "sok pintar", "sok tahu", "tukang ngibul"];
+const escRe = x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), c1 = x => x.replace(/(.)\1+/g, "$1");
+const BSET = new Set(BW), BCSET = new Set(BW.filter(w => c1(w) === w)), LEET = {"0":"o", "1":"i", "3":"e", "4":"a", "5":"s", "7":"t", "@":"a", "$":"s"};
+const BPH = new RegExp("(^|[^\\p{L}\\p{N}])(" + BP.map(p => p.split(" ").map(escRe).join("\\s+")).join("|") + ")(?![\\p{L}\\p{N}])", "giu");
+function badWord(w, prev, next){
+  let x = w.toLowerCase(); if(/^[0-9]+$/.test(x)) return false;
+  x = x.replace(/[013457@$]/g, ch => LEET[ch]);
+  if(x.indexOf("*") >= 0){
+    const parts = x.split(/\*+/); if(parts.join("").length < 2) return false;
+    const re = new RegExp("^" + parts.map(escRe).join(".+") + "$"); return BW.some(b => b !== "yatim" && re.test(b));
+  }
+  const a = x.replace(/(.)\1{2,}/g, "$1$1"), c = c1(x), k = BSET.has(x) ? x : BSET.has(a) ? a : BCSET.has(c) ? c : "";
+  if(!k) return false;
+  if(k === "yatim" && (/^(anak|panti|piatu|dan|para|santunan)$/.test(prev) || /^\s+piatu/i.test(next))) return false;
+  return true;
+}
+function censor(v){
+  let s = String(v === undefined || v === null ? "" : v), hit = false;
+  s = s.replace(BPH, (m, pre, ph) => { hit = true; return pre + ph.replace(/\S/g, "*"); });
+  const re = /[\p{L}\p{N}*@$]+/gu; let out = "", last = 0, prev = "", m;
+  while((m = re.exec(s))){
+    const w = m[0], bad = badWord(w, prev, s.slice(re.lastIndex, re.lastIndex + 8));
+    out += s.slice(last, m.index) + (bad ? "*".repeat(w.length) : w); if(bad) hit = true;
+    last = m.index + w.length; prev = w.toLowerCase();
+  }
+  return {t:out + s.slice(last), hit};
+}
+function paintReplyBar(){
+  const rb = HS.ui.rb; if(!rb) return; rb.textContent = ""; rb.hidden = !HS.reply; if(!HS.reply) return;
+  const x = el("button", "hm-del", "✕"); x.type = "button"; x.setAttribute("aria-label", L("Batal membalas", "Cancel reply")); x.onclick = () => { HS.reply = null; paintReplyBar(); };
+  rb.append("↪ " + L("Membalas ", "Replying to "), el("b", "", censor(HS.reply.n).t), x);
+}
+function startReply(c){
+  HS.reply = {id:c.r || c.id, n:clean(c.n, 40) || L("Pengguna", "User")}; paintReplyBar();
+  const ta = HS.ui.ta; if(ta){ try{ ta.scrollIntoView({block:"center", behavior:"smooth"}); }catch(e){} ta.focus(); }
+}
+function paintCfg(t){
+  const p = el("div", "panel keep"), c = tcfg(t);
+  p.append(el("span", "label", L("⚙️ PENGATURAN TURNAMEN", "⚙️ TOURNAMENT SETTINGS")));
+  [["id", L("Tampilkan ID turnamen di beranda", "Show tournament ID on home"), c.id], ["com", L("Komentar", "Comments"), c.com], ["like", L("Like (suka dan tidak suka)", "Likes (like and dislike)"), c.like]].forEach(r => {
+    const row = el("div", "hm-set"), sw = el("button", "hm-sw"); sw.type = "button"; sw.setAttribute("role", "switch"); sw.setAttribute("aria-checked", String(r[2])); sw.setAttribute("aria-label", r[1]);
+    sw.onclick = () => { const o = {}; o[r[0]] = !r[2]; t.cfg = Object.assign({}, t.cfg, o); persist(); paint(); };
+    row.append(el("span", "", r[1]), sw); p.append(row);
+  });
+  p.append(el("small", "hm-sm", L("Berlaku untuk semua pengikut turnamen ini.", "Applies to everyone following this tournament.")));
+  return p;
+}
 function ago(ts){
   const s = Math.max(0, (Date.now() - (+ts || 0)) / 1000); if(s < 60) return L("baru saja", "just now");
   const mi = Math.floor(s / 60); if(mi < 60) return L(mi + " mnt lalu", mi + "m ago");
@@ -8324,7 +8397,7 @@ function countFollowers(oid){
 }
 function startHome(oid){
   if(HS.oid === oid) return;
-  stopHome(); Object.assign(HS, {oid, up:0, down:0, mine:0, vBusy:false, fBusy:false, com:[], cReady:false, cErr:false, following:null, fcount:ON.counts[oid] === undefined ? null : ON.counts[oid]});
+  stopHome(); Object.assign(HS, {oid, up:0, down:0, mine:0, vBusy:false, fBusy:false, com:[], cReady:false, cErr:false, following:null, reply:null, fcount:ON.counts[oid] === undefined ? null : ON.counts[oid]});
   const u = ON.user(); if(!u) return;
   ON.lib().then(({m, db:f}) => {
     if(HS.oid !== oid) return;
@@ -8387,6 +8460,7 @@ function fillAct(){
   }
   box.append(fr);
   if(HS.following) box.append(el("small", "hm-sm", L("Ketuk tombol di atas untuk berhenti mengikuti.", "Tap the button above to unfollow.")));
+  if(!tcfg(t).like) return;
   const vr = el("div", "hm-row"), mkV = (v, label, cnt) => {
     const b = el("button", "hm-vote " + (v === 1 ? "up" : "dn") + (HS.mine === v ? " on" : "")); b.type = "button"; b.disabled = HS.vBusy;
     b.setAttribute("aria-pressed", String(HS.mine === v)); b.setAttribute("aria-label", label + " (" + cnt + ")");
@@ -8412,32 +8486,40 @@ function fillComments(){
   if(HS.cErr){ box.append(el("p", "err", L("Komentar tidak bisa dimuat. Pastikan aturan Firestore sudah diperbarui.", "Comments could not be loaded. Make sure the Firestore rules are updated."))); return; }
   if(!n){ const e = el("div", "hm-empty"); e.append(el("div", "hm-eic", "💬"), el("p", "", L("Belum ada komentar. Jadilah yang pertama!", "No comments yet. Be the first!"))); box.append(e); return; }
   const role = roleOf(), mt = ON.meta[t.oid] || {}, me = ON.user();
-  HS.com.forEach(c => {
+  const ids = new Set(HS.com.map(c => c.id)), kids = {}, roots = [], canReply = !!me && role !== "local";
+  HS.com.forEach(c => { if(c.r && ids.has(c.r)) (kids[c.r] = kids[c.r] || []).push(c); else roots.push(c); });
+  const one = (c, isRep) => {
     const rr = c.u && mt.owner && c.u === mt.owner ? "admin" : (c.a && (mt.mods || []).includes(c.a)) ? "mod" : "";
-    const row = el("div", "hm-c"), av = mkAv({name:c.n}), body = el("div", "hm-cb"), hd = el("div", "hm-ch");
+    const row = el("div", "hm-c" + (isRep ? " hm-rep" : "")), av = mkAv({name:c.n}), body = el("div", "hm-cb"), hd = el("div", "hm-ch");
     av.classList.add("sm");
-    hd.append(el("span", "hm-cn", c.n || L("Pengguna", "User")));
+    hd.append(el("span", "hm-cn", censor(c.n).t || L("Pengguna", "User")));
     if(rr) hd.append(el("span", "hm-role " + rr, rr === "admin" ? "ADMIN" : "MOD"));
     hd.append(el("span", "hm-ct", ago(c.t)));
     if((me && c.u === me.uid) || role === "admin" || role === "mod"){
       const d = el("button", "hm-del", "✕"); d.type = "button"; d.setAttribute("aria-label", L("Hapus komentar", "Delete comment")); d.onclick = () => delComment(t, c); hd.append(d);
     }
-    body.append(hd, el("p", "hm-cx", String(c.x || ""))); row.append(av, body); box.append(row);
-  });
+    body.append(hd);
+    if(c.rn) body.append(el("p", "hm-rq", "↪ " + L("Membalas ", "Replying to ") + censor(c.rn).t));
+    body.append(el("p", "hm-cx", censor(c.x).t));
+    if(canReply){ const rb = el("button", "hm-rb", L("Balas", "Reply")); rb.type = "button"; rb.onclick = () => startReply(c); body.append(rb); }
+    row.append(av, body); box.append(row);
+  };
+  roots.forEach(c => { one(c, false); (kids[c.id] || []).slice().sort((x, y) => (x.t || 0) - (y.t || 0)).forEach(k => one(k, true)); });
   if(n >= HS.max) box.append(el("p", "hint", L("Menampilkan " + HS.max + " komentar terbaru.", "Showing the latest " + HS.max + " comments.")));
 }
 async function postComment(t, ta, send){
-  const u = ON.user(); if(!u || HS.posting) return;
-  const x = ta.value.replace(/\r/g, "").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "").replace(/\n{3,}/g, "\n\n").trim().slice(0, 300);
+  const u = ON.user(); if(!u || HS.posting || !tcfg(t).com) return;
+  let x = ta.value.replace(/\r/g, "").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "").replace(/\n{3,}/g, "\n\n").trim().slice(0, 300);
   if(!x) return;
+  const cz = censor(x); if(cz.hit){ x = cz.t; toast(L("Kata kasar disensor.", "Offensive words were censored.")); }
   if(!ON.accountId()){ toast(L("Akunmu belum siap. Coba lagi sebentar.", "Your account is not ready yet. Try again in a moment.")); return; }
   if(Date.now() - HS.lastPost < 3000){ toast(L("Tunggu sebentar sebelum mengirim lagi.", "Wait a moment before posting again.")); return; }
   if(navigator.onLine === false){ toast(L("Sedang offline.", "You are offline.")); return; }
   HS.posting = true; send.disabled = true;
   try{
     const {m, db:f} = await ON.lib();
-    await withTimeout(m.addDoc(m.collection(f, "tournaments", t.oid, "comments"), po({u:String(u.uid), a:String(ON.accountId()), n:clean(ON.nm(u), 40) || L("Pengguna", "User"), x, t:Date.now()})));
-    HS.lastPost = Date.now(); HS.draft = ""; ta.value = ""; ta.dispatchEvent(new Event("input"));
+    await withTimeout(m.addDoc(m.collection(f, "tournaments", t.oid, "comments"), po(Object.assign({u:String(u.uid), a:String(ON.accountId()), n:clean(ON.nm(u), 40) || L("Pengguna", "User"), x, t:Date.now()}, HS.reply ? {r:HS.reply.id, rn:HS.reply.n} : {}))));
+    HS.lastPost = Date.now(); HS.draft = ""; HS.reply = null; paintReplyBar(); ta.value = ""; ta.dispatchEvent(new Event("input"));
   }catch(e){ toast(errTxt(e)); }
   HS.posting = false; send.disabled = !ta.value.trim();
 }
@@ -8451,7 +8533,7 @@ function buildComposer(t){
   ta.oninput = () => { HS.draft = ta.value; upd(); };
   ta.onkeydown = e => { if(e.key === "Enter" && (e.ctrlKey || e.metaKey) && !send.disabled){ e.preventDefault(); send.click(); } };
   send.onclick = () => postComment(t, ta, send);
-  bar.append(cnt, send); w.append(ta, bar, el("small", "hm-sm", L("Hanya admin, moderator, dan pengikut yang bisa berkomentar.", "Only the admin, moderators and followers can comment."))); upd(); return w;
+  bar.append(cnt, send); const rb = el("div", "hm-rbar"); HS.ui.rb = rb; HS.ui.ta = ta; paintReplyBar(); w.append(rb, ta, bar, el("small", "hm-sm", L("Hanya admin, moderator, dan pengikut yang bisa berkomentar.", "Only the admin, moderators and followers can comment."))); upd(); return w;
 }
 function progressOf(t){
   const ko = t.ko ? t.ko.flat().filter(x => !x.bye) : [];
@@ -8467,6 +8549,12 @@ function paintHero(t, live){
   chips.append(sc); chips.append(el("span", "hm-chip", live ? "🌐 Online" : L("📁 Lokal", "📁 Local")));
   const rl = roleOf(); if(rl !== "local") chips.append(el("span", "hm-chip role", roleTxt(rl)));
   h.append(chips);
+  if(live && t.oid && tcfg(t).id){
+    const ir = el("div", "hm-idrow"), cp = el("button", "hm-cp"); cp.type = "button"; cp.setAttribute("aria-label", L("Salin ID turnamen", "Copy tournament ID"));
+    cp.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
+    cp.onclick = () => copyTxt(t.oid, L("ID disalin.", "ID copied."));
+    ir.append(el("span", "", "ID"), el("code", "", t.oid), cp); h.append(ir);
+  }
   const pr = el("div", "hm-prog"), bar = el("div", "hm-bar"), fill = el("span"), pc = pg.all ? Math.round(pg.done / pg.all * 100) : 0;
   fill.style.width = pc + "%"; bar.append(fill); bar.setAttribute("role", "progressbar"); bar.setAttribute("aria-valuemin", "0"); bar.setAttribute("aria-valuemax", "100"); bar.setAttribute("aria-valuenow", String(pc));
   pr.append(bar); h.append(pr);
@@ -8507,6 +8595,8 @@ function paintHome(box, t){
   }
   const act = el("div", "panel stack keep hm-act"); HS.ui.act = act; box.append(act); fillAct();
   paintCrew(box, t);
+  if(role === "admin" || role === "mod") box.append(paintCfg(t));
+  if(!tcfg(t).com){ const off = el("div", "panel keep"); off.append(el("p", "hint", L("💬 Komentar dinonaktifkan oleh panitia turnamen.", "💬 Comments are turned off by the tournament organizers."))); box.append(off); return; }
   const cp = el("div", "panel stack keep"), cnt = el("span", "label"), list = el("div", "hm-list");
   HS.ui.cnt = cnt; HS.ui.list = list; cp.append(cnt, buildComposer(t), list); box.append(cp); fillComments();
 }
