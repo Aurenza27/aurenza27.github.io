@@ -8021,7 +8021,7 @@ try{ const NN = window.parent && window.parent.satuTitikNotif; if(NN && NN.mine)
 try{ let a = JSON.parse(localStorage.getItem("st_notif_mine") || "[]"); if(!Array.isArray(a)) a = []; a.push(SESS); localStorage.setItem("st_notif_mine", JSON.stringify(a.slice(-60))); }catch(e){}
 const metaOf = t => { const c = tcfg(t); return {name:String(t.name || ""), sport:String(t.sport || "other"), fmt:String(t.fmt || "league"), cfg:{id:c.id, com:c.com, like:c.like}}; };
 const ON = {
-  fb:null, pushed:{}, srv:{}, meta:{}, unsub:{}, counts:{}, status:"", later:false, busy:false, uidNow:null, qUnsub:null, tm:0, invUnsub:null, invOut:[], prof:{}, profBusy:{},
+  fb:null, pushed:{}, srv:{}, nmSent:{}, meta:{}, unsub:{}, counts:{}, status:"", later:false, busy:false, uidNow:null, qUnsub:null, tm:0, invUnsub:null, invOut:[], prof:{}, profBusy:{},
   dirty:(() => { try{ return JSON.parse(localStorage.getItem("st_sync_ttdirty") || "{}") || {}; }catch(e){ return {}; } })(),
   A(){ try{ return window.parent && window.parent !== window ? (window.parent.satuTitikAuth || null) : null; }catch(e){ return null; } },
   nm(u){ const a = ON.A(); return String((a && a.username && a.usernameUid === u.uid ? a.username : "") || u.displayName || ""); },
@@ -8071,6 +8071,14 @@ function roleFrom(x){ const u = ON.user(); if(u && x.owner === u.uid) return "ad
 function applyDoc(oid, x){
   if(!x) return;
   if(typeof x.d === "string") ON.srv[oid] = x.d;
+  /* nama admin yang tampil ke moderator dan pengikut = username Satu Titik; perbarui di server bila admin menggantinya (tanpa mengubah cap waktu update) */
+  try{
+    const u0 = ON.user(), a0 = ON.A();
+    if(u0 && x.owner === u0.uid && !ON.nmSent[oid] && a0 && a0.username && a0.usernameUid === u0.uid && String(a0.username) !== String(x.ownerName || "")){
+      ON.nmSent[oid] = 1;
+      ON.lib().then(({m, db:f}) => m.updateDoc(m.doc(f, "tournaments", oid), po({ownerName:String(a0.username)}))).catch(() => {});
+    }
+  }catch(e){}
   const role = roleFrom(x); let own = db.list.find(t => t.oid === oid);
   /* turnamen lokal milik akun Google lain (sisa dari akun sebelumnya di perangkat ini): lepas dari daftar akun ini */
   if(own && ON.user() && x.owner !== ON.user().uid){
@@ -8094,7 +8102,7 @@ function applyDoc(oid, x){
     if(REM[oid]){ REM[oid].role = role; REM[oid].mods = ON.meta[oid].mods; }
     else if(typeof x.d === "string"){ try{ const t = JSON.parse(x.d); t.oid = oid; ON.pushed[oid] = x.d; REM[oid] = {t, d:x.d, role, owner:x.owner, ownerName:x.ownerName || "", mods:ON.meta[oid].mods}; changed = true; }catch(e){} }
   }
-  if(REM[oid]) REM[oid].role = role;
+  if(REM[oid]){ REM[oid].role = role; if(x.ownerName) REM[oid].ownerName = x.ownerName; }
   if(changed || prev !== JSON.stringify(ON.meta[oid]) + (REM[oid] ? REM[oid].role : "")) rerender();
 }
 function watch(oid){
@@ -8271,7 +8279,7 @@ function paintOnline(box, t){
   const mt = ON.meta[t.oid] || (r ? {mods:r.mods, ownerName:r.ownerName} : {mods:[]});
   p.append(el("b", "", "STATUS : " + roleTxt(role)), el("p", "hint", st));
   if(role === "admin"){
-    p.append(el("p", "hint", L("Status Kamu sebagai admin, kamu bisa mengelola semuanya, menambah atau menghapus moderator, dan menghapus turnamen.", "You are the admin: you can manage everything, add or remove moderators, and delete the tournament.")));
+    p.append(el("p", "hint", L("Status Kamu sebagai admin, kamu bisa mengelola semuanya, menambah atau menghapus moderator, dan menghapus turnamen.", "Your status is admin: you can manage everything, add or remove moderators, and delete the tournament.")));
     const code = el("div", "code", t.oid); p.append(el("span", "label", L("KODE TURNAMEN", "TOURNAMENT CODE")), code);
     const row = el("div", "row"); row.append(mkBtn(L("Salin kode", "Copy code"), "btn ghost sm grow", () => { try{ navigator.clipboard.writeText(t.oid).then(() => toast(L("Kode disalin.", "Code copied."))); }catch(e){ toast(t.oid); } }), mkBtn(L("Bagikan undangan", "Share invite"), "btn ghost sm grow", () => shareCode(t)));
     p.append(row);
@@ -8328,7 +8336,13 @@ function paintOnline(box, t){
     dp.append(mkBtn(L("Matikan online (jadikan lokal lagi)", "Turn online off (make local again)"), "btn ghost sm danger", () => { if(confirm(L("Hapus turnamen dari server? Data tetap ada di perangkatmu, tetapi moderator dan pengikut tidak bisa mengaksesnya lagi.", "Remove the tournament from the server? Your local copy stays, but moderators and followers lose access."))) stopOnline(t); }));
     box.append(dp); return;
   }
-  p.append(el("p", "hint", (r && r.ownerName ? "Admin : " + r.ownerName + "\u00a0\u00a0" : "") + (role === "mod" ? L("Status Kamu sebagai moderator, kamu bisa mengisi skor dan jadwal, tetapi tidak bisa menghapus turnamen. Perubahan langsung terlihat oleh semua.", "You are a moderator: you can enter scores and fixtures, but you cannot delete the tournament. Changes show up for everyone instantly.") : L("Status Kamu sebagai pengikut, kamu hanya bisa melihat, tampilan diperbarui otomatis.", "You are a follower: you can only view, and the view updates automatically."))));
+  const stTxt = role === "mod"
+    ? L("Status Kamu sebagai moderator, kamu bisa mengisi skor dan jadwal, tetapi tidak bisa menghapus turnamen. Perubahan langsung terlihat oleh semua.", "Your status is moderator: you can enter scores and fixtures, but you cannot delete the tournament. Changes show up for everyone instantly.")
+    : L("Status Kamu sebagai pengikut, kamu hanya bisa melihat, tampilan diperbarui otomatis.", "Your status is follower: you can only view, and the view updates automatically.");
+  const ad = el("p", "hint");
+  if(r && r.ownerName){ ad.append(el("b", "", "Admin"), el("br"), el("b", "", r.ownerName), "\u00a0\u00a0" + stTxt); }   /* nama = username akun Satu Titik milik admin */
+  else ad.textContent = stTxt;
+  p.append(ad);
   if(role === "follower") p.append(el("p", "hint", L("Untuk berhenti mengikuti, buka tab Beranda.", "To unfollow, open the Home tab.")));
   box.append(p);
 }
@@ -9030,7 +9044,7 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
 /* ===== PUSAT NOTIFIKASI (lonceng di beranda) =====
    Penyimpanan: localStorage "st_notif" (ikut tersinkron ke akun Google bersama data lain). Sumber notifikasi ada di blok Firebase (undangan, update turnamen, pengumuman versi). */
 (function(){
-  const APP_VER = "1.0.1"; window.satuTitikVer = APP_VER;   /* naikkan angka ini setiap kali merilis index.html baru */
+  const APP_VER = "1.0.2"; window.satuTitikVer = APP_VER;   /* naikkan angka ini setiap kali merilis index.html baru */
   const KEY = "st_notif", SEEN = "st_notif_seen", MAX = 60, SEEN_MAX = 400;
   const rd = (k, d) => { try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } };
   const wr = (k, v) => { try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} };
