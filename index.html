@@ -132,19 +132,36 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #bellBtn[data-n="0"] .bdg{display:none}
 #bellBtn.has{border-color:var(--gold);background:rgba(212,169,79,.1);animation:bellGlow 2.8s ease-out infinite}
 #bellBtn.has svg{animation:bellRing 4.8s ease-in-out infinite}
-#bellBtn.has .bdg{animation:bdgIn .45s cubic-bezier(.2,1.7,.4,1) both}
+#bellBtn .bdg.pop{animation:bdgPop .55s cubic-bezier(.2,1.7,.4,1) both}
+#bellBtn.ring{animation:bellFlash 1.5s ease-out}
 #bellBtn[aria-expanded="true"],#bellBtn[aria-expanded="true"] svg{animation:none}
-#bellBtn.ring::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--gold2);pointer-events:none;animation:bellRipple .9s ease-out 2}
-#bellBtn.ring svg{animation:bellRingFast .75s ease-in-out 2}
+#bellBtn.ring::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--gold2);pointer-events:none;animation:bellRipple .95s ease-out 2}
+#bellBtn.ring::before{content:"";position:absolute;inset:-2px;border-radius:50%;border:1.5px solid var(--gold);opacity:0;pointer-events:none;animation:bellRipple 1s ease-out .35s 2}
+#bellBtn.ring svg{animation:bellSwing 1.35s cubic-bezier(.36,.07,.19,.97) both}
+#bellBtn .bclap{transform-box:fill-box;transform-origin:50% 0}
+#bellBtn.ring .bclap{animation:clapSwing 1.35s cubic-bezier(.36,.07,.19,.97) .06s both}
+#bellBtn[aria-expanded="true"]{border-color:var(--gold);background:rgba(212,169,79,.14);box-shadow:0 0 0 3px rgba(212,169,79,.15),0 0 14px rgba(212,169,79,.3)}
+#bellBtn[aria-expanded="true"].tap svg,#bellBtn.settle svg{animation:bellTap .7s ease-out}
 @keyframes bellRing{0%,22%,100%{transform:rotate(0)}3%{transform:rotate(15deg)}6%{transform:rotate(-13deg)}9%{transform:rotate(10deg)}12%{transform:rotate(-7deg)}15%{transform:rotate(4deg)}18%{transform:rotate(-2deg)}}
 @keyframes bellRingFast{0%,100%{transform:rotate(0)}15%{transform:rotate(20deg)}35%{transform:rotate(-17deg)}55%{transform:rotate(11deg)}75%{transform:rotate(-6deg)}}
 @keyframes bellGlow{0%{box-shadow:0 0 0 0 rgba(212,169,79,.45)}70%,100%{box-shadow:0 0 0 12px rgba(212,169,79,0)}}
 @keyframes bellRipple{from{opacity:.9;transform:scale(1)}to{opacity:0;transform:scale(1.7)}}
-@keyframes bdgIn{from{transform:scale(0)}to{transform:scale(1)}}
-@media (prefers-reduced-motion:reduce){#bellBtn.has,#bellBtn.has svg,#bellBtn.has .bdg,#bellBtn.ring svg{animation:none}#bellBtn.ring::after{animation:none;display:none}}
-#bellPanel{position:absolute;z-index:30;top:52px;left:0;display:flex;flex-direction:column;width:min(350px,calc(100vw - 32px));max-height:min(72vh,540px);padding:0;overflow:hidden;text-align:left;border:1px solid var(--gold);border-radius:16px;background:var(--bg2);box-shadow:0 10px 30px rgba(0,0,0,.6);transform-origin:top left;animation:accIn .18s ease-out;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+@keyframes bdgPop{0%{transform:scale(0)}60%{transform:scale(1.28)}100%{transform:scale(1)}}
+@keyframes bellSwing{0%,100%{transform:rotate(0)}12%{transform:rotate(20deg)}28%{transform:rotate(-17deg)}44%{transform:rotate(13deg)}58%{transform:rotate(-9deg)}72%{transform:rotate(5deg)}86%{transform:rotate(-2deg)}}
+@keyframes clapSwing{0%,100%{transform:translateX(0)}15%{transform:translateX(-1.5px)}32%{transform:translateX(1.3px)}48%{transform:translateX(-1px)}62%{transform:translateX(.65px)}76%{transform:translateX(-.3px)}}
+@keyframes bellFlash{0%{box-shadow:0 0 0 0 rgba(212,169,79,.7),0 0 0 rgba(240,207,134,0)}40%{box-shadow:0 0 0 6px rgba(212,169,79,.22),0 0 22px rgba(240,207,134,.65)}100%{box-shadow:0 0 0 12px rgba(212,169,79,0),0 0 0 rgba(240,207,134,0)}}
+@keyframes bellTap{0%,100%{transform:rotate(0)}20%{transform:rotate(14deg)}45%{transform:rotate(-10deg)}70%{transform:rotate(5deg)}}
+@keyframes bnIn{0%{opacity:0;transform:translateY(-6px) scale(.08)}45%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes bnOut{0%{opacity:1;transform:none}60%{opacity:1}100%{opacity:0;transform:translateY(-6px) scale(.08)}}
+@keyframes nrowIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#bellBtn.has,#bellBtn.has svg,#bellBtn .bdg.pop,#bellBtn.ring,#bellBtn.ring svg,#bellBtn.ring .bclap,#bellBtn.tap svg,#bellBtn.settle svg{animation:none!important}#bellBtn.ring::after,#bellBtn.ring::before{animation:none;display:none}}
+#bellPanel{position:absolute;z-index:30;top:52px;left:0;display:flex;flex-direction:column;width:min(350px,calc(100vw - 32px));max-height:min(72vh,540px);padding:0;overflow:hidden;text-align:left;border:1px solid var(--gold);border-radius:16px;background:var(--bg2);box-shadow:0 10px 30px rgba(0,0,0,.6);transform-origin:22px -30px;will-change:transform,opacity;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 #bellPanel[hidden]{display:none}
-@media (prefers-reduced-motion:reduce){#bellPanel{animation:none}}
+#bellPanel.in{animation:bnIn .4s cubic-bezier(.2,.9,.25,1.08) both}
+#bellPanel.out{animation:bnOut .24s cubic-bezier(.5,0,.75,.4) forwards;pointer-events:none}
+#bellPanel.in .nrow{animation:nrowIn .36s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(110ms + var(--i,0) * 40ms)}
+#bellPanel.in .nempty svg{transform-origin:50% 8%;animation:bellTap .9s ease-out .3s both}
+@media (prefers-reduced-motion:reduce){#bellPanel,#bellPanel.in,#bellPanel.out,#bellPanel.in .nrow,#bellPanel.in .nempty svg{animation:none!important}}
 #bellPanel .nhd{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 14px 12px}
 #bellPanel .nht{margin:0;font:600 13px/1.2 var(--head);letter-spacing:.16em;text-transform:uppercase;color:var(--gold2)}
 #bellPanel .nlnk{border:0;background:none;padding:6px 4px;min-height:32px;font:inherit;font-size:12.5px;color:var(--gold2);cursor:pointer;border-radius:8px}
@@ -204,12 +221,11 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 .gear:active{transform:scale(.88)}
 .gear[aria-expanded="true"]{border-color:var(--gold);background:rgba(212,169,79,.14);box-shadow:0 0 0 3px rgba(212,169,79,.15),0 0 14px rgba(212,169,79,.3)}
 .gear[aria-expanded="true"] svg{transform:rotate(180deg)}
-#spX:active svg{transform:rotate(90deg)}
-#spanel{transform-origin:top right}
-@keyframes spIn{from{opacity:0;transform:translateY(-10px) scale(.93)}to{opacity:1;transform:none}}
-@keyframes spOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-10px) scale(.93)}}
-#spanel.in{animation:spIn .3s cubic-bezier(.2,.9,.25,1) both}
-#spanel.out{animation:spOut .2s ease-in forwards;pointer-events:none}
+#spanel{transform-origin:top right;will-change:transform,opacity}
+@keyframes spIn{from{opacity:0;transform:scale(.06)}35%{opacity:1}to{opacity:1;transform:none}}
+@keyframes spOut{from{opacity:1;transform:none}65%{opacity:1}to{opacity:0;transform:scale(.06)}}
+#spanel.in{animation:spIn .36s cubic-bezier(.2,.9,.25,1) both}
+#spanel.out{animation:spOut .24s cubic-bezier(.5,0,.75,.4) forwards;pointer-events:none}
 @media (prefers-reduced-motion:reduce){.gear,.gear svg{transition:none}#spanel.in,#spanel.out{animation:none}}
 #spB[hidden]{display:none}
 #spB{margin-right:6px}
@@ -390,7 +406,7 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 <div id="bgShade" hidden></div>
 
 <aside id="spanel" hidden>
-  <div class="sh"><button class="gear" id="spB" type="button" hidden></button><b id="spT"></b><button class="gear" id="spX" type="button" aria-label="✕">✕</button></div>
+  <div class="sh"><button class="gear" id="spB" type="button" hidden></button><b id="spT"></b></div>
   <div id="sv0">
     <section id="spAcc" aria-labelledby="spAccT"><p class="atl" id="spAccT">Akun</p><div id="spAccBody"></div></section>
     <button class="sc grp" id="gSound" data-g="sound" type="button"></button>
@@ -1032,7 +1048,6 @@ function paintHome(){
   document.documentElement.lang = h.lang; Net.paint();
   $("homeSub").textContent = h.sub; $("back").textContent = h.back;
   $("gear").setAttribute("aria-label", h.gear); $("gearHome").setAttribute("aria-label", h.gear);
-  $("spX").setAttribute("aria-label", h.close); $("spX").title = h.close;
   paintVer(); $("spFol").textContent = h.fol; $("privLink").textContent = h.priv; if(!$("privacy").hidden) paintPrivacy();
   const ab = h.ab, T = (id, v) => { $(id).textContent = v; };
   T("abBack", h.back); T("abTitle", ab.title); T("abSub", ab.sub); T("abH1", ab.h1); T("abP1", ab.p1);
@@ -1049,6 +1064,14 @@ function paintHome(){
   });
 }
 let spTimer = 0;
+/* titik asal animasi = pusat ikon pengaturan yang sedang tampil, jadi panel seperti keluar dari dan kembali ke ikon itu */
+function spOrigin(p){
+  try{
+    const g = [$("gearHome"), $("gear")].map(b => b.getBoundingClientRect()).find(r => r.width > 0 && r.height > 0);
+    if(!g) return;
+    p.style.transformOrigin = (g.left + g.width / 2 - p.offsetLeft) + "px " + (g.top + g.height / 2 - p.offsetTop) + "px";
+  }catch(e){}
+}
 function togglePanel(force){
   const p = $("spanel");
   const open = force === undefined ? (p.hidden || p.classList.contains("out")) : force;
@@ -1058,16 +1081,26 @@ function togglePanel(force){
     /* geser panel sedikit ke bawah supaya tidak menutupi ikon pengaturan: di beranda ikon lebih rendah daripada di bilah menu */
     const top = $("view").hidden ? 90 : 62;
     p.style.top = "calc(" + top + "px + env(safe-area-inset-top,0px))"; p.style.maxHeight = "calc(100% - " + (top + 16) + "px)";
-    p.hidden = false;
+    p.hidden = false; spOrigin(p);
     if(!calm){ void p.offsetWidth; p.classList.add("in"); }
   } else if(!p.hidden && !calm){
-    p.classList.add("out");
-    spTimer = setTimeout(() => { p.hidden = true; p.classList.remove("out"); }, 200);
+    spOrigin(p); p.classList.add("out");
+    spTimer = setTimeout(() => { p.hidden = true; p.classList.remove("out"); }, 240);
   } else { p.hidden = true; }
   if(open && spView) showView("");
   $("gear").setAttribute("aria-expanded", String(open)); $("gearHome").setAttribute("aria-expanded", String(open));
 }
-$("gear").addEventListener("click", () => togglePanel()); $("gearHome").addEventListener("click", () => togglePanel()); $("spX").addEventListener("click", () => togglePanel(false));
+$("gear").addEventListener("click", () => togglePanel()); $("gearHome").addEventListener("click", () => togglePanel());
+/* tutup panel pengaturan: klik ikon pengaturan sekali lagi, klik di mana saja di luar panel, atau tekan Esc.
+   Klik penutup tidak diteruskan ke elemen di bawahnya, jadi tidak membuka menu secara tidak sengaja. */
+const spOpen = () => { const p = $("spanel"); return !p.hidden && !p.classList.contains("out"); };
+document.addEventListener("click", e => {
+  if(!spOpen() || e.target.closest("#spanel, #gear, #gearHome")) return;
+  e.preventDefault(); e.stopPropagation(); togglePanel(false);
+}, true);
+document.addEventListener("keydown", e => { if(e.key === "Escape" && spOpen()) togglePanel(false); });
+/* klik di dalam menu (iframe) tidak sampai ke halaman ini, tapi fokus pindah ke iframe */
+addEventListener("blur", () => { setTimeout(() => { const a = document.activeElement; if(spOpen() && a && a.tagName === "IFRAME") togglePanel(false); }, 0); });
 /* menu Tentang: halaman penuh, bukan sub-panel */
 function paintVer(){ const v = (S.lang === "en" ? "Version " : "Versi ") + (window.satuTitikVer || "1.0.0"); $("spVer").textContent = v; $("abVer").textContent = v; }
 function openAbout(){ paintVer(); togglePanel(false); $("about").hidden = false; $("about").querySelector(".abscroll").scrollTop = 0; $("abBack").focus({preventScroll:true}); }
@@ -7980,9 +8013,11 @@ const roleOf = () => { const r = remOf(); if(r) return r.role; const t = cur(); 
    Turnamen online disimpan di Firestore: tournaments/{kode}. Pengikut: tournaments/{kode}/followers/{uid}. Aturan keamanan: lihat firestore.rules. */
 const SESS = uid();
 try{ const NN = window.parent && window.parent.satuTitikNotif; if(NN && NN.mine) NN.mine[SESS] = 1; }catch(e){}
+/* sesi milik sendiri juga disimpan permanen: perubahan yang terkirim saat aplikasi ditutup atau login ulang tidak boleh diberitakan ke diri sendiri */
+try{ let a = JSON.parse(localStorage.getItem("st_notif_mine") || "[]"); if(!Array.isArray(a)) a = []; a.push(SESS); localStorage.setItem("st_notif_mine", JSON.stringify(a.slice(-60))); }catch(e){}
 const metaOf = t => { const c = tcfg(t); return {name:String(t.name || ""), sport:String(t.sport || "other"), fmt:String(t.fmt || "league"), cfg:{id:c.id, com:c.com, like:c.like}}; };
 const ON = {
-  fb:null, pushed:{}, meta:{}, unsub:{}, counts:{}, status:"", later:false, busy:false, uidNow:null, qUnsub:null, tm:0, invUnsub:null, invOut:[], prof:{}, profBusy:{},
+  fb:null, pushed:{}, srv:{}, meta:{}, unsub:{}, counts:{}, status:"", later:false, busy:false, uidNow:null, qUnsub:null, tm:0, invUnsub:null, invOut:[], prof:{}, profBusy:{},
   dirty:(() => { try{ return JSON.parse(localStorage.getItem("st_sync_ttdirty") || "{}") || {}; }catch(e){ return {}; } })(),
   A(){ try{ return window.parent && window.parent !== window ? (window.parent.satuTitikAuth || null) : null; }catch(e){ return null; } },
   nm(u){ const a = ON.A(); return String((a && a.username && a.usernameUid === u.uid ? a.username : "") || u.displayName || ""); },
@@ -8031,6 +8066,7 @@ function roleFrom(x){ const u = ON.user(); if(u && x.owner === u.uid) return "ad
 /* terapkan data dokumen server ke tampilan lokal */
 function applyDoc(oid, x){
   if(!x) return;
+  if(typeof x.d === "string") ON.srv[oid] = x.d;
   const role = roleFrom(x); let own = db.list.find(t => t.oid === oid);
   /* turnamen lokal milik akun Google lain (sisa dari akun sebelumnya di perangkat ini): lepas dari daftar akun ini */
   if(own && ON.user() && x.owner !== ON.user().uid){
@@ -8107,7 +8143,7 @@ async function flush(){
       try{
         const d = JSON.stringify(t);
         if(d.length > 900000){ toast(L("Data turnamen terlalu besar untuk disinkronkan.", "Tournament data is too large to sync.")); delete ON.dirty[t.oid]; continue; }
-        if(ON.pushed[t.oid] !== d) await m.updateDoc(m.doc(f, "tournaments", t.oid), po(Object.assign({d, u:Date.now(), by:SESS}, metaOf(t))));
+        if(ON.pushed[t.oid] !== d && ON.srv[t.oid] !== d) await m.updateDoc(m.doc(f, "tournaments", t.oid), po(Object.assign({d, u:Date.now(), by:SESS}, metaOf(t))));
         ON.pushed[t.oid] = d; delete ON.dirty[t.oid]; ON.status = "ok";
       }catch(e){
         if(e && (e.code === "permission-denied" || e.code === "not-found")){ delete ON.dirty[t.oid]; ON.status = "denied"; if(e.code === "not-found" && db.list.find(x => x === t)){ delete t.oid; save("data", db); } }
@@ -9023,7 +9059,7 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
     en:{title:"Notifications", all:"Mark all as read", empty:"No notifications yet.\nInvitations, tournament updates and new-version news will show up here.", clear:"Clear all", del:"Delete notification", reload:"Reload now", open:"Open Tournament", unread:"unread", now:"Just now", m:"min ago", h:"hr ago", d:"days ago", newN:"New notification", accept:"Accept", decline:"Decline", acc:"Accepted", dec:"Declined", canc:"Cancelled", fail:"Could not process. Try again."}
   };
   const ICON = {
-    bell:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5a6 6 0 0 1 12 0c0 5.2 2 6.8 2 6.8H4s2-1.6 2-6.8z"/><path d="M10 19.5a2 2 0 0 0 4 0"/></svg>',
+    bell:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5a6 6 0 0 1 12 0c0 5.2 2 6.8 2 6.8H4s2-1.6 2-6.8z"/><path class="bclap" d="M10 19.5a2 2 0 0 0 4 0"/></svg>',
     invite:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M19 8v6M16 11h6"/></svg>',
     update:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16V8M8.5 11.5L12 8l3.5 3.5"/></svg>',
     tournament:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7M10 17h4"/></svg>',
@@ -9041,18 +9077,30 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
     const dd = Math.floor(h / 24); if(dd < 7) return dd + " " + t.d;
     try{ return new Date(ts).toLocaleDateString(lang() === "en" ? "en-GB" : "id-ID", { day:"numeric", month:"short", year:"numeric" }); }catch(e){ return ""; }
   }
-  let opened = false;
+  let opened = false, ct = 0, it = 0, tapT = 0, prevN = 0;
+  /* animasi mati bila pengguna memilih "kurangi gerakan" di perangkat atau mematikan Animasi di pengaturan */
+  const calm = () => (typeof S !== "undefined" && S && S.anim === false) || !!(window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches);
+  const flick = cls => { btn.classList.remove("tap", "settle"); if(calm()) return; void btn.offsetWidth; btn.classList.add(cls); clearTimeout(tapT); tapT = setTimeout(() => btn.classList.remove(cls), 800); };
   const setOpen = v => {
     if(!!v === opened) return;
-    opened = !!v; pan.hidden = !opened; btn.setAttribute("aria-expanded", String(opened));
-    if(opened) paintPanel(); else N.markAllRead();   /* ditutup = semua dianggap sudah dilihat */
+    opened = !!v; btn.setAttribute("aria-expanded", String(opened));
+    clearTimeout(ct); clearTimeout(it); pan.classList.remove("in", "out");
+    if(opened){
+      pan.hidden = false; paintPanel();
+      if(!calm()){ void pan.offsetWidth; pan.classList.add("in"); it = setTimeout(() => pan.classList.remove("in"), 800); flick("tap"); }
+    } else {
+      N.markAllRead();   /* ditutup = semua dianggap sudah dilihat */
+      if(!pan.hidden && !calm()){ pan.classList.add("out"); ct = setTimeout(() => { pan.hidden = true; pan.classList.remove("out"); }, 240); flick("settle"); }
+      else pan.hidden = true;
+    }
   };
   function paintBell(){
     const t = T[lang()], n = N.unread();
     btn.innerHTML = ICON.bell; btn.dataset.n = String(n);
     btn.classList.toggle("has", n > 0);
     btn.title = t.title; btn.setAttribute("aria-label", t.title + (n ? " (" + n + " " + t.unread + ")" : ""));
-    if(n){ const b = mk("span", "bdg", n > 9 ? "9+" : String(n)); b.setAttribute("aria-hidden", "true"); btn.appendChild(b); }
+    if(n){ const b = mk("span", "bdg", n > 9 ? "9+" : String(n)); b.setAttribute("aria-hidden", "true"); if(n > prevN && !calm()) b.classList.add("pop"); btn.appendChild(b); }
+    prevN = n;
   }
   function paintPanel(){
     const t = T[lang()], list = N.list(); pan.textContent = ""; pan.setAttribute("aria-label", t.title);
@@ -9064,8 +9112,8 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
       t.empty.split("\n").forEach(l => e.appendChild(mk("span", null, l))); pan.appendChild(e); return;
     }
     const box = mk("div", "nlist");
-    list.forEach(n => {
-      const row = mk("div", "nrow" + (n.read ? "" : " un"));
+    list.forEach((n, idx) => {
+      const row = mk("div", "nrow" + (n.read ? "" : " un")); row.style.setProperty("--i", String(Math.min(idx, 7)));
       const main = mk("button", "nmain"); main.type = "button";
       const ic = mk("span", "ni t-" + (ICON[n.type] ? n.type : "info")); ic.innerHTML = ICON[n.type] || ICON.info;
       const bd = mk("div", "nbody"), tt = mk("p", "ntt");
@@ -9115,8 +9163,8 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
   }
   let rt = 0;
   function ring(it){
-    btn.classList.remove("ring"); void btn.offsetWidth; btn.classList.add("ring");
-    clearTimeout(rt); rt = setTimeout(() => btn.classList.remove("ring"), 1900);
+    btn.classList.remove("ring"); if(!calm()){ void btn.offsetWidth; btn.classList.add("ring"); }
+    clearTimeout(rt); rt = setTimeout(() => btn.classList.remove("ring"), 2500);
     if(live && it){ live.textContent = ""; setTimeout(() => { live.textContent = T[lang()].newN + ": " + tx(it.title); }, 50); }
   }
   btn.addEventListener("click", () => setOpen(!opened));
@@ -9401,6 +9449,7 @@ const NSRC = (() => {
   const N = () => window.satuTitikNotif;
   const rdj = (k, d) => { try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } };
   const TUK = "st_notif_tu";
+  const hsh = v => { let h = 5381; const z = String(v || ""); for(let i = 0; i < z.length; i++) h = ((h << 5) + h + z.charCodeAt(i)) | 0; return h.toString(36) + "." + z.length; };
   let tu = rdj(TUK, {}); if(!tu || typeof tu !== "object" || Array.isArray(tu)) tu = {};
   const saveTu = () => { try{ localStorage.setItem(TUK, JSON.stringify(tu)); }catch(e){} };
   let unsubs = [], key = null, jt = 0, watching = new Set();
@@ -9409,13 +9458,15 @@ const NSRC = (() => {
     const n = N(); if(!n || !x) return;
     const isOwner = x.owner === uid, isMod = !!acc && (x.modIds || []).includes(acc);
     const name = String(x.name || "Turnamen"), admin = String(x.ownerName || "");
-    const last = tu[oid], u = +x.u || 0;
-    if(last && u > last.u && !(x.by && n.mine[x.by])){
+    const last = tu[oid], u = +x.u || 0, h = hsh(x.d);
+    const mineS = by => { if(!by) return false; if(n.mine[by]) return true; const a = rdj("st_notif_mine", []); return Array.isArray(a) && a.includes(by); };
+    /* hanya diberitakan jika isi turnamen (jadwal, skor, klasemen) benar-benar berbeda dari yang terakhir dilihat; cap waktu saja tidak cukup */
+    if(last && u > last.u && last.h !== undefined && last.h !== h && !mineS(x.by)){
       n.add({ id: "tu_" + oid, type: "tournament", act: { menu: "turnamen" },
         title: { id: "Turnamen diperbarui", en: "Tournament updated" },
         body: { id: "\"" + name + "\" baru saja diperbarui (jadwal, skor, atau klasemen).", en: "\"" + name + "\" was just updated (fixtures, scores or standings)." } }, { replace: true });
     }
-    if(!last || u > last.u || last.n !== name){ tu[oid] = { u: Math.max(u, last ? last.u : 0), n: name }; saveTu(); }
+    if(!last || u > last.u || last.n !== name || last.h !== h){ tu[oid] = { u: Math.max(u, last ? last.u : 0), n: name, h }; saveTu(); }
   }
   function gone(oid){
     const e = tu[oid], n = N(); if(!e || !n) return;
