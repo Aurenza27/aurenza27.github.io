@@ -7664,9 +7664,17 @@ const ON = {
 const roleTxt = r => r === "admin" ? "ADMIN" : r === "mod" ? L("MODERATOR", "MODERATOR") : r === "follower" ? L("PENGIKUT", "FOLLOWER") : "";
 const newCode = () => { const c = "abcdefghjkmnpqrstuvwxyz23456789"; let s = ""; const a = new Uint32Array(10); (window.crypto || {getRandomValues:x => x.forEach((_, i) => x[i] = Math.random() * 4e9)}).getRandomValues(a); a.forEach(n => s += c[n % c.length]); return s; };
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rj) => setTimeout(() => rj({code:"timeout"}), ms || 15000))]);
-const ONVER = "online-v6";
+const ONVER = "online-v7";
 /* Firestore dimuat di Beranda (jendela induk); objek data harus dibuat dari Object milik induk, kalau tidak ditolak ("custom Object object") */
-const po = src => { let O = Object; try{ if(window.parent && window.parent !== window && window.parent.Object) O = window.parent.Object; }catch(e){} return Object.assign(new O(), src); };
+const po = src => {
+  let P = window; try{ if(window.parent && window.parent !== window && window.parent.Object) P = window.parent; }catch(e){}
+  const cv = v => {
+    if(Array.isArray(v)){ const a = new P.Array(); v.forEach(x => a.push(cv(x))); return a; }
+    if(v && typeof v === "object" && Object.getPrototypeOf(v) === Object.prototype){ const o = new P.Object(); Object.keys(v).forEach(k => { o[k] = cv(v[k]); }); return o; }
+    return v;   /* nilai biasa dan objek Firestore (arrayUnion dll.) dibiarkan */
+  };
+  return cv(src);
+};
 let lastErr = "";
 const errTxt = e => {
   try{ console.warn("turnamen online:", e); lastErr = JSON.stringify({code:e && e.code, name:e && e.name, message:e && e.message, str:String(e)}).slice(0, 400); }catch(x){}
