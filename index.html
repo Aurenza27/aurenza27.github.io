@@ -9030,7 +9030,7 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
 /* ===== PUSAT NOTIFIKASI (lonceng di beranda) =====
    Penyimpanan: localStorage "st_notif" (ikut tersinkron ke akun Google bersama data lain). Sumber notifikasi ada di blok Firebase (undangan, update turnamen, pengumuman versi). */
 (function(){
-  const APP_VER = "1.0.0"; window.satuTitikVer = APP_VER;   /* naikkan angka ini setiap kali merilis index.html baru */
+  const APP_VER = "1.0.1"; window.satuTitikVer = APP_VER;   /* naikkan angka ini setiap kali merilis index.html baru */
   const KEY = "st_notif", SEEN = "st_notif_seen", MAX = 60, SEEN_MAX = 400;
   const rd = (k, d) => { try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } };
   const wr = (k, v) => { try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} };
