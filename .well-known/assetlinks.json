@@ -1,0 +1,18 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.aurenza27.satutitik",
+      "sha256_cert_fingerprints": ["32:ED:50:31:E4:56:22:B5:B8:D9:6B:35:57:AF:CE:A2:10:CF:E9:97:15:00:A1:E8:34:4B:6E:21:BC:FB:00:B2"]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.aurenza27.twa",
+      "sha256_cert_fingerprints": ["32:ED:50:31:E4:56:22:B5:B8:D9:6B:35:57:AF:CE:A2:10:CF:E9:97:15:00:A1:E8:34:4B:6E:21:BC:FB:00:B2"]
+    }
+  }
+]
