@@ -139,6 +139,15 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #bellPanel .nbd{margin:3px 0 0;font-size:13px;line-height:1.45;color:var(--muted);overflow-wrap:anywhere}
 #bellPanel .nmt{margin:5px 0 0;font-size:11.5px;color:var(--muted);opacity:.8}
 #bellPanel .nact{display:inline-block;margin-top:9px;min-height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--gold);background:rgba(212,169,79,.1);color:var(--gold2);font:inherit;font-size:13px;cursor:pointer}
+#bellPanel .nbtns{display:flex;gap:8px;margin-top:10px}
+#bellPanel .nbtns .nact{margin-top:0;min-width:84px;justify-content:center}
+#bellPanel .nact:not(.ghost){background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1408;border-color:var(--gold);font-weight:700}
+#bellPanel .nact.nact2{background:rgba(212,169,79,.1);color:var(--gold2);font-weight:400}
+#bellPanel .nact.ghost{background:transparent;color:var(--text);border-color:var(--line)}
+#bellPanel .nact:disabled{opacity:.5;cursor:default}
+#bellPanel .ntag{display:inline-block;margin-top:8px;margin-right:8px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);font-size:11.5px;color:var(--muted)}
+#bellPanel .ntag.accepted{color:#6fd39a;border-color:rgba(60,200,120,.5)}
+#bellPanel .ntag.declined,#bellPanel .ntag.cancelled{color:#f0a0a0;border-color:rgba(240,82,79,.45)}
 #bellPanel .nx{position:absolute;top:8px;right:6px;display:grid;place-items:center;width:30px;height:30px;padding:0;border:0;border-radius:50%;background:none;color:var(--muted);cursor:pointer;opacity:.7}
 #bellPanel .nx:hover{opacity:1;background:rgba(255,255,255,.06)}
 #bellPanel .nx svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
@@ -7221,6 +7230,18 @@ input:disabled,select:disabled{opacity:.55;cursor:not-allowed;-webkit-text-fill-
 .badge{font-size:10px;letter-spacing:.12em;padding:2px 8px;border-radius:999px;border:1px solid var(--gold);color:var(--gold2);font-style:normal;vertical-align:middle}
 .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:22px;letter-spacing:.2em;text-align:center;padding:10px;border:1px dashed var(--gold);border-radius:12px;color:var(--gold2);user-select:all}
 .grow{flex:1}.ro *{pointer-events:none}.ro .keep,.ro .keep *{pointer-events:auto}
+.av{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--gold);background:var(--bg2);color:var(--gold2);font-weight:700;font-size:16px;overflow:hidden}
+img.av{display:block;object-fit:cover}
+.pn{margin:0;font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pi{margin:2px 0 0;font-size:12px;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+.pv{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--gold);border-radius:12px;background:rgba(212,169,79,.08)}
+.pv.bad{border-color:rgba(229,123,114,.6);background:rgba(229,123,114,.1)}
+.pv .pbody{flex:1;min-width:0}
+.pv .pw{margin:4px 0 0;font-size:13px;line-height:1.45;color:var(--bad)}
+.pv.bad > .pw{margin:0}
+.tg{flex:none;display:inline-block;font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.tg.wait{color:var(--gold2);border-color:var(--gold)}
+.tg.no{color:var(--bad);border-color:rgba(229,123,114,.5)}
 </style>
 </head>
 <body>
@@ -7707,7 +7728,7 @@ const SESS = uid();
 try{ const NN = window.parent && window.parent.satuTitikNotif; if(NN && NN.mine) NN.mine[SESS] = 1; }catch(e){}
 const metaOf = t => ({name:String(t.name || ""), sport:String(t.sport || "other"), fmt:String(t.fmt || "league")});
 const ON = {
-  fb:null, pushed:{}, meta:{}, unsub:{}, counts:{}, status:"", later:false, busy:false, uidNow:null, qUnsub:null, tm:0,
+  fb:null, pushed:{}, meta:{}, unsub:{}, counts:{}, status:"", later:false, busy:false, uidNow:null, qUnsub:null, tm:0, invUnsub:null, invOut:[], prof:{}, profBusy:{},
   dirty:(() => { try{ return JSON.parse(localStorage.getItem("st_sync_ttdirty") || "{}") || {}; }catch(e){ return {}; } })(),
   A(){ try{ return window.parent && window.parent !== window ? (window.parent.satuTitikAuth || null) : null; }catch(e){ return null; } },
   user(){ const A = ON.A(); return (A && A.user) || null; },
@@ -7801,6 +7822,7 @@ function watch(oid){
 function unwatchAll(){
   Object.keys(ON.unsub).forEach(k => { try{ ON.unsub[k](); }catch(e){} }); ON.unsub = {};
   if(ON.qUnsub){ try{ ON.qUnsub(); }catch(e){} ON.qUnsub = null; }
+  if(ON.invUnsub){ try{ ON.invUnsub(); }catch(e){} ON.invUnsub = null; } ON.invOut = [];
   Object.keys(REM).forEach(k => delete REM[k]); ON.meta = {};
 }
 async function startOnline(){
@@ -7813,6 +7835,7 @@ async function startOnline(){
   try{
     const {m, db:f} = await ON.lib();
     if(ON.accountId()) ON.qUnsub = m.onSnapshot(m.query(m.collection(f, "tournaments"), m.where("modIds", "array-contains", ON.accountId())), snap => snap.docs.forEach(d => { watch(d.id); }), () => {});
+    ON.invUnsub = m.onSnapshot(m.query(m.collection(f, "invites"), m.where("ownerUid", "==", u.uid)), snap => { ON.invOut = snap.docs.map(d => Object.assign({id:d.id}, d.data())); rerender(); }, () => {});
   }catch(e){}
   flush(); rerender();
 }
@@ -7867,11 +7890,40 @@ async function stopOnline(t){
     save("data", db); toast(L("Turnamen kembali lokal. Pengikut tidak bisa melihatnya lagi.", "Tournament is local again. Followers can no longer see it.")); paint();
   }catch(e){ toast(errTxt(e)); }
 }
-async function setMods(t, mid, add){
+/* ----- undangan moderator lewat ID pengguna ----- */
+async function profOf(id){
+  const {m, db:f} = await ON.lib();
+  const sn = await m.getDoc(m.doc(f, "accountIds", id));
+  return sn.exists() ? sn.data() : null;
+}
+function needProf(id){
+  if(id in ON.prof || ON.profBusy[id]) return; ON.profBusy[id] = 1;
+  profOf(id).then(x => { ON.prof[id] = x; }).catch(() => { ON.prof[id] = null; }).then(() => { delete ON.profBusy[id]; rerender(); });
+}
+function mkAv(pr){
+  const nm = String((pr && pr.name) || "?").trim(), ini = () => el("span", "av", (nm[0] || "?").toUpperCase());
+  if(pr && pr.photo){ const im = el("img", "av"); im.alt = ""; im.referrerPolicy = "no-referrer"; im.src = pr.photo; im.onerror = () => { im.replaceWith(ini()); }; return im; }
+  return ini();
+}
+async function inviteMod(t, id, pr){
+  const u = ON.user(); if(!u) throw new Error("nologin");
+  const {m, db:f} = await ON.lib(), ref = m.doc(f, "invites", t.oid + "_" + id), ex = await m.getDoc(ref);
+  if(ex.exists()){
+    if(ex.data().status === "pending"){ toast(L("Undangan masih menunggu jawaban.", "The invite is still pending.")); return; }
+    await m.deleteDoc(ref);
+  }
+  await m.setDoc(ref, po({oid:String(t.oid), tName:String(t.name || ""), ownerUid:String(u.uid), ownerName:String(u.displayName || u.email || ""), toUid:String(pr.uid), toAccountId:String(id), toName:String(pr.name || ""), status:"pending", ts:Date.now()}));
+  toast(L("Undangan terkirim ke " + (pr.name || id) + ".", "Invite sent to " + (pr.name || id) + "."));
+}
+async function cancelInvite(t, id){
+  try{ const {m, db:f} = await ON.lib(); await m.deleteDoc(m.doc(f, "invites", t.oid + "_" + id)); }catch(e){ toast(errTxt(e)); }
+}
+async function setMods(t, mid){   /* mencabut moderator (menambah sekarang lewat undangan) */
   try{
     const {m, db:f} = await ON.lib();
-    await m.updateDoc(m.doc(f, "tournaments", t.oid), po({modIds: add ? m.arrayUnion(mid) : m.arrayRemove(mid)}));
-    const mt = ON.meta[t.oid] = ON.meta[t.oid] || {mods:[]}; mt.mods = add ? Array.from(new Set((mt.mods || []).concat(mid))) : (mt.mods || []).filter(x => x !== mid);
+    await m.updateDoc(m.doc(f, "tournaments", t.oid), po({modIds: m.arrayRemove(mid)}));
+    const mt = ON.meta[t.oid] = ON.meta[t.oid] || {mods:[]}; mt.mods = (mt.mods || []).filter(x => x !== mid);
+    try{ const ref = m.doc(f, "invites", t.oid + "_" + mid); if((await m.getDoc(ref)).exists()) await m.deleteDoc(ref); }catch(e){}
     paint();
   }catch(e){ toast(errTxt(e)); }
 }
@@ -7932,18 +7984,51 @@ function paintOnline(box, t){
     ON.lib().then(({m, db:f}) => m.getCountFromServer(m.collection(f, "tournaments", t.oid, "followers"))).then(c => { ON.counts[t.oid] = c.data().count; fc.textContent = L("Pengikut: ", "Followers: ") + ON.counts[t.oid]; }).catch(() => {});
     box.append(p);
     const mp = el("div", "panel stack keep");
-    mp.append(el("span", "label", L("MODERATOR", "MODERATORS")), el("p", "hint", L("Moderator (ditambahkan lewat ID pengguna, contoh ST-000123) bisa mengisi skor dan jadwal, tetapi tidak bisa menghapus turnamen atau mengatur moderator. ID ada di panel akun (ikon profil di beranda).", "Moderators (added by user ID, e.g. ST-000123) can enter scores and fixtures, but cannot delete the tournament or manage moderators. The ID is in the account panel (profile icon on the home screen).")));
-    (mt.mods || []).forEach(em => { const rw = el("div", "row"); rw.append(el("span", "grow", em), mkBtn(L("Hapus", "Remove"), "btn ghost sm danger", () => { if(confirm(L("Cabut akses moderator " + em + "?", "Remove moderator " + em + "?"))) setMods(t, em, false); })); mp.append(rw); });
-    if(!(mt.mods || []).length) mp.append(el("p", "hint", L("Belum ada moderator.", "No moderators yet.")));
-    const ar = el("div", "row"), ei = el("input"); ei.type = "text"; ei.placeholder = L("ID pengguna moderator (ST-000123)", "moderator's user ID (ST-000123)"); ei.maxLength = 20; ei.autocapitalize = "characters"; ei.autocomplete = "off"; ei.spellcheck = false;
-    ar.append(ei, mkBtn(L("Tambah", "Add"), "btn sm", () => {
-      const v = ei.value.trim().toUpperCase();
-      if(!/^ST-\d{6,}$/.test(v)){ toast(L("ID pengguna tidak valid. Format: ST-000123.", "Invalid user ID. Format: ST-000123.")); return; }
-      if(v === ON.accountId()){ toast(L("Kamu sudah admin.", "You are already the admin.")); return; }
-      if((mt.mods || []).length >= 20){ toast(L("Maksimal 20 moderator.", "At most 20 moderators.")); return; }
-      setMods(t, v, true);
-    }));
-    mp.append(ar); box.append(mp);
+    mp.append(el("span", "label", L("MODERATOR", "MODERATORS")), el("p", "hint", L("Ketik ID pengguna (contoh ST-000123). Jika terdaftar, foto profilnya muncul dan kamu bisa mengirim undangan. Orang itu menjadi moderator setelah menerima undangan di tab notifikasinya.", "Type a user ID (e.g. ST-000123). If it is registered, their profile photo appears and you can send an invite. They become a moderator after accepting it in their notifications tab.")));
+    const person = (id, pr, tag, btn) => { const rw = el("div", "row"), w = el("div", "grow"); w.style.minWidth = "0"; w.append(el("p", "pn", (pr && pr.name) || L("Pengguna", "User")), el("p", "pi", id)); rw.append(mkAv(pr), w); if(tag) rw.append(tag); if(btn) rw.append(btn); return rw; };
+    (mt.mods || []).forEach(id => { needProf(id); mp.append(person(id, ON.prof[id], null, mkBtn(L("Hapus", "Remove"), "btn ghost sm danger", () => { if(confirm(L("Cabut akses moderator " + id + "?", "Remove moderator " + id + "?"))) setMods(t, id); }))); });
+    const outs = (ON.invOut || []).filter(x => x.oid === t.oid && x.status !== "accepted");
+    outs.forEach(x => { needProf(x.toAccountId); const pend = x.status === "pending"; mp.append(person(x.toAccountId, ON.prof[x.toAccountId] || {name:x.toName}, el("span", "tg " + (pend ? "wait" : "no"), pend ? L("Menunggu", "Pending") : L("Ditolak", "Declined")), mkBtn(pend ? L("Batalkan", "Cancel") : L("Hapus", "Dismiss"), "btn ghost sm", () => cancelInvite(t, x.toAccountId)))); });
+    if(!(mt.mods || []).length && !outs.length) mp.append(el("p", "hint", L("Belum ada moderator.", "No moderators yet.")));
+    const ar = el("div", "row"), ei = el("input"), pv = el("div", "stack");
+    ei.type = "text"; ei.placeholder = L("ID pengguna (ST-000123)", "User ID (ST-000123)"); ei.maxLength = 20; ei.autocapitalize = "characters"; ei.autocomplete = "off"; ei.spellcheck = false;
+    let cur = null, tk = 0, tmr = 0, lastBad = "";
+    const ib = mkBtn(L("Undang", "Invite"), "btn sm", async () => {
+      if(!cur) return; const c = cur; ib.disabled = true;
+      try{ await inviteMod(t, c.id, c.pr); ei.value = ""; pv.textContent = ""; cur = null; }catch(e){ toast(errTxt(e)); ib.disabled = false; }
+    });
+    ib.disabled = true;
+    const bad = msg => { pv.textContent = ""; const b = el("div", "pv bad"); b.append(el("p", "pw", msg)); pv.append(b); };
+    const check = async () => {
+      const v = ei.value.trim().toUpperCase(), my = ++tk; cur = null; ib.disabled = true;
+      if(!v){ pv.textContent = ""; return; }
+      if(!/^ST-\d{6,}$/.test(v)){ if(v.length >= 9) bad(L("Format ID tidak valid. Contoh: ST-000123.", "Invalid ID format. Example: ST-000123.")); else pv.textContent = ""; return; }
+      pv.textContent = ""; pv.append(el("p", "hint", L("Mencari akun…", "Looking up account…")));
+      let pr;
+      try{ pr = await profOf(v); }catch(e){ if(my === tk) bad(L("Gagal mencari akun. Cek koneksi internet.", "Could not look up the account. Check your connection.")); return; }
+      if(my !== tk) return;
+      if(!pr){
+        bad(L("ID " + v + " tidak terdaftar. Periksa lagi ID-nya, atau minta orangnya membuka panel akun di beranda untuk melihat ID.", "ID " + v + " is not registered. Check the ID, or ask the person to open the account panel on the home screen to see it."));
+        if(lastBad !== v){ lastBad = v; toast(L("ID " + v + " tidak terdaftar.", "ID " + v + " is not registered.")); }
+        return;
+      }
+      ON.prof[v] = pr;
+      const pendN = (ON.invOut || []).filter(x => x.oid === t.oid && x.status === "pending");
+      const nm = pr.name || L("Pengguna", "User"); let warn = "";
+      if(v === ON.accountId()) warn = L("Itu ID-mu sendiri, kamu sudah admin.", "That is your own ID; you are already the admin.");
+      else if((mt.mods || []).includes(v)) warn = L(nm + " sudah menjadi moderator.", nm + " is already a moderator.");
+      else if(pendN.some(x => x.toAccountId === v)) warn = L("Undangan untuk " + nm + " masih menunggu jawaban.", "The invite for " + nm + " is still pending.");
+      else if((mt.mods || []).length + pendN.length >= 20) warn = L("Maksimal 20 moderator.", "At most 20 moderators.");
+      pv.textContent = "";
+      const card = el("div", "pv" + (warn ? " bad" : "")), body = el("div", "pbody");
+      body.append(el("p", "pn", nm), el("p", "pi", v)); if(warn) body.append(el("p", "pw", warn));
+      card.append(mkAv(pr), body); pv.append(card);
+      if(!warn){ cur = {id:v, pr}; ib.disabled = false; }
+    };
+    ei.addEventListener("input", () => { ei.value = ei.value.toUpperCase(); cur = null; ib.disabled = true; clearTimeout(tmr); tmr = setTimeout(check, 350); });
+    ei.addEventListener("keydown", e => { if(e.key === "Enter" && !ib.disabled) ib.click(); });
+    ar.append(ei, ib);
+    mp.append(ar, pv); box.append(mp);
     const dp = el("div", "panel stack keep");
     dp.append(mkBtn(L("Matikan online (jadikan lokal lagi)", "Turn online off (make local again)"), "btn ghost sm danger", () => { if(confirm(L("Hapus turnamen dari server? Data tetap ada di perangkatmu, tetapi moderator dan pengikut tidak bisa mengaksesnya lagi.", "Remove the tournament from the server? Your local copy stays, but moderators and followers lose access."))) stopOnline(t); }));
     box.append(dp); return;
@@ -8376,10 +8461,11 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
       if(!seen.includes(n.id)){ seen.push(n.id); wr(SEEN, seen.slice(-SEEN_MAX)); }
       save(); emit(it.read ? null : it); return true;
     },
+    patch(id, f){ const x = items.find(i => i.id === id); if(!x) return false; Object.keys(f).forEach(k => { x[k] = (k === "inv" && x.inv) ? Object.assign({}, x.inv, f[k]) : f[k]; }); save(); emit(); return true; },
     markRead(id){ const x = items.find(i => i.id === id); if(x && !x.read){ x.read = true; save(); emit(); } },
     markAllRead(){ let c = false; items.forEach(x => { if(!x.read){ x.read = true; c = true; } }); if(c){ save(); emit(); } },
     remove(id){ items = items.filter(x => x.id !== id); save(); emit(); },
-    clear(){ items = []; save(); emit(); }
+    clear(){ items = items.filter(x => x.inv && x.inv.status === "pending"); save(); emit(); }   /* undangan yang belum dijawab tidak ikut terhapus */
   };
   addEventListener("storage", e => { if(e.key === KEY){ items = rd(KEY, []); if(!Array.isArray(items)) items = []; emit(); } });
 
@@ -8387,8 +8473,8 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
   const btn = document.getElementById("bellBtn"), pan = document.getElementById("bellPanel"), live = document.getElementById("bellLive");
   if(!btn || !pan) return;
   const T = {
-    id:{title:"Notifikasi", all:"Tandai semua dibaca", empty:"Belum ada notifikasi.\nUndangan, update turnamen, dan kabar versi terbaru akan muncul di sini.", clear:"Hapus semua", del:"Hapus notifikasi", reload:"Muat ulang sekarang", open:"Buka Turnamen", unread:"belum dibaca", now:"Baru saja", m:"menit lalu", h:"jam lalu", d:"hari lalu", newN:"Notifikasi baru"},
-    en:{title:"Notifications", all:"Mark all as read", empty:"No notifications yet.\nInvitations, tournament updates and new-version news will show up here.", clear:"Clear all", del:"Delete notification", reload:"Reload now", open:"Open Tournament", unread:"unread", now:"Just now", m:"min ago", h:"hr ago", d:"days ago", newN:"New notification"}
+    id:{title:"Notifikasi", all:"Tandai semua dibaca", empty:"Belum ada notifikasi.\nUndangan, update turnamen, dan kabar versi terbaru akan muncul di sini.", clear:"Hapus semua", del:"Hapus notifikasi", reload:"Muat ulang sekarang", open:"Buka Turnamen", unread:"belum dibaca", now:"Baru saja", m:"menit lalu", h:"jam lalu", d:"hari lalu", newN:"Notifikasi baru", accept:"Terima", decline:"Tolak", acc:"Diterima", dec:"Ditolak", canc:"Dibatalkan", fail:"Gagal memproses. Coba lagi."},
+    en:{title:"Notifications", all:"Mark all as read", empty:"No notifications yet.\nInvitations, tournament updates and new-version news will show up here.", clear:"Clear all", del:"Delete notification", reload:"Reload now", open:"Open Tournament", unread:"unread", now:"Just now", m:"min ago", h:"hr ago", d:"days ago", newN:"New notification", accept:"Accept", decline:"Decline", acc:"Accepted", dec:"Declined", canc:"Cancelled", fail:"Could not process. Try again."}
   };
   const ICON = {
     bell:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5a6 6 0 0 1 12 0c0 5.2 2 6.8 2 6.8H4s2-1.6 2-6.8z"/><path d="M10 19.5a2 2 0 0 0 4 0"/></svg>',
@@ -8441,6 +8527,26 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
       bd.appendChild(tt);
       if(tx(n.body)) bd.appendChild(mk("p", "nbd", tx(n.body)));
       bd.appendChild(mk("p", "nmt", ago(n.ts, t)));
+      if(n.inv){
+        const st = n.inv.status;
+        if(st === "pending"){
+          const bx = mk("div", "nbtns"), ok = mk("button", "nact", t.accept), no = mk("button", "nact ghost", t.decline); ok.type = no.type = "button";
+          const go = async yes => {
+            ok.disabled = no.disabled = true;
+            const r = await (N.respond ? N.respond(n, yes) : Promise.resolve({ ok: false }));
+            if(!r || !r.ok){ ok.disabled = no.disabled = false; if(typeof toast === "function") toast(t.fail + (r && r.err ? " (" + r.err + ")" : "")); }
+          };
+          ok.addEventListener("click", e => { e.stopPropagation(); go(true); });
+          no.addEventListener("click", e => { e.stopPropagation(); go(false); });
+          bx.append(ok, no); bd.appendChild(bx);
+        } else {
+          bd.appendChild(mk("span", "ntag " + st, st === "accepted" ? t.acc : st === "declined" ? t.dec : t.canc));
+          if(st === "accepted"){
+            const a = mk("button", "nact nact2", t.open); a.type = "button";
+            a.addEventListener("click", e => { e.stopPropagation(); setOpen(false); location.hash = "turnamen"; }); bd.appendChild(a);
+          }
+        }
+      }
       if(n.act && n.act.reload){
         const a = mk("button", "nact", t.reload); a.type = "button";
         a.addEventListener("click", e => { e.stopPropagation(); N.markRead(n.id); location.reload(); }); bd.appendChild(a);
@@ -8450,9 +8556,12 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
         N.markRead(n.id);
         if(n.act && n.act.menu){ setOpen(false); location.hash = n.act.menu; }
       });
-      const x = mk("button", "nx"); x.type = "button"; x.innerHTML = ICON.x; x.title = t.del; x.setAttribute("aria-label", t.del);
-      x.addEventListener("click", e => { e.stopPropagation(); N.remove(n.id); });
-      row.append(main, x); box.appendChild(row);
+      row.append(main);
+      if(!(n.inv && n.inv.status === "pending")){   /* undangan harus dijawab dulu: tidak ada tombol hapus */
+        const x = mk("button", "nx"); x.type = "button"; x.innerHTML = ICON.x; x.title = t.del; x.setAttribute("aria-label", t.del);
+        x.addEventListener("click", e => { e.stopPropagation(); N.remove(n.id); }); row.append(x);
+      }
+      box.appendChild(row);
     });
     pan.appendChild(box);
     const ft = mk("div", "nft"), cl = mk("button", "nlnk", t.clear); cl.type = "button"; cl.addEventListener("click", () => N.clear());
@@ -8560,6 +8669,7 @@ const PROF = (() => {
           return { id: nid, fresh: true };
         });
         const id = res.id;
+        try{ await m.setDoc(m.doc(db, "accountIds", id), { uid: u.uid, name: String(u.displayName || ""), photo: String(u.photoURL || ""), at: Date.now() }, { merge: true }); }catch(e){ console.warn("direktori id gagal:", e && (e.code || e.message)); }
         try{ localStorage.setItem(key(u.uid), id); }catch(e){}
         if(res.fresh && window.satuTitikNotif) window.satuTitikNotif.add({ id: "acc_" + u.uid, type: "account",
           title: { id: "Akun siap dipakai", en: "Your account is ready" },
@@ -8703,11 +8813,6 @@ const NSRC = (() => {
     const n = N(); if(!n || !x) return;
     const isOwner = x.owner === uid, isMod = !!acc && (x.modIds || []).includes(acc);
     const name = String(x.name || "Turnamen"), admin = String(x.ownerName || "");
-    if(isMod && !isOwner){
-      n.add({ id: "inv_" + oid, type: "invite", act: { menu: "turnamen" },
-        title: { id: "Undangan moderator", en: "Moderator invitation" },
-        body: { id: (admin || "Admin") + " menambahkanmu sebagai moderator turnamen \"" + name + "\".", en: (admin || "The admin") + " added you as a moderator of \"" + name + "\"." } });
-    }
     const last = tu[oid], u = +x.u || 0;
     if(last && u > last.u && !(x.by && n.mine[x.by])){
       n.add({ id: "tu_" + oid, type: "tournament", act: { menu: "turnamen" },
@@ -8744,8 +8849,53 @@ const NSRC = (() => {
           }, onErr));
         });
       };
+      /* undangan masuk (untuk saya): terima / tolak dari tab notifikasi */
+      unsubs.push(m.onSnapshot(m.query(m.collection(db, "invites"), m.where("toUid", "==", u.uid)), snap => {
+        const n = N(); if(!n) return;
+        snap.docChanges().forEach(ch => {
+          const d = ch.doc, x = d.data() || {}, nid = "inv_" + d.id;
+          let st = String(x.status || "pending");
+          if(ch.type === "removed"){ const ex = n.list().find(i => i.id === nid); if(!ex || !ex.inv || ex.inv.status !== "pending") return; st = "cancelled"; }
+          const tt = invTx(x, st), inv = { docId: d.id, oid: String(x.oid || ""), status: st, tName: String(x.tName || ""), ownerName: String(x.ownerName || "") };
+          if(!n.patch(nid, { inv, title: tt.title, body: tt.body }) && st === "pending") n.add({ id: nid, type: "invite", ts: +x.ts || Date.now(), inv, title: tt.title, body: tt.body });
+        });
+      }, onErr));
+      /* undangan keluar (dari saya): kabari saat diterima / ditolak */
+      unsubs.push(m.onSnapshot(m.query(m.collection(db, "invites"), m.where("ownerUid", "==", u.uid)), snap => {
+        const n = N(); if(!n) return;
+        snap.docChanges().forEach(ch => {
+          if(ch.type === "removed") return;
+          const x = ch.doc.data() || {}, st = x.status; if(st !== "accepted" && st !== "declined") return;
+          const who = String(x.toName || x.toAccountId || "Pengguna"), nm = String(x.tName || "Turnamen"), ts = +x.at || Date.now(), yes = st === "accepted";
+          n.add({ id: "ir_" + ch.doc.id + "_" + st + "_" + ts, type: "invite", ts, read: ts < Date.now() - 14 * 864e5, act: { menu: "turnamen" },
+            title: yes ? { id: "Undangan diterima", en: "Invitation accepted" } : { id: "Undangan ditolak", en: "Invitation declined" },
+            body: yes ? { id: who + " menerima undangan moderator turnamen \"" + nm + "\".", en: who + " accepted the moderator invitation for \"" + nm + "\"." }
+                      : { id: who + " menolak undangan moderator turnamen \"" + nm + "\".", en: who + " declined the moderator invitation for \"" + nm + "\"." } });
+        });
+      }, onErr));
       watchJoined(); jt = setInterval(watchJoined, 15000);
     }catch(e){}
+  }
+  const invTx = (x, st) => {
+    const nm = String(x.tName || "Turnamen"), ow = String(x.ownerName || "Admin");
+    if(st === "accepted") return { title: { id: "Undangan diterima", en: "Invitation accepted" }, body: { id: "Kamu sekarang moderator turnamen \"" + nm + "\".", en: "You are now a moderator of \"" + nm + "\"." } };
+    if(st === "declined") return { title: { id: "Undangan ditolak", en: "Invitation declined" }, body: { id: "Kamu menolak undangan moderator turnamen \"" + nm + "\".", en: "You declined the moderator invitation for \"" + nm + "\"." } };
+    if(st === "cancelled") return { title: { id: "Undangan dibatalkan", en: "Invitation cancelled" }, body: { id: ow + " membatalkan undangan moderator untuk turnamen \"" + nm + "\".", en: ow + " cancelled the moderator invitation for \"" + nm + "\"." } };
+    return { title: { id: "Undangan moderator", en: "Moderator invitation" }, body: { id: ow + " mengundangmu menjadi moderator turnamen \"" + nm + "\". Terima atau tolak undangan ini.", en: ow + " invited you to be a moderator of \"" + nm + "\". Accept or decline." } };
+  };
+  async function respond(n, accept){
+    try{
+      const u = A.user, acc = A.accountId;
+      if(!u || !n || !n.inv) return { ok: false, err: "login" };
+      if(accept && !acc) return { ok: false, err: "id" };
+      const { m, db } = await A.getDb(), b = m.writeBatch(db);
+      b.update(m.doc(db, "invites", n.inv.docId), { status: accept ? "accepted" : "declined", at: Date.now() });
+      if(accept) b.update(m.doc(db, "tournaments", n.inv.oid), { modIds: m.arrayUnion(acc) });
+      await b.commit();
+      const st = accept ? "accepted" : "declined", tt = invTx(n.inv, st);
+      N().patch(n.id, { inv: { status: st }, title: tt.title, body: tt.body });
+      return { ok: true };
+    }catch(e){ return { ok: false, err: String(e && (e.code || e.message) || "").replace(/^firestore\//, "").slice(0, 60) }; }
   }
   const verCmp = (a, b) => { const x = String(a).split(".").map(Number), y = String(b).split(".").map(Number); for(let i = 0; i < Math.max(x.length, y.length); i++){ const d = (x[i] || 0) - (y[i] || 0); if(d) return d > 0 ? 1 : -1; } return 0; };
   let lastAnn = 0;
@@ -8769,6 +8919,7 @@ const NSRC = (() => {
   document.addEventListener("visibilitychange", () => { if(!document.hidden) announce(); });
   setInterval(announce, 30 * 60000);
   setTimeout(announce, 2000);
+  try{ if(N()) N().respond = respond; }catch(e){}
   return { start, announce };
 })();
 A.onChange(x => { try{ NSRC.start(x.user, A.accountId); }catch(e){} });
