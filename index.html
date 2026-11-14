@@ -7662,7 +7662,16 @@ const ON = {
 };
 const roleTxt = r => r === "admin" ? "ADMIN" : r === "mod" ? L("MODERATOR", "MODERATOR") : r === "follower" ? L("PENGIKUT", "FOLLOWER") : "";
 const newCode = () => { const c = "abcdefghjkmnpqrstuvwxyz23456789"; let s = ""; const a = new Uint32Array(10); (window.crypto || {getRandomValues:x => x.forEach((_, i) => x[i] = Math.random() * 4e9)}).getRandomValues(a); a.forEach(n => s += c[n % c.length]); return s; };
-const errTxt = e => e && e.code === "permission-denied" ? L("Izin ditolak. Pastikan aturan Firestore sudah dipasang dan kamu punya hak akses.", "Permission denied. Make sure the Firestore rules are installed and you have access.") : navigator.onLine === false ? L("Sedang offline.", "You are offline.") : L("Gagal terhubung ke server.", "Could not reach the server.");
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rj) => setTimeout(() => rj({code:"timeout"}), ms || 15000))]);
+const errTxt = e => {
+  try{ console.warn("turnamen online:", e); }catch(x){}
+  const c = e && (e.code || e.message) ? String(e.code || e.message).replace(/^firestore\//, "") : "";
+  if(c === "permission-denied") return L("Izin ditolak. Pastikan aturan Firestore sudah dipasang (Publish) dan Cloud Firestore sudah diaktifkan.", "Permission denied. Make sure the Firestore rules are published and Cloud Firestore is enabled.");
+  if(navigator.onLine === false) return L("Sedang offline.", "You are offline.");
+  if(c === "timeout" || c === "unavailable") return L("Server tidak merespons (" + c + "). Cek koneksi, dan pastikan database Cloud Firestore sudah dibuat di Firebase Console.", "The server did not respond (" + c + "). Check your connection and that a Cloud Firestore database exists in the Firebase Console.");
+  if(c === "nofb") return L("Fitur online belum siap. Muat ulang aplikasi lalu coba lagi.", "Online feature is not ready. Reload the app and try again.");
+  return L("Gagal terhubung ke server", "Could not reach the server") + (c ? " (" + c.slice(0, 60) + ")" : "") + ".";
+};
 function rerender(){
   const a = document.activeElement;
   if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)){ ON.later = true; return; }
@@ -7768,7 +7777,7 @@ async function goOnline(t){
   const oid = newCode(); t.oid = oid;
   try{
     const {m, db:f} = await ON.lib(), d = JSON.stringify(t);
-    await m.setDoc(m.doc(f, "tournaments", oid), {owner:u.uid, ownerName:u.displayName || u.email || "", modEmails:[], name:t.name, sport:t.sport, fmt:t.fmt, d, u:Date.now(), by:SESS, created:Date.now()});
+    await withTimeout(m.setDoc(m.doc(f, "tournaments", oid), {owner:u.uid, ownerName:u.displayName || u.email || "", modEmails:[], name:t.name, sport:t.sport, fmt:t.fmt, d, u:Date.now(), by:SESS, created:Date.now()}));
     ON.pushed[oid] = d; save("data", db); watch(oid); toast(L("Turnamen sekarang online.", "Tournament is now online.")); paint();
   }catch(e){ delete t.oid; toast(errTxt(e)); }
 }
@@ -7792,7 +7801,7 @@ async function followCode(code){
   code = (code || "").trim().toLowerCase(); const u = ON.user();
   if(!u || !/^[a-z0-9]{6,20}$/.test(code)){ toast(L("Kode tidak valid.", "Invalid code.")); return false; }
   try{
-    const {m, db:f} = await ON.lib(), snap = await m.getDoc(m.doc(f, "tournaments", code));
+    const {m, db:f} = await ON.lib(), snap = await withTimeout(m.getDoc(m.doc(f, "tournaments", code)));
     if(!snap.exists()){ toast(L("Turnamen dengan kode itu tidak ditemukan.", "No tournament with that code.")); return false; }
     const x = snap.data();
     if(x.owner !== u.uid) await m.setDoc(m.doc(f, "tournaments", code, "followers", u.uid), {n:u.displayName || "", t:Date.now()});
@@ -8296,7 +8305,15 @@ A.login = async () => {
   }catch(e){ A.error = navigator.onLine === false ? "offline" : "fail"; }
   emit();
 };
-A.getDb = async () => { const m = await import(BASE + "firebase-firestore.js"); const f = await init(); return { m, db: m.getFirestore(f.ai) }; };
+/* Firestore dibuat sekali; auto-detect long polling supaya tetap jalan di WebView/jaringan seluler yang memblokir streaming */
+let FSDB = null;
+function fsOpen(m, ai){
+  if(FSDB) return FSDB;
+  try{ FSDB = m.initializeFirestore(ai, { experimentalAutoDetectLongPolling: true }); }
+  catch(e){ FSDB = m.getFirestore(ai); }
+  return FSDB;
+}
+A.getDb = async () => { const m = await import(BASE + "firebase-firestore.js"); const f = await init(); return { m, db: fsOpen(m, f.ai) }; };
 A.logout = async () => {
   try{ const { a, auth } = await init(); await auth.signOut(a); }catch(e){}
   A.error = null; emit();
@@ -8316,7 +8333,7 @@ const SY = (() => {
   async function lib(){
     if(fs) return;
     const m = await import(BASE + "firebase-firestore.js"); const f = await init();
-    db = m.getFirestore(f.ai); fs = m;
+    db = fsOpen(m, f.ai); fs = m;
   }
   const ref = () => fs.doc(db, "users", uid);
   function scan(){
