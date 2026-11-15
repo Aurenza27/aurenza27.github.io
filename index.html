@@ -265,7 +265,7 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #bgShade::after{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(212,169,79,.16),rgba(212,169,79,0) 55%);mix-blend-mode:soft-light}
 @keyframes vidIn{from{opacity:0}to{opacity:.9}}
 @media (prefers-reduced-motion:reduce){#bgVid{animation:none}}
-.sg:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#spanel .rl{display:grid;grid-template-rows:0fr;margin:0;transition:grid-template-rows .28s cubic-bezier(.3,.8,.3,1)}#spanel .rl.open{grid-template-rows:1fr}#spanel .rlw{overflow:hidden;min-height:0}#spanel .rlc{margin:0 0 8px;padding:10px 12px;border:1px solid var(--gold);border-top:0;border-radius:0 0 12px 12px;opacity:0;transform:translateY(-6px);transition:opacity .22s,transform .28s}#spanel .rl.open .rlc{opacity:1;transform:none}#spanel .sc.rlon{margin-bottom:0;border-radius:12px 12px 0 0}#spanel .rlt{display:block;margin-bottom:6px;font-size:12.5px;color:var(--muted)}#spanel .rlc .seg{margin:0}@media (prefers-reduced-motion:reduce){#spanel .rl,#spanel .rlc{transition:none}}.sg:disabled{opacity:.4;cursor:default}.sg:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
 
 /* ===== HALAMAN TENTANG (teks murni, bisa direvisi di objek HT: kunci "ab") ===== */
 #about{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;background:var(--bg);color:var(--text)}
@@ -427,9 +427,9 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
   <div id="svSound" hidden>
     <button class="sc" id="sbSound" type="button"></button>
     <button class="sc" id="sbMusic" type="button"></button>
-    <button class="sc" id="sbRead" type="button"></button>
-    <label><span id="spML"></span><input type="range" id="spM" min="0" max="100" step="5"></label>
-    <label><span id="spAL"></span><input type="range" id="spA" min="0" max="100" step="5"></label>
+    <div class="rl" id="rlMusic"><div class="rlw"><div class="rlc"><span class="rlt" id="spML"></span><input type="range" id="spM" min="0" max="100" step="5"></div></div></div>
+    <button class="sc" id="sbVibe" type="button"></button>
+    <div class="rl" id="rlVibe"><div class="rlw"><div class="rlc"><div class="seg s3" data-k="vlevel"><button class="sg" data-v="low" type="button"></button><button class="sg" data-v="mid" type="button"></button><button class="sg" data-v="high" type="button"></button></div></div></div></div>
   </div>
   <div id="svPlay" hidden>
     <button class="sc" id="sbAuto" type="button"></button>
@@ -743,7 +743,8 @@ if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){ addEven
 }); }
 Net.sync();
 Net.start();
-const $ = id => document.getElementById(id);
+try{ delete window.speechSynthesis; delete window.SpeechSynthesisUtterance; }catch(e){}
+const __nil = {}; const $ = id => document.getElementById(id) || (__nil[id] || (__nil[id] = Object.assign(document.createElement("div"), {value:"", checked:false})));
 /* kode menu disimpan sebagai teks; penanda khusus dikembalikan ke bentuk aslinya saat dibuka */
 const unesc = s => s.split("</scr@@" + "ipt").join("</scr" + "ipt").split("<!@@" + "--").join("<!" + "--");
 
@@ -751,7 +752,7 @@ const unesc = s => s.split("</scr@@" + "ipt").join("</scr" + "ipt").split("<!@@"
    Disimpan di satu kunci, lalu ditulis ke kunci tiap menu sebelum menu dibuka dan diterapkan langsung bila menu sedang terbuka.
    Panel ⚙️ di dalam tiap menu disembunyikan. Menu baru: tambahkan kunci & id tombolnya di writeKeys, TOG, dan RNG. */
 const SKEY = "titikhilangs_settings", GAPS = [3, 5, 8, 12, 20, 30];
-const DEF = {sound:true, music:true, read:true, auto:false, scroll:true, mvol:70, aivol:100, gap:8, lang:"id", theme:"navy", fsize:100, fmode:"serif", anim:true};
+const DEF = {sound:true, music:true, read:true, auto:false, scroll:true, mvol:70, aivol:100, gap:8, lang:"id", theme:"navy", fsize:100, fmode:"serif", anim:true, vibe:true, vlevel:"mid"};
 let S = Object.assign({}, DEF), curMenu = null;
 try{ Object.assign(S, JSON.parse(localStorage.getItem(SKEY) || "{}")); }catch(e){}
 if(!GAPS.includes(S.gap)) S.gap = 8;
@@ -759,7 +760,7 @@ if(S.lang !== "en") S.lang = "id";
 if(!["navy","black","smoke","fog","stars","video"].includes(S.theme)) S.theme = "navy";
 S.fsize = [90,100,115].includes(+S.fsize) ? +S.fsize : 100;
 if(S.fmode !== "sans") S.fmode = "serif";
-S.anim = S.anim !== false;
+S.anim = S.anim !== false; S.vibe = S.vibe !== false; if(!["low","mid","high"].includes(S.vlevel)) S.vlevel = "mid";
 S.mvol = Math.min(100, Math.max(0, +S.mvol || 0)); S.aivol = Math.min(100, Math.max(0, +S.aivol || 0));
 function writeKeys(s){
   const w = (k, v) => { try{ localStorage.setItem(k, v); }catch(e){} }, j = JSON.stringify, b = x => x ? "1" : "0", gi = GAPS.indexOf(s.gap);
@@ -859,6 +860,12 @@ const PIC = {
   lang:GI('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'),
   reset:GI('<path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/>')
 };
+PIC.vibe = GI('<rect x="8" y="4" width="8" height="16" rx="2"/><path d="M4.5 8v8M19.5 8v8M2 10.5v3M22 10.5v3"/>');
+PIC.mode = GI('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>');
+const VB = {
+  id:{on:["📳 Getar: aktif","📳 Getar: diam"], lvs:["Ringan","Sedang","Kuat"]},
+  en:{on:["📳 Vibration: active","📳 Vibration: silent"], lvs:["Light","Medium","Strong"]}
+};
 PIC.user = GI('<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.6 4.5-5.5 8-5.5s6.5 1.9 8 5.5"/>');
 PIC.mail = GI('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6.5L20.5 7"/>');
 PIC.trash = GI('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>');
@@ -869,8 +876,8 @@ PIC.info = GI('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>');
 $("gear").innerHTML = PIC.gear; $("gearHome").innerHTML = PIC.gear; $("spB").innerHTML = GI('<path d="M15 6l-6 6 6 6"/>');
 const put = (id, k, text) => { $(id).innerHTML = PIC[k] + "<span>" + text.replace(/^[^\p{L}\p{N}]+/u, "") + "</span>"; };
 const TT = {
-  id:{t:"⚙️ Pengaturan", snd:["🔊 Suara: menyala","🔇 Suara: senyap"], mus:["🎵 Musik: nyala","🎵 Musik: mati"], rd:["🗣️ Bacakan: nyala","🗣️ Bacakan: mati"], au:["⏭️ Auto-next: nyala","⏭️ Auto-next: mati"], sc:["📜 Scroll otomatis: nyala","📜 Scroll otomatis: mati"], gap:"⏱️ Jeda: {n} dtk", lang:"🌐 Indonesia", mv:"🎼 Volume musik: {n}%", av:"🗣️ Volume suara AI: {n}%", rs:"↺ Reset semua pengaturan", nt:"Berlaku untuk semua menu."},
-  en:{t:"⚙️ Settings", snd:["🔊 Sound: on","🔇 Sound: silent"], mus:["🎵 Music: on","🎵 Music: off"], rd:["🗣️ Read aloud: on","🗣️ Read aloud: off"], au:["⏭️ Auto-next: on","⏭️ Auto-next: off"], sc:["📜 Auto scroll: on","📜 Auto scroll: off"], gap:"⏱️ Gap: {n} s", lang:"🌐 English", mv:"🎼 Music volume: {n}%", av:"🗣️ AI voice volume: {n}%", rs:"↺ Reset all settings", nt:"Applies to every menu."}
+  id:{t:"⚙️ Pengaturan", snd:["🔊 Mode: aktif","🔇 Mode: diam"], mus:["🎵 Musik: nyala","🎵 Musik: mati"], rd:["🗣️ Bacakan: nyala","🗣️ Bacakan: mati"], au:["⏭️ Auto-next: nyala","⏭️ Auto-next: mati"], sc:["📜 Scroll otomatis: nyala","📜 Scroll otomatis: mati"], gap:"⏱️ Jeda: {n} dtk", lang:"🌐 Indonesia", mv:"🎼 Volume musik: {n}%", av:"🗣️ Volume suara AI: {n}%", rs:"↺ Reset semua pengaturan", nt:"Berlaku untuk semua menu."},
+  en:{t:"⚙️ Settings", snd:["🔊 Mode: active","🔇 Mode: silent"], mus:["🎵 Music: on","🎵 Music: off"], rd:["🗣️ Read aloud: on","🗣️ Read aloud: off"], au:["⏭️ Auto-next: on","⏭️ Auto-next: off"], sc:["📜 Auto scroll: on","📜 Auto scroll: off"], gap:"⏱️ Gap: {n} s", lang:"🌐 English", mv:"🎼 Music volume: {n}%", av:"🗣️ AI voice volume: {n}%", rs:"↺ Reset all settings", nt:"Applies to every menu."}
 };
 /* ===== TAMPILAN: tema, ukuran huruf, mode font, animasi. CSS yang sama dipasang di beranda dan di tiap menu ===== */
 const FONT_SANS = 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
@@ -1012,8 +1019,8 @@ const AP = {
   id:{theme:"Tema", themes:["Biru malam","Hitam pekat","Kabut asap","Kabut laut","Langit berbintang","Asap sinematik"], size:"Ukuran huruf", sizes:["Kecil","Sedang","Besar"], font:"Mode font", fonts:["Serif klasik","Sans-serif"], anim:["Animasi: nyala","Animasi: mati"]},
   en:{theme:"Theme", themes:["Midnight blue","Pure black","Smoke","Sea fog","Starry sky","Cinematic smoke"], size:"Font size", sizes:["Small","Medium","Large"], font:"Font mode", fonts:["Classic serif","Sans-serif"], anim:["Animation: on","Animation: off"]}
 };
-Object.assign(TT.id, {bk:"Kembali", glq:"Cari istilah…", gle:"Istilah tidak ditemukan.", g:{sound:"Suara", play:"Pemutaran", lang:"Bahasa", about:"Tentang", look:"Tampilan", gloss:"Istilah", saran:"Kotak Saran", profile:"Profil", reset:"Reset", cache:"Hapus cache"}});
-Object.assign(TT.en, {bk:"Back", glq:"Search terms…", gle:"No terms found.", g:{sound:"Sound", play:"Playback", lang:"Language", about:"About", look:"Appearance", gloss:"Glossary", saran:"Suggestion Box", profile:"Profile", reset:"Reset", cache:"Clear cache"}});
+Object.assign(TT.id, {bk:"Kembali", glq:"Cari istilah…", gle:"Istilah tidak ditemukan.", g:{sound:"Mode", play:"Pemutaran", lang:"Bahasa", about:"Tentang", look:"Tampilan", gloss:"Istilah", saran:"Kotak Saran", profile:"Profil", reset:"Reset", cache:"Hapus cache"}});
+Object.assign(TT.en, {bk:"Back", glq:"Search terms…", gle:"No terms found.", g:{sound:"Mode", play:"Playback", lang:"Language", about:"About", look:"Appearance", gloss:"Glossary", saran:"Suggestion Box", profile:"Profile", reset:"Reset", cache:"Clear cache"}});
 Object.assign(TT.id, {
   rx:{info:"Pilih apa yang ingin direset.", data:["Reset data","Hapus riwayat dan hasil semua menu di perangkat dan di server (bila masuk dengan Google). Pengaturan dan akun tetap."], set:["Reset pengaturan","Kembalikan suara, musik, tampilan, dan bahasa ke bawaan. Ikut tersinkron ke akunmu. Data tetap."], all:["Kembali ke setelan awal","Reset data dan reset pengaturan sekaligus, di perangkat dan di server. Akun tetap masuk."],
     q:{data:"Reset data? Riwayat dan hasil semua menu akan dihapus dan tidak bisa dikembalikan.", set:"Reset pengaturan? Semua pengaturan kembali ke bawaan. Data tidak berubah.", all:"Kembali ke setelan awal? Semua data dan pengaturan akan dihapus dan tidak bisa dikembalikan."},
@@ -1065,18 +1072,17 @@ const SR = {
   en:{info:"Got a suggestion, feedback, or a menu idea? Write it below and send it. No login needed.", ph:"Write your suggestion here…", send:"Send suggestion", subj:"Suggestion for Satu Titik", empty:"Please write your suggestion first.", sending:"Sending…", queued:"You are offline. Your suggestion is saved and will be sent automatically once you are back online.", ok:"Thank you! Your suggestion has been sent.", fail:"Could not send (check your internet connection). Try again, or send via your email app.", mail:"Send via email app"}
 };
 let spView = "", rPend = null, chBytes = null;
-const SPV = {"":"sv0", sound:"svSound", play:"svPlay", lang:"svLang", about:"svAbout", look:"svLook", gloss:"svGloss", saran:"svSaran", profile:"svProfile", reset:"svReset", cache:"svCache"}, SPI = {sound:"sound", play:"auto", look:"look", lang:"lang", about:"info", gloss:"book", saran:"mail", profile:"user", reset:"reset", cache:"cache"};
+const SPV = {"":"sv0", sound:"svSound", play:"svPlay", lang:"svLang", about:"svAbout", look:"svLook", gloss:"svGloss", saran:"svSaran", profile:"svProfile", reset:"svReset", cache:"svCache"}, SPI = {sound:"mode", play:"auto", look:"look", lang:"lang", about:"info", gloss:"book", saran:"mail", profile:"user", reset:"reset", cache:"cache"};
 function showView(v){ spView = v; rPend = null; $("rStat").hidden = true; $("chStat").hidden = true; paintPanel(); if(v === "cache") cacheUse(); }
 function paintPanel(){
   const t = TT[S.lang], pb = (id, k, on, a) => { put(id, k, on ? a[0] : a[1]); $(id).setAttribute("aria-pressed", String(!!on)); };
   put("spT", spView ? SPI[spView] : "gear", spView ? t.g[spView] : t.t); $("spN").textContent = t.nt; $("spN").hidden = spView === "about"; put("sbLang", "lang", t.lang); paintRC(t);
-  pb("sbSound", "sound", S.sound, t.snd); pb("sbMusic", "music", S.music, t.mus); pb("sbRead", "read", S.read, t.rd); pb("sbAuto", "auto", S.auto, t.au); pb("sbScroll", "scroll", S.scroll, t.sc);
+  pb("sbSound", "sound", S.sound, t.snd); pb("sbMusic", "music", S.music, t.mus); pb("sbAuto", "auto", S.auto, t.au); pb("sbScroll", "scroll", S.scroll, t.sc);
   put("sbGap", "gap", t.gap.replace("{n}", S.gap));
-  put("spML", "music", t.mv.replace("{n}", S.mvol)); $("spM").value = S.mvol;
-  put("spAL", "read", t.av.replace("{n}", S.aivol)); $("spA").value = S.aivol;
+  $("spM").value = S.mvol;
   Object.keys(SPV).forEach(k => { $(SPV[k]).hidden = k !== spView; });
   $("spB").hidden = !spView; $("spB").setAttribute("aria-label", t.bk); $("spB").title = t.bk;
-  put("gSound", "sound", t.g.sound); put("gPlay", "auto", t.g.play); put("gLang", "lang", t.g.lang); put("gAbout", "info", t.g.about); put("gLook", "look", t.g.look);
+  put("gSound", "mode", t.g.sound); put("gPlay", "auto", t.g.play); put("gLang", "lang", t.g.lang); put("gAbout", "info", t.g.about); put("gLook", "look", t.g.look);
   put("gSaran", "mail", t.g.saran); put("gDukung", "heart", S.lang === "en" ? "Support Us" : "Dukung Kami");
   { const r = SR[S.lang]; $("srInfo").textContent = r.info; $("srMsg").placeholder = r.ph; put("srSend", "mail", r.send); $("srCnt").textContent = $("srMsg").value.length + " / 1500"; }
   put("gGloss", "book", t.g.gloss); $("glQ").placeholder = t.glq; $("glEmpty").textContent = t.gle; $("spanel").classList.toggle("wide", spView === "gloss"); if(glLang !== S.lang) buildGloss();
@@ -1085,6 +1091,12 @@ function paintPanel(){
   const lists = {theme:A.themes, fsize:A.sizes, fmode:A.fonts};
   document.querySelectorAll("#svLook .seg").forEach(g => { const k = g.dataset.k; g.querySelectorAll(".sg").forEach((b, i) => { b.textContent = lists[k][i]; b.setAttribute("aria-pressed", String(String(S[k]) === b.dataset.v)); }); });
   pb("sbAnim", "anim", S.anim, A.anim);
+  { const V = VB[S.lang];
+    pb("sbVibe", "vibe", S.vibe, V.on);
+    document.querySelectorAll("#svSound .seg .sg").forEach((x, i) => { x.textContent = V.lvs[i]; x.setAttribute("aria-pressed", String(S.vlevel === x.dataset.v)); x.disabled = !S.vibe; });
+    $("spML").textContent = t.mv.replace("{n}", S.mvol).replace(/^[^\p{L}\p{N}]+/u, "");
+    /* volume musik dan kekuatan getar menggulung turun otomatis saat tombolnya aktif, dan naik lagi saat diam */
+    [["rlMusic", "sbMusic", S.music], ["rlVibe", "sbVibe", S.vibe]].forEach(([r, bt, on]) => { const e = $(r); e.classList.toggle("open", !!on); e.inert = !on; $(bt).classList.toggle("rlon", !!on); }); }
   paintAp();
   paintHome();
 }
@@ -1211,16 +1223,36 @@ document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("privacy
 document.querySelectorAll("#spanel .grp").forEach(b => b.addEventListener("click", () => b.dataset.g === "about" ? openAbout() : b.dataset.g === "dukung" ? window.open("https://saweria.co/AURENZA", "_blank", "noopener,noreferrer") : showView(b.dataset.g))); $("spB").addEventListener("click", () => showView(""));
 $("svLook").addEventListener("click", e => { const b = e.target.closest(".sg"); if(!b) return; const k = b.parentElement.dataset.k; setS({[k]: k === "fsize" ? +b.dataset.v : b.dataset.v}); });
 $("sbAnim").addEventListener("click", () => setS({anim:!S.anim}));
-/* tombol Suara = mode utama: senyap mematikan efek suara, musik, dan suara AI sekaligus; menyala menghidupkan semuanya kembali */
-$("sbSound").addEventListener("click", () => { const on = !S.sound; setS({sound:on, music:on, read:on}); });
+/* tombol Mode = pengaturan utama: diam mematikan efek suara, musik, dan getar sekaligus; aktif menghidupkan semuanya kembali */
+$("sbSound").addEventListener("click", () => { const on = !S.sound; setS({sound:on, music:on, vibe:on, read:on}); if(on) haptic(true); });
 $("sbMusic").addEventListener("click", () => setS(!S.music ? {music:true, sound:true} : {music:false}));
-$("sbRead").addEventListener("click", () => setS(!S.read ? {read:true, sound:true} : {read:false}));
+/* ===== Mode getar: getar singkat saat tombol/menu ditekan (di beranda dan di dalam menu) ===== */
+const VIBMS = {low:10, mid:22, high:40};
+function haptic(ok){
+  if(!S.vibe) return;
+  const ms = VIBMS[S.vlevel] || 22, pat = ok ? [ms, 45, ms] : ms;
+  const fallback = () => { try{ if(navigator.vibrate) navigator.vibrate(pat); }catch(e){} };
+  try{
+    const C = window.Capacitor;
+    if(C && C.isNativePlatform && C.isNativePlatform()){
+      const H = (C.Plugins && C.Plugins.Haptics) || (C.registerPlugin ? C.registerPlugin("Haptics") : null);
+      if(H && H.vibrate){ H.vibrate({duration: ok ? ms * 2 : ms}).catch(fallback); return; }
+    }
+  }catch(e){}
+  fallback();
+}
+const HAPSEL = "button, .item, summary, [role=button], .sg, .chip";
+function hapticHook(d){
+  try{ d = d || ($("frame") && $("frame").contentDocument); if(d && !d.__hap){ d.__hap = 1; d.addEventListener("click", e => { if(e.target && e.target.closest && e.target.closest(HAPSEL)) haptic(); }, true); } }catch(e){}
+}
+hapticHook(document);
+$("sbVibe").addEventListener("click", () => { setS(!S.vibe ? {vibe:true, sound:true} : {vibe:false}); if(S.vibe) haptic(true); });
+$("svSound").addEventListener("click", e => { const b = e.target.closest(".sg"); if(!b || b.disabled) return; setS({vlevel:b.dataset.v}); haptic(true); });
 $("sbAuto").addEventListener("click", () => setS({auto:!S.auto}));
 $("sbScroll").addEventListener("click", () => setS({scroll:!S.scroll}));
 $("sbGap").addEventListener("click", () => setS({gap:GAPS[(GAPS.indexOf(S.gap) + 1) % GAPS.length]}));
 $("sbLang").addEventListener("click", () => setS({lang:S.lang === "id" ? "en" : "id"}));
 $("spM").addEventListener("input", e => setS({mvol:+e.target.value}));
-$("spA").addEventListener("input", e => setS({aivol:+e.target.value}));
 $("srMsg").addEventListener("input", () => { $("srCnt").textContent = $("srMsg").value.length + " / 1500"; });
 const srMail = m => { location.href = "mailto:" + SARAN_EMAIL + "?subject=" + encodeURIComponent(SR[S.lang].subj) + "&body=" + encodeURIComponent(m); };
 function srStatus(t, mailFallback){
@@ -1395,79 +1427,7 @@ function stHelper(){
   };
 }
 const ST_CSS = '<style id="stCss">.ststamp{margin:10px 0 0;text-align:center;font-size:11px;line-height:1.45;opacity:.72;font-variant-numeric:tabular-nums;letter-spacing:.01em}.ststamp[hidden]{display:none}.mtime{margin:-2px 6px 8px;text-align:right;font-size:10.5px;line-height:1.3;opacity:.65;font-variant-numeric:tabular-nums}.tdate{display:block;margin-top:2px;font-size:11px;opacity:.75;font-variant-numeric:tabular-nums}</style>';
-/* ===== Jembatan suara v2: WebView tanpa Web Speech -> TTS native Android (plugin Capacitor); bila plugin tidak ada -> suara online cadangan ===== */
-function ttsShim(){
-  try{
-    if(window.speechSynthesis && window.SpeechSynthesisUtterance){
-      try{ if(speechSynthesis.getVoices().length) return; }catch(e){}
-    }
-    var C = null; try{ C = parent.Capacitor; }catch(e){}
-    var native = false; try{ native = !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){}
-    var P = null;
-    if(native){ try{ P = (C.Plugins && C.Plugins.TextToSpeech) || (C.registerPlugin ? C.registerPlugin("TextToSpeech") : null); }catch(e){} }
-    var mode = P ? "native" : "online";
-    var warned = false;
-    function warn(m){ if(warned) return; warned = true; try{ if(typeof toast === "function") toast(m); }catch(e){} }
-    function Utt(text){ this.text = String(text == null ? "" : text); this.lang = "id-ID"; this.rate = 1; this.pitch = 1; this.volume = 1; this.voice = null; }
-    var VOICES = [
-      {name:"Suara Indonesia", lang:"id-ID", localService:true, default:true, voiceURI:"shim-id"},
-      {name:"English voice", lang:"en-US", localService:true, default:false, voiceURI:"shim-en"}
-    ];
-    var q = [], busy = false, gen = 0, audio = null;
-    var S = {
-      speaking:false, pending:false, paused:false,
-      getVoices:function(){ return VOICES; },
-      speak:function(u){ q.push(u); S.pending = true; next(); },
-      cancel:function(){
-        gen++; q = []; busy = false; S.speaking = false; S.pending = false;
-        if(P){ try{ P.stop(); }catch(e){} }
-        if(audio){ try{ audio.pause(); audio.src = ""; }catch(e){} audio = null; }
-      },
-      pause:function(){}, resume:function(){}, onvoiceschanged:null,
-      addEventListener:function(){}, removeEventListener:function(){}
-    };
-    function playOnline(txt, lang, u, cb){
-      try{
-        var tl = lang.split("-")[0].toLowerCase(); if(tl === "in") tl = "id";
-        var a = new Audio("https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=" + encodeURIComponent(tl) + "&q=" + encodeURIComponent(txt.slice(0, 190)));
-        audio = a; a.volume = Math.max(0, Math.min(1, u.volume == null ? 1 : u.volume));
-        try{ a.playbackRate = Math.max(.5, Math.min(2, u.rate || 1)); }catch(e){}
-        a.onended = function(){ cb(false); };
-        a.onerror = function(){ cb(true, "suara online gagal (cek internet)"); };
-        var pr = a.play(); if(pr && pr.catch) pr.catch(function(e){ cb(true, "suara diblokir: " + (e && e.message || e)); });
-      }catch(e){ cb(true, String(e && e.message || e)); }
-    }
-    function next(){
-      if(busy || !q.length) return;
-      var u = q.shift(), my = gen; busy = true; S.speaking = true; S.pending = q.length > 0;
-      var txt = (u.text || "").trim();
-      if(!txt){ busy = false; S.speaking = false; try{ u.onend && u.onend({}); }catch(e){} next(); return; }
-      try{ u.onstart && u.onstart({}); }catch(e){}
-      var lang = (u.lang || "id-ID").replace("_", "-");
-      var finish = function(err, why){
-        if(my !== gen) return;
-        busy = false; S.speaking = false;
-        if(err) warn("Suara gagal: " + (why || "tidak diketahui"));
-        try{ if(err){ u.onerror && u.onerror({error:"synthesis-failed"}); } else { u.onend && u.onend({}); } }catch(e){}
-        next();
-      };
-      if(mode === "native"){
-        try{
-          P.speak({ text:txt, lang:lang, rate:Math.max(.1, Math.min(2, u.rate || 1)), pitch:Math.max(.5, Math.min(2, u.pitch || 1)), volume:Math.max(0, Math.min(1, u.volume == null ? 1 : u.volume)), category:"ambient", queueStrategy:1 })
-            .then(function(){ finish(false); }, function(e){
-              /* plugin native belum terpasang / mesin TTS tidak ada: pindah ke suara online dan ulangi kalimat ini */
-              mode = "online"; warn("TTS native tidak tersedia (" + (e && (e.message || e.code) || "?") + "), memakai suara online");
-              if(my !== gen) return; playOnline(txt, lang, u, finish);
-            });
-        }catch(e){ mode = "online"; playOnline(txt, lang, u, finish); }
-      } else { playOnline(txt, lang, u, finish); }
-    }
-    window.SpeechSynthesisUtterance = Utt;
-    window.speechSynthesis = S;
-    window.__ttsMode = mode;
-  }catch(e){}
-}
-const ST_HELPER = ST_CSS + "<scr" + "ipt>(" + stHelper.toString() + ")();<\/scr" + "ipt>" + "<scr" + "ipt>(" + ttsShim.toString() + ")();<\/scr" + "ipt>";
+const ST_HELPER = ST_CSS + "<scr" + "ipt>try{ delete window.speechSynthesis; delete window.SpeechSynthesisUtterance; }catch(e){}<\/scr" + "ipt>" + "<scr" + "ipt>(" + stHelper.toString() + ")();<\/scr" + "ipt>";
 function menuSrc(m){
   const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER, i = s.indexOf("</head>");
   return i < 0 ? css + s : s.slice(0, i) + css + s.slice(i);
@@ -1478,7 +1438,7 @@ function openMenu(m){
   $("vt").textContent = mTitle(m);
   const f = document.createElement("iframe");
   f.id = "frame"; f.title = mTitle(m); f.setAttribute("allow", "autoplay");
-  curMenu = m.id; writeKeys(S); f.addEventListener("load", () => { try{ watchFrame(); }catch(e){} try{ paintMenuTitles(); }catch(e){} try{ medisHookFrame(); }catch(e){} try{ hibHookFrame(); }catch(e){} }); f.srcdoc = menuSrc(m);
+  curMenu = m.id; writeKeys(S); f.addEventListener("load", () => { try{ watchFrame(); }catch(e){} try{ paintMenuTitles(); }catch(e){} try{ medisHookFrame(); }catch(e){} try{ hibHookFrame(); }catch(e){} try{ hapticHook(); }catch(e){} }); f.srcdoc = menuSrc(m);
   $("view").appendChild(f);
   $("home").hidden = true; $("view").hidden = false;
   document.title = mTitle(m);
@@ -1966,16 +1926,6 @@ body.hasqa.hasbar .scrollchip{bottom:calc(228px + env(safe-area-inset-bottom,0px
   </div>
   <p class="sub" data-i18n="sub">Seberapa hebat kemampuan detektifmu?</p>
 
-  <section class="panel say" id="sayPanel">
-    <span class="label" data-i18n="sayLbl">💬 BILIK INTERAKSI</span>
-    <textarea id="sayInput" rows="2" maxlength="300" placeholder="Ketik pesan untuk penonton…" aria-label="Tulisan yang akan dibacakan" data-i18n-ph="sayPh" data-i18n-aria="sayAria"></textarea>
-    <div class="srow">
-      <button class="btn" id="sayBtn">🗣️ INTERAKSI</button>
-      <button class="btn ghost" id="sayTpl" aria-label="Isi template sambutan" title="Template sambutan" data-i18n-aria="sayTplAria" data-i18n-title="sayTplTitle">📋</button>
-      <button class="btn ghost" id="sayClear" aria-label="Hapus tulisan" data-i18n-aria="sayClearAria">🗑️</button>
-    </div>
-  </section>
-
   <div class="boards" id="boards">
     <section class="board" id="vipBoard">
       <div class="label" data-i18n="vipBoardLbl">👑 VIP TERBARU</div>
@@ -2062,12 +2012,10 @@ body.hasqa.hasbar .scrollchip{bottom:calc(228px + env(safe-area-inset-bottom,0px
     <div class="grip" id="sideGrip" data-i18n="gripLbl">⠿ Geser panel</div>
     <button class="chip" id="soundBtn" aria-pressed="true">🔊 Suara</button>
     <button class="chip" id="musicBtn" aria-pressed="true">🎵 Musik: nyala</button>
-    <button class="chip" id="voiceBtn" aria-pressed="false">🗣️ Bacakan: mati</button>
     <button class="chip" id="autoBtn" aria-pressed="false" hidden>⏭️ Auto-next: mati</button>
     <button class="chip" id="gapBtn" hidden>⏱️ Jeda: 8 dtk</button>
     <button class="chip" id="langBtn" aria-label="Bahasa / Language">🌐 Indonesia</button>
     <label class="vol"><span id="volLbl">🎼 Volume musik: 50%</span><input type="range" id="volRange" min="0" max="100" step="1" value="50" aria-label="Volume musik"></label>
-    <label class="vol"><span id="aiVolLbl">🗣️ Volume suara AI: 100%</span><input type="range" id="aiVolRange" min="0" max="100" step="1" value="100" aria-label="Volume suara AI"></label>
   </div>
 </aside>
 <button class="chip scrollchip" id="scrollBtn" hidden>⏸ Stop scroll otomatis</button>
@@ -2359,7 +2307,7 @@ function loc(r){
   return o;
 }
 
-const $ = id => document.getElementById(id);
+const __nil = {}; const $ = id => document.getElementById(id) || (__nil[id] || (__nil[id] = Object.assign(document.createElement("div"), {value:"", checked:false})));
 const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let mode = "single", sound = true, current = null, busy = false, tickT = null;
 let board = new Map(), vipBoard = [];
@@ -2418,7 +2366,7 @@ function toast(msg){
 }
 
 /* suara pembaca hasil (Web Speech API bawaan perangkat, tanpa server) */
-const TTS = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+const TTS = false;
 let voiceOn = false, warnedVoice = {};
 try{ voiceOn = localStorage.getItem("asd_voice") === "1"; }catch(e){}
 /* Pilih suara sesuai bahasa yang dipilih. Android sering memakai kode lama "in-ID" untuk Indonesia, jadi dicek juga.
@@ -3629,16 +3577,6 @@ dt{font-size:10px;margin-top:12px}
 <div class="app">
   <div class="brand"><div class="icon">👻</div><h1>CEK KHODAM</h1></div>
   <p class="sub" data-i18n="sub"></p>
-  <section class="panel say" id="sayPanel">
-    <span class="label" id="sayLbl"></span>
-    <textarea id="sayInput" rows="2" maxlength="300"></textarea>
-    <div class="srow">
-      <button class="btn" id="sayBtn" type="button"></button>
-      <button class="btn ghost" id="sayTpl" type="button">📋</button>
-      <button class="btn ghost" id="sayClear" type="button">🗑️</button>
-    </div>
-  </section>
-
   <div class="panel" id="inPanel">
     <span class="label" data-i18n="nameLbl"></span>
     <div class="row">
@@ -3669,9 +3607,6 @@ dt{font-size:10px;margin-top:12px}
       </dl>
       <div class="quote" id="cMsg"></div>
       <div class="ststamp" id="cTime" hidden></div>
-      <div class="acts">
-        <button class="btn ghost sm" id="replayBtn" type="button" data-i18n="replayBtn"></button>
-      </div>
       <div class="cnt" id="cnt"></div>
       <div class="clr"><button class="btn ghost" id="clrBtn" type="button" data-i18n="clearScr"></button></div>
     </div>
@@ -3700,12 +3635,10 @@ dt{font-size:10px;margin-top:12px}
     <div class="grip" id="grip" data-i18n="grip"></div>
     <button class="chip" id="fxBtn" type="button"></button>
     <button class="chip" id="musicBtn" type="button"></button>
-    <button class="chip" id="readBtn" type="button"></button>
     <button class="chip" id="autoBtn" type="button"></button>
     <button class="chip" id="gapBtn" type="button"></button>
     <button class="chip" id="langBtn" type="button"></button>
     <label class="vol"><span id="mvolLbl"></span><input type="range" id="mvol" min="0" max="100" step="5"></label>
-    <label class="vol"><span id="volLbl"></span><input type="range" id="vol" min="0" max="100" step="5"></label>
   </div>
 </aside>
 <div class="autobar" id="autoBar" hidden><span id="autoTxt"></span><button class="btn ghost sm" id="autoStop" type="button" data-i18n="stopBtn"></button></div>
@@ -3713,7 +3646,7 @@ dt{font-size:10px;margin-top:12px}
 <div class="toast" id="toast" role="status"></div>
 
 <script>
-const $ = id => document.getElementById(id);
+const __nil = {}; const $ = id => document.getElementById(id) || (__nil[id] || (__nil[id] = Object.assign(document.createElement("div"), {value:"", checked:false})));
 
 /* ===== teks antarmuka dua bahasa ===== */
 const I18N = {
@@ -4180,7 +4113,7 @@ function chime(rar){
 }
 
 /* ===== suara AI (sistem sama seperti TH Analytics: Web Speech bawaan perangkat, tanpa server) ===== */
-const TTS = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+const TTS = false;
 let speakTok = 0, speakGuard = 0, speakWarn = 0, speakDone = null, warnedVoice = {};
 /* Pilih suara sesuai bahasa. Android sering memakai kode lama "in-ID" untuk Indonesia, jadi dicek juga.
    Prioritas: locale persis (id-ID / en-US), lalu suara lokal di perangkat (lebih stabil, tidak terpotong). */
@@ -4904,7 +4837,6 @@ body.hascard .app{padding-top:22px}
     <button class="sc" id="soundBtn" type="button"></button>
     <button class="sc" id="musicBtn" type="button"></button>
     <label class="sv"><span id="mvolLbl"></span><input type="range" id="mvol" min="0" max="100" step="5"></label>
-    <label class="sv"><span id="volLbl"></span><input type="range" id="vol" min="0" max="100" step="5"></label>
     <button class="sc" id="autoBtn" type="button"></button>
     <button class="sc" id="gapBtn" type="button"></button>
     <button class="sc" id="langBtn" type="button"></button>
@@ -4913,7 +4845,7 @@ body.hascard .app{padding-top:22px}
 <div class="autobar" id="autoBar" hidden><span id="autoTxt"></span><button class="btn ghost sm" id="autoStop" type="button"></button></div>
 <div class="toast" id="toast"></div>
 <script>
-const $ = id => document.getElementById(id);
+const __nil = {}; const $ = id => document.getElementById(id) || (__nil[id] || (__nil[id] = Object.assign(document.createElement("div"), {value:"", checked:false})));
 function realDate(d, m, y){ return y >= 1900 && y <= 2100 && m >= 1 && m <= 12 && d >= 1 && new Date(Date.UTC(y, m - 1, d)).getUTCDate() === d; }
 const QMAX = 200, NAMEMAX = 40;
 const clean = n => n.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, NAMEMAX);
@@ -5155,10 +5087,6 @@ function render(b, c, at0){
     "• Combined: a blend of the three, i.e. what matches in at least 2 of the 3 systems."));
   how.style.whiteSpace = "pre-line"; how.style.textAlign = "left";
   card.appendChild(how);
-  const a = el("div", "acts");
-  const rd = el("button", "btn ghost sm", "🔊 BACAKAN");
-  rd.type = "button"; rd.addEventListener("click", () => speak(true));
-  a.append(rd); card.appendChild(a);
   card.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard"); card.classList.remove("pop"); void card.offsetWidth; card.classList.add("pop");
   if(scrollFollow){ try{ card.scrollIntoView({behavior:"smooth", block:"start"}); }catch(e){} }
 }
@@ -5176,21 +5104,8 @@ function copyText(){
   const fb = () => { try{ const a = document.createElement("textarea"); a.value = t; a.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(a); a.select(); const ok = document.execCommand("copy"); a.remove(); toast(ok ? ok1 : no1); }catch(e){ toast(no1); } };
   try{ navigator.clipboard.writeText(t).then(() => toast(ok1), fb); }catch(e){ fb(); }
 }
-const pickVoice = () => { try{ const re = lang === "en" ? /^en[-_]/i : /^(id|in)[-_]/i; return speechSynthesis.getVoices().find(x => re.test(x.lang || "")) || null; }catch(e){ return null; } };
 function stopSpeak(){ try{ speechSynthesis.cancel(); }catch(e){} }
-function speak(force){
-  if(!cur || (force !== true && !soundOn)) return;
-  if(!("speechSynthesis" in window)){ toast(L("Perangkat ini tidak mendukung suara AI", "This device doesn't support AI voice")); return; }
-  const {b, c} = cur, en = lang === "en";
-  const txt = en ? (b.name ? b.name + ". " : "") + "Your weton is " + c.w.name + ", zodiac " + tr(SHIO[c.si]) + " " + tr(UN[c.un]) + ". Your life path number is " + c.lp + ", expression number " + c.ex + ". Combined good days: " + dl(c.mixD) + ". Combined lucky numbers: " + list(c.mixN.map(String)) + ". Combined lucky colors: " + list(c.mixC.map(tr)) + "."
-    : (b.name ? b.name + ". " : "") + "Wetonmu " + c.w.name + ", shio " + SHIO[c.si] + " " + UN[c.un] + ". Angka watakmu " + c.lp + ", angka kemampuanmu " + c.ex + ". Hari baik gabungan: " + dl(c.mixD) + ". Angka hoki gabungan: " + list(c.mixN.map(String)) + ". Warna hoki gabungan: " + list(c.mixC) + ".";
-  try{
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(txt); u.lang = en ? "en-US" : "id-ID"; u.rate = .95; u.volume = aiVol;
-    const v = pickVoice(); if(v){ u.voice = v; u.lang = v.lang; } else toast(L("Suara Indonesia belum terpasang. Pasang lewat Pengaturan > Teks-ke-suara", "English voice isn't installed. Install it via Settings > Text-to-speech"));
-    speechSynthesis.speak(u);
-  }catch(e){ toast(L("Suara tidak bisa diputar", "Voice can't be played")); }
-}
+function speak(){}
 
 function parse(text){
   if(String(text).indexOf("_") < 1) return null;   /* wajib memakai pembatas _ : nama_tanggal lahir */
@@ -5367,13 +5282,12 @@ $("nextBtn").addEventListener("click", checkNow);
 $("autoStop").addEventListener("click", clearAuto);
 $("clrBtn").addEventListener("click", clearScreen);
 $("qClear").addEventListener("click", () => { if(!queue.length){ toast(L("Antrean sudah kosong", "Queue is already empty")); return; } queue = []; save("queue", queue); clearAuto(); renderQueue(); toast(L("Antrean dikosongkan", "Queue cleared")); });
-$("soundBtn").addEventListener("click", () => { soundOn = !soundOn; save("sound", soundOn); if(!soundOn) stopSpeak(); paintStatic(); toast(soundOn ? L("Suara menyala", "Sound on") : L("Mode senyap: suara AI dimatikan", "Muted: AI voice off")); });
+$("soundBtn").addEventListener("click", () => { soundOn = !soundOn; save("sound", soundOn); if(!soundOn) stopSpeak(); paintStatic(); toast(soundOn ? L("Suara menyala", "Sound on") : L("Mode senyap", "Muted")); });
 $("musicBtn").addEventListener("click", () => { music = !music; save("music", music); music ? musicStart() : musicStop(); paintStatic(); });
 const onMvol = e => { mVol = Math.max(0, Math.min(1, e.target.value / 100)); save("mvol", mVol); $("mvolLbl").textContent = L("🎼 Volume musik: ", "🎼 Music volume: ") + Math.round(mVol * 100) + "%"; if(music && !mT) musicStart(); applyMusicVol(true); };
 $("mvol").addEventListener("input", onMvol); $("mvol").addEventListener("change", onMvol);
 const onVol = e => { aiVol = Math.max(0, Math.min(1, e.target.value / 100)); save("vol", aiVol); $("volLbl").textContent = L("🗣️ Volume suara AI: ", "🗣️ AI voice volume: ") + Math.round(aiVol * 100) + "%"; };
 $("vol").addEventListener("input", onVol);
-$("vol").addEventListener("change", () => { if(cur && soundOn){ speak(); } else if(cur){ speak(true); } });
 $("autoBtn").addEventListener("click", () => { autoOn = !autoOn; save("auto", autoOn); paintStatic(); if(!autoOn) clearAuto(); else if(queue.length && cur) startNext(); });
 $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; save("gap", gapI); paintStatic(); if(timer) startNext(); });
 $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paintStatic(); if(cur) render(cur.b, cur.c, cur.at); toast(L("Bahasa: Indonesia", "Language: English")); });
@@ -5582,7 +5496,6 @@ body.hascard .app{padding-top:22px}
     <button class="sc" id="soundBtn" type="button"></button>
     <button class="sc" id="musicBtn" type="button"></button>
     <label class="sv"><span id="mvolLbl"></span><input type="range" id="mvol" min="0" max="100" step="5"></label>
-    <label class="sv"><span id="volLbl"></span><input type="range" id="vol" min="0" max="100" step="5"></label>
     <button class="sc" id="autoBtn" type="button"></button>
     <button class="sc" id="gapBtn" type="button"></button>
     <button class="sc" id="langBtn" type="button"></button>
@@ -5591,7 +5504,7 @@ body.hascard .app{padding-top:22px}
 <div class="autobar" id="autoBar" hidden><span id="autoTxt"></span><button class="btn ghost sm" id="autoStop" type="button"></button></div>
 <div class="toast" id="toast"></div>
 <script>
-const $ = id => document.getElementById(id);
+const __nil = {}; const $ = id => document.getElementById(id) || (__nil[id] || (__nil[id] = Object.assign(document.createElement("div"), {value:"", checked:false})));
 function realDate(d, m, y){ return y >= 1900 && y <= 2100 && m >= 1 && m <= 12 && d >= 1 && new Date(Date.UTC(y, m - 1, d)).getUTCDate() === d; }
 const QMAX = 200, NAMEMAX = 40;
 const clean = n => n.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, NAMEMAX);
@@ -5856,10 +5769,6 @@ function render(b, c, at0){
   if(c.only) how.textContent = L("Cara hitungnya (singkat):\n• Numerologi: angka Kemampuan, Keinginan hati, dan Kesan luar dihitung dari huruf namamu (Pythagoras; tiap kata direduksi lalu dijumlah). Pakai nama lengkap sesuai akta supaya lebih akurat.\n• Watak utama dan wuku butuh tanggal lahir lengkap, jadi belum dihitung.", "How it is calculated (short):\n• Numerology: Expression, Soul urge and Personality come from the letters of your name (Pythagoras; each word is reduced, then added). Use the full name from your ID for better accuracy.\n• Life path and wuku need the full birth date, so they are not counted.");
   how.style.whiteSpace = "pre-line"; how.style.textAlign = "left";
   card.appendChild(how);
-  const a = el("div", "acts");
-  const rd = el("button", "btn ghost sm", "🔊 BACAKAN");
-  rd.type = "button"; rd.addEventListener("click", () => speak(true));
-  a.append(rd); card.appendChild(a);
   card.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard"); card.classList.remove("pop"); void card.offsetWidth; card.classList.add("pop");
   if(scrollFollow){ try{ card.scrollIntoView({behavior:"smooth", block:"start"}); }catch(e){} }
 }
@@ -5875,22 +5784,8 @@ function copyText(){
   const fb = () => { try{ const a = document.createElement("textarea"); a.value = t; a.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(a); a.select(); const ok = document.execCommand("copy"); a.remove(); toast(ok ? ok1 : no1); }catch(e){ toast(no1); } };
   try{ navigator.clipboard.writeText(t).then(() => toast(ok1), fb); }catch(e){ fb(); }
 }
-const pickVoice = () => { try{ const re = lang === "en" ? /^en[-_]/i : /^(id|in)[-_]/i; return speechSynthesis.getVoices().find(x => re.test(x.lang || "")) || null; }catch(e){ return null; } };
 function stopSpeak(){ try{ speechSynthesis.cancel(); }catch(e){} }
-function speak(force){
-  if(!cur || (force !== true && !soundOn)) return;
-  if(!("speechSynthesis" in window)){ toast(L("Perangkat ini tidak mendukung suara AI", "This device doesn't support AI voice")); return; }
-  const {b, c} = cur, en = lang === "en";
-  const wd = c.only ? null : wukuD(c);
-  const txt = c.only ? (en ? (b.name + ". Your expression number is " + c.ex + ": " + tr(NMEAN[c.ex]) + ".") : (b.name + ". Angka kemampuanmu " + c.ex + ": " + NMEAN[c.ex] + ".")) : en ? (b.name ? b.name + ". " : "") + "Your weton is " + c.w.name + ", wuku " + c.wk + ". Your life path number is " + c.lp + ": " + tr(NMEAN[c.lp]) + ". Your expression number is " + c.ex + ": " + tr(NMEAN[c.ex]) + ". The character of wuku " + c.wk + " is " + wd[1].toLowerCase() + "."
-    : (b.name ? b.name + ". " : "") + "Wetonmu " + c.w.name + ", wuku " + c.wk + ". Angka watakmu " + c.lp + ": " + NMEAN[c.lp] + ". Angka kemampuanmu " + c.ex + ": " + NMEAN[c.ex] + ". Watak wuku " + c.wk + " adalah " + wd[1].toLowerCase() + ".";
-  try{
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(txt); u.lang = en ? "en-US" : "id-ID"; u.rate = .95; u.volume = aiVol;
-    const v = pickVoice(); if(v){ u.voice = v; u.lang = v.lang; } else toast(L("Suara Indonesia belum terpasang. Pasang lewat Pengaturan > Teks-ke-suara", "English voice isn't installed. Install it via Settings > Text-to-speech"));
-    speechSynthesis.speak(u);
-  }catch(e){ toast(L("Suara tidak bisa diputar", "Voice can't be played")); }
-}
+function speak(){}
 
 function parse(text){
   text = String(text).trim(); const k = text.indexOf("_");
@@ -6075,13 +5970,12 @@ $("nextBtn").addEventListener("click", checkNow);
 $("autoStop").addEventListener("click", clearAuto);
 $("clrBtn").addEventListener("click", clearScreen);
 $("qClear").addEventListener("click", () => { if(!queue.length){ toast(L("Antrean sudah kosong", "Queue is already empty")); return; } queue = []; save("queue", queue); clearAuto(); renderQueue(); toast(L("Antrean dikosongkan", "Queue cleared")); });
-$("soundBtn").addEventListener("click", () => { soundOn = !soundOn; save("sound", soundOn); if(!soundOn) stopSpeak(); paintStatic(); toast(soundOn ? L("Suara menyala", "Sound on") : L("Mode senyap: suara AI dimatikan", "Muted: AI voice off")); });
+$("soundBtn").addEventListener("click", () => { soundOn = !soundOn; save("sound", soundOn); if(!soundOn) stopSpeak(); paintStatic(); toast(soundOn ? L("Suara menyala", "Sound on") : L("Mode senyap", "Muted")); });
 $("musicBtn").addEventListener("click", () => { music = !music; save("music", music); music ? musicStart() : musicStop(); paintStatic(); });
 const onMvol = e => { mVol = Math.max(0, Math.min(1, e.target.value / 100)); save("mvol", mVol); $("mvolLbl").textContent = L("🎼 Volume musik: ", "🎼 Music volume: ") + Math.round(mVol * 100) + "%"; if(music && !mT) musicStart(); applyMusicVol(true); };
 $("mvol").addEventListener("input", onMvol); $("mvol").addEventListener("change", onMvol);
 const onVol = e => { aiVol = Math.max(0, Math.min(1, e.target.value / 100)); save("vol", aiVol); $("volLbl").textContent = L("🗣️ Volume suara AI: ", "🗣️ AI voice volume: ") + Math.round(aiVol * 100) + "%"; };
 $("vol").addEventListener("input", onVol);
-$("vol").addEventListener("change", () => { if(cur && soundOn){ speak(); } else if(cur){ speak(true); } });
 $("autoBtn").addEventListener("click", () => { autoOn = !autoOn; save("auto", autoOn); paintStatic(); if(!autoOn) clearAuto(); else if(queue.length && cur) startNext(); });
 $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; save("gap", gapI); paintStatic(); if(timer) startNext(); });
 $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paintStatic(); if(cur) render(cur.b, cur.c, cur.at); toast(L("Bahasa: Indonesia", "Language: English")); });
@@ -6236,7 +6130,6 @@ h3{margin:0 0 8px;font-size:13px;letter-spacing:.18em;color:var(--gold);overflow
     <button class="sc" id="soundBtn" type="button"></button>
     <button class="sc" id="musicBtn" type="button"></button>
     <label class="sv"><span id="mvolLbl"></span><input type="range" id="mvol" min="0" max="100" step="5"></label>
-    <label class="sv"><span id="volLbl"></span><input type="range" id="vol" min="0" max="100" step="5"></label>
     <button class="sc" id="autoBtn" type="button"></button>
     <button class="sc" id="gapBtn" type="button"></button>
     <button class="sc" id="langBtn" type="button"></button>
@@ -6246,7 +6139,7 @@ h3{margin:0 0 8px;font-size:13px;letter-spacing:.18em;color:var(--gold);overflow
 <div class="toast" id="toast" role="status"></div>
 </div>
 <script>
-const $ = id => document.getElementById(id);
+const __nil = {}; const $ = id => document.getElementById(id) || (__nil[id] || (__nil[id] = Object.assign(document.createElement("div"), {value:"", checked:false})));
 function realDate(d, m, y){ return y >= 1900 && y <= 2100 && m >= 1 && m <= 12 && d >= 1 && new Date(Date.UTC(y, m - 1, d)).getUTCDate() === d; }
 const QMAX = 200, NAMEMAX = 40;
 const clean = n => n.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, NAMEMAX);
@@ -6403,8 +6296,7 @@ function show(ra, rb, at0){
   const top = el("div", "panel score"), br = el("div", "bar"), bi = el("i"), tip = el("p", "tiny", acc + (miss.length ? ". " + L("Belum dihitung: ", "Not counted: ") + miss.join(", ") + ". " + L("Lengkapi tanggal lahir untuk hasil lebih akurat.", "Add the birth dates for a more accurate result.") : "")); bi.style.width = all + "%"; br.append(bi); tip.style.marginTop = "10px";
   top.append(el("h3", "", A.nm + " & " + B.nm), el("div", "big", all + "%"), el("div", "vd", vd), br, tip, STime.el(at));
   cur = {ra, rb, A, B, all, vd, wj:curWj, at};
-  const rd = el("button", "ghost", L("🔊 BACAKAN", "🔊 READ ALOUD")); rd.type = "button"; rd.addEventListener("click", () => speak(true));
-  o.textContent = ""; o.append(top, ...cards, rd); o.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard");
+  o.textContent = ""; o.append(top, ...cards); o.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard");
   o.classList.remove("pop"); void o.offsetWidth; o.classList.add("pop");
   if(scrollFollow){ try{ o.scrollIntoView({behavior:"smooth", block:"start"}); }catch(e){} }
 }
@@ -6458,21 +6350,8 @@ function startNext(){
   tick = setInterval(() => { n = Math.max(0, n - 1); if(queue.length) upd(); }, 1000);
   timer = setTimeout(checkNow, GAPS[gapI] * 1000);
 }
-const pickVoice = () => { try{ const re = lang === "en" ? /^en[-_]/i : /^(id|in)[-_]/i; return speechSynthesis.getVoices().find(x => re.test(x.lang || "")) || null; }catch(e){ return null; } };
 function stopSpeak(){ try{ speechSynthesis.cancel(); }catch(e){} }
-function speak(force){
-  if(!cur || (force !== true && !soundOn)) return;
-  if(!("speechSynthesis" in window)){ toast(L("Perangkat ini tidak mendukung suara AI", "This device doesn't support AI voice")); return; }
-  const {A, B, all, vd, wj} = cur, en = lang === "en", v = vd.replace(/[^\p{L}\p{N}\s,.\-]/gu, "").trim();
-  const txt = en ? A.nm + " and " + B.nm + ". Compatibility " + all + " percent: " + v + "." + (wj ? " Javanese weton: " + wj[0] + ", " + wj[2] + "." : "")
-    : A.nm + " dan " + B.nm + ". Kecocokan " + all + " persen: " + v + "." + (wj ? " Weton Jawa: " + wj[0] + ", " + wj[1] + "." : "");
-  try{
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(txt); u.lang = en ? "en-US" : "id-ID"; u.rate = .95; u.volume = aiVol;
-    const pv = pickVoice(); if(pv){ u.voice = pv; u.lang = pv.lang; } else toast(L("Suara Indonesia belum terpasang. Pasang lewat Pengaturan > Teks-ke-suara", "English voice isn't installed. Install it via Settings > Text-to-speech"));
-    speechSynthesis.speak(u);
-  }catch(e){ toast(L("Suara tidak bisa diputar", "Voice can't be played")); }
-}
+function speak(){}
 /* ===== musik latar: dibuat langsung oleh browser (drone gamelan pelan), sama seperti Cek Khodam ===== */
 let music = load("music", true) !== false, mVol = +load("mvol", .7), mT = 0, mStep = 0, mg = null, mfx = null, actx = null, curLvl = -1;
 if(!(mVol >= 0 && mVol <= 1)) mVol = .5;
@@ -6557,13 +6436,12 @@ function clearScreen(){
 $("clr").addEventListener("click", clearScreen);
 $("add").addEventListener("click", addQueue); $("qNext").addEventListener("click", checkNow); $("qClear").addEventListener("click", clearQueue);
 $("autoStop").addEventListener("click", clearAuto);
-$("soundBtn").addEventListener("click", () => { soundOn = !soundOn; save("sound", soundOn); if(!soundOn) stopSpeak(); paint(); toast(soundOn ? L("Suara menyala", "Sound on") : L("Mode senyap: suara AI dimatikan", "Muted: AI voice off")); });
+$("soundBtn").addEventListener("click", () => { soundOn = !soundOn; save("sound", soundOn); if(!soundOn) stopSpeak(); paint(); toast(soundOn ? L("Suara menyala", "Sound on") : L("Mode senyap", "Muted")); });
 $("musicBtn").addEventListener("click", () => { music = !music; save("music", music); music ? musicStart() : musicStop(); paint(); });
 const onMvol = e => { mVol = Math.max(0, Math.min(1, e.target.value / 100)); save("mvol", mVol); $("mvolLbl").textContent = L("🎼 Volume musik: ", "🎼 Music volume: ") + Math.round(mVol * 100) + "%"; if(music && !mT) musicStart(); applyMusicVol(true); };
 $("mvol").addEventListener("input", onMvol); $("mvol").addEventListener("change", onMvol);
 const onVol = e => { aiVol = Math.max(0, Math.min(1, e.target.value / 100)); save("vol", aiVol); $("volLbl").textContent = L("🗣️ Volume suara AI: ", "🗣️ AI voice volume: ") + Math.round(aiVol * 100) + "%"; };
 $("vol").addEventListener("input", onVol);
-$("vol").addEventListener("change", () => { if(cur && soundOn){ speak(); } else if(cur){ speak(true); } });
 $("autoBtn").addEventListener("click", () => { autoOn = !autoOn; save("auto", autoOn); paint(); if(!autoOn) clearAuto(); else if(queue.length && cur) startNext(); });
 $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; save("gap", gapI); paint(); if(timer) startNext(); });
 $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paint(); if(cur) show(cur.ra, cur.rb, cur.at); toast(L("Bahasa: Indonesia", "Language: English")); });
@@ -6768,7 +6646,6 @@ h3{margin:0 0 8px;font-size:13px;letter-spacing:.18em;color:var(--gold);overflow
     <button class="sc" id="soundBtn" type="button"></button>
     <button class="sc" id="musicBtn" type="button"></button>
     <label class="sv"><span id="mvolLbl"></span><input type="range" id="mvol" min="0" max="100" step="5"></label>
-    <label class="sv"><span id="volLbl"></span><input type="range" id="vol" min="0" max="100" step="5"></label>
     <button class="sc" id="autoBtn" type="button"></button>
     <button class="sc" id="gapBtn" type="button"></button>
     <button class="sc" id="langBtn" type="button"></button>
@@ -6778,7 +6655,7 @@ h3{margin:0 0 8px;font-size:13px;letter-spacing:.18em;color:var(--gold);overflow
 <div class="toast" id="toast" role="status"></div>
 </div>
 <script>
-const $ = id => document.getElementById(id);
+const __nil = {}; const $ = id => document.getElementById(id) || (__nil[id] || (__nil[id] = Object.assign(document.createElement("div"), {value:"", checked:false})));
 const QMAX = 200, NAMEMAX = 40;
 const clean = n => String(n || "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, NAMEMAX);
 const LS = k => "tb_" + k;
@@ -6921,8 +6798,7 @@ function show(p, at0){
   kcard.append(el("p", "fine", L("Panduan umum, bukan standar resmi Kemenkes atau WHO: selisih 500 kkal per hari ≈ 0,45 kg per minggu (1 kg ≈ 7.700 kkal). Hasil nyata berbeda tiap orang. Konsultasikan ke dokter atau ahli gizi sebelum mengubah pola makan, terutama bila punya penyakit, sedang hamil, atau menyusui.",
     "General guidance, not an official Indonesian MoH or WHO standard: a 500 kcal daily gap ≈ 0.45 kg per week (1 kg ≈ 7,700 kcal). Real results vary. Talk to a doctor or dietitian before changing your diet, especially with a medical condition, pregnancy or breastfeeding.")));
   cur = {p, c, nm, pl, at};
-  const rd = el("button", "ghost", L("🔊 BACAKAN", "🔊 READ ALOUD")); rd.type = "button"; rd.addEventListener("click", () => speak(true));
-  o.textContent = ""; o.append(hero, cls, wcard, ecard, kcard, rd); o.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard");
+  o.textContent = ""; o.append(hero, cls, wcard, ecard, kcard); o.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard");
   o.classList.remove("pop"); void o.offsetWidth; o.classList.add("pop");
   if(scrollFollow){ try{ o.scrollIntoView({behavior:"smooth", block:"start"}); }catch(e){} }
 }
@@ -6976,21 +6852,8 @@ function startNext(){
   tick = setInterval(() => { n = Math.max(0, n - 1); if(queue.length) upd(); }, 1000);
   timer = setTimeout(checkNow, GAPS[gapI] * 1000);
 }
-const pickVoice = () => { try{ const re = lang === "en" ? /^en[-_]/i : /^(id|in)[-_]/i; return speechSynthesis.getVoices().find(x => re.test(x.lang || "")) || null; }catch(e){ return null; } };
 function stopSpeak(){ try{ speechSynthesis.cancel(); }catch(e){} }
-function speak(force){
-  if(!cur || (force !== true && !soundOn)) return;
-  if(!("speechSynthesis" in window)){ toast(L("Perangkat ini tidak mendukung suara AI", "This device doesn't support AI voice")); return; }
-  const {p, c, nm, pl} = cur, en = lang === "en", k = en ? c.k[2] : c.k[1], w = en ? c.w[2] : c.w[1];
-  const txt = en ? nm + ". Your BMI is " + fx(c.b, 1) + ", " + k + " by the Indonesian Ministry of Health, and " + w + " by WHO. Estimated energy need is " + r10(c.tee) + " kilocalories per day." + (pl.goal === "hold" ? " Your weight is already normal; keep your intake around " + r10(pl.hold) + " kilocalories." : " To reach a normal weight you need to " + (pl.goal === "lose" ? "lose" : "gain") + " about " + fx(pl.gap, 1) + " kilograms, with a suggested intake of about " + r10(pl.goal === "lose" ? pl.cut : pl.add) + " kilocalories per day.")
-    : nm + ". IMT kamu " + fx(c.b, 1) + ", kategori " + k + " menurut Kemenkes, dan " + w + " menurut WHO. Perkiraan kebutuhan energi " + r10(c.tee) + " kilokalori per hari." + (pl.goal === "hold" ? " Berat badanmu sudah normal; pertahankan asupan sekitar " + r10(pl.hold) + " kilokalori." : " Untuk mencapai berat normal, kamu perlu " + (pl.goal === "lose" ? "turun" : "naik") + " sekitar " + fx(pl.gap, 1) + " kilogram, dengan asupan yang disarankan sekitar " + r10(pl.goal === "lose" ? pl.cut : pl.add) + " kilokalori per hari.");
-  try{
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(txt); u.lang = en ? "en-US" : "id-ID"; u.rate = .95; u.volume = aiVol;
-    const pv = pickVoice(); if(pv){ u.voice = pv; u.lang = pv.lang; } else toast(L("Suara Indonesia belum terpasang. Pasang lewat Pengaturan > Teks-ke-suara", "English voice isn't installed. Install it via Settings > Text-to-speech"));
-    speechSynthesis.speak(u);
-  }catch(e){ toast(L("Suara tidak bisa diputar", "Voice can't be played")); }
-}
+function speak(){}
 /* ===== musik latar menu medis: diputar oleh halaman Home, bukan oleh menu ini =====
    "measured_recovery.mp3" ditanam satu kali di Home dan hanya diputar selama menu berkategori "medis" terbuka.
    Menu ini hanya menyimpan status tombol Musik dan volumenya (music, mVol); Home membacanya lewat #musicBtn dan #mvol. */
@@ -7035,13 +6898,12 @@ function clearScreen(){
 $("clr").addEventListener("click", clearScreen);
 $("add").addEventListener("click", addQueue); $("qNext").addEventListener("click", checkNow); $("qClear").addEventListener("click", clearQueue);
 $("autoStop").addEventListener("click", clearAuto);
-$("soundBtn").addEventListener("click", () => { soundOn = !soundOn; save("sound", soundOn); if(!soundOn) stopSpeak(); paint(); toast(soundOn ? L("Suara menyala", "Sound on") : L("Mode senyap: suara AI dimatikan", "Muted: AI voice off")); });
+$("soundBtn").addEventListener("click", () => { soundOn = !soundOn; save("sound", soundOn); if(!soundOn) stopSpeak(); paint(); toast(soundOn ? L("Suara menyala", "Sound on") : L("Mode senyap", "Muted")); });
 $("musicBtn").addEventListener("click", () => { music = !music; save("music", music); music ? musicStart() : musicStop(); paint(); });
 const onMvol = e => { mVol = Math.max(0, Math.min(1, e.target.value / 100)); save("mvol", mVol); $("mvolLbl").textContent = L("🎼 Volume musik: ", "🎼 Music volume: ") + Math.round(mVol * 100) + "%"; if(music && !mT) musicStart(); applyMusicVol(true); };
 $("mvol").addEventListener("input", onMvol); $("mvol").addEventListener("change", onMvol);
 const onVol = e => { aiVol = Math.max(0, Math.min(1, e.target.value / 100)); save("vol", aiVol); $("volLbl").textContent = L("🗣️ Volume suara AI: ", "🗣️ AI voice volume: ") + Math.round(aiVol * 100) + "%"; };
 $("vol").addEventListener("input", onVol);
-$("vol").addEventListener("change", () => { if(cur && soundOn){ speak(); } else if(cur){ speak(true); } });
 $("autoBtn").addEventListener("click", () => { autoOn = !autoOn; save("auto", autoOn); paint(); if(!autoOn) clearAuto(); else if(queue.length && cur) startNext(); });
 $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; save("gap", gapI); paint(); if(timer) startNext(); });
 $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paint(); if(cur) show(cur.p, cur.at); toast(L("Bahasa: Indonesia", "Language: English")); });
@@ -7246,7 +7108,6 @@ h3{margin:0 0 8px;font-size:13px;letter-spacing:.18em;color:var(--gold);overflow
     <button class="sc" id="soundBtn" type="button"></button>
     <button class="sc" id="musicBtn" type="button"></button>
     <label class="sv"><span id="mvolLbl"></span><input type="range" id="mvol" min="0" max="100" step="5"></label>
-    <label class="sv"><span id="volLbl"></span><input type="range" id="vol" min="0" max="100" step="5"></label>
     <button class="sc" id="autoBtn" type="button"></button>
     <button class="sc" id="gapBtn" type="button"></button>
     <button class="sc" id="langBtn" type="button"></button>
@@ -7256,7 +7117,7 @@ h3{margin:0 0 8px;font-size:13px;letter-spacing:.18em;color:var(--gold);overflow
 <div class="toast" id="toast" role="status"></div>
 </div>
 <script>
-const $ = id => document.getElementById(id);
+const __nil = {}; const $ = id => document.getElementById(id) || (__nil[id] || (__nil[id] = Object.assign(document.createElement("div"), {value:"", checked:false})));
 const QMAX = 200, NAMEMAX = 40;
 const clean = n => String(n || "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, NAMEMAX);
 const LS = k => "tk_" + k;
@@ -7425,8 +7286,7 @@ function show(p, at0){
   const wcd = el("div", "panel");
   wcd.append(sec("🚨", L("TANDA BAHAYA", "WARNING SIGNS")), el("p", "warn", L("Segera ke fasilitas kesehatan bila ada perdarahan dari jalan lahir, nyeri perut hebat, muntah terus-menerus sampai tidak bisa makan atau minum, demam tinggi, sakit kepala hebat dengan pandangan kabur atau bengkak mendadak di wajah dan tangan, keluar air ketuban, atau gerakan janin berkurang atau hilang.", "Go to a health facility right away if you have vaginal bleeding, severe abdominal pain, constant vomiting so you can't eat or drink, high fever, a severe headache with blurred vision or sudden swelling of the face and hands, leaking amniotic fluid, or reduced or absent baby movements.")));
   cur = {p, c, nm, wg, at};
-  const rd = el("button", "ghost", L("🔊 BACAKAN", "🔊 READ ALOUD")); rd.type = "button"; rd.addEventListener("click", () => speak(true));
-  o.textContent = ""; o.append(hero); if(tcard) o.append(tcard); o.append(dcard, acard); if(wcard) o.append(wcard); o.append(wcd, rd); o.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard");
+  o.textContent = ""; o.append(hero); if(tcard) o.append(tcard); o.append(dcard, acard); if(wcard) o.append(wcard); o.append(wcd); o.hidden = false; $("clrWrap").hidden = false; document.body.classList.add("hascard");
   o.classList.remove("pop"); void o.offsetWidth; o.classList.add("pop");
   if(scrollFollow){ try{ o.scrollIntoView({behavior:"smooth", block:"start"}); }catch(e){} }
 }
@@ -7481,26 +7341,8 @@ function startNext(){
   tick = setInterval(() => { n = Math.max(0, n - 1); if(queue.length) upd(); }, 1000);
   timer = setTimeout(checkNow, GAPS[gapI] * 1000);
 }
-const pickVoice = () => { try{ const re = lang === "en" ? /^en[-_]/i : /^(id|in)[-_]/i; return speechSynthesis.getVoices().find(x => re.test(x.lang || "")) || null; }catch(e){ return null; } };
 function stopSpeak(){ try{ speechSynthesis.cancel(); }catch(e){} }
-function speak(force){
-  if(!cur || (force !== true && !soundOn)) return;
-  if(!("speechSynthesis" in window)){ toast(L("Perangkat ini tidak mendukung suara AI", "This device doesn't support AI voice")); return; }
-  const {c, nm, wg} = cur, en = lang === "en";
-  const ws = wg && wg.gain !== undefined
-    ? (en ? " Weight gain so far is " + fx(wg.gain, 1) + " kilograms, " + (wg.st === "ok" ? "within the guidance range." : wg.st === "hi" ? "above the guidance range." : wg.t1 ? "which is common in the first trimester." : "below the guidance range.")
-          : " Kenaikan berat badan sejauh ini " + fx(wg.gain, 1) + " kilogram, " + (wg.st === "ok" ? "dalam rentang anjuran." : wg.st === "hi" ? "di atas rentang anjuran." : wg.t1 ? "hal yang umum di trimester satu." : "di bawah rentang anjuran."))
-    : "";
-  const txt = en
-    ? nm + ". Gestational age is " + c.w + " weeks and " + c.r + " days, trimester " + (c.tri + 1) + ". Estimated due date is " + fmtD(c.edd) + (c.left >= 0 ? ", about " + c.left + " days from now." : ", which has passed by " + (-c.left) + " days.") + ws + " This is an estimate, not a diagnosis. Please see a doctor or midwife."
-    : nm + ". Usia kehamilan " + c.w + " minggu " + c.r + " hari, trimester " + (c.tri + 1) + ". Perkiraan hari lahir " + fmtD(c.edd) + (c.left >= 0 ? ", sekitar " + c.left + " hari lagi." : ", sudah lewat " + (-c.left) + " hari.") + ws + " Ini perkiraan, bukan diagnosis. Periksakan ke dokter atau bidan.";
-  try{
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(txt); u.lang = en ? "en-US" : "id-ID"; u.rate = .95; u.volume = aiVol;
-    const pv = pickVoice(); if(pv){ u.voice = pv; u.lang = pv.lang; } else toast(L("Suara Indonesia belum terpasang. Pasang lewat Pengaturan > Teks-ke-suara", "English voice isn't installed. Install it via Settings > Text-to-speech"));
-    speechSynthesis.speak(u);
-  }catch(e){ toast(L("Suara tidak bisa diputar", "Voice can't be played")); }
-}
+function speak(){}
 /* ===== musik latar menu medis: diputar oleh halaman Home, bukan oleh menu ini =====
    "measured_recovery.mp3" ditanam satu kali di Home dan hanya diputar selama menu berkategori "medis" terbuka.
    Menu ini hanya menyimpan status tombol Musik dan volumenya (music, mVol); Home membacanya lewat #musicBtn dan #mvol. */
@@ -7548,13 +7390,12 @@ function clearScreen(){
 $("clr").addEventListener("click", clearScreen);
 $("add").addEventListener("click", addQueue); $("qNext").addEventListener("click", checkNow); $("qClear").addEventListener("click", clearQueue);
 $("autoStop").addEventListener("click", clearAuto);
-$("soundBtn").addEventListener("click", () => { soundOn = !soundOn; save("sound", soundOn); if(!soundOn) stopSpeak(); paint(); toast(soundOn ? L("Suara menyala", "Sound on") : L("Mode senyap: suara AI dimatikan", "Muted: AI voice off")); });
+$("soundBtn").addEventListener("click", () => { soundOn = !soundOn; save("sound", soundOn); if(!soundOn) stopSpeak(); paint(); toast(soundOn ? L("Suara menyala", "Sound on") : L("Mode senyap", "Muted")); });
 $("musicBtn").addEventListener("click", () => { music = !music; save("music", music); music ? musicStart() : musicStop(); paint(); });
 const onMvol = e => { mVol = Math.max(0, Math.min(1, e.target.value / 100)); save("mvol", mVol); $("mvolLbl").textContent = L("🎼 Volume musik: ", "🎼 Music volume: ") + Math.round(mVol * 100) + "%"; if(music && !mT) musicStart(); applyMusicVol(true); };
 $("mvol").addEventListener("input", onMvol); $("mvol").addEventListener("change", onMvol);
 const onVol = e => { aiVol = Math.max(0, Math.min(1, e.target.value / 100)); save("vol", aiVol); $("volLbl").textContent = L("🗣️ Volume suara AI: ", "🗣️ AI voice volume: ") + Math.round(aiVol * 100) + "%"; };
 $("vol").addEventListener("input", onVol);
-$("vol").addEventListener("change", () => { if(cur && soundOn){ speak(); } else if(cur){ speak(true); } });
 $("autoBtn").addEventListener("click", () => { autoOn = !autoOn; save("auto", autoOn); paint(); if(!autoOn) clearAuto(); else if(queue.length && cur) startNext(); });
 $("gapBtn").addEventListener("click", () => { gapI = (gapI + 1) % GAPS.length; save("gap", gapI); paint(); if(timer) startNext(); });
 $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); stopSpeak(); paint(); if(cur) show(cur.p, cur.at); toast(L("Bahasa: Indonesia", "Language: English")); });
@@ -7856,12 +7697,12 @@ img.av{display:block;object-fit:cover}
   <div id="main" class="stack"></div>
 </div>
 <aside class="side" id="side">
-  <button id="fxBtn" type="button"></button><button id="musicBtn" type="button"></button><button id="readBtn" type="button"></button><button id="autoBtn" type="button"></button><button id="gapBtn" type="button"></button><button id="langBtn" type="button"></button>
-  <input type="range" id="mvol" min="0" max="100" step="5"><input type="range" id="vol" min="0" max="100" step="5">
+  <button id="fxBtn" type="button"></button><button id="musicBtn" type="button"></button><button id="autoBtn" type="button"></button><button id="gapBtn" type="button"></button><button id="langBtn" type="button"></button>
+  <input type="range" id="mvol" min="0" max="100" step="5">
 </aside>
 <div class="toast" id="toast" role="status"></div>
 <script>
-const $ = id => document.getElementById(id);
+const __nil = {}; const $ = id => document.getElementById(id) || (__nil[id] || (__nil[id] = Object.assign(document.createElement("div"), {value:"", checked:false})));
 const LS = k => "tt_" + k;
 function load(k, d){ try{ const v = localStorage.getItem(LS(k)); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }
 function save(k, v){ try{ localStorage.setItem(LS(k), JSON.stringify(v)); return true; }catch(e){ return false; } }
@@ -7884,7 +7725,7 @@ applyAnim();
 if(!(gapI >= 0 && gapI < GAPS.length)) gapI = 1;
 aiVol = isFinite(aiVol) ? Math.max(0, Math.min(1, aiVol)) : 1; mVol = isFinite(mVol) ? Math.max(0, Math.min(1, mVol)) : .7;
 let actx = null, nextT = 0, musT = 0, musI = 0;
-const TTS = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+const TTS = false;
 function ac(){ actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if(actx.state === "suspended") actx.resume(); return actx; }
 function note(f, t0, dur, vol, type){
   const c = ac(), o = c.createOscillator(), g = c.createGain();
