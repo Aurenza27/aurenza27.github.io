@@ -1327,6 +1327,32 @@ $("chBtn").addEventListener("click", async () => {
   try{ if(localStorage.getItem("sp_rel") !== null){ localStorage.removeItem("sp_rel"); n++; } }catch(e){}
   rStatus("chStat", n ? c.done : c.none); b.disabled = false; cacheUse();
 });
+
+/* ===== VERSI APLIKASI ANDROID (Capacitor): iklan banner AdMob + konfigurasi login native =====
+   Semua kode di bawah hanya aktif di aplikasi Android hasil bungkus Capacitor. Di web/PWA tidak ada yang berubah. */
+window.satuTitikNative = {
+  /* Isi dengan Web client ID dari Firebase: Authentication > Sign-in method > Google > Web SDK configuration */
+  googleWebClientId: "",
+  /* Iklan: isi ad unit banner asli dari AdMob lalu ubah testMode menjadi false. Default memakai iklan uji resmi Google. */
+  adBanner: "ca-app-pub-5946674639326014/3036495241",
+  testMode: true
+};
+(function(){
+  const C = window.Capacitor;
+  let native = false; try{ native = !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){}
+  if(!native) return;
+  const plug = n => (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null);
+  async function initAds(){
+    const AdMob = plug("AdMob"), cfg = window.satuTitikNative;
+    if(!AdMob) return;
+    try{
+      await AdMob.initialize({});
+      try{ const ci = await AdMob.requestConsentInfo(); if(ci && ci.isConsentFormAvailable && ci.status === "REQUIRED") await AdMob.showConsentForm(); }catch(e){}
+      await AdMob.showBanner({ adId: cfg.adBanner, adSize: "ADAPTIVE_BANNER", position: "BOTTOM_CENTER", margin: 0, isTesting: !!cfg.testMode });
+    }catch(e){ console.warn("Iklan tidak dapat dimuat:", e); }
+  }
+  window.addEventListener("load", () => setTimeout(initAds, 1500));
+})();
 /* ===== STime: tanggal dan jam hasil menu, mengikuti jam server (stClock milik Beranda) ===== */
 function stHelper(){
   var P = null; try{ P = parent.stClock; }catch(e){}
@@ -9514,15 +9540,34 @@ async function init(){
   try{ await auth.getRedirectResult(a); }catch(e){}
   return F = { a, auth, ai };
 }
+/* di aplikasi Android (Capacitor) Google memblokir login di dalam WebView, jadi dipakai pemilih akun native lalu token-nya dipakai masuk ke Firebase */
+function nativePlug(n){
+  try{ const C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return null; return (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null); }catch(e){ return null; }
+}
+async function nativeLogin(a, auth, SL){
+  const id = (window.satuTitikNative || {}).googleWebClientId;
+  if(!SL || !id) throw Object.assign(new Error("noconfig"), { code: "noconfig" });
+  await SL.initialize({ google: { webClientId: id } });
+  const r = await SL.login({ provider: "google", options: {} });
+  const tok = r && r.result && r.result.idToken;
+  if(!tok) throw new Error("notoken");
+  await auth.signInWithCredential(a, auth.GoogleAuthProvider.credential(tok));
+}
 A.login = async () => {
   A.error = null;
   try{
     const { a, auth } = await init();
-    try{ await auth.signInWithPopup(a, new auth.GoogleAuthProvider()); }
-    catch(e){
-      if(e && (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment")) return auth.signInWithRedirect(a, new auth.GoogleAuthProvider());
-      if(e && (e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request")) A.error = "cancel";
-      else A.error = (e && e.code === "auth/network-request-failed") ? "offline" : "fail";
+    const SL = nativePlug("SocialLogin");
+    if(SL){
+      try{ await nativeLogin(a, auth, SL); }
+      catch(e){ A.error = (e && (e.code === "USER_CANCELLED" || /cancel/i.test(String(e.message || "")))) ? "cancel" : (navigator.onLine === false ? "offline" : "fail"); }
+    }else{
+      try{ await auth.signInWithPopup(a, new auth.GoogleAuthProvider()); }
+      catch(e){
+        if(e && (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment")) return auth.signInWithRedirect(a, new auth.GoogleAuthProvider());
+        if(e && (e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request")) A.error = "cancel";
+        else A.error = (e && e.code === "auth/network-request-failed") ? "offline" : "fail";
+      }
     }
   }catch(e){ A.error = navigator.onLine === false ? "offline" : "fail"; }
   emit();
@@ -9539,6 +9584,7 @@ A.getDb = async () => { const m = await import(BASE + "firebase-firestore.js"); 
 A.logout = async () => {
   try{ await SY.now(); }catch(e){}   /* kirim perubahan terakhir ke cloud sebelum keluar */
   try{ const { a, auth } = await init(); await auth.signOut(a); }catch(e){}
+  try{ const SL = nativePlug("SocialLogin"); if(SL) await SL.logout({ provider: "google" }); }catch(e){}
   A.error = null; emit();
 };
 /* ===== ID AKUN (dibuat sistem) =====
