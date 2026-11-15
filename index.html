@@ -1402,9 +1402,11 @@ window.satuTitikNative = {
      interstitial: false = matikan sepenuhnya (kembali seperti semula). adInterstitial kosong = pakai iklan uji Google. */
   interstitial: true,
   adInterstitial: "ca-app-pub-5946674639326014/1532501020",
-  interstitialFirstMin: 5,      /* iklan pertama baru boleh muncul setelah aplikasi dipakai sekian menit */
+  interstitialFirstMin: 2,      /* iklan pertama baru boleh muncul setelah aplikasi dipakai sekian menit */
   interstitialGapMin: 4,        /* jeda minimal antar iklan berikutnya (menit) */
-  interstitialMaxPerSession: 4, /* batas jumlah iklan layar penuh sekali buka aplikasi */
+  interstitialMaxPerSession: 3, /* batas jumlah iklan layar penuh sekali buka aplikasi */
+  interstitialEveryNMenus: 6,   /* pemicu tambahan: iklan juga muncul setelah sekian kali buka-tutup menu (dihitung sejak aplikasi dibuka / iklan terakhir). 0 = matikan */
+  interstitialMinSpacingMin: 2, /* jarak minimal antar iklan untuk SEMUA pemicu (waktu maupun hitungan menu) */
   interstitialMinMenuSec: 10,   /* menu yang ditutup sebelum sekian detik dianggap salah ketuk: tidak memicu iklan */
   interstitialQuietSec: 20,     /* tidak ada iklan selama panel Pengaturan/Akun/Profil/Notifikasi/Tentang/Privasi terbuka, dan sekian detik setelah dipakai */
   testMode: true
@@ -1414,7 +1416,7 @@ window.satuTitikNative = {
   let native = false; try{ native = !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){}
   if(!native) return;
   const plug = n => (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null);
-  let itReady = false, itBusy = false, itLast = Date.now(), itCount = 0;   /* itLast dimulai saat aplikasi dibuka: tidak ada iklan di beberapa menit pertama */
+  let itReady = false, itBusy = false, itLast = Date.now(), itCount = 0, itClosed = 0;   /* itLast dimulai saat aplikasi dibuka: tidak ada iklan di beberapa menit pertama */
   function initInterstitial(AdMob, cfg){
     const id = cfg.adInterstitial || "ca-app-pub-3940256099942544/1033173712";
     const prep = async () => {
@@ -1437,15 +1439,21 @@ window.satuTitikNative = {
       onMenuClosed: async () => {
         const quietMs = Math.max(0, +cfg.interstitialQuietSec || 0) * 1000;
         if(quietOpen() || (quietMs && Date.now() - quietAt < quietMs)) return;       /* sedang/baru memakai Pengaturan, Akun, Profil, atau Notifikasi */
-        const maxN = +cfg.interstitialMaxPerSession || 4;
+        const maxN = +cfg.interstitialMaxPerSession || 3;
         if(itCount >= maxN) return;                                                   /* batas per sesi tercapai */
         const minSec = Math.max(0, +cfg.interstitialMinMenuSec || 0);
         const opened = window.satuTitikMenuOpenedAt || 0;
         if(minSec && opened && Date.now() - opened < minSec * 1000) return;           /* menu ditutup terlalu cepat */
-        const first = Math.max(1, +cfg.interstitialFirstMin || 5) * 60000;
+        itClosed++;                                                                   /* hitung hanya penutupan menu yang sah (bukan salah ketuk / panel khusus) */
+        const first = Math.max(1, +cfg.interstitialFirstMin || 2) * 60000;
         const gap = Math.max(1, +cfg.interstitialGapMin || 4) * 60000;
-        if(!itReady || Date.now() - itLast < (itCount === 0 ? first : gap)) return;
-        itReady = false; itCount++;
+        const everyN = Math.max(0, +cfg.interstitialEveryNMenus || 0);
+        const byTime = Date.now() - itLast >= (itCount === 0 ? first : gap);          /* pemicu 1: sudah cukup lama */
+        const byCount = everyN > 0 && itClosed >= everyN;                              /* pemicu 2: sudah beberapa kali buka-tutup menu */
+        const spacing = Math.max(0, +cfg.interstitialMinSpacingMin || 0) * 60000;
+        if(spacing && Date.now() - itLast < spacing) return;                          /* jangan pernah dua iklan berdekatan, apa pun pemicunya */
+        if(!itReady || !(byTime || byCount)) return;
+        itReady = false; itCount++; itClosed = 0;
         try{ await AdMob.showInterstitial(); }catch(e){ setTimeout(prep, 5000); }
       }
     };
