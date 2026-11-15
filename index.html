@@ -9567,22 +9567,22 @@ async function nativeLogin(a, auth, SL){
   await auth.signInWithCredential(a, auth.GoogleAuthProvider.credential(tok));
 }
 A.login = async () => {
-  A.error = null;
+  A.error = null; A.detail = "";
   try{
     const { a, auth } = await init();
     const SL = nativePlug("SocialLogin");
     if(SL){
       try{ await nativeLogin(a, auth, SL); }
-      catch(e){ console.error("[login] native gagal:", e); A.error = (e && (e.code === "USER_CANCELLED" || /cancel/i.test(String(e.message || "")))) ? "cancel" : (navigator.onLine === false ? "offline" : "fail"); }
+      catch(e){ console.error("[login] native gagal:", e); A.detail = "native: " + String((e && (e.code || e.message)) || e).slice(0,140); A.error = (e && (e.code === "USER_CANCELLED" || /cancel/i.test(String(e.message || "")))) ? "cancel" : (navigator.onLine === false ? "offline" : "fail"); }
     }else{
       try{ await auth.signInWithPopup(a, new auth.GoogleAuthProvider()); }
       catch(e){
         if(e && (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment")) return auth.signInWithRedirect(a, new auth.GoogleAuthProvider());
         if(e && (e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request")) A.error = "cancel";
-        else{ console.error("[login] popup gagal:", e && e.code, e); A.error = (e && e.code === "auth/network-request-failed") ? "offline" : "fail"; }
+        else{ console.error("[login] popup gagal:", e && e.code, e); A.detail = "popup: " + String((e && (e.code || e.message)) || e).slice(0,140); A.error = (e && e.code === "auth/network-request-failed") ? "offline" : "fail"; }
       }
     }
-  }catch(e){ console.error("[login] init gagal:", e); A.error = navigator.onLine === false ? "offline" : "fail"; }
+  }catch(e){ console.error("[login] init gagal:", e); A.detail = "init: " + String((e && (e.code || e.message)) || e).slice(0,140); A.error = navigator.onLine === false ? "offline" : "fail"; }
   emit();
 };
 /* Firestore dibuat sekali; auto-detect long polling supaya tetap jalan di WebView/jaringan seluler yang memblokir streaming */
@@ -10029,7 +10029,7 @@ if(navigator.onLine !== false) init().catch(() => {});
         busy = false; paint();
       });
       box.appendChild(b);
-      if(a.error) box.appendChild(mk("p", "herr", a.error === "offline" ? t.off : a.error === "cancel" ? t.cancel : t.fail));
+      if(a.error) box.appendChild(mk("p", "herr", a.error === "offline" ? t.off : a.error === "cancel" ? t.cancel : t.fail + (a.detail ? " [" + a.detail + "]" : "")));
     }
   }
 
