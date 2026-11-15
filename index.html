@@ -1348,7 +1348,14 @@ window.satuTitikNative = {
     try{
       await AdMob.initialize({});
       try{ const ci = await AdMob.requestConsentInfo(); if(ci && ci.isConsentFormAvailable && ci.status === "REQUIRED") await AdMob.showConsentForm(); }catch(e){}
+      /* Sisakan ruang di bawah halaman setinggi banner, supaya tulisan kaki beranda dan menu tidak tertutup iklan */
+      const st = document.createElement("style");
+      st.textContent = "#home{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px) + var(--adh,0px))!important}#view{bottom:var(--adh,0px)!important}";
+      document.head.appendChild(st);
+      const setH = h => { h = Math.round(+h || 0); if(h > 0) document.documentElement.style.setProperty("--adh", h + "px"); };
+      try{ AdMob.addListener("bannerAdSizeChanged", e => setH(e && e.height)); }catch(e){}
       await AdMob.showBanner({ adId: cfg.adBanner, adSize: "ADAPTIVE_BANNER", position: "BOTTOM_CENTER", margin: 0, isTesting: !!cfg.testMode });
+      setTimeout(() => { if(!document.documentElement.style.getPropertyValue("--adh")) setH(60); }, 2500);
     }catch(e){ console.warn("Iklan tidak dapat dimuat:", e); }
   }
   window.addEventListener("load", () => setTimeout(initAds, 1500));
