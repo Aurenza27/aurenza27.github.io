@@ -1547,6 +1547,19 @@ function stBackHelper(){
   };
 }
 const ST_BACK = "<scr" + "ipt>(" + stBackHelper.toString() + ")();<\/scr" + "ipt>";
+/* Bagikan gambar di aplikasi Android (Capacitor): WebView tidak punya navigator.share untuk file, jadi gambar disimpan ke cache
+   lewat plugin Filesystem lalu dibuka di lembar bagikan lewat plugin Share. Di web/PWA fungsi ini mengembalikan false dan jalur biasa dipakai. */
+window.stNativeShare = async function(blob, name, title){
+  try{
+    const C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return false;
+    const pl = n => (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null);
+    const FS = pl("Filesystem"), SH = pl("Share"); if(!FS || !SH) return false;
+    const b64 = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = no; r.readAsDataURL(blob); });
+    const w = await FS.writeFile({path:name, data:b64, directory:"CACHE"});
+    await SH.share({title:title, dialogTitle:title, files:[w.uri]});
+    return true;
+  }catch(e){ return /cancel|dismiss/i.test(String((e && e.message) || e)); }
+};
 /* Tombol "Bagikan gambar" di semua menu yang punya hasil (primbon, hiburan, kesehatan).
    Hasil yang tampil difoto jadi PNG lewat SVG foreignObject (tanpa library), lalu dibagikan atau diunduh.
    Turnamen tidak ikut karena sudah punya versi sendiri (klasemen). */
@@ -1659,6 +1672,7 @@ function stShareHelper(){
         if(!blob) throw new Error("blob");
         var name = (title.replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "hasil") + ".png";
         var file = new File([blob], name, {type:"image/png"});
+        try{ var ns = W.parent && W.parent.stNativeShare; if(ns && await ns(blob, name, title)) return; }catch(e){}
         try{
           if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:title}); return; }
         }catch(e){ if(e && e.name === "AbortError") return; }
@@ -9512,6 +9526,7 @@ function shareImage(t){
   c.toBlob(async b => {
     if(!b){ toast(L("Gagal membuat gambar.", "Could not create the image.")); return; }
     const file = new File([b], "klasemen.png", {type:"image/png"});
+    try{ const ns = parent.stNativeShare; if(ns && await ns(b, "klasemen.png", t.name)) return; }catch(e){}
     try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:t.name}); return; } }catch(e){ if(e && e.name === "AbortError") return; }
     download("klasemen-" + (t.name.replace(/[^\w-]+/g, "_").slice(0, 30) || "turnamen") + ".png", b); toast(L("Gambar diunduh.", "Image downloaded."));
   }, "image/png");
