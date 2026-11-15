@@ -1306,11 +1306,17 @@ function paintRC(t){
   if(rPend){ $("rcQ").textContent = r.q[rPend]; $("rcSync").textContent = r.srv; $("rcSync").hidden = rPend === "set" || !(window.satuTitikAuth && window.satuTitikAuth.user); }
   put("rcYes", "alert", r.yes); $("rcNo").textContent = r.no;
   $("chInfo").textContent = c.info; put("chBtn", "cache", c.btn); $("chNote").textContent = c.note;
-  const u = $("chUse"); u.hidden = chBytes === null; if(chBytes !== null) u.textContent = c.use.replace("{n}", fmtB(chBytes));
+  const u = $("chUse"); u.hidden = chBytes === null; if(chBytes !== null) u.textContent = (chOnlyCache ? c.use.replace("penyimpanan terpakai", "cache terpakai").replace("storage used", "cache used") : c.use).replace("{n}", fmtB(chBytes));
 }
 const fmtB = n => n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
+var chOnlyCache = false;
 async function cacheUse(){
-  try{ const s = await navigator.storage.estimate(); chBytes = s.usage || 0; }catch(e){ chBytes = null; }
+  /* pakai ukuran cache saja bila peramban menyediakannya; total penyimpanan (data akun, IndexedDB, dsb.) tidak ikut turun saat cache dihapus */
+  try{
+    const s = await navigator.storage.estimate(), d = s.usageDetails;
+    chOnlyCache = !!(d && typeof d.caches === "number");
+    chBytes = chOnlyCache ? d.caches : (s.usage || 0);
+  }catch(e){ chBytes = null; }
   paintRC(TT[S.lang]);
 }
 function rStatus(id, msg){ const e = $(id); e.hidden = !msg; e.textContent = msg || ""; }
@@ -1370,9 +1376,19 @@ $("rcYes").addEventListener("click", () => { if(rPend) doReset(rPend); });
 $("chBtn").addEventListener("click", async () => {
   const c = TT[S.lang].ch, b = $("chBtn"); b.disabled = true; rStatus("chStat", c.busy);
   let n = 0;
-  try{ if(window.caches){ const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); n = ks.length; } }catch(e){}
+  try{
+    if(window.caches){
+      /* hapus semua cache; ulangi bila service worker sempat mengisinya lagi di tengah proses */
+      for(let i = 0; i < 3; i++){
+        const ks = await caches.keys(); if(!ks.length) break;
+        await Promise.all(ks.map(k => caches.delete(k))); n += ks.length;
+      }
+    }
+  }catch(e){}
   try{ if(localStorage.getItem("sp_rel") !== null){ localStorage.removeItem("sp_rel"); n++; } }catch(e){}
   rStatus("chStat", n ? c.done : c.none); b.disabled = false; cacheUse();
+  /* perkiraan ukuran di peramban baru ikut turun beberapa saat kemudian */
+  setTimeout(cacheUse, 1000); setTimeout(cacheUse, 3000);
 });
 
 /* ===== VERSI APLIKASI ANDROID (Capacitor): iklan banner AdMob + konfigurasi login native =====
