@@ -1549,6 +1549,29 @@ function stBackHelper(){
 const ST_BACK = "<scr" + "ipt>(" + stBackHelper.toString() + ")();<\/scr" + "ipt>";
 /* Bagikan gambar di aplikasi Android (Capacitor): WebView tidak punya navigator.share untuk file, jadi gambar disimpan ke cache
    lewat plugin Filesystem lalu dibuka di lembar bagikan lewat plugin Share. Di web/PWA fungsi ini mengembalikan false dan jalur biasa dipakai. */
+window.stPdfBlob = function(c){
+  /* PDF satu halaman tanpa library: gambar JPEG dari kanvas ditempel memenuhi halaman (lebar 595 pt, tinggi mengikuti gambar) */
+  const bin = atob(c.toDataURL("image/jpeg", 0.92).split(",")[1]), jpg = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) jpg[i] = bin.charCodeAt(i);
+  const enc = new TextEncoder(), parts = [], off = [];
+  let len = 0;
+  const add = x => { const b = typeof x === "string" ? enc.encode(x) : x; parts.push(b); len += b.length; };
+  const obj = (n, body) => { off[n] = len; add(n + " 0 obj\n" + body + "\nendobj\n"); };
+  const pw = 595, ph = Math.round(pw * c.height / c.width * 100) / 100;
+  add("%PDF-1.4\n");
+  obj(1, "<< /Type /Catalog /Pages 2 0 R >>");
+  obj(2, "<< /Type /Pages /Kids [3 0 R] /Count 1 >>");
+  obj(3, "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + pw + " " + ph + "] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>");
+  off[4] = len;
+  add("4 0 obj\n<< /Type /XObject /Subtype /Image /Width " + c.width + " /Height " + c.height + " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + jpg.length + " >>\nstream\n");
+  add(jpg); add("\nendstream\nendobj\n");
+  const cs = "q " + pw + " 0 0 " + ph + " 0 0 cm /Im0 Do Q";
+  obj(5, "<< /Length " + cs.length + " >>\nstream\n" + cs + "\nendstream");
+  const xr = len; let x = "xref\n0 6\n0000000000 65535 f \n";
+  for(let i = 1; i <= 5; i++) x += String(off[i]).padStart(10, "0") + " 00000 n \n";
+  add(x + "trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xr + "\n%%EOF");
+  return new Blob(parts, {type:"application/pdf"});
+};
 window.stNativeShare = async function(blob, name, title){
   try{
     const C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return false;
@@ -1567,8 +1590,8 @@ function stShareHelper(){
   try{
     var d = document, W = window, busy = false, tt = null;
     var T = {
-      id:{btn:"\uD83D\uDDBC\uFE0F Bagikan gambar", busy:"Membuat gambar\u2026", fail:"Gagal membuat gambar.", done:"Gambar diunduh.", cta:"Coba sendiri di aplikasi Satu Titik"},
-      en:{btn:"\uD83D\uDDBC\uFE0F Share image", busy:"Creating image\u2026", fail:"Could not create the image.", done:"Image downloaded.", cta:"Try it yourself in the Satu Titik app"}
+      id:{btn:"\uD83D\uDDBC\uFE0F Bagikan gambar", busy:"Membuat gambar\u2026", fail:"Gagal membuat gambar.", done:"Gambar diunduh.", btn2:"\uD83D\uDCC4 Bagikan PDF", donePdf:"PDF diunduh.", cta:"Coba sendiri di aplikasi Satu Titik"},
+      en:{btn:"\uD83D\uDDBC\uFE0F Share image", busy:"Creating image\u2026", fail:"Could not create the image.", done:"Image downloaded.", btn2:"\uD83D\uDCC4 Share PDF", donePdf:"PDF downloaded.", cta:"Try it yourself in the Satu Titik app"}
     };
     var SKIP = "button,script,style,audio,video,iframe,input,textarea,select,.sp,.fx,.clr,[data-noshare]";
     var SVGNS = "http://www.w3.org/2000/svg";
@@ -1667,20 +1690,22 @@ function stShareHelper(){
       x.fillText("Satu Titik \u00B7 Aurenza27", cw / 2, ch - 16);
       return c;
     }
-    async function go(){
+    async function go(mode){
       if(busy) return;
       var el = target(); if(!el) return;
       busy = true;
       try{
         toast(tx("busy"));
         if(d.fonts && d.fonts.ready) await d.fonts.ready;
-        var o = build(el), sc = pickScale(o.w, o.h), img = new Image();
+        var pdf = mode === "pdf", o = build(el), sc = pickScale(o.w, o.h), img = new Image();
+        if(pdf) sc = Math.min(sc, 2);
         await new Promise(function(ok, no){ img.onload = ok; img.onerror = no; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgOf(o, sc)); });
         var title = menuTitle(), c = draw(img, o.w, o.h, title, sc);
-        var blob = await new Promise(function(ok){ c.toBlob(ok, "image/png"); });
+        var mime = pdf ? "application/pdf" : "image/png";
+        var blob = pdf ? W.parent.stPdfBlob(c) : await new Promise(function(ok){ c.toBlob(ok, "image/png"); });
         if(!blob) throw new Error("blob");
-        var name = (title.replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "hasil") + ".png";
-        var file = new File([blob], name, {type:"image/png"});
+        var name = (title.replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "hasil") + (pdf ? ".pdf" : ".png");
+        var file = new File([blob], name, {type:mime});
         try{ var ns = W.parent && W.parent.stNativeShare; if(ns && await ns(blob, name, title)) return; }catch(e){}
         try{
           if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:title}); return; }
@@ -1688,22 +1713,27 @@ function stShareHelper(){
         var u = URL.createObjectURL(blob), a = d.createElement("a");
         a.href = u; a.download = name; d.body.appendChild(a); a.click(); a.remove();
         setTimeout(function(){ URL.revokeObjectURL(u); }, 4000);
-        toast(tx("done"));
+        toast(tx(pdf ? "donePdf" : "done"));
       }catch(e){ toast(tx("fail")); }
       finally{ busy = false; }
     }
     function mount(){
-      var c = clrBtn(), p, b, cn;
-      if(!c || $("stShareBtn")) return;
-      b = d.createElement("button"); b.type = "button"; b.id = "stShareBtn";
-      cn = c.className || ""; if(!/\bghost\b/.test(cn)) cn += " ghost";
-      b.className = cn.trim(); b.textContent = tx("btn"); b.addEventListener("click", go);
-      p = c.parentNode; p.insertBefore(b, c);
-      if(/flex/.test(W.getComputedStyle(p).display)){
-        b.style.cssText += ";flex:1 1 0;min-width:0;margin-right:8px"; c.style.cssText += ";flex:1 1 0;min-width:0";
-      }else b.style.marginBottom = "10px";
+      var c = clrBtn(), p, row, cn;
+      if(!c || $("stShareRow")) return;
+      cn = c.className || ""; if(!/\bghost\b/.test(cn)) cn += " ghost"; cn = cn.trim();
+      function mk(id, key, mode){
+        var b = d.createElement("button"); b.type = "button"; b.id = id; b.className = cn; b.textContent = tx(key);
+        b.style.cssText = "flex:1 1 0;min-width:0;margin:0;padding-left:6px;padding-right:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
+        b.addEventListener("click", function(){ go(mode); });
+        return b;
+      }
+      row = d.createElement("div"); row.id = "stShareRow";
+      row.style.cssText = "display:flex;gap:8px;width:100%;flex:0 0 100%;margin-bottom:10px";
+      row.appendChild(mk("stShareBtn", "btn", "png")); row.appendChild(mk("stSharePdf", "btn2", "pdf"));
+      p = c.parentNode; p.insertBefore(row, c);
+      if(/flex/.test(W.getComputedStyle(p).display)){ p.style.flexWrap = "wrap"; c.style.cssText += ";flex:1 1 100%"; }
     }
-    new MutationObserver(function(){ var b = $("stShareBtn"); if(b) b.textContent = tx("btn"); }).observe(d.documentElement, {attributes:true, attributeFilter:["lang"]});
+    new MutationObserver(function(){ var b = $("stShareBtn"), b2 = $("stSharePdf"); if(b) b.textContent = tx("btn"); if(b2) b2.textContent = tx("btn2"); }).observe(d.documentElement, {attributes:true, attributeFilter:["lang"]});
     if(d.readyState === "loading") d.addEventListener("DOMContentLoaded", mount); else mount();
     W.addEventListener("load", mount);
   }catch(e){}
@@ -9382,8 +9412,9 @@ function paintTable(box, t){
   if(note) box.append(el("p", "hint", note));
   const r = el("div", "row no-print");
   const sh = el("button", "btn ghost sm grow keep", L("🖼️ Bagikan gambar", "🖼️ Share image")); sh.type = "button"; sh.onclick = () => shareImage(t);
+  const shp = el("button", "btn ghost sm grow keep", L("📄 Bagikan PDF", "📄 Share PDF")); shp.type = "button"; shp.onclick = () => shareImage(t, true);
   const pr = el("button", "btn ghost sm grow", L("🖨️ Cetak", "🖨️ Print")); pr.type = "button"; pr.onclick = () => { try{ window.print(); }catch(e){ toast(L("Cetak tidak tersedia.", "Print is not available.")); } };
-  r.append(sh, pr); box.append(r);
+  r.append(sh, shp, pr); box.append(r);
 }
 function paintBracket(box, t){
   if(!t.ko){
@@ -9501,7 +9532,7 @@ function paintMore(box, t){
 }
 
 /* ===== GAMBAR UNTUK DIBAGIKAN (kanvas -> PNG) ===== */
-function shareImage(t){
+function shareImage(t, pdf){
   const groups = t.fmt === "group" ? t.gr : [t.teams.map((_, i) => i)];
   const rowsAll = groups.map((ids, g) => standings(t, ids, g));
   const W = 720, rowH = 44, pad = 28;
@@ -9532,13 +9563,14 @@ function shareImage(t){
   });
   x.fillStyle = gold2; x.font = "bold 15px " + FF; x.fillText(L("Coba sendiri di aplikasi Satu Titik", "Try it yourself in the Satu Titik app"), pad, H - 38);
   x.fillStyle = mut; x.font = "13px " + FF; x.fillText("Satu Titik · Aurenza27", pad, H - 16);
-  c.toBlob(async b => {
+  const fin = async b => {
     if(!b){ toast(L("Gagal membuat gambar.", "Could not create the image.")); return; }
-    const file = new File([b], "klasemen.png", {type:"image/png"});
-    try{ const ns = parent.stNativeShare; if(ns && await ns(b, "klasemen.png", t.name)) return; }catch(e){}
+    const fn = pdf ? "klasemen.pdf" : "klasemen.png", file = new File([b], fn, {type:pdf ? "application/pdf" : "image/png"});
+    try{ const ns = parent.stNativeShare; if(ns && await ns(b, fn, t.name)) return; }catch(e){}
     try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:t.name}); return; } }catch(e){ if(e && e.name === "AbortError") return; }
-    download("klasemen-" + (t.name.replace(/[^\w-]+/g, "_").slice(0, 30) || "turnamen") + ".png", b); toast(L("Gambar diunduh.", "Image downloaded."));
-  }, "image/png");
+    download("klasemen-" + (t.name.replace(/[^\w-]+/g, "_").slice(0, 30) || "turnamen") + (pdf ? ".pdf" : ".png"), b); toast(pdf ? L("PDF diunduh.", "PDF downloaded.") : L("Gambar diunduh.", "Image downloaded."));
+  };
+  if(pdf){ try{ fin(parent.stPdfBlob(c)); }catch(e){ fin(null); } } else c.toBlob(fin, "image/png");
 }
 
 $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); paint(); });
