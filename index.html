@@ -1320,7 +1320,10 @@ function paintRC(t){
 }
 const fmtB = n => n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
 var chOnlyCache = false;
+function nativeCache(){ try{ return (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CacheCleaner) || null; }catch(e){ return null; } }
 async function cacheUse(){
+  const NP = nativeCache();
+  if(NP){ try{ const r = await NP.size(); chOnlyCache = true; chBytes = r.bytes || 0; paintRC(TT[S.lang]); return; }catch(e){} }
   /* pakai ukuran cache saja bila peramban menyediakannya; total penyimpanan (data akun, IndexedDB, dsb.) tidak ikut turun saat cache dihapus */
   try{
     const s = await navigator.storage.estimate(), d = s.usageDetails;
@@ -1396,6 +1399,8 @@ $("chBtn").addEventListener("click", async () => {
     }
   }catch(e){}
   try{ if(localStorage.getItem("sp_rel") !== null){ localStorage.removeItem("sp_rel"); n++; } }catch(e){}
+  const NP = nativeCache();
+  if(NP){ try{ const r = await NP.clear(); if((r.before || 0) > (r.bytes || 0) || (r.before || 0) > 0) n++; }catch(e){} }
   rStatus("chStat", n ? c.done : c.none); b.disabled = false; cacheUse();
   /* perkiraan ukuran di peramban baru ikut turun beberapa saat kemudian */
   setTimeout(cacheUse, 1000); setTimeout(cacheUse, 3000);
@@ -2055,7 +2060,7 @@ textarea::placeholder{color:#565d6e}
 .boards li.m1 .md,.boards li.m2 .md,.boards li.m3 .md{font-size:17px}
 .boards li.empty{justify-content:center;color:var(--muted);font-size:13px;font-style:italic}
 .boards .board .btn.ghost{min-height:34px;font-size:12px;padding:0 6px;margin-top:8px}
-.card::after{content:"";position:absolute;inset:0;border-radius:16px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='150'%3E%3Ctext x='125' y='80' text-anchor='middle' transform='rotate(-24 125 75)' font-family='Georgia,serif' font-size='21' font-weight='700' letter-spacing='4' fill='%23d4a94f' fill-opacity='.11'%3ETITIK HILANGS%3C/text%3E%3C/svg%3E")}
+.card::after{content:"";position:absolute;inset:0;border-radius:16px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='150'%3E%3C/svg%3E")}
 .card.vip{border-color:var(--gold2);box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 38px rgba(240,207,134,.2),inset 0 0 40px rgba(212,169,79,.08)}
 .card.vip .stamp{color:var(--gold2);border-color:var(--gold2)}
 .alias{color:var(--gold2);font-size:16px;letter-spacing:.1em;margin-top:6px}
@@ -2273,7 +2278,6 @@ body.hasqa.hasbar .scrollchip{bottom:calc(228px + env(safe-area-inset-bottom,0px
   <div class="brand">
     <div class="icon">🔍</div>
     <h1>INSTING DETEKTIF</h1>
-    <h2>BY TITIK HILANGS</h2>
   </div>
   <p class="sub" data-i18n="sub">Seberapa hebat kemampuan detektifmu?</p>
 
@@ -2342,7 +2346,6 @@ body.hasqa.hasbar .scrollchip{bottom:calc(228px + env(safe-area-inset-bottom,0px
     </div>
     <div class="revisit" data-i18n="revisit">🔄 Cek lagi namamu besok untuk melihat perkembangan statistikmu</div>
     <div class="ststamp" id="rTime" hidden></div>
-    <div class="wm">TITIK HILANGS</div>
   </article>
 
   <div class="actions" id="actions">
@@ -2355,7 +2358,7 @@ body.hasqa.hasbar .scrollchip{bottom:calc(228px + env(safe-area-inset-bottom,0px
   </div>
 
 
-  <div class="foot">🔐 CLASSIFIED · 🧩 SOLVE · 📜 CASE CLOSED<br><br>Titik Hilangs</div>
+  <div class="foot">🔐 CLASSIFIED · 🧩 SOLVE · 📜 CASE CLOSED</div>
 </main>
 <aside class="side" id="side">
   <button class="chip sidetog" id="minBtn" aria-expanded="false" aria-controls="toolsRow">⚙️</button>
@@ -2573,7 +2576,7 @@ id:{
   stampLegend:"LEGENDARIS ★", stampSial:"SIAL 💀",
   clearBtn:"🧹 BERSIHKAN LAYAR", vipNoteB:"👑 ID CARD HANYA TERSEDIA UNTUK VIP", vipNoteS:"Mau punya kartu identitas detektif sendiri? Jadilah VIP dan generate namamu!",
   idcTitle:"KARTU IDENTITAS DETEKTIF", idcVerified:"★ TERVERIFIKASI ★", idcIdLbl:"ID DETEKTIF", idcSupport:"PENDUKUNG",
-  shotMsg:"SILAKAN DI SCREENSHOT TUAN DAN TERIMA KASIH SUDAH SUPPORT TITIK HILANGS",
+  shotMsg:"SILAKAN DI SCREENSHOT TUAN DAN TERIMA KASIH",
   shotCd:'Layar menutup otomatis dalam <b id="shotCd">10</b> detik',
   spQueue:"Antrean nomor {n}.", spTwin:"kembar ke-{n}", spAlias:"Julukan, {a}.", spRank:"Pangkat {r}.", spLegend:"Luar biasa!", spSial:"Aduh.",
   spSpec:"Spesialisasi, {s}.", spSpec2:"Spesialisasi pendukung, {s}.", spStat:"{l}, {v} persen.",
@@ -2622,7 +2625,7 @@ en:{
   stampLegend:"LEGENDARY ★", stampSial:"UNLUCKY 💀",
   clearBtn:"🧹 CLEAR SCREEN", vipNoteB:"👑 ID CARD IS FOR VIPs ONLY", vipNoteS:"Want your own detective ID card? Become a VIP and generate your name!",
   idcTitle:"DETECTIVE IDENTITY CARD", idcVerified:"★ VERIFIED ★", idcIdLbl:"DETECTIVE ID", idcSupport:"SUPPORTING",
-  shotMsg:"PLEASE TAKE A SCREENSHOT AND THANK YOU FOR SUPPORTING TITIK HILANGS",
+  shotMsg:"PLEASE TAKE A SCREENSHOT AND THANK YOU",
   shotCd:'Screen closes automatically in <b id="shotCd">10</b> seconds',
   spQueue:"Queue number {n}.", spTwin:"number {n}", spAlias:"Nickname, {a}.", spRank:"Rank, {r}.", spLegend:"Incredible!", spSial:"Ouch.",
   spSpec:"Specialty, {s}.", spSpec2:"Supporting specialty, {s}.", spStat:"{l}, {v} percent.",
@@ -3248,7 +3251,7 @@ function buildText(r0){
   if(r.vip) s += "\n" + tx("btSupport") + ": " + r.spec2;
   s += "\n\n" + L.map(x => sLabel(x.key) + ": " + r[x.key] + "%").join("\n");
   if(r.vip) s += "\n\n" + tx("btStrong") + ": " + r.strong.label + " " + r.strong.v + "%\n" + tx("btWeak") + ": " + r.weak.label + " " + r.weak.v + "%\n" + tx("btCase") + ": " + r.kasus;
-  return s + "\n\n" + tx("btFinal") + ": " + r.score + "/100" + (r0.at ? "\n🕒 " + STime.text(r0.at) : "") + "\n\n- Titik Hilangs";
+  return s + "\n\n" + tx("btFinal") + ": " + r.score + "/100" + (r0.at ? "\n🕒 " + STime.text(r0.at) : "");
 }
 async function copyText(text){
   try{ if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; } }catch(e){}
