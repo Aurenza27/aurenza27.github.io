@@ -1402,7 +1402,11 @@ window.satuTitikNative = {
      interstitial: false = matikan sepenuhnya (kembali seperti semula). adInterstitial kosong = pakai iklan uji Google. */
   interstitial: true,
   adInterstitial: "ca-app-pub-5946674639326014/1532501020",
-  interstitialGapMin: 3,
+  interstitialFirstMin: 5,      /* iklan pertama baru boleh muncul setelah aplikasi dipakai sekian menit */
+  interstitialGapMin: 4,        /* jeda minimal antar iklan berikutnya (menit) */
+  interstitialMaxPerSession: 4, /* batas jumlah iklan layar penuh sekali buka aplikasi */
+  interstitialMinMenuSec: 10,   /* menu yang ditutup sebelum sekian detik dianggap salah ketuk: tidak memicu iklan */
+  interstitialQuietSec: 20,     /* tidak ada iklan selama panel Pengaturan/Akun/Profil/Notifikasi/Tentang/Privasi terbuka, dan sekian detik setelah dipakai */
   testMode: true
 };
 (function(){
@@ -1410,7 +1414,7 @@ window.satuTitikNative = {
   let native = false; try{ native = !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){}
   if(!native) return;
   const plug = n => (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null);
-  let itReady = false, itBusy = false, itLast = Date.now();   /* itLast dimulai saat aplikasi dibuka: tidak ada iklan di beberapa menit pertama */
+  let itReady = false, itBusy = false, itLast = Date.now(), itCount = 0;   /* itLast dimulai saat aplikasi dibuka: tidak ada iklan di beberapa menit pertama */
   function initInterstitial(AdMob, cfg){
     const id = cfg.adInterstitial || "ca-app-pub-3940256099942544/1033173712";
     const prep = async () => {
@@ -1418,14 +1422,30 @@ window.satuTitikNative = {
       try{ await AdMob.prepareInterstitial({ adId: id, isTesting: !!cfg.testMode || !cfg.adInterstitial }); itReady = true; }catch(e){ itReady = false; }
       itBusy = false;
     };
+    /* panel yang dikecualikan dari iklan: Pengaturan (termasuk Akun dan Profil), Notifikasi, Tentang, Kebijakan Privasi */
+    const QUIET_IDS = ["spanel", "bellPanel", "about", "privacy"];
+    let quietAt = 0;
+    const quietOpen = () => QUIET_IDS.some(id => { const e = document.getElementById(id); return !!e && !e.hidden; });
+    try{
+      const mo = new MutationObserver(() => { quietAt = Date.now(); });
+      QUIET_IDS.forEach(id => { const e = document.getElementById(id); if(e) mo.observe(e, { attributes: true, attributeFilter: ["hidden", "class"] }); });
+    }catch(e){}
     try{ AdMob.addListener("interstitialAdDismissed", () => { itReady = false; itLast = Date.now(); setTimeout(prep, 1500); }); }catch(e){}
     try{ AdMob.addListener("interstitialAdFailedToLoad", () => { itReady = false; itBusy = false; setTimeout(prep, 60000); }); }catch(e){}
     window.satuTitikAds = {
       /* dipanggil dari closeMenu: satu-satunya tempat iklan layar penuh boleh muncul */
       onMenuClosed: async () => {
+        const quietMs = Math.max(0, +cfg.interstitialQuietSec || 0) * 1000;
+        if(quietOpen() || (quietMs && Date.now() - quietAt < quietMs)) return;       /* sedang/baru memakai Pengaturan, Akun, Profil, atau Notifikasi */
+        const maxN = +cfg.interstitialMaxPerSession || 4;
+        if(itCount >= maxN) return;                                                   /* batas per sesi tercapai */
+        const minSec = Math.max(0, +cfg.interstitialMinMenuSec || 0);
+        const opened = window.satuTitikMenuOpenedAt || 0;
+        if(minSec && opened && Date.now() - opened < minSec * 1000) return;           /* menu ditutup terlalu cepat */
+        const first = Math.max(1, +cfg.interstitialFirstMin || 5) * 60000;
         const gap = Math.max(1, +cfg.interstitialGapMin || 4) * 60000;
-        if(!itReady || Date.now() - itLast < gap) return;
-        itReady = false;
+        if(!itReady || Date.now() - itLast < (itCount === 0 ? first : gap)) return;
+        itReady = false; itCount++;
         try{ await AdMob.showInterstitial(); }catch(e){ setTimeout(prep, 5000); }
       }
     };
@@ -1493,6 +1513,7 @@ function menuSrc(m){
 writeKeys(S); paintPanel();
 
 function openMenu(m){
+  window.satuTitikMenuOpenedAt = Date.now();   /* dipakai logika iklan: menu yang ditutup terlalu cepat tidak memicu iklan */
   $("vt").textContent = mTitle(m);
   const f = document.createElement("iframe");
   f.id = "frame"; f.title = mTitle(m); f.setAttribute("allow", "autoplay");
@@ -1507,6 +1528,7 @@ function closeMenu(){
   if($("view").hidden) return;
   try{ $("frame").contentWindow.speechSynthesis.cancel(); }catch(e){}
   try{ speechSynthesis.cancel(); }catch(e){}
+  try{ const fd = $("frame").contentWindow.document, ae = fd.activeElement; if(ae && ae !== fd.body && ae.blur) ae.blur(); }catch(e){}   /* simpan isian yang sedang diketik (mis. skor) sebelum menu dibuang */
   $("frame").remove();   /* musik dan suara AI ikut berhenti */
   curMenu = null; $("view").hidden = true; $("home").hidden = false;
   try{ medisSync(true); }catch(e){}
