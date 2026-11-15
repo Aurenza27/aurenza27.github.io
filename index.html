@@ -1554,8 +1554,8 @@ function stShareHelper(){
   try{
     var d = document, W = window, busy = false, tt = null;
     var T = {
-      id:{btn:"\uD83D\uDDBC\uFE0F Bagikan gambar", busy:"Membuat gambar\u2026", fail:"Gagal membuat gambar.", done:"Gambar diunduh."},
-      en:{btn:"\uD83D\uDDBC\uFE0F Share image", busy:"Creating image\u2026", fail:"Could not create the image.", done:"Image downloaded."}
+      id:{btn:"\uD83D\uDDBC\uFE0F Bagikan gambar", busy:"Membuat gambar\u2026", fail:"Gagal membuat gambar.", done:"Gambar diunduh.", cta:"Coba sendiri di aplikasi Satu Titik"},
+      en:{btn:"\uD83D\uDDBC\uFE0F Share image", busy:"Creating image\u2026", fail:"Could not create the image.", done:"Image downloaded.", cta:"Try it yourself in the Satu Titik app"}
     };
     var SKIP = "button,script,style,audio,video,iframe,input,textarea,select,.sp,.fx,.clr,[data-noshare]";
     var SVGNS = "http://www.w3.org/2000/svg";
@@ -1629,7 +1629,7 @@ function stShareHelper(){
       return t.length > 34 ? t.slice(0, 33) + "\u2026" : t;
     }
     function draw(img, w, h, title){
-      var pad = 24, top = 64, bot = 44, cw = w + pad * 2, ch = top + h + bot, sc = 2;
+      var pad = 24, top = 64, bot = 70, cw = w + pad * 2, ch = top + h + bot, sc = 2;
       while(sc > 1 && cw * sc * ch * sc > 12e6) sc -= 0.25;
       var c = d.createElement("canvas"); c.width = Math.round(cw * sc); c.height = Math.round(ch * sc);
       var x = c.getContext("2d"), bs = W.getComputedStyle(d.body), hh = d.querySelector(".brand h1");
@@ -1639,7 +1639,9 @@ function stShareHelper(){
       x.textBaseline = "alphabetic"; x.textAlign = "left";
       x.fillStyle = (hh ? W.getComputedStyle(hh) : bs).color; x.font = "700 22px " + ff; x.fillText(title, pad, 40);
       x.drawImage(img, pad, top, w, h);
-      x.globalAlpha = 0.6; x.fillStyle = bs.color; x.font = "13px " + ff; x.textAlign = "center";
+      x.textAlign = "center"; x.globalAlpha = 0.9; x.fillStyle = (hh ? W.getComputedStyle(hh) : bs).color; x.font = "700 15px " + ff;
+      x.fillText(tx("cta"), cw / 2, ch - 40);
+      x.globalAlpha = 0.6; x.fillStyle = bs.color; x.font = "13px " + ff;
       x.fillText("Satu Titik \u00B7 Aurenza27", cw / 2, ch - 16);
       return c;
     }
@@ -9480,7 +9482,7 @@ function shareImage(t){
   const groups = t.fmt === "group" ? t.gr : [t.teams.map((_, i) => i)];
   const rowsAll = groups.map((ids, g) => standings(t, ids, g));
   const W = 720, rowH = 44, pad = 28;
-  let H = 120 + rowsAll.reduce((s, r) => s + r.length * rowH + (t.fmt === "group" ? 70 : 52), 0) + 40;
+  let H = 120 + rowsAll.reduce((s, r) => s + r.length * rowH + (t.fmt === "group" ? 70 : 52), 0) + 66;
   const c = el("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
   const cs = getComputedStyle(document.documentElement), cv = (n, d) => (cs.getPropertyValue(n) || "").trim() || d;
   const FF = (getComputedStyle(document.body).fontFamily || "Georgia,serif").replace(/"/g, "");
@@ -9505,6 +9507,7 @@ function shareImage(t){
     });
     y += 40;
   });
+  x.fillStyle = gold2; x.font = "bold 15px " + FF; x.fillText(L("Coba sendiri di aplikasi Satu Titik", "Try it yourself in the Satu Titik app"), pad, H - 38);
   x.fillStyle = mut; x.font = "13px " + FF; x.fillText("Satu Titik · Aurenza27", pad, H - 16);
   c.toBlob(async b => {
     if(!b){ toast(L("Gagal membuat gambar.", "Could not create the image.")); return; }
