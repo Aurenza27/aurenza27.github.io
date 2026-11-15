@@ -1398,6 +1398,9 @@ window.satuTitikNative = {
   googleWebClientId: "109811928525-6faa62nh89vmt3alpu3ob2v61glcv4m9.apps.googleusercontent.com",
   /* Iklan: isi ad unit banner asli dari AdMob lalu ubah testMode menjadi false. Default memakai iklan uji resmi Google. */
   adBanner: "ca-app-pub-5946674639326014/3036495241",
+  banner: true,                 /* true = tampilkan iklan banner di bawah beranda; false = tidak ada banner (interstisial tetap jalan sesuai pengaturannya) */
+  bannerClosable: true,         /* true = ada tombol "Tutup iklan" di atas banner (di luar area iklan) */
+  bannerReshowMin: 30,          /* banner muncul lagi sekian menit setelah ditutup. 0 = tidak muncul lagi sampai aplikasi dibuka ulang */
   /* Interstisial (iklan layar penuh): muncul hanya saat pengguna menutup sebuah menu, dengan jeda minimal antar iklan.
      interstitial: false = matikan sepenuhnya (kembali seperti semula). adInterstitial kosong = pakai iklan uji Google. */
   interstitial: true,
@@ -1465,14 +1468,40 @@ window.satuTitikNative = {
     try{
       await AdMob.initialize({});
       try{ const ci = await AdMob.requestConsentInfo(); if(ci && ci.isConsentFormAvailable && ci.status === "REQUIRED") await AdMob.showConsentForm(); }catch(e){}
-      /* Sisakan ruang di bawah halaman setinggi banner, supaya tulisan kaki beranda dan menu tidak tertutup iklan */
-      const st = document.createElement("style");
-      st.textContent = "#home{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px) + var(--adh,0px))!important}#view,#about,#privacy{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - var(--adh,0px))!important}";
-      document.head.appendChild(st);
-      const setH = h => { h = Math.round(+h || 0); if(h > 0) document.documentElement.style.setProperty("--adh", h + "px"); };
-      try{ AdMob.addListener("bannerAdSizeChanged", e => setH(e && e.height)); }catch(e){}
-      await AdMob.showBanner({ adId: cfg.adBanner, adSize: "ADAPTIVE_BANNER", position: "BOTTOM_CENTER", margin: 0, isTesting: !!cfg.testMode });
-      setTimeout(() => { if(!document.documentElement.style.getPropertyValue("--adh")) setH(60); }, 2500);
+      if(cfg.banner !== false){
+        /* Sisakan ruang di bawah halaman setinggi banner, supaya tulisan kaki beranda dan menu tidak tertutup iklan */
+        const st = document.createElement("style");
+        st.textContent = "#home{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px) + var(--adh,0px))!important}#view,#about,#privacy{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - var(--adh,0px))!important}";
+        document.head.appendChild(st);
+        let lastH = 0, bannerHidden = false, cbtn = null;
+        const mkClose = () => {
+          if(cbtn || cfg.bannerClosable === false) return;
+          cbtn = document.createElement("button");
+          cbtn.type = "button"; cbtn.textContent = "\u2715 Tutup iklan"; cbtn.setAttribute("aria-label", "Tutup iklan");
+          /* diletakkan DI ATAS banner dengan jarak, tidak menimpa area iklan (sesuai kebijakan AdMob) */
+          cbtn.style.cssText = "position:fixed;right:10px;bottom:calc(var(--adh,60px) + 14px);z-index:2147483000;padding:7px 13px;font:600 12px/1 system-ui,sans-serif;color:#e8e8ee;background:rgba(20,22,30,.9);border:1px solid rgba(255,255,255,.25);border-radius:999px;cursor:pointer";
+          cbtn.addEventListener("click", async () => {
+            bannerHidden = true;
+            try{ await AdMob.hideBanner(); }catch(e){}
+            document.documentElement.style.setProperty("--adh", "0px");
+            if(cbtn){ cbtn.remove(); cbtn = null; }
+            const m = +cfg.bannerReshowMin || 0;
+            if(m > 0) setTimeout(async () => {
+              bannerHidden = false;
+              try{ await AdMob.resumeBanner(); }catch(e){}
+              setH(lastH || 60);
+            }, m * 60000);
+          });
+          document.body.appendChild(cbtn);
+        };
+        const setH = h => {
+          h = Math.round(+h || 0);
+          if(h > 0){ lastH = h; if(!bannerHidden){ document.documentElement.style.setProperty("--adh", h + "px"); mkClose(); } }
+        };
+        try{ AdMob.addListener("bannerAdSizeChanged", e => setH(e && e.height)); }catch(e){}
+        await AdMob.showBanner({ adId: cfg.adBanner, adSize: "ADAPTIVE_BANNER", position: "BOTTOM_CENTER", margin: 0, isTesting: !!cfg.testMode });
+        setTimeout(() => { if(!document.documentElement.style.getPropertyValue("--adh")) setH(60); }, 2500);
+      }
       if(cfg.interstitial !== false) initInterstitial(AdMob, cfg);
     }catch(e){ console.warn("Iklan tidak dapat dimuat:", e); }
   }
