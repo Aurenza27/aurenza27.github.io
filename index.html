@@ -1525,8 +1525,28 @@ function stHelper(){
 }
 const ST_CSS = '<style id="stCss">.ststamp{margin:10px 0 0;text-align:center;font-size:11px;line-height:1.45;opacity:.72;font-variant-numeric:tabular-nums;letter-spacing:.01em}.ststamp[hidden]{display:none}.mtime{margin:-2px 6px 8px;text-align:right;font-size:10.5px;line-height:1.3;opacity:.65;font-variant-numeric:tabular-nums}.tdate{display:block;margin-top:2px;font-size:11px;opacity:.75;font-variant-numeric:tabular-nums}</style>';
 const ST_HELPER = ST_CSS + "<scr" + "ipt>try{ delete window.speechSynthesis; delete window.SpeechSynthesisUtterance; }catch(e){}<\/scr" + "ipt>" + "<scr" + "ipt>(" + stHelper.toString() + ")();<\/scr" + "ipt>";
+/* Tombol back HP: tiap menu melaporkan "lapisan" layar di dalamnya (hasil yang tampil, detail turnamen, tab turnamen), dari bawah ke atas. */
+function stBackHelper(){
+  window.__stLayers = function(){
+    const L = [], d = document, $ = id => d.getElementById(id);
+    try{
+      if(typeof paintDetail === "function" && typeof paintNew === "function"){
+        if(view === "new") L.push(() => { view = "list"; paint(); toTop(); });
+        else if(view === "detail"){
+          L.push(() => { view = "list"; paint(); toTop(); });
+          if(tab !== "home") L.push(() => { tab = "home"; paint(); });
+        }
+      } else if(d.body && d.body.classList.contains("hascard")){
+        const c = $("clrBtn") || $("clr");
+        if(c && c.offsetParent) L.push(() => c.click());
+      }
+    }catch(e){}
+    return L;
+  };
+}
+const ST_BACK = "<scr" + "ipt>(" + stBackHelper.toString() + ")();<\/scr" + "ipt>";
 function menuSrc(m){
-  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER, i = s.indexOf("</head>");
+  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK, i = s.indexOf("</head>");
   return i < 0 ? css + s : s.slice(0, i) + css + s.slice(i);
 }
 writeKeys(S); paintPanel();
@@ -10216,6 +10236,7 @@ if(navigator.onLine !== false) init().catch(() => {});
 </script>
 <script>
 /* ===== TOMBOL BACK HP =====
+   Layar di dalam menu (hasil yang tampil, detail turnamen, tab turnamen) juga dihitung sebagai lapisan lewat window.__stLayers di tiap menu.
    Tombol back menutup lapisan paling atas lebih dulu: halaman Kebijakan Privasi, halaman Tentang, sub-halaman Pengaturan
    (Profil, Tampilan, Reset, dst.), panel Pengaturan, panel Notifikasi. Menu yang terbuka tetap kembali ke beranda lewat
    hash (#menu) seperti sebelumnya. Aplikasi baru keluar bila tidak ada lagi yang terbuka.
@@ -10223,8 +10244,16 @@ if(navigator.onLine !== false) init().catch(() => {});
 (function(){
   const $ = id => document.getElementById(id);
   /* daftar lapisan yang sedang terbuka, dari bawah ke atas */
+  /* lapisan di dalam menu yang sedang terbuka (iframe), paling bawah */
+  function frameLayers(){
+    try{
+      const f = $("frame"), v = $("view");
+      if(f && v && !v.hidden && f.contentWindow && f.contentWindow.__stLayers) return f.contentWindow.__stLayers() || [];
+    }catch(e){}
+    return [];
+  }
   function layers(){
-    const L = [], bb = $("bellBtn");
+    const L = frameLayers().slice(), bb = $("bellBtn");
     if(bb && bb.getAttribute("aria-expanded") === "true") L.push(() => bb.click());
     if(typeof spOpen === "function" && spOpen()){
       L.push(() => togglePanel(false));
@@ -10261,7 +10290,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   addEventListener("popstate", () => {
     const prev = cur, now = stl(), h = location.hash, hashMoved = h !== lastHash;
     lastHash = h; cur = now;
-    if(ignore > 0){ ignore--; return; }
+    if(ignore > 0){ ignore--; if(pendingBack){ pendingBack = false; setTimeout(clickBack, 0); } return; }
     /* entri lama yang lapisannya sudah ditutup lewat tombol di layar: lewati, teruskan mundur */
     if(prev > 0 && prev > layers().length && !hashMoved){ leave(); return; }
     let guard = 8;
@@ -10269,12 +10298,56 @@ if(navigator.onLine !== false) init().catch(() => {});
     last = layers().length;
   });
   addEventListener("hashchange", () => { lastHash = location.hash; cur = stl(); });
+  /* tombol "‹ Beranda" di layar: buang dulu entri riwayat milik lapisan, supaya back berikutnya tidak membuka menu lagi */
+  let pendingBack = false, bypass = false;
+  function clickBack(){ bypass = true; try{ $("back").click(); }finally{ bypass = false; } }
+  addEventListener("click", e => {
+    const b = e.target && e.target.closest && e.target.closest("#back");
+    if(!b || bypass || pendingBack) return;
+    const k = stl(); if(k <= 0) return;
+    e.stopImmediatePropagation(); e.preventDefault();
+    pendingBack = true; ignore++; history.go(-k);
+    setTimeout(() => { if(pendingBack){ pendingBack = false; ignore = Math.max(0, ignore - 1); clickBack(); } }, 800);
+  }, true);
+  /* pantau perubahan layar di dalam menu (iframe) supaya riwayatnya ikut bertambah/berkurang */
+  let fo = null, ft = 0;
+  function watchFrame(f){
+    f.addEventListener("load", () => {
+      try{
+        if(fo) fo.disconnect();
+        const d = f.contentDocument; if(!d || !d.documentElement) return;
+        fo = new MutationObserver(() => { clearTimeout(ft); ft = setTimeout(sync, 30); });
+        fo.observe(d.documentElement, { subtree:true, childList:true, attributes:true, attributeFilter:["hidden", "class"] });
+        sync();
+      }catch(e){}
+    });
+  }
+  const vw = $("view");
+  if(vw) new MutationObserver(ms => {
+    ms.forEach(m => m.addedNodes.forEach(n => { if(n.id === "frame") watchFrame(n); }));
+    sync();
+  }).observe(vw, { childList:true, attributes:true, attributeFilter:["hidden"] });
   const mo = new MutationObserver(sync);
   [["spanel", { attributes: true, subtree: true, attributeFilter: ["hidden", "class"] }],
    ["about", { attributes: true, attributeFilter: ["hidden"] }],
    ["privacy", { attributes: true, attributeFilter: ["hidden"] }],
    ["bellBtn", { attributes: true, attributeFilter: ["aria-expanded"] }]
   ].forEach(([id, o]) => { const e = $(id); if(e) mo.observe(e, o); });
+  /* Aplikasi Android (Capacitor): bila plugin App terpasang, tombol back bawaan HP ditangani di sini, karena Capacitor tidak lagi memakai riwayat WebView */
+  (function(){
+    try{
+      const C = window.Capacitor; if(!C || !(C.isNativePlatform && C.isNativePlatform())) return;
+      const A = (C.Plugins && C.Plugins.App) || (C.registerPlugin ? C.registerPlugin("App") : null);
+      if(!A || !A.addListener) return;
+      A.addListener("backButton", () => {
+        const L = layers();
+        if(L.length){ L[L.length - 1](); return; }
+        const v = $("view"), b = $("back");
+        if(v && !v.hidden && b){ b.click(); return; }   /* menu terbuka: kembali ke beranda */
+        if(A.exitApp) A.exitApp();
+      });
+    }catch(e){ console.warn("backButton gagal dipasang:", e && (e.message || e)); }
+  })();
 })();
 </script>
 </body>
