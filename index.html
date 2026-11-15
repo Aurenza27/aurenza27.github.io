@@ -1627,7 +1627,17 @@ function stShareHelper(){
       inlineAll(el, cl); walk(el, cl);
       cl.style.cssText += ";margin:0;left:0;top:0;position:relative;transform:none;opacity:1;visibility:visible;overflow:visible;max-height:none;box-sizing:border-box;width:" + w + "px;height:" + h + "px;animation:none;transition:none";
       var xml = new XMLSerializer().serializeToString(cl);
-      return {w:w, h:h, svg:'<svg xmlns="' + SVGNS + '" width="' + w + '" height="' + h + '"><foreignObject x="0" y="0" width="' + w + '" height="' + h + '">' + xml + "</foreignObject></svg>"};
+      return {w:w, h:h, xml:xml};
+    }
+    /* skala gambar: makin besar makin tajam, dibatasi supaya memori HP aman */
+    function pickScale(w, h){
+      var cw = w + 48, ch = 64 + h + 70, sc = 3;
+      while(sc > 1 && cw * sc * ch * sc > 16e6) sc -= 0.25;
+      return sc;
+    }
+    /* ukuran SVG sudah dikali skala (viewBox tetap), jadi isinya digambar ulang tajam, bukan dibesarkan dari gambar kecil */
+    function svgOf(o, sc){
+      return '<svg xmlns="' + SVGNS + '" width="' + Math.round(o.w * sc) + '" height="' + Math.round(o.h * sc) + '" viewBox="0 0 ' + o.w + " " + o.h + '"><foreignObject x="0" y="0" width="' + o.w + '" height="' + o.h + '">' + o.xml + "</foreignObject></svg>";
     }
     function bgColor(){
       var els = [d.body, d.documentElement], i, v;
@@ -1641,13 +1651,12 @@ function stShareHelper(){
       var h = d.querySelector(".brand h1"), t = ((h && h.textContent) || d.title || "Satu Titik").trim();
       return t.length > 34 ? t.slice(0, 33) + "\u2026" : t;
     }
-    function draw(img, w, h, title){
-      var pad = 24, top = 64, bot = 70, cw = w + pad * 2, ch = top + h + bot, sc = 2;
-      while(sc > 1 && cw * sc * ch * sc > 12e6) sc -= 0.25;
+    function draw(img, w, h, title, sc){
+      var pad = 24, top = 64, bot = 70, cw = w + pad * 2, ch = top + h + bot;
       var c = d.createElement("canvas"); c.width = Math.round(cw * sc); c.height = Math.round(ch * sc);
       var x = c.getContext("2d"), bs = W.getComputedStyle(d.body), hh = d.querySelector(".brand h1");
       var ff = bs.fontFamily || "sans-serif";
-      x.scale(sc, sc);
+      x.scale(sc, sc); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = "high";
       x.fillStyle = bgColor(); x.fillRect(0, 0, cw, ch);
       x.textBaseline = "alphabetic"; x.textAlign = "left";
       x.fillStyle = (hh ? W.getComputedStyle(hh) : bs).color; x.font = "700 22px " + ff; x.fillText(title, pad, 40);
@@ -1665,9 +1674,9 @@ function stShareHelper(){
       try{
         toast(tx("busy"));
         if(d.fonts && d.fonts.ready) await d.fonts.ready;
-        var o = build(el), img = new Image();
-        await new Promise(function(ok, no){ img.onload = ok; img.onerror = no; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(o.svg); });
-        var title = menuTitle(), c = draw(img, o.w, o.h, title);
+        var o = build(el), sc = pickScale(o.w, o.h), img = new Image();
+        await new Promise(function(ok, no){ img.onload = ok; img.onerror = no; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgOf(o, sc)); });
+        var title = menuTitle(), c = draw(img, o.w, o.h, title, sc);
         var blob = await new Promise(function(ok){ c.toBlob(ok, "image/png"); });
         if(!blob) throw new Error("blob");
         var name = (title.replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "hasil") + ".png";
@@ -9497,7 +9506,7 @@ function shareImage(t){
   const rowsAll = groups.map((ids, g) => standings(t, ids, g));
   const W = 720, rowH = 44, pad = 28;
   let H = 120 + rowsAll.reduce((s, r) => s + r.length * rowH + (t.fmt === "group" ? 70 : 52), 0) + 66;
-  const c = el("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
+  const c = el("canvas"); c.width = W * 2; c.height = H * 2; const x = c.getContext("2d"); x.scale(2, 2);
   const cs = getComputedStyle(document.documentElement), cv = (n, d) => (cs.getPropertyValue(n) || "").trim() || d;
   const FF = (getComputedStyle(document.body).fontFamily || "Georgia,serif").replace(/"/g, "");
   const bgC = cv("--bg", "#0b0d12"), gold = cv("--gold", "#d4a94f"), gold2 = cv("--gold2", "#f0cf86"), txt = cv("--text", "#ece7da"), mut = cv("--muted", "#8d93a3");
