@@ -102,6 +102,14 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #spProfBody .hsync{margin:4px 0 14px;font-size:12.5px;color:var(--muted);line-height:1.4}
 #spAcc .herr,#svProfile .herr{margin:10px 0 0;font-size:13px;color:#f0a0a0;line-height:1.4}
 #svProfile .obtn{display:block;width:100%;margin-top:6px;min-height:42px;padding:0 14px;border-radius:12px;border:1px solid var(--gold);background:transparent;color:var(--gold2);font:inherit;font-size:14px;cursor:pointer}
+#svProfile .dbtn{display:block;width:100%;margin-top:10px;min-height:42px;padding:0 14px;border-radius:12px;border:1px solid #c0605a;background:transparent;color:#f0a0a0;font:inherit;font-size:14px;cursor:pointer}
+#svProfile .dbtn:disabled{opacity:.6;cursor:default}
+#svProfile .dbox{margin-top:10px;padding:12px;border:1px solid #c0605a;border-radius:12px}
+#svProfile .dbox .dq{margin:0 0 6px;font-size:14.5px;font-weight:600;color:#f0a0a0}
+#svProfile .dbox .dd{margin:0;font-size:13px;line-height:1.5;color:var(--muted)}
+#svProfile .dbox .erow .ok{background:#c0504a;border-color:#c0504a;color:#fff}
+#svProfile .dbtn:focus-visible,#svProfile .dbox button:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#spAcc .eok{margin:10px 0 0;font-size:13px;color:#8fd9a8;line-height:1.4}
 #svProfile .pav{display:flex;flex-direction:column;align-items:center;gap:10px;margin:4px 0 14px}
 #svProfile .pav .big{width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--gold2)}
 #svProfile .pav .big svg{width:48px;height:48px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
@@ -1181,7 +1189,7 @@ const PV = {
     {h:"3. Untuk apa data dipakai", l:["Menjalankan fitur aplikasi dan menampilkan hasil menu.","Memungkinkan masuk akun, sinkronisasi data, dan fitur turnamen online (undangan moderator memakai ID Akun).","Menampilkan profilmu, serta menerima dan membaca saran dari pengguna.","Menampilkan iklan pada versi aplikasi yang memuat iklan, sebagai sumber pendanaan pengembangan."], p:["Kami tidak menjual data pribadimu. Kami juga tidak membagikan data akun, username, atau hasil menumu kepada pengiklan."]},
     {h:"4. Layanan pihak ketiga", l:["Google Firebase (Authentication dan Cloud Firestore): untuk masuk akun dan menyimpan data akun.","Web3Forms: untuk mengirim pesan dari Kotak Saran.","Saweria: tautan Dukung Kami membuka halaman eksternal yang punya kebijakan privasinya sendiri.","Google, Cloudflare, dan WorldTimeAPI: untuk pengecekan koneksi dan waktu.","Jaringan iklan (misalnya Google AdMob): hanya pada versi yang menampilkan iklan."], p:["Layanan-layanan ini punya kebijakan privasi sendiri yang berlaku saat data diproses oleh mereka."]},
     {h:"5. Penyimpanan dan keamanan", p:["Data lokal tersimpan di perangkatmu dan hilang bila data aplikasi atau browser dihapus. Data akun disimpan di layanan Google Firebase dan dikirim lewat koneksi terenkripsi (HTTPS). Tidak ada metode penyimpanan atau pengiriman data yang sepenuhnya bebas risiko, jadi kami tidak dapat menjamin keamanan mutlak."]},
-    {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk dengan Google, data di server ikut dihapus).","Untuk meminta penghapusan akun dan data cloud, kirim permintaan lewat Kotak Saran dengan menyebut ID Akunmu."]},
+    {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk dengan Google, data di server ikut dihapus).","Hapus akun dan data cloud kapan saja lewat Pengaturan > Akun > Lihat profil > Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri."]},
     {h:"7. Anak-anak", p:["Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun, dan kami tidak dengan sengaja mengumpulkan data mereka. Bila kamu orang tua dan menemukan data anak di aplikasi ini, hubungi kami lewat Kotak Saran."]},
     {h:"8. Hasil menu", p:["Hasil menu primbon dan hiburan bersifat hiburan. Hasil BMI, kalori, dan kehamilan adalah informasi umum, bukan pengganti nasihat tenaga kesehatan."]},
     {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini."]},
@@ -1197,7 +1205,7 @@ const PV = {
     {h:"3. How data is used", l:["To run the app’s features and show menu results.","To enable sign-in, data sync, and online tournaments (moderator invitations use the Account ID).","To show your profile, and to receive and read user suggestions.","To show ads in app versions that contain ads, as a way to fund development."], p:["We do not sell your personal data. We also do not share your account data, username, or menu results with advertisers."]},
     {h:"4. Third-party services", l:["Google Firebase (Authentication and Cloud Firestore): for sign-in and storing account data.","Web3Forms: to deliver messages from the Suggestion Box.","Saweria: the Support Us link opens an external page with its own privacy policy.","Google, Cloudflare, and WorldTimeAPI: for connection and time checks.","Ad networks (for example Google AdMob): only in versions that show ads."], p:["These services have their own privacy policies, which apply when they process data."]},
     {h:"5. Storage and security", p:["Local data stays on your device and is lost if you clear the app or browser data. Account data is stored in Google Firebase and sent over encrypted connections (HTTPS). No method of storage or transmission is completely risk-free, so we cannot guarantee absolute security."]},
-    {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in with Google, server data is deleted too).","To request deletion of your account and cloud data, send a request through the Suggestion Box and include your Account ID."]},
+    {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in with Google, server data is deleted too).","Delete your account and cloud data at any time via Settings > Account > View profile > Delete account. Data on this device stays until you delete it yourself."]},
     {h:"7. Children", p:["This app is not intended for children under 13, and we do not knowingly collect their data. If you are a parent and find a child’s data in this app, contact us through the Suggestion Box."]},
     {h:"8. Menu results", p:["Primbon and entertainment menu results are for entertainment. BMI, calorie, and pregnancy results are general information, not a substitute for advice from a health professional."]},
     {h:"9. Changes to this policy", p:["This policy may be updated. The date of the latest update is shown at the top of this page."]},
@@ -9603,6 +9611,51 @@ A.logout = async () => {
   try{ const SL = nativePlug("SocialLogin"); if(SL) await SL.logout({ provider: "google" }); }catch(e){}
   A.error = null; emit();
 };
+/* ===== HAPUS AKUN =====
+   Urutan: verifikasi ulang lewat Google (syarat Firebase untuk menghapus akun) -> hapus data server (turnamen, undangan, salinan sinkron)
+   -> hapus dokumen akun dan direktori ID -> hapus akun Firebase Authentication. Data di perangkat ini tetap ada, sama seperti saat Keluar.
+   Kode galat yang dilempar: nologin, offline, cancel, mismatch, popup, fail. */
+A.deleteAccount = async () => {
+  const u = A.user; if(!u) throw new Error("nologin");
+  if(navigator.onLine === false) throw new Error("offline");
+  if(typeof window.wipeServer !== "function") throw new Error("fail");
+  const { a, auth } = await init(), uid = u.uid, acc = A.accountId, SL = nativePlug("SocialLogin");
+  /* 1) verifikasi ulang: pilih akun Google yang sama */
+  try{
+    if(SL){
+      const id = (window.satuTitikNative || {}).googleWebClientId; if(!id) throw new Error("noconfig");
+      await SL.initialize({ google: { webClientId: id } });
+      const r = await SL.login({ provider: "google", options: {} });
+      const tok = r && r.result && r.result.idToken; if(!tok) throw new Error("notoken");
+      await auth.reauthenticateWithCredential(u, auth.GoogleAuthProvider.credential(tok));
+    }else{
+      await auth.reauthenticateWithPopup(u, new auth.GoogleAuthProvider());
+    }
+  }catch(e){
+    const c = String((e && (e.code || e.message)) || "");
+    if(/popup-closed|cancelled-popup|USER_CANCELLED|cancel/i.test(c)) throw new Error("cancel");
+    if(/user-mismatch/i.test(c)) throw new Error("mismatch");
+    if(/popup-blocked/i.test(c)) throw new Error("popup");
+    if(/network/i.test(c) || navigator.onLine === false) throw new Error("offline");
+    console.error("[hapus akun] verifikasi gagal:", e); throw new Error("fail");
+  }
+  /* 2) hapus data server; sinkron dihentikan dulu supaya tidak mengunggah ulang */
+  let joined = []; try{ const j = JSON.parse(localStorage.getItem("tt_joined") || "[]"); if(Array.isArray(j)) joined = j.filter(x => typeof x === "string"); }catch(e){}
+  try{ SY.stop(); }catch(e){}
+  try{ await window.wipeServer(A, joined); }
+  catch(e){ console.error("[hapus akun] data server gagal:", e); try{ SY.start(uid); }catch(x){} throw new Error("fail"); }
+  const soft = async f => { try{ await f(); }catch(e){ console.warn("[hapus akun] sebagian data tidak terhapus:", e && (e.code || e.message)); } };
+  const { m, db } = await A.getDb();
+  if(acc) await soft(() => m.deleteDoc(m.doc(db, "accountIds", acc)));
+  await soft(() => m.deleteDoc(m.doc(db, "users", uid)));
+  /* 3) hapus akun dari Firebase Authentication */
+  try{ await auth.deleteUser(u); }
+  catch(e){ console.error("[hapus akun] deleteUser gagal:", e); try{ SY.start(uid); }catch(x){} throw new Error("fail"); }
+  ["st_sync_acc_" + uid, "st_sync_un_" + uid, "st_sync_ph_" + uid, "st_sync_h", "st_sync_ts", "st_sync_uid"].forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
+  try{ await auth.signOut(a); }catch(e){}
+  try{ if(SL) await SL.logout({ provider: "google" }); }catch(e){}
+  A.error = null; emit();
+};
 /* ===== ID AKUN (dibuat sistem) =====
    Setiap akun Google yang masuk pertama kali dibuatkan ID sendiri oleh sistem, berurutan dan tidak pernah sama: ST-000001, ST-000002, dst.
    Disimpan di users/{uid}.accountId; nomor urut diambil lewat transaksi dari meta/counter, jadi dua orang tidak mungkin dapat ID yang sama.
@@ -9955,19 +10008,25 @@ if(navigator.onLine !== false) init().catch(() => {});
         short:"Username minimal 3 karakter.", long:"Username maksimal 20 karakter.", chars:"Hanya huruf, angka, spasi, titik, garis bawah, dan strip.",
         idl:"ID Akun", cpy:"Salin ID Akun", cpd:"ID Akun disalin", photoBtn:"Ubah foto", photoDel:"Hapus foto", photoOk:"Foto profil diperbarui.", photoRm:"Foto dikembalikan ke foto Google.", photoBusy:"Memproses foto…",
         type:"File harus berupa gambar (JPG atau PNG).", big:"Ukuran gambar maksimal 10 MB.",
-        login:"Masuk dengan Google", logout:"Keluar", off:"Tidak ada koneksi internet. Coba lagi setelah online.", fail:"Gagal. Coba lagi.", cancel:"Masuk dibatalkan.", sy:"Menyinkronkan data…", sok:"Data tersimpan di akun Google kamu.", soff:"Menunggu koneksi internet untuk menyinkronkan.", serr:"Gagal menyinkronkan. Akan dicoba lagi."},
+        login:"Masuk dengan Google", logout:"Keluar", off:"Tidak ada koneksi internet. Coba lagi setelah online.", fail:"Gagal. Coba lagi.", cancel:"Masuk dibatalkan.", sy:"Menyinkronkan data…", sok:"Data tersimpan di akun Google kamu.", soff:"Menunggu koneksi internet untuk menyinkronkan.", serr:"Gagal menyinkronkan. Akan dicoba lagi.",
+        del:"Hapus akun", delQ:"Hapus akun ini secara permanen?", delD:"Akun Google-mu dihapus dari Satu Titik, termasuk ID Akun, username, foto profil, data yang tersinkron, dan turnamen online milikmu. Tindakan ini tidak bisa dibatalkan. Data di perangkat ini tetap ada, dan akun Google-mu sendiri (Gmail dan lainnya) tidak ikut terhapus. Kamu akan diminta memilih akun Google ini sekali lagi untuk konfirmasi.",
+        delYes:"Ya, hapus akun", delBusy:"Menghapus akun…", delDone:"Akun sudah dihapus dari Satu Titik.",
+        d_cancel:"Penghapusan dibatalkan.", d_mismatch:"Akun Google yang dipilih berbeda. Pilih akun yang sedang masuk.", d_popup:"Jendela masuk Google diblokir. Izinkan pop-up lalu coba lagi.", d_fail:"Akun belum terhapus. Coba lagi."},
     en:{ttl:"Account", prof:"View profile", edit:"Edit", unl:"Username", eml:"Email", save:"Save", cancel2:"Cancel", saving:"Saving…", saved:"Username updated.",
         short:"Username must be at least 3 characters.", long:"Username must be at most 20 characters.", chars:"Letters, numbers, spaces, dots, underscores and dashes only.",
         idl:"Account ID", cpy:"Copy Account ID", cpd:"Account ID copied", photoBtn:"Change photo", photoDel:"Remove photo", photoOk:"Profile photo updated.", photoRm:"Photo reverted to your Google photo.", photoBusy:"Processing photo…",
         type:"The file must be an image (JPG or PNG).", big:"The image must be 10 MB or smaller.",
-        login:"Sign in with Google", logout:"Sign out", off:"No internet connection. Try again once you are online.", fail:"Failed. Please try again.", cancel:"Sign-in cancelled.", sy:"Syncing data…", sok:"Your data is saved to your Google account.", soff:"Waiting for an internet connection to sync.", serr:"Sync failed. Will retry."}
+        login:"Sign in with Google", logout:"Sign out", off:"No internet connection. Try again once you are online.", fail:"Failed. Please try again.", cancel:"Sign-in cancelled.", sy:"Syncing data…", sok:"Your data is saved to your Google account.", soff:"Waiting for an internet connection to sync.", serr:"Sync failed. Will retry.",
+        del:"Delete account", delQ:"Delete this account permanently?", delD:"Your Google account is removed from Satu Titik, including the Account ID, username, profile photo, synced data, and your online tournaments. This cannot be undone. Data on this device stays, and your Google account itself (Gmail and so on) is not deleted. You will be asked to pick this Google account once more to confirm.",
+        delYes:"Yes, delete account", delBusy:"Deleting account…", delDone:"The account was deleted from Satu Titik.",
+        d_cancel:"Deletion cancelled.", d_mismatch:"A different Google account was chosen. Pick the account that is signed in.", d_popup:"The Google sign-in window was blocked. Allow pop-ups and try again.", d_fail:"The account was not deleted. Please try again."}
   };
   const G = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
   const I_COPY = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
   const I_OK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   const I_USER = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.6 4.5-5.5 8-5.5s6.5 1.9 8 5.5"/></svg>';
   const lang = () => (typeof S !== "undefined" && S && S.lang === "en") ? "en" : "id";
-  let busy = false, editing = false, eMsg = "", eErr = "", eVal = "", eBusy = false, pBusy = false, pMsg = "", pErr = "", copied = false, cTimer = 0;
+  let busy = false, editing = false, eMsg = "", eErr = "", eVal = "", eBusy = false, pBusy = false, pMsg = "", pErr = "", copied = false, cTimer = 0, dConf = false, dBusy = false, dErr = "", dDone = false;
   function mk(tag, cls, txt){ const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
   const unameOf = (a, u) => (a.username && a.usernameUid === u.uid) ? a.username : (u.displayName || "");
   const photoOf = (a, u) => (a.photo && a.photoUid === u.uid) ? a.photo : (u.photoURL || "");
@@ -10019,7 +10078,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       const pb = mk("button", "prof"); pb.type = "button"; pb.setAttribute("aria-label", t.prof);
       const im = avatar(photoOf(a, u), "hav"); if(im) pb.appendChild(im);
       const w = mk("div", "hwho"); w.appendChild(mk("p", "hnm", unameOf(a, u))); w.appendChild(mk("p", "hsub", t.prof)); pb.appendChild(w);
-      pb.addEventListener("click", () => { editing = false; eErr = eMsg = pErr = pMsg = ""; if(typeof showView === "function") showView("profile"); });
+      pb.addEventListener("click", () => { editing = false; eErr = eMsg = pErr = pMsg = ""; dConf = false; dErr = ""; if(typeof showView === "function") showView("profile"); });
       box.appendChild(pb);
       const ir = idRow(a, t); if(ir) box.appendChild(ir);
     } else {
@@ -10032,6 +10091,7 @@ if(navigator.onLine !== false) init().catch(() => {});
         busy = false; paint();
       });
       box.appendChild(b);
+      if(dDone) box.appendChild(mk("p", "eok", t.delDone));
       if(a.error) box.appendChild(mk("p", "herr", a.error === "offline" ? t.off : a.error === "cancel" ? t.cancel : t.fail + (a.detail ? " [" + a.detail + "]" : "")));
     }
   }
@@ -10106,16 +10166,40 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(a.sync) pv.appendChild(mk("p", "hsync", a.sync === "sync" ? t.sy : a.sync === "ok" ? t.sok : a.sync === "off" ? t.soff : t.serr));
     /* Keluar akun ada di halaman Profil */
     const lo = mk("button", "obtn", t.logout); lo.type = "button";
+    lo.disabled = dBusy;
     lo.addEventListener("click", async () => { const x = window.satuTitikAuth; if(x){ try{ await x.logout(); }catch(e){} } paint(); });
     pv.appendChild(lo);
+    /* Hapus akun: konfirmasi dulu, lalu verifikasi ulang lewat Google dan hapus data serta akunnya */
+    if(!dConf){
+      const db = mk("button", "dbtn", t.del); db.type = "button";
+      db.addEventListener("click", () => { dConf = true; dErr = ""; paint(); });
+      pv.appendChild(db);
+    } else {
+      const bx = mk("div", "dbox"); bx.setAttribute("role", "alertdialog");
+      bx.append(mk("p", "dq", t.delQ), mk("p", "dd", t.delD));
+      const er = mk("div", "erow"), ok = mk("button", "ok", dBusy ? t.delBusy : t.delYes), cn = mk("button", null, t.cancel2);
+      ok.type = cn.type = "button"; ok.disabled = cn.disabled = dBusy;
+      ok.addEventListener("click", async () => {
+        const x = window.satuTitikAuth; if(!x || !x.deleteAccount || dBusy) return;
+        dBusy = true; dErr = ""; paint();
+        try{ await x.deleteAccount(); dConf = false; dDone = true; }
+        catch(e){ const m = e && e.message; dErr = m === "offline" ? t.off : (m && t["d_" + m]) || t.d_fail; }
+        dBusy = false; paint();
+      });
+      cn.addEventListener("click", () => { dConf = false; dErr = ""; paint(); });
+      er.append(ok, cn); bx.appendChild(er);
+      if(dErr) bx.appendChild(mk("p", "herr", dErr));
+      pv.appendChild(bx);
+    }
   }
 
   function paint(){
     const a = window.satuTitikAuth || {}, t = T[lang()];
     /* jaga fokus dan posisi kursor saat kolom username sedang diketik */
     const ae = document.activeElement, keep = ae && ae.id === "spUnIn" ? [ae.selectionStart, ae.selectionEnd] : null;
+    if(a.user) dDone = false;
     if(!a.user){
-      editing = false; eMsg = eErr = pMsg = pErr = "";
+      editing = false; eMsg = eErr = pMsg = pErr = ""; dConf = false; dErr = "";
       if(typeof spView !== "undefined" && spView === "profile" && typeof showView === "function") showView("");
     }
     paintMain(a, t); paintProfile(a, t);
