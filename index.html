@@ -1773,7 +1773,8 @@ function stShareHelper(){
         if(sh) sh(d, lang(), function(m){ go(m); }); else go("png");
       });
       p = c.parentNode; p.insertBefore(b, c);
-      if(/flex/.test(W.getComputedStyle(p).display)){ p.style.flexWrap = "wrap"; c.style.cssText += ";flex:1 1 100%"; }
+      /* pembungkus bisa masih tersembunyi (display:none) saat dipasang, jadi jangan bergantung pada gaya hitungan: selalu izinkan baris baru */
+      p.style.flexWrap = "wrap"; c.style.cssText += ";flex:1 1 100%;width:100%;box-sizing:border-box";
     }
     new MutationObserver(function(){ var b = $("stShareBtn"), t = b && b.querySelector("span"); if(t) t.textContent = tx("btn"); }).observe(d.documentElement, {attributes:true, attributeFilter:["lang"]});
     if(d.readyState === "loading") d.addEventListener("DOMContentLoaded", mount); else mount();
