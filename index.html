@@ -1549,6 +1549,43 @@ function stBackHelper(){
 const ST_BACK = "<scr" + "ipt>(" + stBackHelper.toString() + ")();<\/scr" + "ipt>";
 /* Bagikan gambar di aplikasi Android (Capacitor): WebView tidak punya navigator.share untuk file, jadi gambar disimpan ke cache
    lewat plugin Filesystem lalu dibuka di lembar bagikan lewat plugin Share. Di web/PWA fungsi ini mengembalikan false dan jalur biasa dipakai. */
+/* Lembar pilihan "Bagikan" (gambar atau PDF): satu tombol saja di menu, pilihannya muncul di lembar dari bawah. Dipakai semua menu dan Turnamen. */
+window.stShareSheet = function(doc, lang, cb){
+  try{
+    const en = lang === "en", old = doc.getElementById("stSheet"); if(old) old.remove();
+    const T = en
+      ? {t:"Share result", img:"Image (PNG)", imgd:"Sharp, great for stories and chats", pdf:"Document (PDF)", pdfd:"One page, easy to save and print", c:"Cancel"}
+      : {t:"Bagikan hasil", img:"Gambar (PNG)", imgd:"Tajam, cocok untuk status dan chat", pdf:"Dokumen (PDF)", pdfd:"Satu halaman, mudah disimpan dan dicetak", c:"Batal"};
+    const CSS = "#stSheet{position:fixed;inset:0;z-index:99998;font-family:inherit}" +
+      "#stSheet .stsh-bd{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:opacity .22s}" +
+      "#stSheet .stsh-sh{position:absolute;left:50%;bottom:0;width:100%;max-width:520px;transform:translate(-50%,100%);transition:transform .26s cubic-bezier(.2,.8,.2,1);box-sizing:border-box;padding:8px 16px calc(16px + env(safe-area-inset-bottom,0px));background:var(--panel,var(--card,#161922));border:1px solid var(--line,rgba(255,255,255,.12));border-bottom:0;border-radius:20px 20px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.45);color:var(--text,#ece7da)}" +
+      "#stSheet.on .stsh-bd{opacity:1}#stSheet.on .stsh-sh{transform:translate(-50%,0)}" +
+      "#stSheet .stsh-grab{display:block;width:40px;height:4px;border-radius:2px;background:var(--line,rgba(255,255,255,.25));margin:4px auto 14px}" +
+      "#stSheet .stsh-t{font-size:13px;letter-spacing:.14em;text-transform:uppercase;text-align:center;color:var(--gold2,var(--gold,#e6c477));margin:0 0 12px;font-weight:700}" +
+      "#stSheet .stsh-o{display:flex;align-items:center;gap:14px;width:100%;box-sizing:border-box;margin:0 0 10px;padding:12px 14px;min-height:64px;text-align:left;font:inherit;color:inherit;background:rgba(255,255,255,.04);border:1px solid var(--line,rgba(255,255,255,.14));border-radius:14px;cursor:pointer;letter-spacing:0;text-transform:none;-webkit-tap-highlight-color:transparent}" +
+      "#stSheet .stsh-o:active{border-color:var(--gold,#d4a94f);background:rgba(212,169,79,.1)}" +
+      "#stSheet .stsh-ic{flex:none;width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(212,169,79,.14);color:var(--gold2,var(--gold,#e6c477))}" +
+      "#stSheet .stsh-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}" +
+      "#stSheet .stsh-tx{flex:1;min-width:0;display:block}#stSheet .stsh-tx b{display:block;font-size:15px;font-weight:700;line-height:1.25}" +
+      "#stSheet .stsh-tx small{display:block;margin-top:2px;font-size:12px;opacity:.65;line-height:1.35}" +
+      "#stSheet .stsh-c{display:block;width:100%;box-sizing:border-box;margin:2px 0 0;min-height:46px;font:inherit;font-size:14px;color:inherit;opacity:.8;background:transparent;border:0;cursor:pointer;letter-spacing:.04em}";
+    const IMG = '<svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg>';
+    const PDF = '<svg viewBox="0 0 24 24"><path d="M7 3.5h7l4.5 4.5v11a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5z"/><path d="M14 3.5V8h4.5M8.5 13h7M8.5 16.5h5"/></svg>';
+    const ov = doc.createElement("div"); ov.id = "stSheet";
+    ov.innerHTML = "<style>" + CSS + "</style><div class=\"stsh-bd\"></div><div class=\"stsh-sh\" role=\"dialog\" aria-modal=\"true\" aria-label=\"" + T.t + "\"><i class=\"stsh-grab\"></i><div class=\"stsh-t\">" + T.t + "</div>" +
+      "<button type=\"button\" class=\"stsh-o\" data-m=\"png\"><span class=\"stsh-ic\">" + IMG + "</span><span class=\"stsh-tx\"><b>" + T.img + "</b><small>" + T.imgd + "</small></span></button>" +
+      "<button type=\"button\" class=\"stsh-o\" data-m=\"pdf\"><span class=\"stsh-ic\">" + PDF + "</span><span class=\"stsh-tx\"><b>" + T.pdf + "</b><small>" + T.pdfd + "</small></span></button>" +
+      "<button type=\"button\" class=\"stsh-c\">" + T.c + "</button></div>";
+    const key = e => { if(e.key === "Escape") close(); };
+    const close = () => { ov.classList.remove("on"); doc.removeEventListener("keydown", key); setTimeout(() => ov.remove(), 260); };
+    ov.querySelector(".stsh-bd").addEventListener("click", close);
+    ov.querySelector(".stsh-c").addEventListener("click", close);
+    ov.querySelectorAll(".stsh-o").forEach(b => b.addEventListener("click", () => { const m = b.getAttribute("data-m"); close(); setTimeout(() => cb(m), 180); }));
+    doc.addEventListener("keydown", key);
+    doc.body.appendChild(ov);
+    requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add("on")));
+  }catch(e){ try{ cb("png"); }catch(_){} }
+};
 window.stPdfBlob = function(c){
   /* PDF satu halaman tanpa library: gambar JPEG dari kanvas ditempel memenuhi halaman (lebar 595 pt, tinggi mengikuti gambar) */
   const bin = atob(c.toDataURL("image/jpeg", 0.92).split(",")[1]), jpg = new Uint8Array(bin.length);
@@ -1590,8 +1627,8 @@ function stShareHelper(){
   try{
     var d = document, W = window, busy = false, tt = null;
     var T = {
-      id:{btn:"\uD83D\uDDBC\uFE0F Bagikan gambar", busy:"Membuat gambar\u2026", fail:"Gagal membuat gambar.", done:"Gambar diunduh.", btn2:"\uD83D\uDCC4 Bagikan PDF", donePdf:"PDF diunduh.", cta:"Coba sendiri di aplikasi Satu Titik"},
-      en:{btn:"\uD83D\uDDBC\uFE0F Share image", busy:"Creating image\u2026", fail:"Could not create the image.", done:"Image downloaded.", btn2:"\uD83D\uDCC4 Share PDF", donePdf:"PDF downloaded.", cta:"Try it yourself in the Satu Titik app"}
+      id:{btn:"Bagikan", busy:"Membuat gambar\u2026", fail:"Gagal membuat gambar.", done:"Gambar diunduh.", btn2:"\uD83D\uDCC4 Bagikan PDF", donePdf:"PDF diunduh.", cta:"Coba sendiri di aplikasi Satu Titik"},
+      en:{btn:"Share", busy:"Creating image\u2026", fail:"Could not create the image.", done:"Image downloaded.", btn2:"\uD83D\uDCC4 Share PDF", donePdf:"PDF downloaded.", cta:"Try it yourself in the Satu Titik app"}
     };
     var SKIP = "button,script,style,audio,video,iframe,input,textarea,select,.sp,.fx,.clr,[data-noshare]";
     var SVGNS = "http://www.w3.org/2000/svg";
@@ -1717,23 +1754,23 @@ function stShareHelper(){
       }catch(e){ toast(tx("fail")); }
       finally{ busy = false; }
     }
+    var ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg>';
+    function lang(){ return /^en/i.test(d.documentElement.lang || "") ? "en" : "id"; }
     function mount(){
-      var c = clrBtn(), p, row, cn;
-      if(!c || $("stShareRow")) return;
+      var c = clrBtn(), p, b, cn;
+      if(!c || $("stShareBtn")) return;
       cn = c.className || ""; if(!/\bghost\b/.test(cn)) cn += " ghost"; cn = cn.trim();
-      function mk(id, key, mode){
-        var b = d.createElement("button"); b.type = "button"; b.id = id; b.className = cn; b.textContent = tx(key);
-        b.style.cssText = "flex:1 1 0;min-width:0;margin:0;padding-left:6px;padding-right:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
-        b.addEventListener("click", function(){ go(mode); });
-        return b;
-      }
-      row = d.createElement("div"); row.id = "stShareRow";
-      row.style.cssText = "display:flex;gap:8px;width:100%;flex:0 0 100%;margin-bottom:10px";
-      row.appendChild(mk("stShareBtn", "btn", "png")); row.appendChild(mk("stSharePdf", "btn2", "pdf"));
-      p = c.parentNode; p.insertBefore(row, c);
+      b = d.createElement("button"); b.type = "button"; b.id = "stShareBtn"; b.className = cn;
+      b.innerHTML = ICON + "<span>" + tx("btn") + "</span>";
+      b.style.cssText = "display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:0 0 100%;width:100%;box-sizing:border-box;margin:0 0 10px";
+      b.addEventListener("click", function(){
+        var sh = null; try{ sh = W.parent && W.parent.stShareSheet; }catch(e){}
+        if(sh) sh(d, lang(), function(m){ go(m); }); else go("png");
+      });
+      p = c.parentNode; p.insertBefore(b, c);
       if(/flex/.test(W.getComputedStyle(p).display)){ p.style.flexWrap = "wrap"; c.style.cssText += ";flex:1 1 100%"; }
     }
-    new MutationObserver(function(){ var b = $("stShareBtn"), b2 = $("stSharePdf"); if(b) b.textContent = tx("btn"); if(b2) b2.textContent = tx("btn2"); }).observe(d.documentElement, {attributes:true, attributeFilter:["lang"]});
+    new MutationObserver(function(){ var b = $("stShareBtn"), t = b && b.querySelector("span"); if(t) t.textContent = tx("btn"); }).observe(d.documentElement, {attributes:true, attributeFilter:["lang"]});
     if(d.readyState === "loading") d.addEventListener("DOMContentLoaded", mount); else mount();
     W.addEventListener("load", mount);
   }catch(e){}
@@ -9411,10 +9448,11 @@ function paintTable(box, t){
   const note = ((isSet(t) ? rankHint(t) : "") + (t.fmt === "group" ? L("Baris berwarna lolos ke babak gugur.", "Highlighted rows advance to the knockout stage.") : "")).trim();
   if(note) box.append(el("p", "hint", note));
   const r = el("div", "row no-print");
-  const sh = el("button", "btn ghost sm grow keep", L("🖼️ Bagikan gambar", "🖼️ Share image")); sh.type = "button"; sh.onclick = () => shareImage(t);
-  const shp = el("button", "btn ghost sm grow keep", L("📄 Bagikan PDF", "📄 Share PDF")); shp.type = "button"; shp.onclick = () => shareImage(t, true);
+  const sh = el("button", "btn ghost sm grow keep"); sh.type = "button";
+  sh.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg>' + L("Bagikan", "Share");
+  sh.onclick = () => { try{ parent.stShareSheet(document, lang, m => shareImage(t, m === "pdf")); }catch(e){ shareImage(t); } };
   const pr = el("button", "btn ghost sm grow", L("🖨️ Cetak", "🖨️ Print")); pr.type = "button"; pr.onclick = () => { try{ window.print(); }catch(e){ toast(L("Cetak tidak tersedia.", "Print is not available.")); } };
-  r.append(sh, shp, pr); box.append(r);
+  r.append(sh, pr); box.append(r);
 }
 function paintBracket(box, t){
   if(!t.ko){
