@@ -1395,30 +1395,48 @@ function stHelper(){
   };
 }
 const ST_CSS = '<style id="stCss">.ststamp{margin:10px 0 0;text-align:center;font-size:11px;line-height:1.45;opacity:.72;font-variant-numeric:tabular-nums;letter-spacing:.01em}.ststamp[hidden]{display:none}.mtime{margin:-2px 6px 8px;text-align:right;font-size:10.5px;line-height:1.3;opacity:.65;font-variant-numeric:tabular-nums}.tdate{display:block;margin-top:2px;font-size:11px;opacity:.75;font-variant-numeric:tabular-nums}</style>';
-/* ===== Jembatan suara: WebView Android tidak punya Web Speech, jadi dipakai TTS bawaan Android lewat plugin Capacitor ===== */
+/* ===== Jembatan suara v2: WebView tanpa Web Speech -> TTS native Android (plugin Capacitor); bila plugin tidak ada -> suara online cadangan ===== */
 function ttsShim(){
   try{
     if(window.speechSynthesis && window.SpeechSynthesisUtterance){
       try{ if(speechSynthesis.getVoices().length) return; }catch(e){}
     }
     var C = null; try{ C = parent.Capacitor; }catch(e){}
-    if(!(C && C.isNativePlatform && C.isNativePlatform())) return;
-    var P = (C.Plugins && C.Plugins.TextToSpeech) || (C.registerPlugin ? C.registerPlugin("TextToSpeech") : null);
-    if(!P) return;
+    var native = false; try{ native = !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){}
+    var P = null;
+    if(native){ try{ P = (C.Plugins && C.Plugins.TextToSpeech) || (C.registerPlugin ? C.registerPlugin("TextToSpeech") : null); }catch(e){} }
+    var mode = P ? "native" : "online";
+    var warned = false;
+    function warn(m){ if(warned) return; warned = true; try{ if(typeof toast === "function") toast(m); }catch(e){} }
     function Utt(text){ this.text = String(text == null ? "" : text); this.lang = "id-ID"; this.rate = 1; this.pitch = 1; this.volume = 1; this.voice = null; }
     var VOICES = [
-      {name:"Android TTS Indonesia", lang:"id-ID", localService:true, default:true, voiceURI:"android-id"},
-      {name:"Android TTS English", lang:"en-US", localService:true, default:false, voiceURI:"android-en"}
+      {name:"Suara Indonesia", lang:"id-ID", localService:true, default:true, voiceURI:"shim-id"},
+      {name:"English voice", lang:"en-US", localService:true, default:false, voiceURI:"shim-en"}
     ];
-    var q = [], busy = false, gen = 0;
+    var q = [], busy = false, gen = 0, audio = null;
     var S = {
       speaking:false, pending:false, paused:false,
       getVoices:function(){ return VOICES; },
       speak:function(u){ q.push(u); S.pending = true; next(); },
-      cancel:function(){ gen++; q = []; busy = false; S.speaking = false; S.pending = false; try{ P.stop(); }catch(e){} },
+      cancel:function(){
+        gen++; q = []; busy = false; S.speaking = false; S.pending = false;
+        if(P){ try{ P.stop(); }catch(e){} }
+        if(audio){ try{ audio.pause(); audio.src = ""; }catch(e){} audio = null; }
+      },
       pause:function(){}, resume:function(){}, onvoiceschanged:null,
       addEventListener:function(){}, removeEventListener:function(){}
     };
+    function playOnline(txt, lang, u, cb){
+      try{
+        var tl = lang.split("-")[0].toLowerCase(); if(tl === "in") tl = "id";
+        var a = new Audio("https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=" + encodeURIComponent(tl) + "&q=" + encodeURIComponent(txt.slice(0, 190)));
+        audio = a; a.volume = Math.max(0, Math.min(1, u.volume == null ? 1 : u.volume));
+        try{ a.playbackRate = Math.max(.5, Math.min(2, u.rate || 1)); }catch(e){}
+        a.onended = function(){ cb(false); };
+        a.onerror = function(){ cb(true, "suara online gagal (cek internet)"); };
+        var pr = a.play(); if(pr && pr.catch) pr.catch(function(e){ cb(true, "suara diblokir: " + (e && e.message || e)); });
+      }catch(e){ cb(true, String(e && e.message || e)); }
+    }
     function next(){
       if(busy || !q.length) return;
       var u = q.shift(), my = gen; busy = true; S.speaking = true; S.pending = q.length > 0;
@@ -1426,19 +1444,27 @@ function ttsShim(){
       if(!txt){ busy = false; S.speaking = false; try{ u.onend && u.onend({}); }catch(e){} next(); return; }
       try{ u.onstart && u.onstart({}); }catch(e){}
       var lang = (u.lang || "id-ID").replace("_", "-");
-      var done = function(err){
+      var finish = function(err, why){
         if(my !== gen) return;
         busy = false; S.speaking = false;
+        if(err) warn("Suara gagal: " + (why || "tidak diketahui"));
         try{ if(err){ u.onerror && u.onerror({error:"synthesis-failed"}); } else { u.onend && u.onend({}); } }catch(e){}
         next();
       };
-      try{
-        P.speak({ text:txt, lang:lang, rate:Math.max(.1, Math.min(2, u.rate || 1)), pitch:Math.max(.5, Math.min(2, u.pitch || 1)), volume:Math.max(0, Math.min(1, u.volume == null ? 1 : u.volume)), category:"ambient", queueStrategy:1 })
-          .then(function(){ done(false); }, function(){ done(true); });
-      }catch(e){ done(true); }
+      if(mode === "native"){
+        try{
+          P.speak({ text:txt, lang:lang, rate:Math.max(.1, Math.min(2, u.rate || 1)), pitch:Math.max(.5, Math.min(2, u.pitch || 1)), volume:Math.max(0, Math.min(1, u.volume == null ? 1 : u.volume)), category:"ambient", queueStrategy:1 })
+            .then(function(){ finish(false); }, function(e){
+              /* plugin native belum terpasang / mesin TTS tidak ada: pindah ke suara online dan ulangi kalimat ini */
+              mode = "online"; warn("TTS native tidak tersedia (" + (e && (e.message || e.code) || "?") + "), memakai suara online");
+              if(my !== gen) return; playOnline(txt, lang, u, finish);
+            });
+        }catch(e){ mode = "online"; playOnline(txt, lang, u, finish); }
+      } else { playOnline(txt, lang, u, finish); }
     }
     window.SpeechSynthesisUtterance = Utt;
     window.speechSynthesis = S;
+    window.__ttsMode = mode;
   }catch(e){}
 }
 const ST_HELPER = ST_CSS + "<scr" + "ipt>(" + stHelper.toString() + ")();<\/scr" + "ipt>" + "<scr" + "ipt>(" + ttsShim.toString() + ")();<\/scr" + "ipt>";
