@@ -10214,5 +10214,68 @@ if(navigator.onLine !== false) init().catch(() => {});
   paint();
 })();
 </script>
+<script>
+/* ===== TOMBOL BACK HP =====
+   Tombol back menutup lapisan paling atas lebih dulu: halaman Kebijakan Privasi, halaman Tentang, sub-halaman Pengaturan
+   (Profil, Tampilan, Reset, dst.), panel Pengaturan, panel Notifikasi. Menu yang terbuka tetap kembali ke beranda lewat
+   hash (#menu) seperti sebelumnya. Aplikasi baru keluar bila tidak ada lagi yang terbuka.
+   Cara kerja: tiap lapisan yang terbuka menambah satu entri riwayat (alamat sama), jadi back membuang entri itu dan di sini lapisannya ditutup. */
+(function(){
+  const $ = id => document.getElementById(id);
+  /* daftar lapisan yang sedang terbuka, dari bawah ke atas */
+  function layers(){
+    const L = [], bb = $("bellBtn");
+    if(bb && bb.getAttribute("aria-expanded") === "true") L.push(() => bb.click());
+    if(typeof spOpen === "function" && spOpen()){
+      L.push(() => togglePanel(false));
+      if(typeof spView !== "undefined" && spView) L.push(() => showView(""));
+    }
+    const ab = $("about"); if(ab && !ab.hidden) L.push(() => closeAbout());
+    const pv = $("privacy"); if(pv && !pv.hidden) L.push(() => closePrivacy());
+    return L;
+  }
+  const stl = () => (history.state && history.state.stl) || 0;
+  let cur = stl(), last = 0, lastHash = location.hash, ignore = 0;
+  /* keluar dari aplikasi bila sudah tidak ada riwayat lagi (aplikasi Android bungkus Capacitor), selain itu mundur biasa */
+  function leave(){
+    try{
+      if(window.navigation && navigation.canGoBack === false){
+        const A = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+        if(A && A.exitApp) A.exitApp();
+        return;
+      }
+    }catch(e){}
+    history.back();
+  }
+  /* lapisan bertambah: tambah entri riwayat. Lapisan ditutup lewat tombol di layar: buang entri paling atasnya bila masih miliknya. */
+  function sync(){
+    const n = layers().length;
+    if(n > last){
+      for(let k = last + 1; k <= n; k++){ try{ history.pushState({ stl: k }, "", location.href); }catch(e){} }
+      cur = stl();
+    } else if(n < last && stl() === last){
+      ignore++; history.back();
+    }
+    last = n;
+  }
+  addEventListener("popstate", () => {
+    const prev = cur, now = stl(), h = location.hash, hashMoved = h !== lastHash;
+    lastHash = h; cur = now;
+    if(ignore > 0){ ignore--; return; }
+    /* entri lama yang lapisannya sudah ditutup lewat tombol di layar: lewati, teruskan mundur */
+    if(prev > 0 && prev > layers().length && !hashMoved){ leave(); return; }
+    let guard = 8;
+    while(layers().length > now && guard-- > 0){ const L = layers(); L[L.length - 1](); }
+    last = layers().length;
+  });
+  addEventListener("hashchange", () => { lastHash = location.hash; cur = stl(); });
+  const mo = new MutationObserver(sync);
+  [["spanel", { attributes: true, subtree: true, attributeFilter: ["hidden", "class"] }],
+   ["about", { attributes: true, attributeFilter: ["hidden"] }],
+   ["privacy", { attributes: true, attributeFilter: ["hidden"] }],
+   ["bellBtn", { attributes: true, attributeFilter: ["aria-expanded"] }]
+  ].forEach(([id, o]) => { const e = $(id); if(e) mo.observe(e, o); });
+})();
+</script>
 </body>
 </html>
