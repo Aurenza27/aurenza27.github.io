@@ -1547,8 +1547,145 @@ function stBackHelper(){
   };
 }
 const ST_BACK = "<scr" + "ipt>(" + stBackHelper.toString() + ")();<\/scr" + "ipt>";
+/* Tombol "Bagikan gambar" di semua menu yang punya hasil (primbon, hiburan, kesehatan).
+   Hasil yang tampil difoto jadi PNG lewat SVG foreignObject (tanpa library), lalu dibagikan atau diunduh.
+   Turnamen tidak ikut karena sudah punya versi sendiri (klasemen). */
+function stShareHelper(){
+  try{
+    var d = document, W = window, busy = false, tt = null;
+    var T = {
+      id:{btn:"\uD83D\uDDBC\uFE0F Bagikan gambar", busy:"Membuat gambar\u2026", fail:"Gagal membuat gambar.", done:"Gambar diunduh."},
+      en:{btn:"\uD83D\uDDBC\uFE0F Share image", busy:"Creating image\u2026", fail:"Could not create the image.", done:"Image downloaded."}
+    };
+    var SKIP = "button,script,style,audio,video,iframe,input,textarea,select,.sp,.fx,.clr,[data-noshare]";
+    var SVGNS = "http://www.w3.org/2000/svg";
+    function tx(k){ return (/^en/i.test(d.documentElement.lang || "") ? T.en : T.id)[k]; }
+    function $(id){ return d.getElementById(id); }
+    function toast(m){
+      var e = $("stShareToast");
+      if(!e){
+        e = d.createElement("div"); e.id = "stShareToast";
+        e.style.cssText = "position:fixed;left:50%;bottom:28px;transform:translateX(-50%);max-width:86%;padding:10px 16px;border-radius:12px;background:rgba(20,20,24,.94);color:#fff;font:600 14px system-ui,sans-serif;text-align:center;z-index:99999;pointer-events:none;opacity:0;transition:opacity .2s";
+        d.body.appendChild(e);
+      }
+      e.textContent = m; e.style.opacity = "1"; clearTimeout(tt);
+      tt = setTimeout(function(){ e.style.opacity = "0"; }, 2200);
+    }
+    function target(){ return $("out") || $("card"); }
+    function clrBtn(){ return $("clrBtn") || $("clr") || $("clearBtn"); }
+
+    /* salin gaya hitungan (computed) ke klon supaya tampilan sama persis di dalam SVG */
+    function inlineAll(a, b){
+      var cs = W.getComputedStyle(a), s = "", i;
+      for(i = 0; i < cs.length; i++) s += cs[i] + ":" + cs.getPropertyValue(cs[i]) + ";";
+      b.setAttribute("style", s + "animation:none!important;transition:none!important;");
+      b.removeAttribute("class"); b.removeAttribute("id"); b.removeAttribute("hidden");
+    }
+    function walk(a, b){
+      var ac = a.children, bc = b.children, i, ca, cb, st, im, c;
+      for(i = ac.length - 1; i >= 0; i--){
+        ca = ac[i]; cb = bc[i]; if(!cb) continue;
+        if(ca.namespaceURI === SVGNS){
+          if(ca.tagName.toLowerCase() === "svg") inlineAll(ca, cb);   /* isi svg dibiarkan apa adanya */
+          continue;
+        }
+        st = W.getComputedStyle(ca);
+        if(st.display === "none" || ca.matches(SKIP)){ cb.remove(); continue; }
+        if(ca.tagName === "CANVAS"){
+          im = d.createElement("img");
+          try{ im.setAttribute("src", ca.toDataURL("image/png")); }catch(e){ cb.remove(); continue; }
+          inlineAll(ca, im); cb.parentNode.replaceChild(im, cb); continue;
+        }
+        if(ca.tagName === "IMG"){
+          if(!/^data:/i.test(ca.getAttribute("src") || "")){
+            try{
+              c = d.createElement("canvas"); c.width = ca.naturalWidth; c.height = ca.naturalHeight;
+              c.getContext("2d").drawImage(ca, 0, 0); cb.setAttribute("src", c.toDataURL("image/png"));
+            }catch(e){ cb.remove(); continue; }
+          }
+          cb.removeAttribute("srcset"); inlineAll(ca, cb); continue;
+        }
+        inlineAll(ca, cb); walk(ca, cb);
+      }
+    }
+    function build(el){
+      var r = el.getBoundingClientRect(), w = Math.ceil(r.width), h = Math.ceil(Math.max(r.height, el.scrollHeight));
+      var cl = el.cloneNode(true);
+      inlineAll(el, cl); walk(el, cl);
+      cl.style.cssText += ";margin:0;left:0;top:0;position:relative;transform:none;opacity:1;visibility:visible;overflow:visible;max-height:none;box-sizing:border-box;width:" + w + "px;height:" + h + "px;animation:none;transition:none";
+      var xml = new XMLSerializer().serializeToString(cl);
+      return {w:w, h:h, svg:'<svg xmlns="' + SVGNS + '" width="' + w + '" height="' + h + '"><foreignObject x="0" y="0" width="' + w + '" height="' + h + '">' + xml + "</foreignObject></svg>"};
+    }
+    function bgColor(){
+      var els = [d.body, d.documentElement], i, v;
+      for(i = 0; i < els.length; i++){
+        v = W.getComputedStyle(els[i]).backgroundColor;
+        if(v && v !== "transparent" && !/,\s*0\)$/.test(v)) return v;
+      }
+      return W.getComputedStyle(d.documentElement).getPropertyValue("--bg").trim() || "#0b0d12";
+    }
+    function menuTitle(){
+      var h = d.querySelector(".brand h1"), t = ((h && h.textContent) || d.title || "Satu Titik").trim();
+      return t.length > 34 ? t.slice(0, 33) + "\u2026" : t;
+    }
+    function draw(img, w, h, title){
+      var pad = 24, top = 64, bot = 44, cw = w + pad * 2, ch = top + h + bot, sc = 2;
+      while(sc > 1 && cw * sc * ch * sc > 12e6) sc -= 0.25;
+      var c = d.createElement("canvas"); c.width = Math.round(cw * sc); c.height = Math.round(ch * sc);
+      var x = c.getContext("2d"), bs = W.getComputedStyle(d.body), hh = d.querySelector(".brand h1");
+      var ff = bs.fontFamily || "sans-serif";
+      x.scale(sc, sc);
+      x.fillStyle = bgColor(); x.fillRect(0, 0, cw, ch);
+      x.textBaseline = "alphabetic"; x.textAlign = "left";
+      x.fillStyle = (hh ? W.getComputedStyle(hh) : bs).color; x.font = "700 22px " + ff; x.fillText(title, pad, 40);
+      x.drawImage(img, pad, top, w, h);
+      x.globalAlpha = 0.6; x.fillStyle = bs.color; x.font = "13px " + ff; x.textAlign = "center";
+      x.fillText("Satu Titik \u00B7 Aurenza27", cw / 2, ch - 16);
+      return c;
+    }
+    async function go(){
+      if(busy) return;
+      var el = target(); if(!el) return;
+      busy = true;
+      try{
+        toast(tx("busy"));
+        if(d.fonts && d.fonts.ready) await d.fonts.ready;
+        var o = build(el), img = new Image();
+        await new Promise(function(ok, no){ img.onload = ok; img.onerror = no; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(o.svg); });
+        var title = menuTitle(), c = draw(img, o.w, o.h, title);
+        var blob = await new Promise(function(ok){ c.toBlob(ok, "image/png"); });
+        if(!blob) throw new Error("blob");
+        var name = (title.replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "hasil") + ".png";
+        var file = new File([blob], name, {type:"image/png"});
+        try{
+          if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:title}); return; }
+        }catch(e){ if(e && e.name === "AbortError") return; }
+        var u = URL.createObjectURL(blob), a = d.createElement("a");
+        a.href = u; a.download = name; d.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(u); }, 4000);
+        toast(tx("done"));
+      }catch(e){ toast(tx("fail")); }
+      finally{ busy = false; }
+    }
+    function mount(){
+      var c = clrBtn(), p, b, cn;
+      if(!c || $("stShareBtn")) return;
+      b = d.createElement("button"); b.type = "button"; b.id = "stShareBtn";
+      cn = c.className || ""; if(!/\bghost\b/.test(cn)) cn += " ghost";
+      b.className = cn.trim(); b.textContent = tx("btn"); b.addEventListener("click", go);
+      p = c.parentNode; p.insertBefore(b, c);
+      if(/flex/.test(W.getComputedStyle(p).display)){
+        b.style.cssText += ";flex:1 1 0;min-width:0;margin-right:8px"; c.style.cssText += ";flex:1 1 0;min-width:0";
+      }else b.style.marginBottom = "10px";
+    }
+    new MutationObserver(function(){ var b = $("stShareBtn"); if(b) b.textContent = tx("btn"); }).observe(d.documentElement, {attributes:true, attributeFilter:["lang"]});
+    if(d.readyState === "loading") d.addEventListener("DOMContentLoaded", mount); else mount();
+    W.addEventListener("load", mount);
+  }catch(e){}
+}
+const ST_SHARE = "<scr" + "ipt>(" + stShareHelper.toString() + ")();<\/scr" + "ipt>";
 function menuSrc(m){
-  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK, i = s.indexOf("</head>");
+  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK + (m.id === "turnamen" ? "" : ST_SHARE), i = s.indexOf("</head>");
   return i < 0 ? css + s : s.slice(0, i) + css + s.slice(i);
 }
 writeKeys(S); paintPanel();
