@@ -1227,19 +1227,34 @@ $("sbAnim").addEventListener("click", () => setS({anim:!S.anim}));
 $("sbSound").addEventListener("click", () => { const on = !S.sound; setS({sound:on, music:on, vibe:on, read:on}); if(on) haptic(true); });
 $("sbMusic").addEventListener("click", () => setS(!S.music ? {music:true, sound:true} : {music:false}));
 /* ===== Mode getar: getar singkat saat tombol/menu ditekan (di beranda dan di dalam menu) ===== */
-const VIBMS = {low:10, mid:22, high:40};
-function haptic(ok){
-  if(!S.vibe) return;
-  const ms = VIBMS[S.vlevel] || 22, pat = ok ? [ms, 45, ms] : ms;
-  const fallback = () => { try{ if(navigator.vibrate) navigator.vibrate(pat); }catch(e){} };
+const VIBMS = {low:20, mid:40, high:70};
+/* getar utama: di aplikasi Android (Capacitor) memakai plugin Haptics native; di web/PWA memakai navigator.vibrate.
+   Pola array [getar, jeda, getar, ...] didukung di kedua jalur. Dipanggil juga dari menu (iframe) lewat window.parent. */
+function nativeVibrate(pat){
+  const arr = Array.isArray(pat) ? pat : [pat];
+  let H = null;
   try{
     const C = window.Capacitor;
-    if(C && C.isNativePlatform && C.isNativePlatform()){
-      const H = (C.Plugins && C.Plugins.Haptics) || (C.registerPlugin ? C.registerPlugin("Haptics") : null);
-      if(H && H.vibrate){ H.vibrate({duration: ok ? ms * 2 : ms}).catch(fallback); return; }
-    }
+    if(C && C.isNativePlatform && C.isNativePlatform()) H = (C.Plugins && C.Plugins.Haptics) || (C.registerPlugin ? C.registerPlugin("Haptics") : null);
   }catch(e){}
-  fallback();
+  const web = () => { try{ if(navigator.vibrate) navigator.vibrate(arr); }catch(e){} };
+  if(!H || !H.vibrate){ web(); return; }
+  let t = 0, failed = false;
+  arr.forEach((d, i) => {
+    if(i % 2 === 0){
+      setTimeout(() => {
+        if(failed) return;
+        Promise.resolve().then(() => H.vibrate({duration: d})).catch(() => { if(!failed){ failed = true; web(); } });
+      }, t);
+    }
+    t += d;
+  });
+}
+window.nativeVibrate = nativeVibrate;
+function haptic(ok){
+  if(!S.vibe) return;
+  const ms = VIBMS[S.vlevel] || 40;
+  nativeVibrate(ok ? [ms, 45, ms] : [ms]);
 }
 const HAPSEL = "button, .item, summary, [role=button], .sg, .chip";
 function hapticHook(d){
@@ -1382,7 +1397,7 @@ window.satuTitikNative = {
       try{ const ci = await AdMob.requestConsentInfo(); if(ci && ci.isConsentFormAvailable && ci.status === "REQUIRED") await AdMob.showConsentForm(); }catch(e){}
       /* Sisakan ruang di bawah halaman setinggi banner, supaya tulisan kaki beranda dan menu tidak tertutup iklan */
       const st = document.createElement("style");
-      st.textContent = "#home{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px) + var(--adh,0px))!important}#view{bottom:var(--adh,0px)!important}";
+      st.textContent = "#home{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px) + var(--adh,0px))!important}#view,#about,#privacy{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - var(--adh,0px))!important}";
       document.head.appendChild(st);
       const setH = h => { h = Math.round(+h || 0); if(h > 0) document.documentElement.style.setProperty("--adh", h + "px"); };
       try{ AdMob.addListener("bannerAdSizeChanged", e => setH(e && e.height)); }catch(e){}
@@ -2358,7 +2373,11 @@ function unlockAudio(){
     if(ac.state === "suspended") ac.resume();
   }catch(e){}
 }
-function buzz(p){ if(sound && navigator.vibrate){ try{navigator.vibrate(p)}catch(e){} } }
+function buzz(p){
+  if(!sound) return;
+  try{ if(window.parent && window.parent !== window && window.parent.nativeVibrate){ window.parent.nativeVibrate(p); return; } }catch(e){}
+  if(navigator.vibrate){ try{navigator.vibrate(p)}catch(e){} }
+}
 
 function toast(msg){
   const t=$("toast"); t.textContent=msg; t.classList.add("show");
