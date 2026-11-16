@@ -9784,6 +9784,13 @@ body.noanim .rm-live i{animation:none}
 .rm-btns .ghost{margin-top:0}
 .rm-btns .go{min-height:48px;font-size:15px;letter-spacing:.08em;margin:0}
 .rm-btns .go.danger{background:linear-gradient(180deg,#e8776c,#c0504a);color:#fff;box-shadow:none}
+.mini.on{border-color:var(--gold);color:var(--gold2);background:rgba(212,169,79,.14);font-weight:700}
+.vbox{margin-top:8px;padding:8px 10px;border:1px dashed rgba(212,169,79,.55);border-radius:10px;background:rgba(212,169,79,.06)}
+.vt{font-size:12.5px;line-height:1.4;color:var(--muted);font-variant-numeric:tabular-nums}
+.vrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}
+.orow.dim{opacity:.55}
+.orow .pts small{display:block;font-size:11px;font-weight:400;color:var(--muted);text-align:right}
+.rk{display:inline-block;min-width:26px}
 .ghost.exit{color:#e8776c;border-color:rgba(224,69,58,.45)}
 .ghost.exit:active{background:rgba(224,69,58,.12)}
 .exitrow{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
@@ -10116,6 +10123,7 @@ button:disabled{opacity:.6}
       code:"KODE RUANG", copy:"Salin kode", copied:"Kode disalin.", pl:"Pemain", hostTag:"pemilik", me:"kamu",
       start:"▶ MULAI RONDE", next:"▶ RONDE BERIKUTNYA", waitStart:"Menunggu pemilik ruang memulai…", waitNext:"Menunggu pemilik ruang…", solo:"Bisa dimulai sendirian untuk mencoba, tapi lebih seru bersama teman.",
       close:"Tutup ruang", leave:"Keluar dari ruangan", sure:"Ketuk lagi untuk memastikan",
+      vote:"Vote", voteOpen:"Voting jawaban", vYes:"Terima", vNo:"Tolak", vVoted:"sudah memilih", vApply:"Terapkan hasil", vCancel:"Batal", vOwn:"Jawabanmu sedang divote pemain lain.", vAcc:"Diterima lewat voting", vRej:"Ditolak lewat voting", boardHint:"Total skor dari semua ronde. Seri voting = jawaban diterima.", left:"keluar",
       rd:"Ronde", ph:"Ketik jawabanmu", send:"KIRIM", sent:"Terkirim ✓ (bisa diubah sebelum waktu habis)", cnt:"sudah menjawab", up:"⏰ Waktu habis!", hostNow:"Buka jawaban sekarang",
       none:"(tidak menjawab)", rej:"Tolak", acc:"Terima", rejd:"ditolak", board:"Klasemen", pts:"poin",
       nf:"Kode ruang tidak ditemukan.", full:"Ruang penuh (maksimal 8 pemain).", closed:"Ruang sudah ditutup.", took:"Pemilik ruang sebelumnya tidak merespons. Kamu sekarang pemilik ruang.", cats:"Kategori", all:"Pilih semua", catHostHint:"Ketuk untuk memilih kategori yang akan diacak. Minimal satu.", catMemHint:"Kategori dipilih oleh pemilik ruang.", minCat:"Pilih minimal satu kategori.", lobbyWait:"Menunggu pemain", lobbyReady:"Siap dimulai", leaveQ:"Keluar dari ruangan?", leaveHostMsg:"Kamu pemilik ruang. Jika keluar, ruang ditutup dan semua pemain ikut keluar.", leaveMemMsg:"Kamu akan keluar dari ruangan ini. Kamu bisa bergabung lagi dengan kode yang sama selama ruang masih dibuka.", stay:"Tetap di sini", leaveGo:"Keluar", denied:"Akses ditolak. Aturan Firestore untuk game ini belum dipasang.", fail:"Gagal, coba lagi.", off:"Tidak ada internet." },
@@ -10126,12 +10134,13 @@ button:disabled{opacity:.6}
       code:"ROOM CODE", copy:"Copy code", copied:"Code copied.", pl:"Players", hostTag:"owner", me:"you",
       start:"▶ START ROUND", next:"▶ NEXT ROUND", waitStart:"Waiting for the room owner to start…", waitNext:"Waiting for the room owner…", solo:"You can start alone to try it out, but it is more fun with friends.",
       close:"Close room", leave:"Leave room", sure:"Tap again to confirm",
+      vote:"Vote", voteOpen:"Answer vote", vYes:"Accept", vNo:"Reject", vVoted:"voted", vApply:"Apply result", vCancel:"Cancel", vOwn:"Other players are voting on your answer.", vAcc:"Accepted by vote", vRej:"Rejected by vote", boardHint:"Total score across all rounds. A tied vote keeps the answer accepted.", left:"left",
       rd:"Round", ph:"Type your answer", send:"SEND", sent:"Sent ✓ (you can change it before time is up)", cnt:"answered", up:"⏰ Time is up!", hostNow:"Reveal answers now",
       none:"(no answer)", rej:"Reject", acc:"Accept", rejd:"rejected", board:"Scoreboard", pts:"pts",
       nf:"Room code not found.", full:"The room is full (max 8 players).", closed:"The room was closed.", took:"The previous owner stopped responding. You are now the room owner.", cats:"Categories", all:"Select all", catHostHint:"Tap to choose which categories get drawn. At least one.", catMemHint:"Categories are chosen by the room owner.", minCat:"Pick at least one category.", lobbyWait:"Waiting for players", lobbyReady:"Ready to start", leaveQ:"Leave the room?", leaveHostMsg:"You are the room owner. If you leave, the room closes and every player is removed.", leaveMemMsg:"You are about to leave this room. You can rejoin with the same code while the room is open.", stay:"Stay here", leaveGo:"Leave", denied:"Access denied. The Firestore rules for this game are not installed yet.", fail:"Failed, please try again.", off:"No internet." }
   };
   var mode = "off";
-  var ON = { catOpen:false, fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
+  var ON = { catOpen:false, names:{}, applying:false, fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
              secs:(+ls("ti_osecs", 45) || 45) };
   if([30, 45, 60].indexOf(ON.secs) < 0) ON.secs = 45;
   function oT(){ return OT[lang]; }
@@ -10201,7 +10210,7 @@ button:disabled{opacity:.6}
     ON.code = code; ON.view = ""; ON.data = null; ON.players = []; ON.sentRd = -1;
     ON.uR = m.onSnapshot(m.doc(db, "ti_rooms", code), onRoom, function(e){ flash(errMsg(e)); });
     ON.uP = m.onSnapshot(m.collection(db, "ti_rooms", code, "p"), function(s){
-      var a = []; s.forEach(function(x){ var v = x.data() || {}; a.push({ u:x.id, n:String(v.n || ""), d:+v.d || 0, j:+v.j || 0 }); });
+      var a = []; s.forEach(function(x){ var v = x.data() || {}; a.push({ u:x.id, n:String(v.n || ""), d:+v.d || 0, j:+v.j || 0, vr:+v.vr || 0, vt:(v.vt && typeof v.vt === "object") ? v.vt : null }); });
       a.sort(function(x, y){ return x.j - y.j; }); ON.players = a; renderO();
     }, function(){});
     if(!ON.tick) ON.tick = setInterval(tickO, 300);
@@ -10304,11 +10313,89 @@ button:disabled{opacity:.6}
       await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), po({ st:"reveal", res:res, pts:scoreOf(res, d.l) }));
     }catch(e){ setTimeout(function(){ ON.revealing = false; }, 3000); }
   }
+  function cloneRes(res){ return (res || []).map(function(r){ return { u:r.u, n:r.n, t:r.t, x:!!r.x, q:+r.q || 0, vy:+r.vy || 0, vn:+r.vn || 0, vd:!!r.vd }; }); }
+  async function saveRes(res){
+    var d = ON.data, f = await lib();
+    await f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), po({ res:res, pts:scoreOf(res, d.l) }));
+  }
   async function toggleRej(i){
     var d = ON.data; if(!d || !isHost() || d.st !== "reveal") return;
-    var res = (d.res || []).map(function(r){ return { u:r.u, n:r.n, t:r.t, x:!!r.x }; }); if(!res[i]) return;
-    res[i].x = !res[i].x;
-    try{ var f = await lib(); await f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), po({ res:res, pts:scoreOf(res, d.l) })); }catch(e){ flash(errMsg(e)); }
+    var res = cloneRes(d.res); if(!res[i]) return;
+    res[i].x = !res[i].x; res[i].q = 0; res[i].vd = false; res[i].vy = 0; res[i].vn = 0;
+    try{ await saveRes(res); }catch(e){ flash(errMsg(e)); }
+  }
+  /* ----- voting jawaban yang diperdebatkan: pemilik ruang membuka, semua pemain selain pemilik jawaban memberi suara ----- */
+  function voters(r){ return ON.players.filter(function(p){ return p.u !== r.u; }); }
+  function voteOf(p, r){ var d = ON.data, v = (p && d && p.vr === d.rd && p.vt) ? p.vt[r.u] : null; return (v && +v.n === r.q) ? v : null; }
+  function tally(r){
+    var vs = voters(r), y = 0, n = 0, vo = 0;
+    vs.forEach(function(p){ var v = voteOf(p, r); if(v){ vo++; if(+v.y === 1) y++; else n++; } });
+    return { y:y, n:n, vo:vo, tot:vs.length };
+  }
+  async function startVote(i){
+    var d = ON.data; if(!d || !isHost() || d.st !== "reveal") return;
+    var res = cloneRes(d.res); if(!res[i] || !res[i].t) return;
+    res.forEach(function(r){ r.q = 0; });
+    res[i].q = Date.now(); res[i].vd = false; res[i].vy = 0; res[i].vn = 0;
+    try{ await saveRes(res); }catch(e){ flash(errMsg(e)); }
+  }
+  async function cancelVote(i){
+    var d = ON.data; if(!d || !isHost() || d.st !== "reveal") return;
+    var res = cloneRes(d.res); if(!res[i]) return; res[i].q = 0;
+    try{ await saveRes(res); }catch(e){ flash(errMsg(e)); }
+  }
+  async function applyVote(i){
+    var d = ON.data; if(!d || !isHost() || d.st !== "reveal" || ON.applying) return;
+    var res = cloneRes(d.res); if(!res[i] || !res[i].q) return;
+    ON.applying = true;
+    var tl = tally(res[i]);
+    res[i].vy = tl.y; res[i].vn = tl.n; res[i].vd = true; res[i].q = 0; res[i].x = tl.n > tl.y;
+    try{ await saveRes(res); }catch(e){ flash(errMsg(e)); }
+    ON.applying = false;
+  }
+  function castVote(uid, y){
+    var d = ON.data, u = meU(); if(!d || !u || d.st !== "reveal" || uid === u.uid) return;
+    var r = (d.res || []).filter(function(x){ return x.u === uid; })[0]; if(!r || !(+r.q)) return;
+    var mine = ON.players.filter(function(p){ return p.u === u.uid; })[0], vt = {};
+    if(mine && mine.vr === d.rd && mine.vt) Object.keys(mine.vt).forEach(function(k){ vt[k] = mine.vt[k]; });
+    vt[uid] = { y:y, n:+r.q };
+    if(mine){ mine.vr = d.rd; mine.vt = vt; renderO(); }
+    lib().then(function(f){ return f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code, "p", u.uid), po({ vr:d.rd, vt:vt })); }).catch(function(e){ flash(errMsg(e)); });
+  }
+  function voteBox(r, i){
+    var d = ON.data, t = oT(), u = meU(), tl = tally(r), box, row;
+    if(+r.q){
+      box = el("div", "vbox");
+      box.appendChild(el("div", "vt", "⚖️ " + t.voteOpen + " · ✓ " + tl.y + "  ✗ " + tl.n + " · " + tl.vo + "/" + tl.tot + " " + t.vVoted));
+      row = el("div", "vrow");
+      if(u && r.u !== u.uid){
+        var mine = ON.players.filter(function(p){ return p.u === u.uid; })[0], mv = voteOf(mine, r);
+        row.appendChild(btn("mini" + (mv && +mv.y === 1 ? " on" : ""), "✓ " + t.vYes, function(){ castVote(r.u, 1); }));
+        row.appendChild(btn("mini" + (mv && +mv.y === 0 ? " on" : ""), "✗ " + t.vNo, function(){ castVote(r.u, 0); }));
+      }else if(u){ row.appendChild(el("span", "vt", t.vOwn)); }
+      if(isHost()){ row.appendChild(btn("mini", t.vApply, function(){ applyVote(i); })); row.appendChild(btn("mini", t.vCancel, function(){ cancelVote(i); })); }
+      box.appendChild(row); return box;
+    }
+    if(r.vd){ box = el("div", "vt", "🗳 " + (r.x ? t.vRej : t.vAcc) + " (✓ " + (+r.vy || 0) + "  ✗ " + (+r.vn || 0) + ")"); box.style.marginTop = "6px"; return box; }
+    if(isHost() && r.t && tl.tot > 0){ row = el("div", "vrow"); row.appendChild(btn("mini", "⚖️ " + t.vote, function(){ startVote(i); })); return row; }
+    return null;
+  }
+  /* ----- papan skor: total semua ronde (base = akumulasi ronde lalu, pts = ronde ini) ----- */
+  function paintBoard(bl, d){
+    var t = oT(), u = meU(), res = d.res || [], ids = {}, inRoom = {}, medals = ["🥇", "🥈", "🥉"];
+    ON.players.forEach(function(p){ ON.names[p.u] = p.n; ids[p.u] = 1; inRoom[p.u] = 1; });
+    res.forEach(function(r){ if(r.n) ON.names[r.u] = r.n; ids[r.u] = 1; });
+    Object.keys(d.base || {}).forEach(function(k){ ids[k] = 1; });
+    bl.textContent = "";
+    Object.keys(ids).sort(function(a, b){ return (totalOf(d, b) - totalOf(d, a)) || nameOf(a).localeCompare(nameOf(b)); }).forEach(function(k, i){
+      var row = el("div", "orow" + (inRoom[k] ? "" : " dim")), left = el("div", "ol"), tot = totalOf(d, k), nm = el("b");
+      nm.appendChild(el("span", "rk", (tot > 0 && i < 3) ? medals[i] : (i + 1) + "."));
+      nm.appendChild(document.createTextNode(nameOf(k) + (u && k === u.uid ? " (" + t.me + ")" : "") + (inRoom[k] ? "" : " · " + t.left)));
+      left.appendChild(nm);
+      var pe = el("span", "pts", tot + " " + t.pts), dl = (d.st === "reveal" && d.pts) ? (+d.pts[k] || 0) : 0;
+      if(dl > 0) pe.appendChild(el("small", "", "+" + dl));
+      row.appendChild(left); row.appendChild(pe); bl.appendChild(row);
+    });
   }
   function submitAns(){
     var d = ON.data, u = meU(), inp = $("oAns"); if(!d || !u || !inp || d.st !== "play" || Date.now() > endMs(d) + 1000) return;
@@ -10417,6 +10504,9 @@ button:disabled{opacity:.6}
         if(Date.now() >= endMs(d) + 1500 || (ON.allSince && Date.now() - ON.allSince > 3000)) doReveal();
       }
       if(!isHost()) tryClaim(d);
+    }else if(d.st === "reveal" && isHost() && !ON.applying){
+      var rr = d.res || [], k;
+      for(k = 0; k < rr.length; k++) if(+rr[k].q){ var tl = tally(rr[k]); if(tl.tot > 0 && tl.vo >= tl.tot) applyVote(k); break; }
     }
   }
   function paintTimer(){
@@ -10455,7 +10545,7 @@ button:disabled{opacity:.6}
     var i, d = ON.data;
     for(i = 0; i < ON.players.length; i++) if(ON.players[i].u === u) return ON.players[i].n;
     if(d && d.res) for(i = 0; i < d.res.length; i++) if(d.res[i].u === u) return d.res[i].n;
-    return "?";
+    return ON.names[u] || oT().anon;
   }
   function renderO(){
     var host = $("onBody"); if(!host) return;
@@ -10548,6 +10638,7 @@ button:disabled{opacity:.6}
       var st = el("p", "hint"); st.id = "oSt"; p.appendChild(st);
       var ct = el("p", "hint"); ct.id = "oCnt"; p.appendChild(ct);
       host.appendChild(p);
+      p = panel(); p.appendChild(el("span", "label", t.board)); var bl0 = el("div"); bl0.id = "oBoard"; p.appendChild(bl0); host.appendChild(p);
       p = panel(); var ul2 = el("ul", "hl rm-pl"); ul2.id = "oPl"; p.appendChild(ul2);
       if(isHost()){ p.appendChild(btn("ghost act", t.hostNow, doReveal)); }
       var xr = el("div", "exitrow"); xr.appendChild(confirmBtn("ghost exit act", isHost() ? t.close : t.leave, isHost() ? closeRoom : leaveRoom)); p.appendChild(xr);
@@ -10562,7 +10653,7 @@ button:disabled{opacity:.6}
       var L2 = /^[A-Z]$/.test(String(d.l)) ? d.l : "?"; pr2.innerHTML = promptHTML({ l:L2, c:catOf(d.c).k });
       p.appendChild(pr2); host.appendChild(p);
       p = panel(); var rl = el("div"); rl.id = "oRes"; p.appendChild(rl); host.appendChild(p);
-      p = panel(); p.appendChild(el("span", "label", t.board)); var bl = el("div"); bl.id = "oBoard"; p.appendChild(bl); host.appendChild(p);
+      p = panel(); p.appendChild(el("span", "label", t.board)); var bl = el("div"); bl.id = "oBoard"; p.appendChild(bl); p.appendChild(el("p", "hint", t.boardHint)); host.appendChild(p);
       host.appendChild(catPanel());
       p = el("div", "oact");
       if(isHost()){ p.appendChild(btn("go act", t.next, startRound)); p.appendChild(confirmBtn("ghost exit act", t.close, closeRoom)); }
@@ -10610,21 +10701,15 @@ button:disabled{opacity:.6}
           if(u && r.u === u.uid) nm.appendChild(document.createTextNode(" (" + t.me + ")"));
           var tx = el("div", "oa" + (r.t ? "" : " dim"), r.t ? r.t : t.none);
           left.appendChild(nm); left.appendChild(tx);
+          var vb = voteBox(r, i); if(vb) left.appendChild(vb);
           var pts = (d.pts && d.pts[r.u]) || 0, pb = el("span", "pts" + (r.x ? " bad" : ""), r.x ? t.rejd : "+" + pts);
           row.appendChild(left); row.appendChild(pb);
           if(isHost() && r.t){ var tg = btn("mini", r.x ? t.acc : t.rej, function(){ toggleRej(i); }); row.appendChild(tg); }
           rl.appendChild(row);
         });
       }
-      if(bl){
-        bl.textContent = "";
-        var ids = {}; res.forEach(function(r){ ids[r.u] = 1; }); Object.keys(d.base || {}).forEach(function(k){ ids[k] = 1; });
-        Object.keys(ids).sort(function(a, b){ return totalOf(d, b) - totalOf(d, a); }).forEach(function(k, i){
-          var row = el("div", "orow"), left = el("div", "ol"); left.appendChild(el("b", "", (i + 1) + ". " + nameOf(k)));
-          row.appendChild(left); row.appendChild(el("span", "pts", totalOf(d, k) + " " + t.pts)); bl.appendChild(row);
-        });
-      }
     }
+    if((d.st === "reveal" || d.st === "play") && $("oBoard")) paintBoard($("oBoard"), d);
   }
 
   /* ----- pergantian mode dan hubungan ke pengaturan Beranda ----- */
