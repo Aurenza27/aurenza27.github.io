@@ -117,6 +117,8 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #frBar{margin-left:auto;flex:none}
 #frBar+#gear{margin-left:0}
 #frHome[hidden],#frBar[hidden],.frb[hidden]{display:none}
+.frinv{display:flex;flex-wrap:wrap;gap:6px;margin:-2px 0 8px 44px}
+.frinv button{flex:1 1 auto;min-height:32px;padding:4px 10px;font-size:12px}
 .frb{position:absolute;top:-4px;right:-4px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:linear-gradient(180deg,#ff7468,#e0372b);color:#fff;font:700 11px/19px var(--ui);text-align:center;letter-spacing:0;box-shadow:0 0 0 2px var(--bg)}
 #frpanel{position:fixed;z-index:30;top:calc(54px + env(safe-area-inset-top,0px));right:10px;width:min(320px,calc(100vw - 20px));max-height:calc(100% - 70px);overflow:auto;padding:12px;border:1px solid var(--gold);border-radius:16px;background:var(--bg2);box-shadow:0 10px 30px rgba(0,0,0,.6)}
 #frpanel .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -8808,19 +8810,45 @@ function mkAv(pr){
   if(pr && pr.photo){ const im = el("img", "av"); im.alt = ""; im.referrerPolicy = "no-referrer"; im.src = pr.photo; im.onerror = () => { im.replaceWith(ini()); }; return im; }
   return ini();
 }
-async function inviteMod(t, id, pr){
+/* kind: "mod" (default, dokumen lama tanpa field kind juga dianggap mod) atau "follow" (undang menjadi pengikut). ID dokumen pengikut diberi akhiran _f */
+const invDocId = (t, id, kind) => t.oid + "_" + id + (kind === "follow" ? "_f" : "");
+async function inviteMod(t, id, pr, kind){
+  kind = kind === "follow" ? "follow" : "mod";
   const u = ON.user(); if(!u) throw new Error("nologin");
-  const {m, db:f} = await ON.lib(), ref = m.doc(f, "invites", t.oid + "_" + id), ex = await m.getDoc(ref);
+  const {m, db:f} = await ON.lib(), ref = m.doc(f, "invites", invDocId(t, id, kind)), ex = await m.getDoc(ref);
   if(ex.exists()){
-    if(ex.data().status === "pending"){ toast(L("Undangan masih menunggu jawaban.", "The invite is still pending.")); return; }
+    if(ex.data().status === "pending"){ toast(L("Undangan masih menunggu jawaban.", "The invite is still pending.")); return false; }
     await m.deleteDoc(ref);
   }
-  await m.setDoc(ref, po({oid:String(t.oid), tName:String(t.name || ""), ownerUid:String(u.uid), ownerName:String(ON.nm(u) || u.email || ""), toUid:String(pr.uid), toAccountId:String(id), toName:String(pr.name || ""), status:"pending", ts:Date.now()}));
+  await m.setDoc(ref, po({oid:String(t.oid), kind, tName:String(t.name || ""), ownerUid:String(u.uid), ownerName:String(ON.nm(u) || u.email || ""), toUid:String(pr.uid), toAccountId:String(id), toName:String(pr.name || ""), status:"pending", ts:Date.now()}));
   toast(L("Undangan terkirim ke " + (pr.name || id) + ".", "Invite sent to " + (pr.name || id) + "."));
+  return true;
 }
-async function cancelInvite(t, id){
-  try{ const {m, db:f} = await ON.lib(); await m.deleteDoc(m.doc(f, "invites", t.oid + "_" + id)); }catch(e){ toast(errTxt(e)); }
+async function cancelInvite(t, id, kind){
+  try{ const {m, db:f} = await ON.lib(); await m.deleteDoc(m.doc(f, "invites", invDocId(t, id, kind))); }catch(e){ toast(errTxt(e)); }
 }
+/* ----- dipakai panel Teman di halaman induk: undang teman dari daftar teman saat detail turnamen online (admin) terbuka ----- */
+window.__stInviteCtx = function(){
+  try{
+    if(view !== "detail") return null;
+    const t = cur(); if(!t || !t.oid || roleOf() !== "admin" || !ON.user()) return null;
+    const mt = ON.meta[t.oid] || {mods:[]}, st = {};
+    (ON.invOut || []).filter(x => x.oid === t.oid).forEach(x => { (st[x.toAccountId] = st[x.toAccountId] || {})[x.kind === "follow" ? "follow" : "mod"] = x.status; });
+    (mt.mods || []).forEach(id => { (st[id] = st[id] || {}).mod = "member"; });
+    return {oid:t.oid, name:String(t.name || ""), st};
+  }catch(e){ return null; }
+};
+window.__stInvite = async function(kind, fr){
+  const t = cur(); if(!t || !t.oid || roleOf() !== "admin") throw new Error("e_noctx");
+  if(fr.acc === ON.accountId()) throw new Error("e_invself");
+  if(kind !== "follow"){
+    const mt = ON.meta[t.oid] || {mods:[]}, pend = (ON.invOut || []).filter(x => x.oid === t.oid && x.kind !== "follow" && x.status === "pending").length;
+    if((mt.mods || []).includes(fr.acc)) throw new Error("e_invmem");
+    if((mt.mods || []).length + pend >= 20) throw new Error("e_invmax");
+  }
+  const ok = await inviteMod(t, fr.acc, {uid:fr.uid, name:fr.name}, kind);
+  if(ok === false) throw new Error("e_invp");
+};
 async function setMods(t, mid){   /* mencabut moderator (menambah sekarang lewat undangan) */
   try{
     const {m, db:f} = await ON.lib();
@@ -8889,11 +8917,11 @@ function paintOnline(box, t){
     ON.lib().then(({m, db:f}) => m.getCountFromServer(m.collection(f, "tournaments", t.oid, "followers"))).then(c => { ON.counts[t.oid] = c.data().count; fc.textContent = L("Pengikut: ", "Followers: ") + ON.counts[t.oid]; }).catch(() => {});
     box.append(p);
     const mp = el("div", "panel stack keep");
-    mp.append(el("span", "label", L("MODERATOR", "MODERATORS")), el("p", "hint", L("Ketik ID pengguna (contoh ST-000123). Jika terdaftar, foto profilnya muncul dan kamu bisa mengirim undangan. Orang itu menjadi moderator setelah menerima undangan di tab notifikasinya.", "Type a user ID (e.g. ST-000123). If it is registered, their profile photo appears and you can send an invite. They become a moderator after accepting it in their notifications tab.")));
+    mp.append(el("span", "label", L("MODERATOR", "MODERATORS")), el("p", "hint", L("Ketik ID pengguna (contoh ST-000123). Jika terdaftar, foto profilnya muncul dan kamu bisa mengirim undangan. Orang itu menjadi moderator setelah menerima undangan di tab notifikasinya. Kamu juga bisa mengundang dari daftar Teman (ikon teman di bagian atas): pilih jadikan moderator atau undang jadi pengikut.", "Type a user ID (e.g. ST-000123). If it is registered, their profile photo appears and you can send an invite. They become a moderator after accepting it in their notifications tab. You can also invite from your Friends list (friends icon at the top): make a moderator or invite as a follower.")));
     const person = (id, pr, tag, btn) => { const rw = el("div", "row"), w = el("div", "grow"); w.style.minWidth = "0"; w.append(el("p", "pn", (pr && pr.name) || L("Pengguna", "User")), el("p", "pi", id)); rw.append(mkAv(pr), w); if(tag) rw.append(tag); if(btn) rw.append(btn); return rw; };
     (mt.mods || []).forEach(id => { needProf(id); mp.append(person(id, ON.prof[id], null, mkBtn(L("Hapus", "Remove"), "btn ghost sm danger", () => { if(confirm(L("Cabut akses moderator " + id + "?", "Remove moderator " + id + "?"))) setMods(t, id); }))); });
-    const outs = (ON.invOut || []).filter(x => x.oid === t.oid && x.status !== "accepted");
-    outs.forEach(x => { needProf(x.toAccountId); const pend = x.status === "pending"; mp.append(person(x.toAccountId, ON.prof[x.toAccountId] || {name:x.toName}, el("span", "tg " + (pend ? "wait" : "no"), pend ? L("Menunggu", "Pending") : L("Ditolak", "Declined")), mkBtn(pend ? L("Batalkan", "Cancel") : L("Hapus", "Dismiss"), "btn ghost sm", () => cancelInvite(t, x.toAccountId)))); });
+    const outs = (ON.invOut || []).filter(x => x.oid === t.oid && x.kind !== "follow" && x.status !== "accepted");
+    outs.forEach(x => { needProf(x.toAccountId); const pend = x.status === "pending"; mp.append(person(x.toAccountId, ON.prof[x.toAccountId] || {name:x.toName}, el("span", "tg " + (pend ? "wait" : "no"), pend ? L("Menunggu", "Pending") : L("Ditolak", "Declined")), mkBtn(pend ? L("Batalkan", "Cancel") : L("Hapus", "Dismiss"), "btn ghost sm", () => cancelInvite(t, x.toAccountId, "mod")))); });
     if(!(mt.mods || []).length && !outs.length) mp.append(el("p", "hint", L("Belum ada moderator.", "No moderators yet.")));
     const ar = el("div", "row"), ei = el("input"), pv = el("div", "stack");
     ei.type = "text"; ei.placeholder = L("ID pengguna (ST-000123)", "User ID (ST-000123)"); ei.maxLength = 20; ei.autocapitalize = "characters"; ei.autocomplete = "off"; ei.spellcheck = false;
@@ -8918,7 +8946,7 @@ function paintOnline(box, t){
         return;
       }
       ON.prof[v] = pr;
-      const pendN = (ON.invOut || []).filter(x => x.oid === t.oid && x.status === "pending");
+      const pendN = (ON.invOut || []).filter(x => x.oid === t.oid && x.kind !== "follow" && x.status === "pending");
       const nm = pr.name || L("Pengguna", "User"); let warn = "";
       if(v === ON.accountId()) warn = L("Itu ID-mu sendiri, kamu sudah admin.", "That is your own ID; you are already the admin.");
       else if((mt.mods || []).includes(v)) warn = L(nm + " sudah menjadi moderator.", nm + " is already a moderator.");
@@ -10965,6 +10993,37 @@ button:disabled{opacity:.6}
   });
 
 
+  /* ===== undangan teman (panel Teman di Beranda) ===== */
+  /* konteks untuk panel Teman: ada bila sedang berada di dalam ruangan online */
+  window.__tiInviteCtx = function(){
+    try{
+      if(mode !== "on" || !ON.code || !ON.data || !meU()) return null;
+      return { code:ON.code, n:ON.players.length, pl:ON.players.map(function(p){ return p.u; }) };
+    }catch(e){ return null; }
+  };
+  /* gabung ke ruangan dari undangan: pindah ke mode Online, keluar dari ruangan lama bila ada */
+  window.__tiJoin = async function(code){
+    code = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5);
+    if(code.length !== 5 || !meU()) return false;
+    if(ON.code === code) return true;
+    if(ON.busy) return false;
+    if(ON.code) await leaveRoom();
+    mode = "on"; paint();
+    await joinRoom(code);
+    return ON.code === code;
+  };
+  /* undangan yang diterima saat menu ini belum terbuka: Beranda menitipkan kodenya di __tiPendingRoom */
+  (function pend(){
+    try{
+      var P = parent, v = P && P.__tiPendingRoom;
+      if(v && v.code && meU() && !ON.busy){
+        P.__tiPendingRoom = null;
+        if(Date.now() - (+v.at || 0) < 90000) window.__tiJoin(v.code);
+      }
+    }catch(e){}
+    setTimeout(pend, 600);
+  })();
+
   /* ===== CHAT REALTIME ruangan online (Firestore: ti_rooms/{kode}/m). Aturan: dilarang spam dan kata kasar ===== */
   var CT = {
     id:{ title:"Chat ruangan", ph:"Ketik pesan…", send:"KIRIM", empty:"Belum ada pesan. Sapa pemain lain!",
@@ -11342,7 +11401,7 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
           bd.appendChild(mk("span", "ntag " + st, st === "accepted" ? t.acc : st === "declined" ? t.dec : t.canc));
           if(st === "accepted"){
             const a = mk("button", "nact nact2", t.open); a.type = "button";
-            a.addEventListener("click", e => { e.stopPropagation(); setOpen(false); location.hash = "turnamen"; }); bd.appendChild(a);
+            a.addEventListener("click", e => { e.stopPropagation(); setOpen(false); if(n.inv.kind === "room" && window.satuTitikJoinRoom) window.satuTitikJoinRoom(n.inv.oid); else location.hash = "turnamen"; }); bd.appendChild(a);
           }
         }
       }
@@ -11774,7 +11833,7 @@ const NSRC = (() => {
           const d = ch.doc, x = d.data() || {}, nid = "inv_" + d.id;
           let st = String(x.status || "pending");
           if(ch.type === "removed"){ const ex = n.list().find(i => i.id === nid); if(!ex || !ex.inv || ex.inv.status !== "pending") return; st = "cancelled"; }
-          const tt = invTx(x, st), inv = { docId: d.id, oid: String(x.oid || ""), status: st, tName: String(x.tName || ""), ownerName: String(x.ownerName || "") };
+          const tt = invTx(x, st), inv = { docId: d.id, oid: String(x.oid || ""), status: st, kind: (x.kind === "follow" || x.kind === "room") ? x.kind : "mod", tName: String(x.tName || ""), ownerName: String(x.ownerName || "") };
           if(!n.patch(nid, { inv, title: tt.title, body: tt.body }) && st === "pending") n.add({ id: nid, type: "invite", ts: +x.ts || Date.now(), inv, title: tt.title, body: tt.body });
         });
       }, onErr));
@@ -11784,32 +11843,65 @@ const NSRC = (() => {
         snap.docChanges().forEach(ch => {
           if(ch.type === "removed") return;
           const x = ch.doc.data() || {}, st = x.status; if(st !== "accepted" && st !== "declined") return;
-          const who = String(x.toName || x.toAccountId || "Pengguna"), nm = String(x.tName || "Turnamen"), ts = +x.at || Date.now(), yes = st === "accepted";
-          n.add({ id: "ir_" + ch.doc.id + "_" + st + "_" + ts, type: "invite", ts, read: ts < Date.now() - 14 * 864e5, act: { menu: "turnamen" },
+          const who = String(x.toName || x.toAccountId || "Pengguna"), nm = String(x.tName || "Turnamen"), ts = +x.at || Date.now(), yes = st === "accepted", fl = x.kind === "follow", rm = x.kind === "room";
+          n.add({ id: "ir_" + ch.doc.id + "_" + st + "_" + ts, type: "invite", ts, read: ts < Date.now() - 14 * 864e5, act: { menu: rm ? "tebak-inisial" : "turnamen" },
             title: yes ? { id: "Undangan diterima", en: "Invitation accepted" } : { id: "Undangan ditolak", en: "Invitation declined" },
-            body: yes ? { id: who + " menerima undangan moderator turnamen \"" + nm + "\".", en: who + " accepted the moderator invitation for \"" + nm + "\"." }
-                      : { id: who + " menolak undangan moderator turnamen \"" + nm + "\".", en: who + " declined the moderator invitation for \"" + nm + "\"." } });
+            body: rm ? (yes ? { id: who + " bergabung ke ruangan " + nm + ".", en: who + " joined the " + nm + " room." } : { id: who + " menolak ajakan ke ruangan " + nm + ".", en: who + " declined the invitation to the " + nm + " room." })
+                : yes ? { id: who + " menerima undangan " + (fl ? "mengikuti" : "moderator") + " turnamen \"" + nm + "\".", en: who + " accepted the " + (fl ? "follower" : "moderator") + " invitation for \"" + nm + "\"." }
+                      : { id: who + " menolak undangan " + (fl ? "mengikuti" : "moderator") + " turnamen \"" + nm + "\".", en: who + " declined the " + (fl ? "follower" : "moderator") + " invitation for \"" + nm + "\"." } });
         });
       }, onErr));
       watchJoined(); jt = setInterval(watchJoined, 15000);
     }catch(e){}
   }
   const invTx = (x, st) => {
-    const nm = String(x.tName || "Turnamen"), ow = String(x.ownerName || "Admin");
-    if(st === "accepted") return { title: { id: "Undangan diterima", en: "Invitation accepted" }, body: { id: "Kamu sekarang moderator turnamen \"" + nm + "\".", en: "You are now a moderator of \"" + nm + "\"." } };
-    if(st === "declined") return { title: { id: "Undangan ditolak", en: "Invitation declined" }, body: { id: "Kamu menolak undangan moderator turnamen \"" + nm + "\".", en: "You declined the moderator invitation for \"" + nm + "\"." } };
-    if(st === "cancelled") return { title: { id: "Undangan dibatalkan", en: "Invitation cancelled" }, body: { id: ow + " membatalkan undangan moderator untuk turnamen \"" + nm + "\".", en: ow + " cancelled the moderator invitation for \"" + nm + "\"." } };
-    return { title: { id: "Undangan moderator", en: "Moderator invitation" }, body: { id: ow + " mengundangmu menjadi moderator turnamen \"" + nm + "\". Terima atau tolak undangan ini.", en: ow + " invited you to be a moderator of \"" + nm + "\". Accept or decline." } };
+    const nm = String(x.tName || "Turnamen"), ow = String(x.ownerName || "Admin"), fl = x.kind === "follow";
+    if(x.kind === "room"){
+      const cd = String(x.oid || ""), rn = "Tebak Inisial (" + cd + ")";
+      if(st === "accepted") return { title: { id: "Undangan diterima", en: "Invitation accepted" }, body: { id: "Kamu bergabung ke ruangan " + rn + ".", en: "You joined the " + rn + " room." } };
+      if(st === "declined") return { title: { id: "Undangan ditolak", en: "Invitation declined" }, body: { id: "Kamu menolak ajakan ke ruangan " + rn + ".", en: "You declined the invitation to the " + rn + " room." } };
+      if(st === "cancelled") return { title: { id: "Undangan dibatalkan", en: "Invitation cancelled" }, body: { id: ow + " membatalkan ajakan ke ruangan " + rn + ".", en: ow + " cancelled the invitation to the " + rn + " room." } };
+      return { title: { id: "Undangan ruangan game", en: "Game room invitation" }, body: { id: ow + " mengajakmu bergabung ke ruangan " + rn + ". Terima atau tolak undangan ini.", en: ow + " invited you to join the " + rn + " room. Accept or decline." } };
+    }
+    const ri = fl ? "mengikuti" : "moderator", re = fl ? "follower" : "moderator";
+    if(st === "accepted") return fl ? { title: { id: "Undangan diterima", en: "Invitation accepted" }, body: { id: "Kamu sekarang mengikuti turnamen \"" + nm + "\".", en: "You are now following \"" + nm + "\"." } }
+      : { title: { id: "Undangan diterima", en: "Invitation accepted" }, body: { id: "Kamu sekarang moderator turnamen \"" + nm + "\".", en: "You are now a moderator of \"" + nm + "\"." } };
+    if(st === "declined") return { title: { id: "Undangan ditolak", en: "Invitation declined" }, body: { id: "Kamu menolak undangan " + ri + " turnamen \"" + nm + "\".", en: "You declined the " + re + " invitation for \"" + nm + "\"." } };
+    if(st === "cancelled") return { title: { id: "Undangan dibatalkan", en: "Invitation cancelled" }, body: { id: ow + " membatalkan undangan " + ri + " untuk turnamen \"" + nm + "\".", en: ow + " cancelled the " + re + " invitation for \"" + nm + "\"." } };
+    return { title: { id: fl ? "Undangan mengikuti turnamen" : "Undangan moderator", en: fl ? "Tournament follow invitation" : "Moderator invitation" },
+      body: { id: ow + " mengundangmu " + (fl ? "mengikuti" : "menjadi moderator") + " turnamen \"" + nm + "\". Terima atau tolak undangan ini.", en: ow + " invited you to " + (fl ? "follow" : "be a moderator of") + " \"" + nm + "\". Accept or decline." } };
+  };
+  /* buka menu Tebak Inisial dan masuk ke ruangan: langsung bila menunya sudah terbuka, kalau belum dititipkan ke __tiPendingRoom */
+  window.satuTitikJoinRoom = function(code){
+    code = String(code || "");
+    try{ const f = document.getElementById("frame"), v = document.getElementById("view"), w = f && v && !v.hidden ? f.contentWindow : null;
+      if(w && typeof w.__tiJoin === "function"){ w.__tiJoin(code); return; } }catch(e){}
+    window.__tiPendingRoom = { code, at: Date.now() };
+    location.hash = "tebak-inisial";
   };
   async function respond(n, accept){
     try{
       const u = A.user, acc = A.accountId;
       if(!u || !n || !n.inv) return { ok: false, err: "login" };
-      if(accept && !acc) return { ok: false, err: "id" };
+      const fl = n.inv.kind === "follow";
+      const rm = n.inv.kind === "room";
+      if(accept && !fl && !rm && !acc) return { ok: false, err: "id" };
+      if(accept && rm){   /* ruangan harus masih ada */
+        const { m: m0, db: d0 } = await A.getDb(), rs = await m0.getDoc(m0.doc(d0, "ti_rooms", n.inv.oid));
+        if(!rs.exists()) return { ok: false, err: "ruangan sudah ditutup" };
+      }
       const { m, db } = await A.getDb(), b = m.writeBatch(db);
       b.update(m.doc(db, "invites", n.inv.docId), { status: accept ? "accepted" : "declined", at: Date.now() });
-      if(accept) b.update(m.doc(db, "tournaments", n.inv.oid), { modIds: m.arrayUnion(acc) });
+      if(accept && fl){
+        const nm = String((A.username && A.usernameUid === u.uid ? A.username : "") || u.displayName || "");
+        b.set(m.doc(db, "tournaments", n.inv.oid, "followers", u.uid), { n: nm, t: Date.now() });
+      } else if(accept && !rm) b.update(m.doc(db, "tournaments", n.inv.oid), { modIds: m.arrayUnion(acc) });
       await b.commit();
+      if(accept && rm){
+        try{ const bb = document.getElementById("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click(); }catch(e){}
+        try{ window.satuTitikJoinRoom(n.inv.oid); }catch(e){}
+      }
+      if(accept && fl){ try{ const j = JSON.parse(localStorage.getItem("tt_joined") || "[]"), a = Array.isArray(j) ? j : []; if(!a.includes(n.inv.oid)){ a.push(n.inv.oid); localStorage.setItem("tt_joined", JSON.stringify(a)); } }catch(e){} }
       const st = accept ? "accepted" : "declined", tt = invTx(n.inv, st);
       N().patch(n.id, { inv: { status: st }, title: tt.title, body: tt.body });
       return { ok: true };
@@ -12075,17 +12167,25 @@ if(navigator.onLine !== false) init().catch(() => {});
       sent:"Permintaan terkirim.", acd:"Kalian sekarang berteman.", rmd:"Teman dihapus.", decd:"Permintaan ditolak.", cand:"Permintaan dibatalkan.",
       e_fmt:"Format ID Akun: ST-000000.", e_self:"Itu ID Akunmu sendiri.", e_nf:"ID Akun tidak ditemukan.", e_already:"Kalian sudah berteman.", e_pending:"Permintaan sudah terkirim. Tunggu temanmu menerimanya.",
       e_noacc:"ID Akunmu belum siap. Coba lagi sebentar lagi.", e_perm:"Izin ditolak oleh server. Pastikan aturan Firestore sudah diperbarui.", e_off:"Tidak ada koneksi internet.", e_fail:"Gagal. Coba lagi.", login:"Masuk dengan Google untuk memakai fitur teman.",
-      rqT:"Permintaan pertemanan", rqB:"{n} ({a}) ingin berteman denganmu.", okT:"Pertemanan diterima", okB:"{n} ({a}) menerima permintaan pertemananmu.", nFr:"{n} teman", nRq:"{n} permintaan baru" },
+      rqT:"Permintaan pertemanan", rqB:"{n} ({a}) ingin berteman denganmu.", okT:"Pertemanan diterima", okB:"{n} ({a}) menerima permintaan pertemananmu.", nFr:"{n} teman", nRq:"{n} permintaan baru",
+      invH:"Undang ke turnamen “{n}”:", invM:"Jadikan moderator", invF:"Undang pengikut", invW:"Menunggu…", invMem:"Moderator ✓", invFd:"Undang lagi", invMd:"Undang lagi (moderator)", invMok:"Undangan moderator terkirim.", invFok:"Undangan pengikut terkirim.",
+      e_invp:"Undangan masih menunggu jawaban.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
+      invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
     en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
       inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
       sent:"Request sent.", acd:"You are now friends.", rmd:"Friend removed.", decd:"Request declined.", cand:"Request cancelled.",
       e_fmt:"Account ID format: ST-000000.", e_self:"That is your own Account ID.", e_nf:"Account ID not found.", e_already:"You are already friends.", e_pending:"The request is already sent. Wait for your friend to accept.",
       e_noacc:"Your Account ID is not ready yet. Try again in a moment.", e_perm:"Permission denied by the server. Make sure the Firestore rules are updated.", e_off:"No internet connection.", e_fail:"Failed. Please try again.", login:"Sign in with Google to use friends.",
-      rqT:"Friend request", rqB:"{n} ({a}) wants to be your friend.", okT:"Friend request accepted", okB:"{n} ({a}) accepted your friend request.", nFr:"{n} friends", nRq:"{n} new requests" }
+      rqT:"Friend request", rqB:"{n} ({a}) wants to be your friend.", okT:"Friend request accepted", okB:"{n} ({a}) accepted your friend request.", nFr:"{n} friends", nRq:"{n} new requests",
+      invH:"Invite to tournament “{n}”:", invM:"Make moderator", invF:"Invite follower", invW:"Pending…", invMem:"Moderator ✓", invFd:"Invite again", invMd:"Invite again (moderator)", invMok:"Moderator invite sent.", invFok:"Follower invite sent.",
+      e_invp:"The invite is still pending.", e_invmem:"They are already a moderator.", e_invmax:"At most 20 moderators.", e_noctx:"Open an online tournament’s detail (as admin) first.", e_invself:"That is your own account.",
+      invRH:"Invite to Guess the Initial room “{n}”:", invR:"Invite to room", invRin:"Already in the room ✓", invRf:"Room is full", invRok:"Room invite sent." }
   };
   const A = () => window.satuTitikAuth || null;
   const myAcc = () => { const a = A(); return a && a.accountId ? String(a.accountId).toUpperCase() : ""; };
   const mk = (tag, cls, txt) => { const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; };
+  let lastSig = "", sigTimer = 0;
+  let invOut = {}, unsubI = null;
   let rows = [], dir = {}, unsub = null, curUid = "", msg = "", msgOk = true, working = false, confirmId = "", inVal = "";
   const subs = new Set();
   const emit = () => { subs.forEach(f => { try{ f(); }catch(e){} }); try{ refresh(); }catch(e){} };
@@ -12113,12 +12213,17 @@ if(navigator.onLine !== false) init().catch(() => {});
   }
   async function start(u){
     if(unsub){ try{ unsub(); }catch(e){} unsub = null; }
-    rows = []; emit();
+    if(unsubI){ try{ unsubI(); }catch(e){} unsubI = null; }
+    invOut = {}; rows = []; emit();
     if(!u) return;
     const a = A(); if(!a || !a.getDb) return;
     try{
       const { m, db } = await a.getDb();
       if(!A() || !A().user || A().user.uid !== u.uid) return;
+      unsubI = m.onSnapshot(m.query(m.collection(db, "invites"), m.where("ownerUid", "==", u.uid)), snap => {
+        const o = {}; snap.docs.forEach(d => { const x = d.data() || {}; if(x.kind === "room") o[d.id] = { st: String(x.status || ""), ts: +x.ts || 0 }; });
+        invOut = o; try{ refresh(); }catch(e){}
+      }, () => {});
       unsub = m.onSnapshot(m.query(m.collection(db, "friendships"), m.where("u", "array-contains", u.uid)), snap => {
         rows = snap.docs.map(d => norm(d.id, d.data(), u.uid)).filter(Boolean);
         const ev = [];
@@ -12188,6 +12293,46 @@ if(navigator.onLine !== false) init().catch(() => {});
     const w = mk("div", "frwho"); w.appendChild(mk("p", "frnm", nameOf(r.acc))); w.appendChild(mk("p", "frid", r.acc)); li.appendChild(w);
     const b = mk("div", "frbt"); btns.forEach(x => b.appendChild(x)); li.appendChild(b); return li;
   }
+  /* konteks turnamen dari menu Turnamen yang sedang terbuka (iframe); null bila bukan admin turnamen online */
+  function tctx(){
+    try{ const f = $("frame"), v = $("view"); if(f && v && !v.hidden && f.contentWindow && typeof f.contentWindow.__stInviteCtx === "function") return f.contentWindow.__stInviteCtx(); }catch(e){}
+    return null;
+  }
+  /* konteks ruangan Tebak Inisial dari menu yang sedang terbuka (null bila tidak sedang di dalam ruangan online) */
+  function rctx(){
+    try{ const f = $("frame"), v = $("view"); if(f && v && !v.hidden && f.contentWindow && typeof f.contentWindow.__tiInviteCtx === "function") return f.contentWindow.__tiInviteCtx(); }catch(e){}
+    return null;
+  }
+  const sigNow = () => { const a = tctx(), b = rctx(); return (a || b) ? JSON.stringify([a, b, b ? invOut : 0]) : ""; };
+  async function inviteRoom(rc, r){
+    const a = A(), u = a && a.user; if(!u) throw new Error("e_fail");
+    if(r.acc === myAcc()) throw new Error("e_invself");
+    const { m, db } = await a.getDb(), id = "ti_" + rc.code + "_" + r.acc, ref = m.doc(db, "invites", id), ex = await m.getDoc(ref);
+    if(ex.exists()){
+      const d = ex.data() || {};
+      if(d.status === "pending" && Date.now() - (+d.ts || 0) < 600000) throw new Error("e_invp");
+      await m.deleteDoc(ref);
+    }
+    const nm = String((a.username && a.usernameUid === u.uid ? a.username : "") || u.displayName || u.email || "");
+    await m.setDoc(ref, { oid: rc.code, kind: "room", tName: "Tebak Inisial · " + rc.code, ownerUid: u.uid, ownerName: nm, toUid: r.uid, toAccountId: r.acc, toName: nameOf(r.acc), status: "pending", ts: Date.now() });
+  }
+  function roomBar(r, t, c){
+    const bar = mk("div", "frinv"), o = invOut["ti_" + c.code + "_" + r.acc], inRoom = c.pl.includes(r.uid), pend = !!o && o.st === "pending" && Date.now() - o.ts < 600000, full = c.n >= 8;
+    const label = inRoom ? t.invRin : pend ? t.invW : full ? t.invRf : (o ? t.invFd : t.invR);
+    bar.appendChild(btn(label, "ok sm", () => run("invRok", async () => { await inviteRoom(c, r); }), inRoom || pend || full));
+    return bar;
+  }
+  function invBar(r, t, c){
+    const s0 = c.st[r.acc] || {}, bar = mk("div", "frinv");
+    const mk1 = (label, kind, st, dis) => { const b = btn(label, "ok sm", () => run(kind === "mod" ? "invMok" : "invFok", async () => {
+      const f = $("frame"), w = f && f.contentWindow; if(!w || typeof w.__stInvite !== "function") throw new Error("e_noctx");
+      await w.__stInvite(kind, { uid: r.uid, acc: r.acc, name: nameOf(r.acc) });
+    }), dis); return b; };
+    const ms = s0.mod, fs = s0.follow;
+    bar.appendChild(mk1(ms === "member" ? t.invMem : ms === "pending" ? t.invW : ms === "declined" || ms === "accepted" ? t.invMd : t.invM, "mod", ms, ms === "member" || ms === "pending"));
+    bar.appendChild(mk1(fs === "pending" ? t.invW : fs === "accepted" || fs === "declined" ? t.invFd : t.invF, "follow", fs, fs === "pending"));
+    return bar;
+  }
   function btn(label, cls, fn, disabled){ const b = mk("button", cls, label); b.type = "button"; b.disabled = !!disabled || working; b.addEventListener("click", fn); return b; }
   async function run(okKey, fn){
     working = true; msg = ""; paint();
@@ -12222,13 +12367,16 @@ if(navigator.onLine !== false) init().catch(() => {});
       out.forEach(r => s.appendChild(row(r, t, [btn(t.cancel, "", () => run("cand", async () => { await act("del", r); return "cand"; }))])));
       pv.appendChild(s);
     }
-    const fr = accepted(), s = mk("div", "frbox"); s.appendChild(mk("p", "frl", t.fr + " (" + fr.length + ")"));
+    const fr = accepted(), s = mk("div", "frbox"), tc = tctx(), rc = tc ? null : rctx(); lastSig = sigNow();
+    s.appendChild(mk("p", "frl", t.fr + " (" + fr.length + ")"));
+    if(tc && fr.length) s.appendChild(mk("p", "frh", t.invH.replace("{n}", tc.name || tc.oid)));
+    else if(rc && fr.length) s.appendChild(mk("p", "frh", t.invRH.replace("{n}", rc.code)));
     if(!fr.length) s.appendChild(mk("p", "frh", t.none));
     fr.forEach(r => {
       if(confirmId === r.id){
         const li = row(r, t, [btn(t.yes, "ok dng", () => { confirmId = ""; run("rmd", async () => { await act("del", r); return "rmd"; }); }), btn(t.no, "", () => { confirmId = ""; paint(); })]);
         s.appendChild(li); s.appendChild(mk("p", "frerr", t.sure));
-      } else s.appendChild(row(r, t, [btn(t.rm, "dng", () => { confirmId = r.id; paint(); })]));
+      } else { s.appendChild(row(r, t, [btn(t.rm, "dng", () => { confirmId = r.id; paint(); })])); if(tc) s.appendChild(invBar(r, t, tc)); else if(rc) s.appendChild(roomBar(r, t, rc)); }
     });
     pv.appendChild(s);
     if(hadFocus){ const i = $("spFrIn"); if(i){ i.focus(); try{ i.setSelectionRange(sel[0], sel[1]); }catch(e){} } }
@@ -12247,7 +12395,12 @@ if(navigator.onLine !== false) init().catch(() => {});
       confirmId = ""; msg = "";
     }
     panel.hidden = !on; btns.forEach(b => b.setAttribute("aria-expanded", String(on)));
-    if(on) paint();
+    clearInterval(sigTimer); sigTimer = 0;
+    if(on){
+      paint();
+      /* selagi panel terbuka, pantau perubahan status undangan / turnamen di menu Turnamen */
+      sigTimer = setInterval(() => { if(working) return; const sg = sigNow(); if(sg !== lastSig){ const ae = document.activeElement; if(ae && ae.id === "spFrIn") return; paint(); } }, 800);
+    }
   }
   function refresh(){
     const t = T[lang()], a = A(), u = !!(a && a.user), q = incoming().length;
