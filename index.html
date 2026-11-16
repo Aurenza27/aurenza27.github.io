@@ -9789,6 +9789,9 @@ body.noanim .rm-live i{animation:none}
 .vt{font-size:12.5px;line-height:1.4;color:var(--muted);font-variant-numeric:tabular-nums}
 .vrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}
 .orow.dim{opacity:.55}
+.orow.me{background:rgba(212,169,79,.07);border-radius:10px;padding-left:8px;padding-right:8px}
+.orow.me .ol b{color:var(--gold2)}
+.ord{margin-left:6px;font-size:11.5px;font-weight:400;color:var(--muted)}
 .orow .pts small{display:block;font-size:11px;font-weight:400;color:var(--muted);text-align:right}
 .rk{display:inline-block;min-width:26px}
 .ghost.exit{color:#e8776c;border-color:rgba(224,69,58,.45)}
@@ -10123,6 +10126,7 @@ button:disabled{opacity:.6}
       code:"KODE RUANG", copy:"Salin kode", copied:"Kode disalin.", pl:"Pemain", hostTag:"pemilik", me:"kamu",
       start:"▶ MULAI RONDE", next:"▶ RONDE BERIKUTNYA", waitStart:"Menunggu pemilik ruang memulai…", waitNext:"Menunggu pemilik ruang…", solo:"Bisa dimulai sendirian untuk mencoba, tapi lebih seru bersama teman.",
       close:"Tutup ruang", leave:"Keluar dari ruangan", sure:"Ketuk lagi untuk memastikan",
+      mkLim:"Jawaban yang diterima", mkLimHint:"Hanya jawaban tercepat yang dihitung. Jawaban salah atau ditolak membuka tempat bagi jawaban berikutnya.", limHint:"🎯 Hanya {n} jawaban tercepat yang diterima. Jawaban salah atau ditolak membuka tempat bagi jawaban berikutnya.", lateTag:"kuota penuh", wrongTag:"salah", n1:"jawaban",
       vote:"Vote", voteOpen:"Voting jawaban", vYes:"Terima", vNo:"Tolak", vVoted:"sudah memilih", vApply:"Terapkan hasil", vCancel:"Batal", vOwn:"Jawabanmu sedang divote pemain lain.", vAcc:"Diterima lewat voting", vRej:"Ditolak lewat voting", boardHint:"Total skor dari semua ronde. Seri voting = jawaban diterima.", left:"keluar",
       rd:"Ronde", ph:"Ketik jawabanmu", send:"KIRIM", sent:"Terkirim ✓ (bisa diubah sebelum waktu habis)", cnt:"sudah menjawab", up:"⏰ Waktu habis!", hostNow:"Buka jawaban sekarang",
       none:"(tidak menjawab)", rej:"Tolak", acc:"Terima", rejd:"ditolak", board:"Klasemen", pts:"poin",
@@ -10134,6 +10138,7 @@ button:disabled{opacity:.6}
       code:"ROOM CODE", copy:"Copy code", copied:"Code copied.", pl:"Players", hostTag:"owner", me:"you",
       start:"▶ START ROUND", next:"▶ NEXT ROUND", waitStart:"Waiting for the room owner to start…", waitNext:"Waiting for the room owner…", solo:"You can start alone to try it out, but it is more fun with friends.",
       close:"Close room", leave:"Leave room", sure:"Tap again to confirm",
+      mkLim:"Accepted answers", mkLimHint:"Only the fastest answers count. A wrong or rejected answer frees a spot for the next one.", limHint:"🎯 Only the fastest {n} answers are accepted. A wrong or rejected answer frees a spot for the next one.", lateTag:"quota full", wrongTag:"wrong", n1:"answers",
       vote:"Vote", voteOpen:"Answer vote", vYes:"Accept", vNo:"Reject", vVoted:"voted", vApply:"Apply result", vCancel:"Cancel", vOwn:"Other players are voting on your answer.", vAcc:"Accepted by vote", vRej:"Rejected by vote", boardHint:"Total score across all rounds. A tied vote keeps the answer accepted.", left:"left",
       rd:"Round", ph:"Type your answer", send:"SEND", sent:"Sent ✓ (you can change it before time is up)", cnt:"answered", up:"⏰ Time is up!", hostNow:"Reveal answers now",
       none:"(no answer)", rej:"Reject", acc:"Accept", rejd:"rejected", board:"Scoreboard", pts:"pts",
@@ -10141,7 +10146,8 @@ button:disabled{opacity:.6}
   };
   var mode = "off";
   var ON = { catOpen:false, names:{}, applying:false, fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
-             secs:(+ls("ti_osecs", 45) || 45) };
+             secs:(+ls("ti_osecs", 45) || 45), lim:(+ls("ti_olim", 5) || 5) };
+  if([2, 3, 4, 5].indexOf(ON.lim) < 0) ON.lim = 5;
   if([30, 45, 60].indexOf(ON.secs) < 0) ON.secs = 45;
   function oT(){ return OT[lang]; }
   function el(tag, cls, txt){ var e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
@@ -10194,10 +10200,17 @@ button:disabled{opacity:.6}
   /*SC-START*/
   function norm(t){ return String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, ""); }
   function okAns(r, l){ var n = norm(r.t); return !r.x && n.length >= 2 && n.charAt(0) === String(l).toLowerCase(); }
-  function scoreOf(res, l){
-    var cnt = {}, out = {};
-    res.forEach(function(r){ if(okAns(r, l)){ var n = norm(r.t); cnt[n] = (cnt[n] || 0) + 1; } });
-    res.forEach(function(r){ out[r.u] = okAns(r, l) ? (cnt[norm(r.t)] > 1 ? 5 : 10) : 0; });
+  function limOf(d){ var n = +(d && d.lim) || 0; return (n >= 2 && n <= 5) ? n : 0; }
+  /* kuota jawaban: res sudah urut menurut waktu masuk; hanya `lim` jawaban sah pertama yang masuk, jawaban salah/ditolak tidak memakai tempat */
+  function slotSet(res, l, lim){
+    var ok = {}, used = 0;
+    res.forEach(function(r){ if(okAns(r, l) && (!lim || used < lim)){ ok[r.u] = 1; used++; } });
+    return ok;
+  }
+  function scoreOf(res, l, lim){
+    var cnt = {}, out = {}, ok = slotSet(res, l, lim);
+    res.forEach(function(r){ if(ok[r.u]){ var n = norm(r.t); cnt[n] = (cnt[n] || 0) + 1; } });
+    res.forEach(function(r){ out[r.u] = ok[r.u] ? (cnt[norm(r.t)] > 1 ? 5 : 10) : 0; });
     return out;
   }
   function totalOf(d, u){ return ((d.base && d.base[u]) || 0) + ((d.pts && d.pts[u]) || 0); }
@@ -10228,7 +10241,7 @@ button:disabled{opacity:.6}
     setBusy(true);
     try{
       var f = await lib(), m = f.m, db = f.db, code = "", ok = false, i;
-      var data = { host:u.uid, hn:meName(), st:"lobby", rd:0, l:"", c:"", secs:ON.secs, end:0, cats:catOn.slice(), res:[], pts:{}, base:{}, v:1, exp:m.Timestamp.fromMillis(Date.now() + 86400000) };
+      var data = { host:u.uid, hn:meName(), st:"lobby", rd:0, l:"", c:"", secs:ON.secs, lim:ON.lim, end:0, cats:catOn.slice(), res:[], pts:{}, base:{}, v:1, exp:m.Timestamp.fromMillis(Date.now() + 86400000) };
       for(i = 0; i < 6 && !ok; i++){
         code = genCode();
         try{ await m.setDoc(m.doc(db, "ti_rooms", code), po(data)); ok = true; }catch(e){ if(i === 5) throw e; }
@@ -10320,15 +10333,22 @@ button:disabled{opacity:.6}
     try{
       var f = await lib(), m = f.m, d = ON.data, ans = {};
       var snap = await m.getDocs(m.collection(f.db, "ti_rooms", ON.code, "a"));
-      snap.forEach(function(x){ var v = x.data(); if(v && v.rd === d.rd) ans[x.id] = String(v.t || "").slice(0, 30); });
-      var res = ON.players.map(function(p){ return { u:p.u, n:p.n, t:ans[p.u] || "", x:false }; });
-      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), po({ st:"reveal", res:res, pts:scoreOf(res, d.l) }));
+      var at = {};
+      snap.forEach(function(x){ var v = x.data(); if(v && v.rd === d.rd){ ans[x.id] = String(v.t || "").slice(0, 30); at[x.id] = (v.at && v.at.toMillis) ? v.at.toMillis() : 0; } });
+      var res = ON.players.map(function(p, i){ return { u:p.u, n:p.n, t:ans[p.u] || "", x:false, i:i }; });
+      /* urut menurut waktu masuk (jawaban tanpa catatan waktu di belakang, yang kosong paling akhir) */
+      res.sort(function(a, b){
+        var ea = a.t ? 0 : 1, eb = b.t ? 0 : 1; if(ea !== eb) return ea - eb;
+        var ta = at[a.u] || 9e15, tb = at[b.u] || 9e15; return (ta - tb) || (a.i - b.i);
+      });
+      res.forEach(function(r){ delete r.i; });
+      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), po({ st:"reveal", res:res, pts:scoreOf(res, d.l, limOf(d)) }));
     }catch(e){ setTimeout(function(){ ON.revealing = false; }, 3000); }
   }
   function cloneRes(res){ return (res || []).map(function(r){ return { u:r.u, n:r.n, t:r.t, x:!!r.x, q:+r.q || 0, vy:+r.vy || 0, vn:+r.vn || 0, vd:!!r.vd }; }); }
   async function saveRes(res){
     var d = ON.data, f = await lib();
-    await f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), po({ res:res, pts:scoreOf(res, d.l) }));
+    await f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), po({ res:res, pts:scoreOf(res, d.l, limOf(d)) }));
   }
   async function toggleRej(i){
     var d = ON.data; if(!d || !isHost() || d.st !== "reveal") return;
@@ -10400,7 +10420,7 @@ button:disabled{opacity:.6}
     Object.keys(d.base || {}).forEach(function(k){ ids[k] = 1; });
     bl.textContent = "";
     Object.keys(ids).sort(function(a, b){ return (totalOf(d, b) - totalOf(d, a)) || nameOf(a).localeCompare(nameOf(b)); }).forEach(function(k, i){
-      var row = el("div", "orow" + (inRoom[k] ? "" : " dim")), left = el("div", "ol"), tot = totalOf(d, k), nm = el("b");
+      var row = el("div", "orow" + (inRoom[k] ? "" : " dim") + (u && k === u.uid ? " me" : "")), left = el("div", "ol"), tot = totalOf(d, k), nm = el("b");
       nm.appendChild(el("span", "rk", (tot > 0 && i < 3) ? medals[i] : (i + 1) + "."));
       nm.appendChild(document.createTextNode(nameOf(k) + (u && k === u.uid ? " (" + t.me + ")" : "") + (inRoom[k] ? "" : " · " + t.left)));
       left.appendChild(nm);
@@ -10412,9 +10432,11 @@ button:disabled{opacity:.6}
   function submitAns(){
     var d = ON.data, u = meU(), inp = $("oAns"); if(!d || !u || !inp || d.st !== "play" || Date.now() > endMs(d) + 1000) return;
     var txt = String(inp.value || "").replace(/\s+/g, " ").trim().slice(0, 30); if(!txt) return;
-    var rd = d.rd; ON.sentRd = rd; paintAnsStat(); beep(880, 0.1, "triangle", 0.06);
+    var rd = d.rd, first = ON.sentRd !== rd; ON.sentRd = rd; paintAnsStat(); beep(880, 0.1, "triangle", 0.06);
     lib().then(function(f){
-      return Promise.all([ f.m.setDoc(f.m.doc(f.db, "ti_rooms", ON.code, "a", u.uid), po({ rd:rd, t:txt })), f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code, "p", u.uid), po({ d:rd })) ]);
+      var aRef = f.m.doc(f.db, "ti_rooms", ON.code, "a", u.uid);
+      /* waktu masuk (jam server) dicatat sekali per ronde; mengubah jawaban tidak menggeser urutan */
+      return Promise.all([ first ? f.m.setDoc(aRef, po({ rd:rd, t:txt, at:f.m.serverTimestamp() })) : f.m.updateDoc(aRef, po({ t:txt })), f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code, "p", u.uid), po({ d:rd })) ]);
     }).catch(function(e){ ON.sentRd = -1; flash(errMsg(e)); paintAnsStat(); });
   }
   /* ----- waktu ronde berbasis jam server (tidak tergantung jam HP pemilik ruang) ----- */
@@ -10595,6 +10617,17 @@ button:disabled{opacity:.6}
         seg.appendChild(c);
       });
       p.appendChild(seg);
+      p.appendChild(el("p", "hint", t.mkLim)); p.lastChild.style.margin = "12px 0 8px";
+      var sgL = el("div", "seg4");
+      [5, 4, 3, 2].forEach(function(n){
+        var c = el("button", "chip", String(n)); c.type = "button"; c.setAttribute("aria-pressed", String(ON.lim === n));
+        c.addEventListener("click", function(){
+          ON.lim = n; sv("ti_olim", n);
+          Array.prototype.forEach.call(sgL.children, function(x, i){ x.setAttribute("aria-pressed", String([5, 4, 3, 2][i] === n)); });
+        });
+        sgL.appendChild(c);
+      });
+      p.appendChild(sgL); p.appendChild(el("p", "hint", t.mkLimHint));
       p.appendChild(el("p", "hint", catOn.length + " / " + CATS.length + " " + t.mkCats));
       p.appendChild(btn("go sm act", t.mk, createRoom));
       host.appendChild(p);
@@ -10614,6 +10647,7 @@ button:disabled{opacity:.6}
       var rmLv = el("span", "rm-live"); rmLv.id = "oLive"; rmLv.appendChild(el("i")); var rmLt = el("span"); rmLt.id = "oLiveT"; rmLv.appendChild(rmLt); rmTp.appendChild(rmLv); p.appendChild(rmTp);
       var cb = el("div", "codebig"); cb.id = "oCode"; p.appendChild(cb);
       var rmMt = el("div", "rm-meta"); rmMt.appendChild(el("span", "rm-pill", "⏱ " + (d.secs || 45) + " " + T().sec));
+      if(limOf(d)) rmMt.appendChild(el("span", "rm-pill", "🎯 " + limOf(d) + " " + t.n1));
       var rmM2 = el("span", "rm-pill", ""); rmM2.id = "oMeta2"; rmMt.appendChild(rmM2); p.appendChild(rmMt);
       p.appendChild(btn("ghost", t.copy, function(){
         var c = ON.code;
@@ -10623,6 +10657,7 @@ button:disabled{opacity:.6}
       host.appendChild(p);
       p = panel(); var rmHd = el("div", "rm-head"); rmHd.appendChild(el("span", "label", t.pl)); var rmPc = el("span", "rm-count"); rmPc.id = "oPlN"; rmHd.appendChild(rmPc); p.appendChild(rmHd);
       var ul = el("ul", "hl rm-pl"); ul.id = "oPl"; p.appendChild(ul); host.appendChild(p);
+      p = panel(); p.appendChild(el("span", "label", t.board)); var bl1 = el("div"); bl1.id = "oBoard"; p.appendChild(bl1); host.appendChild(p);
       host.appendChild(catPanel());
       p = el("div", "oact");
       if(isHost()){
@@ -10654,6 +10689,7 @@ button:disabled{opacity:.6}
       var sd = btn("go sm", t.send, submitAns); sd.id = "oSend"; p.appendChild(sd);
       var st = el("p", "hint"); st.id = "oSt"; p.appendChild(st);
       var ct = el("p", "hint"); ct.id = "oCnt"; p.appendChild(ct);
+      if(limOf(d)) p.appendChild(el("p", "hint", t.limHint.replace("{n}", limOf(d))));
       host.appendChild(p);
       p = panel(); p.appendChild(el("span", "label", t.board)); var bl0 = el("div"); bl0.id = "oBoard"; p.appendChild(bl0); host.appendChild(p);
       p = panel(); var ul2 = el("ul", "hl rm-pl"); ul2.id = "oPl"; p.appendChild(ul2);
@@ -10710,23 +10746,25 @@ button:disabled{opacity:.6}
       paintAnsStat();
     }
     if(d.st === "reveal"){
-      var rl = $("oRes"), bl = $("oBoard"), res = d.res || [];
+      var rl = $("oRes"), bl = $("oBoard"), res = d.res || [], slots = slotSet(res, d.l, limOf(d)), seq = 0;
       if(rl){
         rl.textContent = "";
         res.forEach(function(r, i){
           var row = el("div", "orow"), left = el("div", "ol"), nm = el("b", "", r.n || "?");
           if(u && r.u === u.uid) nm.appendChild(document.createTextNode(" (" + t.me + ")"));
+          if(r.t){ seq++; nm.appendChild(el("span", "ord", "⚡ #" + seq)); }
           var tx = el("div", "oa" + (r.t ? "" : " dim"), r.t ? r.t : t.none);
           left.appendChild(nm); left.appendChild(tx);
           var vb = voteBox(r, i); if(vb) left.appendChild(vb);
-          var pts = (d.pts && d.pts[r.u]) || 0, pb = el("span", "pts" + (r.x ? " bad" : ""), r.x ? t.rejd : "+" + pts);
+          var pts = (d.pts && d.pts[r.u]) || 0, late = !!r.t && !r.x && okAns(r, d.l) && !slots[r.u], wrong = !!r.t && !r.x && !okAns(r, d.l),
+              pb = el("span", "pts" + ((r.x || late || wrong) ? " bad" : ""), r.x ? t.rejd : late ? t.lateTag : wrong ? t.wrongTag : "+" + pts);
           row.appendChild(left); row.appendChild(pb);
           if(isHost() && r.t){ var tg = btn("mini", r.x ? t.acc : t.rej, function(){ toggleRej(i); }); row.appendChild(tg); }
           rl.appendChild(row);
         });
       }
     }
-    if((d.st === "reveal" || d.st === "play") && $("oBoard")) paintBoard($("oBoard"), d);
+    if($("oBoard")) paintBoard($("oBoard"), d);
   }
 
   /* ----- pergantian mode dan hubungan ke pengaturan Beranda ----- */
