@@ -213,6 +213,8 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #frpanel .frmsg.me{align-self:flex-end;background:rgba(212,169,79,.2);border:1px solid rgba(212,169,79,.38);border-bottom-right-radius:4px;cursor:pointer}
 #frpanel .frmsg.th{align-self:flex-start;background:rgba(255,255,255,.07);border:1px solid var(--line);border-bottom-left-radius:4px}
 #frpanel .frmt{color:var(--text);white-space:pre-wrap}
+#frpanel .frmsg.gone{cursor:default;opacity:.75}
+#frpanel .frmsg.gone .frmt{font-style:italic;color:var(--muted)}
 #frpanel .frmtm{display:block;margin-top:1px;font-size:9.5px;color:var(--muted);text-align:right}
 #frpanel .frmdel{display:block;margin:4px 0 0 auto;min-height:24px!important;padding:0 8px!important;font-size:11px!important;border-color:#c0605a!important;color:#f0a0a0!important}
 #frpanel .frcmp{display:flex;gap:6px}
@@ -12480,7 +12482,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   const lang = () => (typeof S !== "undefined" && S && S.lang === "en") ? "en" : "id";
   const T = {
     id:{ ttl:"Teman", sub0:"Daftar teman dan permintaan", add:"TAMBAH TEMAN", addS:"Tambah teman", stOn:"Online", stOff:"Offline", addH:"Masukkan ID Akun temanmu, misalnya ST-000004.", mine:"ID Akunmu: ", ph:"ST-000000", send:"Kirim permintaan", busy:"Mohon tunggu…",
-      inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", pm:"💬 Pesan pribadi", back:"Kembali", msgPh:"Tulis pesan…", msgNone:"Belum ada pesan. Sapa temanmu!", msgDel:"Hapus pesan", msgSend:"Kirim", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
+      inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", pm:"💬 Pesan pribadi", back:"Kembali", msgPh:"Tulis pesan…", msgNone:"Belum ada pesan. Sapa temanmu!", msgDel:"Hapus pesan", msgGone:"Pesan telah dihapus", msgSend:"Kirim", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
       sent:"Permintaan terkirim.", acd:"Kalian sekarang berteman.", rmd:"Teman dihapus.", decd:"Permintaan ditolak.", cand:"Permintaan dibatalkan.",
       e_fmt:"Format ID Akun: ST-000000.", e_self:"Itu ID Akunmu sendiri.", e_nf:"ID Akun tidak ditemukan.", e_already:"Kalian sudah berteman.", e_pending:"Permintaan sudah terkirim. Tunggu temanmu menerimanya.",
       e_noacc:"ID Akunmu belum siap. Coba lagi sebentar lagi.", e_perm:"Izin ditolak oleh server. Pastikan aturan Firestore sudah diperbarui.", e_off:"Tidak ada koneksi internet.", e_fail:"Gagal. Coba lagi.", login:"Masuk dengan Google untuk memakai fitur teman.",
@@ -12491,7 +12493,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       e_invp:"Undangan masih menunggu jawaban.", e_banned:"Akun ini tidak bisa bergabung kembali ke ruangan ini karena sudah dikeluarkan pemilik ruangan.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
       invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
     en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addS:"Add friend", stOn:"Online", stOff:"Offline", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
-      inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", pm:"💬 Private message", back:"Back", msgPh:"Write a message…", msgNone:"No messages yet. Say hi!", msgDel:"Delete message", msgSend:"Send", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
+      inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", pm:"💬 Private message", back:"Back", msgPh:"Write a message…", msgNone:"No messages yet. Say hi!", msgDel:"Delete message", msgGone:"This message was deleted", msgSend:"Send", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
       sent:"Request sent.", acd:"You are now friends.", rmd:"Friend removed.", decd:"Request declined.", cand:"Request cancelled.",
       e_fmt:"Account ID format: ST-000000.", e_self:"That is your own Account ID.", e_nf:"Account ID not found.", e_already:"You are already friends.", e_pending:"The request is already sent. Wait for your friend to accept.",
       e_noacc:"Your Account ID is not ready yet. Try again in a moment.", e_perm:"Permission denied by the server. Make sure the Firestore rules are updated.", e_off:"No internet connection.", e_fail:"Failed. Please try again.", login:"Sign in with Google to use friends.",
@@ -12767,7 +12769,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       const { m, db } = await a.getDb(); if(chatId !== r.id) return;
       chatUnsub = m.onSnapshot(m.query(m.collection(db, "friendships", r.id, "msgs"), m.orderBy("at", "desc"), m.limit(60)), sn => {
         if(chatId !== r.id) return;
-        chatMsgs = sn.docs.map(d => { const x = d.data({ serverTimestamps: "estimate" }) || {}; return { id: d.id, u: String(x.u || ""), t: String(x.t || ""), ms: x.at && x.at.toMillis ? x.at.toMillis() : Date.now() }; }).reverse();
+        chatMsgs = sn.docs.map(d => { const x = d.data({ serverTimestamps: "estimate" }) || {}; return { id: d.id, u: String(x.u || ""), t: String(x.t || ""), g: x.del === true, ms: x.at && x.at.toMillis ? x.at.toMillis() : Date.now() }; }).reverse();
         chatLoaded = true; const last = chatMsgs[chatMsgs.length - 1];
         if(last) setRead(r.id, last.ms); unread[r.id] = false;
         try{ refresh(); }catch(e){}
@@ -12784,7 +12786,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   }
   async function delMsg(id){
     const a = A(), fid = chatId; delId = ""; chatErr = "";
-    try{ const { m, db } = await a.getDb(); await m.deleteDoc(m.doc(db, "friendships", fid, "msgs", id)); }catch(e){ chatErr = ferr(e); }
+    try{ const { m, db } = await a.getDb(); await m.updateDoc(m.doc(db, "friendships", fid, "msgs", id), { t: "", del: true }); }catch(e){ chatErr = ferr(e); }
     paintChat();
   }
   /* hapus semua pesan sebuah pertemanan (dipanggil sebelum teman dihapus) */
@@ -12820,9 +12822,9 @@ if(navigator.onLine !== false) init().catch(() => {});
     let pd = "";
     chatMsgs.forEach(x => {
       const dk = new Date(x.ms).toDateString(); if(dk !== pd){ pd = dk; lg.appendChild(mk("p", "frday", dayLbl(x.ms))); }
-      const mine = x.u === me, b = mk("div", "frmsg " + (mine ? "me" : "th"));
-      b.appendChild(mk("span", "frmt", x.t)); b.appendChild(mk("span", "frmtm", hhmm(x.ms)));
-      if(mine){
+      const mine = x.u === me, b = mk("div", "frmsg " + (mine ? "me" : "th") + (x.g ? " gone" : ""));
+      b.appendChild(mk("span", "frmt", x.g ? "🚫 " + t.msgGone : x.t)); b.appendChild(mk("span", "frmtm", hhmm(x.ms)));
+      if(mine && !x.g){
         const tg = () => { delId = delId === x.id ? "" : x.id; paintChat(); };
         b.tabIndex = 0; b.setAttribute("role", "button"); b.addEventListener("click", tg);
         b.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); tg(); } });
