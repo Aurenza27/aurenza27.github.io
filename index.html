@@ -12354,7 +12354,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       acT:"Pertemanan diterima", acB:"Kamu sekarang berteman dengan {n} ({a}).", dnT:"Permintaan ditolak", dnB:"Kamu menolak permintaan pertemanan {n} ({a}).", cnT:"Permintaan dibatalkan", cnB:"{n} ({a}) membatalkan permintaan pertemanannya.", rjT:"Permintaan pertemanan ditolak", rjB:"{n} ({a}) menolak permintaan pertemananmu.",
       invH:"Undang ke turnamen “{n}”:", invM:"Jadikan moderator", invF:"Undang pengikut", invW:"Menunggu…", invMem:"Moderator ✓", invFd:"Undang lagi", invMd:"Undang lagi (moderator)", invMok:"Undangan moderator terkirim.", invFok:"Undangan pengikut terkirim.",
       e_max:"Daftar temanmu sudah penuh (maksimal 20 teman, termasuk permintaan terkirim).",
-      e_invp:"Undangan masih menunggu jawaban.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
+      e_invp:"Undangan masih menunggu jawaban.", e_banned:"Akun ini tidak bisa bergabung kembali ke ruangan ini karena sudah dikeluarkan pemilik ruangan.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
       invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
     en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
       inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
@@ -12365,7 +12365,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       acT:"Friend request accepted", acB:"You are now friends with {n} ({a}).", dnT:"Request declined", dnB:"You declined the friend request from {n} ({a}).", cnT:"Request cancelled", cnB:"{n} ({a}) cancelled their friend request.", rjT:"Friend request declined", rjB:"{n} ({a}) declined your friend request.",
       invH:"Invite to tournament “{n}”:", invM:"Make moderator", invF:"Invite follower", invW:"Pending…", invMem:"Moderator ✓", invFd:"Invite again", invMd:"Invite again (moderator)", invMok:"Moderator invite sent.", invFok:"Follower invite sent.",
       e_max:"Your friend list is full (maximum 20 friends, including sent requests).",
-      e_invp:"The invite is still pending.", e_invmem:"They are already a moderator.", e_invmax:"At most 20 moderators.", e_noctx:"Open an online tournament’s detail (as admin) first.", e_invself:"That is your own account.",
+      e_invp:"The invite is still pending.", e_banned:"This account cannot rejoin this room because it was removed by the room owner.", e_invmem:"They are already a moderator.", e_invmax:"At most 20 moderators.", e_noctx:"Open an online tournament’s detail (as admin) first.", e_invself:"That is your own account.",
       invRH:"Invite to Guess the Initial room “{n}”:", invR:"Invite to room", invRin:"Already in the room ✓", invRf:"Room is full", invRok:"Room invite sent." }
   };
   const MAX_FRIENDS = 20;
@@ -12522,7 +12522,11 @@ if(navigator.onLine !== false) init().catch(() => {});
   async function inviteRoom(rc, r){
     const a = A(), u = a && a.user; if(!u) throw new Error("e_fail");
     if(r.acc === myAcc()) throw new Error("e_invself");
-    const { m, db } = await a.getDb(), id = "ti_" + rc.code + "_" + r.acc, ref = m.doc(db, "invites", id), ex = await m.getDoc(ref);
+    const { m, db } = await a.getDb(), id = "ti_" + rc.code + "_" + r.acc, ref = m.doc(db, "invites", id);
+    /* pemain yang dikeluarkan dengan opsi larang bergabung (daftar kk di dokumen ruangan) tidak bisa diundang lagi */
+    try{ const rs = await m.getDoc(m.doc(db, "ti_rooms", rc.code)), kk = rs.exists() ? (rs.data() || {}).kk : null; if(Array.isArray(kk) && kk.indexOf(r.uid) >= 0) throw new Error("e_banned"); }
+    catch(e){ if(e && e.message === "e_banned") throw e; }
+    const ex = await m.getDoc(ref);
     if(ex.exists()){
       const d = ex.data() || {};
       if(d.status === "pending" && Date.now() - (+d.ts || 0) < 600000) throw new Error("e_invp");
