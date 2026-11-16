@@ -517,7 +517,8 @@ const MENUS = [
   { id:"cek-jodoh", cat:"primbon", icon:"💞", title:"JODOH", desc:"Cocokkah kalian berdua?", descEn:"Are the two of you a match?", src:"src-cek-jodoh" },
   { id:"cek-bmi", cat:"medis", icon:"⚖️", title:"BMI & KALORI", desc:"IMT (standar Kemenkes dan WHO), target berat, dan kebutuhan kalori harian (FAO/WHO/UNU)", descEn:"BMI (Indonesian MoH and WHO standards), weight target, and daily calorie needs (FAO/WHO/UNU)", src:"src-cek-bmi" },
   { id:"cek-hamil", cat:"medis", icon:"🤰", title:"KEHAMILAN", desc:"Usia kehamilan, perkiraan lahir (HPL), jadwal periksa, dan kenaikan berat badan", descEn:"Gestational age, due date (EDD), checkup schedule, and weight gain", src:"src-cek-hamil" },
-  { id:"turnamen", cat:"hiburan", icon:"🏆", title:"TURNAMEN", desc:"Atur turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor", descEn:"Run a sports or eSports tournament: fixtures, scores, standings, knockout bracket, and top scorers", src:"src-turnamen" }
+  { id:"turnamen", cat:"hiburan", icon:"🏆", title:"TURNAMEN", desc:"Atur turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor", descEn:"Run a sports or eSports tournament: fixtures, scores, standings, knockout bracket, and top scorers", src:"src-turnamen" },
+  { id:"tebak-inisial", cat:"hiburan", icon:"🔤", title:"TEBAK INISIAL", desc:"Acak huruf A–Z dan kategori untuk tebak-tebakan seru anak-anak", descEn:"Random letter A–Z and category for fun kids' guessing games", src:"src-tebak-inisial" }
 ];
 /* judul menu per bahasa: [beranda ID, beranda EN, judul di dalam menu ID, judul di dalam menu EN]. Nama aplikasi "Satu Titik" tidak diterjemahkan. */
 const MTITLE = {
@@ -528,7 +529,8 @@ const MTITLE = {
   "cek-jodoh":["JODOH","MATCH","CEK JODOH","MATCH CHECK"],
   "cek-bmi":["BMI & KALORI","BMI & CALORIES","CEK BMI & KALORI","BMI & CALORIE CHECK"],
   "cek-hamil":["KEHAMILAN","PREGNANCY","CEK KEHAMILAN","PREGNANCY CHECK"],
-  "turnamen":["TURNAMEN","TOURNAMENT","TURNAMEN","TOURNAMENT"]
+  "turnamen":["TURNAMEN","TOURNAMENT","TURNAMEN","TOURNAMENT"],
+  "tebak-inisial":["TEBAK INISIAL","GUESS THE INITIAL","TEBAK INISIAL","GUESS THE INITIAL"]
 };
 const mTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 1 : 0] : m.title; };
 const fTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 3 : 2] : m.title; };
@@ -554,7 +556,8 @@ const ICONS = {
   "cek-jodoh":'<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
   "cek-bmi":'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.5 10a4.5 4.5 0 0 1 7 0"/><path d="M12 13.5l2.2-3"/></svg>',
   "cek-hamil":'<svg viewBox="0 0 24 24"><circle cx="9.5" cy="4.5" r="2"/><path d="M9 8.5c-1.6.4-2.4 1.8-2.4 3.5V20M9 8.5c3 0 6 2 6 6a5 5 0 0 1-3.2 4.6V20"/></svg>',
-  "turnamen":'<svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7M10 17h4"/></svg>'
+  "turnamen":'<svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7M10 17h4"/></svg>',
+  "tebak-inisial":'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M9 16l3-8 3 8M10.2 13.4h3.6"/></svg>'
 };
 const BADGE = {"cek-watak":{id:"Baru", en:"New"}, "cek-jodoh":{id:"Baru", en:"New"}, "cek-bmi":{id:"Baru", en:"New"}, "cek-hamil":{id:"Baru", en:"New"}};
 /* Label "Baru" hilang otomatis 14 hari.
@@ -801,6 +804,8 @@ function writeKeys(s){
   w("tk_gap", j(gi)); w("tk_lang", j(s.lang)); w("tk_vol", j(s.aivol / 100)); w("tk_mvol", j(s.mvol / 100));
   /* Turnamen (awalan tt_; ikut semua pengaturan panel: suara, musik, bacakan, auto-next, jeda, volume, bahasa, scroll) */
   w("tt_fx", j(s.sound)); w("tt_music", j(s.music)); w("tt_read", j(s.read)); w("tt_auto", j(s.auto));
+  /* Tebak Inisial (awalan ti_; ikut Mode suara, bahasa, dan animasi) */
+  w("ti_fx", j(s.sound)); w("ti_lang", s.lang); w("ti_anim", j(s.anim));
   w("tt_gap", j(gi)); w("tt_lang", j(s.lang)); w("tt_follow", j(s.scroll)); w("tt_anim", j(s.anim)); w("tt_vol", j(s.aivol / 100)); w("tt_mvol", j(s.mvol / 100));
 }
 const TOG = {
@@ -811,9 +816,10 @@ const TOG = {
   "cek-jodoh": {soundBtn:s => s.sound && s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
   "cek-bmi": {soundBtn:s => s.sound && s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
   "cek-hamil": {soundBtn:s => s.sound && s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
-  "turnamen": {fxBtn:s => s.sound, readBtn:s => s.read, musicBtn:s => s.music, autoBtn:s => s.auto}
+  "turnamen": {fxBtn:s => s.sound, readBtn:s => s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
+  "tebak-inisial": {}
 };
-const RNG = {"th-analytics":{mvol:"volRange", aivol:"aiVolRange"}, "cek-khodam":{mvol:"mvol", aivol:"vol"}, "hari-hoki":{mvol:"mvol", aivol:"vol"}, "cek-watak":{mvol:"mvol", aivol:"vol"}, "cek-jodoh":{mvol:"mvol", aivol:"vol"}, "cek-bmi":{mvol:"mvol", aivol:"vol"}, "cek-hamil":{mvol:"mvol", aivol:"vol"}, "turnamen":{mvol:"mvol", aivol:"vol"}};
+const RNG = {"th-analytics":{mvol:"volRange", aivol:"aiVolRange"}, "cek-khodam":{mvol:"mvol", aivol:"vol"}, "hari-hoki":{mvol:"mvol", aivol:"vol"}, "cek-watak":{mvol:"mvol", aivol:"vol"}, "cek-jodoh":{mvol:"mvol", aivol:"vol"}, "cek-bmi":{mvol:"mvol", aivol:"vol"}, "cek-hamil":{mvol:"mvol", aivol:"vol"}, "turnamen":{mvol:"mvol", aivol:"vol"}, "tebak-inisial":{}};
 /* Keadaan ASLI menu dibaca langsung dari bingkainya (bukan ditebak dari pengaturan sebelumnya),
    sehingga tombol panel tidak terbalik bila menu mengubah pengaturannya sendiri (mis. tombol Stop auto-next di Cek Khodam). */
 function frameDoc(){
@@ -9629,6 +9635,346 @@ $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id
 musicSync();
 paint();
 try{ startOnline(); }catch(e){}
+</scr@@ipt>
+</body>
+</html>
+</script>
+<script type="text/plain" id="src-tebak-inisial"><!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TEBAK INISIAL</title>
+<style>
+:root{--bg:#0b0d12;--bg2:#141821;--card:#161a23;--line:#2a3040;--text:#ece7da;--muted:#8d93a3;--gold:#d4a94f;--gold2:#f0cf86}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#1c2230 0%,var(--bg) 60%) fixed,var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif;display:flex;justify-content:center}
+.app{width:100%;max-width:420px;padding:18px 18px calc(34px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.brand{text-align:center;margin-top:4px}.brand .icon{font-size:42px;filter:drop-shadow(0 0 18px rgba(212,169,79,.35))}.brand h1{margin:4px 0 0;font-size:24px;letter-spacing:.1em}
+.sub{color:var(--muted);font-style:italic;text-align:center;font-size:14px;line-height:1.45;margin:0}
+.panel{background:linear-gradient(180deg,var(--bg2),var(--card));border:1px solid var(--line);border-radius:16px;padding:16px}
+.label{display:block;font-size:12px;letter-spacing:.2em;color:var(--gold);margin:0 0 10px;text-transform:uppercase}
+.hint{font-size:12.5px;line-height:1.45;color:var(--muted);margin:10px 0 0}
+.stage{text-align:center;padding:16px 14px 18px}
+.reels{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.reel{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:168px;padding:28px 8px 14px;border:1px solid var(--gold);border-radius:16px;background:linear-gradient(180deg,#0d1017,#141821);box-shadow:inset 0 0 24px rgba(0,0,0,.55);overflow:hidden}
+.reel::before,.reel::after{content:"";position:absolute;left:0;right:0;height:22px;pointer-events:none;z-index:1}
+.reel::before{top:0;background:linear-gradient(180deg,rgba(0,0,0,.5),transparent)}
+.reel::after{bottom:0;background:linear-gradient(0deg,rgba(0,0,0,.5),transparent)}
+.cap{position:absolute;top:9px;left:0;right:0;z-index:2;font-size:10.5px;letter-spacing:.22em;color:var(--gold)}
+.val{display:block;font-weight:700;color:var(--gold2);line-height:1}
+#valL{font-size:clamp(76px,26vw,108px)}
+#emoC{display:block;margin-bottom:8px;font-size:46px;line-height:1}
+#valC{font-size:clamp(19px,6vw,25px);letter-spacing:.06em;text-transform:uppercase;overflow-wrap:anywhere}
+.reel.idle .val,.reel.idle #emoC{opacity:.45}
+.reel.run .val,.reel.run #emoC{animation:flick .11s linear infinite}
+@keyframes flick{0%{transform:translateY(-16px);opacity:.3}100%{transform:none;opacity:1}}
+.reel.land{animation:land .55s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes land{0%{transform:scale(.92)}60%{transform:scale(1.05);box-shadow:inset 0 0 24px rgba(0,0,0,.55),0 0 28px rgba(212,169,79,.55)}100%{transform:scale(1)}}
+.prompt{margin:18px 2px 0;min-height:56px;font-size:19px;line-height:1.45}
+.prompt b{color:var(--gold2)}
+.prompt.pop{animation:rise .45s ease}
+@keyframes rise{0%{transform:translateY(8px);opacity:0}100%{transform:none;opacity:1}}
+.tbar{position:relative;height:32px;margin:12px 0 0;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.05);overflow:hidden}
+.tbar i{position:absolute;inset:0;transform-origin:left center;background:rgba(212,169,79,.5)}
+.tbar.low i{background:rgba(224,69,58,.55)}
+.tbar span{position:relative;display:block;line-height:30px;font-size:14px;font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.go{width:100%;min-height:64px;font:inherit;font-size:20px;font-weight:700;letter-spacing:.16em;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0;border-radius:16px;box-shadow:0 6px 20px rgba(212,169,79,.22);cursor:pointer;transition:transform .1s}
+.go:active{transform:scale(.98)}.go:disabled{opacity:.65;cursor:default}
+.ghost{width:100%;min-height:44px;margin-top:12px;font:inherit;font-size:14px;font-weight:600;color:var(--gold2);background:transparent;border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.ghost:active{background:rgba(255,255,255,.06)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{flex:1 1 auto;min-height:44px;padding:0 14px;font:inherit;font-size:14px;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:999px;cursor:pointer}
+.chip[aria-pressed=true]{border-color:var(--gold);color:var(--gold2);background:rgba(212,169,79,.1)}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.hd .label{margin:0}
+.mini{flex:none;min-height:30px;padding:0 12px;font:inherit;font-size:12px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:9px;cursor:pointer}
+.hl{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.hl li{padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:13px;white-space:nowrap}
+.hl li b{color:var(--gold2);margin-right:4px}
+.empty{margin:0;color:var(--muted);font-style:italic;font-size:13px}
+button:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,body.noanim .prompt.pop{animation:none}
+@media (prefers-reduced-motion:reduce){.reel.run .val,.reel.run #emoC,.reel.land,.prompt.pop{animation:none}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="brand"><div class="icon" aria-hidden="true">🔤</div><h1>TEBAK INISIAL</h1></header>
+  <p class="sub" id="sub"></p>
+
+  <section class="panel stage" aria-label="Pengacak">
+    <div class="reels">
+      <div class="reel idle" id="reelL"><span class="cap" id="capL"></span><b class="val" id="valL">?</b></div>
+      <div class="reel idle" id="reelC"><span class="cap" id="capC"></span><i class="val" id="emoC" style="font-style:normal">❓</i><b class="val" id="valC"></b></div>
+    </div>
+    <p class="prompt" id="prompt" aria-live="polite"></p>
+    <div class="tbar" id="tbar" hidden><i id="tfill"></i><span id="tnum"></span></div>
+    <button class="ghost" id="doneBtn" type="button" hidden></button>
+  </section>
+
+  <button class="go" id="goBtn" type="button"></button>
+
+  <section class="panel">
+    <span class="label" id="lbTime"></span>
+    <div class="chips" id="timeChips"></div>
+  </section>
+
+  <section class="panel">
+    <span class="label" id="lbCat"></span>
+    <div class="chips" id="catChips"></div>
+    <p class="hint" id="catHint"></p>
+  </section>
+
+  <section class="panel">
+    <div class="hd"><span class="label" id="lbHist"></span><button class="mini" id="clrBtn2" type="button"></button></div>
+    <ul class="hl" id="histList"></ul>
+    <p class="empty" id="histEmpty"></p>
+  </section>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  var CATS = [
+    {k:"hewan", e:"🐾", id:"Hewan",  en:"Animal",    pid:"hewan",  pen:"an animal"},
+    {k:"buah",  e:"🍎", id:"Buah",   en:"Fruit",     pid:"buah",   pen:"a fruit"},
+    {k:"artis", e:"🎤", id:"Artis",  en:"Celebrity", pid:"artis",  pen:"a celebrity"},
+    {k:"atlet", e:"🏅", id:"Atlet",  en:"Athlete",   pid:"atlet",  pen:"an athlete"},
+    {k:"benda", e:"🧸", id:"Benda",  en:"Object",    pid:"benda",  pen:"an object"},
+    {k:"game",  e:"🎮", id:"Game",   en:"Game",      pid:"game",   pen:"a game"}
+  ];
+  var TT = {
+    id:{ title:"TEBAK INISIAL", sub:"Putar huruf dan kategori, lalu tebak bersama-sama!", capL:"HURUF", capC:"KATEGORI",
+         idle:"Tekan ACAK untuk menentukan huruf dan kategorinya.", spinning:"Mengacak…",
+         go:"🎲 ACAK", again:"🎲 ACAK LAGI", running:"MENGACAK…",
+         done:"✔ Sudah ditebak", sec:"dtk", up:"⏰ Waktu habis!", nice:"👍 Mantap!",
+         lbTime:"Batas waktu", none:"Tanpa waktu", lbCat:"Kategori yang dimainkan", catHint:"Pilih minimal satu kategori.",
+         lbHist:"Riwayat", clr:"Hapus", noHist:"Belum ada putaran." },
+    en:{ title:"GUESS THE INITIAL", sub:"Spin the letter and category, then guess together!", capL:"LETTER", capC:"CATEGORY",
+         idle:"Press SPIN to pick a letter and a category.", spinning:"Spinning…",
+         go:"🎲 SPIN", again:"🎲 SPIN AGAIN", running:"SPINNING…",
+         done:"✔ Guessed it", sec:"s", up:"⏰ Time is up!", nice:"👍 Nice one!",
+         lbTime:"Time limit", none:"No timer", lbCat:"Categories in play", catHint:"Pick at least one category.",
+         lbHist:"History", clr:"Clear", noHist:"No rounds yet." }
+  };
+
+  /* ===== pengaturan dari Beranda (ditulis di localStorage oleh panel pengaturan) ===== */
+  function ls(k, d){ try{ var v = localStorage.getItem(k); return v === null ? d : v; }catch(e){ return d; } }
+  function lsj(k, d){ try{ var v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }
+  function sv(k, v){ try{ localStorage.setItem(k, typeof v === "string" ? v : JSON.stringify(v)); }catch(e){} }
+  var lang = "id", fxOn = true, animOn = true;
+  function readSettings(){
+    lang = ls("ti_lang", "id") === "en" ? "en" : "id";
+    fxOn = lsj("ti_fx", true) !== false;
+    animOn = lsj("ti_anim", true) !== false && !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+    document.documentElement.lang = lang;
+    document.body.classList.toggle("noanim", !animOn);
+  }
+  var T = function(){ return TT[lang]; };
+
+  /* ===== acak yang adil: crypto + tolak-ulang (tanpa bias modulo) ===== */
+  function rnd(n){
+    try{
+      var c = window.crypto || window.msCrypto, a = new Uint32Array(1), m = Math.floor(4294967296 / n) * n, x;
+      do{ c.getRandomValues(a); x = a[0]; }while(x >= m);
+      return x % n;
+    }catch(e){ return Math.floor(Math.random() * n); }
+  }
+
+  /* ===== keadaan permainan ===== */
+  var timerSecs = +lsj("ti_timer", 0) || 0; if([0,10,20,30].indexOf(timerSecs) < 0) timerSecs = 0;
+  var catOn = lsj("ti_cats", null); if(!Array.isArray(catOn)) catOn = CATS.map(function(c){ return c.k; });
+  catOn = catOn.filter(function(k){ return CATS.some(function(c){ return c.k === k; }); }); if(!catOn.length) catOn = CATS.map(function(c){ return c.k; });
+  var hist = lsj("ti_hist", []); if(!Array.isArray(hist)) hist = []; hist = hist.filter(function(h){ return h && LETTERS.indexOf(h.l) >= 0 && CATS.some(function(c){ return c.k === h.c; }); }).slice(0, 30);
+  var cur = null, spinning = false, ever = false;
+  function catOf(k){ for(var i = 0; i < CATS.length; i++) if(CATS[i].k === k) return CATS[i]; return CATS[0]; }
+  function cname(c){ return lang === "en" ? c.en : c.id; }
+
+  function pick(){
+    var pool = CATS.filter(function(c){ return catOn.indexOf(c.k) >= 0; });
+    var recent = hist.slice(0, 12).map(function(h){ return h.l + "|" + h.c; });
+    var L, C, tries = 0;
+    do{ L = LETTERS[rnd(26)]; C = pool[rnd(pool.length)]; tries++; }while(recent.indexOf(L + "|" + C.k) >= 0 && tries < 60);
+    return {l:L, c:C.k};
+  }
+
+  /* ===== suara & getar (mengikuti Mode di pengaturan) ===== */
+  var ac = null;
+  function actx(){
+    if(!fxOn) return null;
+    try{ ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if(ac.state === "suspended") ac.resume(); }catch(e){ ac = null; }
+    return ac;
+  }
+  function beep(f, d, type, g, at){
+    var a = actx(); if(!a) return;
+    try{
+      var t = a.currentTime + (at || 0), o = a.createOscillator(), v = a.createGain();
+      o.type = type || "triangle"; o.frequency.value = f;
+      v.gain.setValueAtTime(0.0001, t); v.gain.exponentialRampToValueAtTime(g || 0.06, t + 0.01); v.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(v); v.connect(a.destination); o.start(t); o.stop(t + d + 0.03);
+    }catch(e){}
+  }
+  function sweep(f1, f2, d, type, g, at){
+    var a = actx(); if(!a) return;
+    try{
+      var t = a.currentTime + (at || 0), o = a.createOscillator(), v = a.createGain();
+      o.type = type || "sine"; o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(f2, t + d);
+      v.gain.setValueAtTime(0.0001, t); v.gain.exponentialRampToValueAtTime(g || 0.07, t + 0.03); v.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(v); v.connect(a.destination); o.start(t); o.stop(t + d + 0.03);
+    }catch(e){}
+  }
+  function burst(d, g, f, at){
+    var a = actx(); if(!a) return;
+    try{
+      var n = Math.max(1, Math.floor(a.sampleRate * d)), b = a.createBuffer(1, n, a.sampleRate), ch = b.getChannelData(0), i;
+      for(i = 0; i < n; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      var t = a.currentTime + (at || 0), s = a.createBufferSource(), fl = a.createBiquadFilter(), v = a.createGain();
+      s.buffer = b; fl.type = "bandpass"; fl.frequency.value = f || 2200; v.gain.value = g || 0.12;
+      s.connect(fl); fl.connect(v); v.connect(a.destination); s.start(t);
+    }catch(e){}
+  }
+  /* bunyi saat tombol ACAK ditekan: tuas ditarik (klik + dentum) lalu desau naik selama kolom berputar */
+  function sfxPress(){
+    burst(0.05, 0.16, 3200); sweep(170, 55, 0.16, "sine", 0.16);
+    sweep(260, 1100, 1.5, "triangle", 0.035, 0.08);
+  }
+  function buzz(ok){ try{ if(parent && typeof parent.haptic === "function") parent.haptic(ok); }catch(e){} }
+
+  /* ===== tampilan ===== */
+  function promptHTML(r){
+    var c = catOf(r.c);
+    return lang === "en"
+      ? "Name <b>" + c.pen + "</b> that starts with <b>" + r.l + "</b>!"
+      : "Sebutkan <b>" + c.pid + "</b> yang berawalan huruf <b>" + r.l + "</b>!";
+  }
+  function setReels(r){
+    var idle = !r;
+    $("reelL").classList.toggle("idle", idle); $("reelC").classList.toggle("idle", idle);
+    $("valL").textContent = idle ? "?" : r.l;
+    $("emoC").textContent = idle ? "❓" : catOf(r.c).e;
+    $("valC").textContent = idle ? "" : cname(catOf(r.c));
+  }
+  function paintHist(){
+    var ul = $("histList"); ul.textContent = "";
+    hist.slice(0, 10).forEach(function(h){
+      var li = document.createElement("li"), b = document.createElement("b"), c = catOf(h.c);
+      b.textContent = h.l; li.appendChild(b); li.appendChild(document.createTextNode(c.e + " " + cname(c))); ul.appendChild(li);
+    });
+    $("histEmpty").hidden = hist.length > 0; $("histEmpty").textContent = T().noHist; ul.hidden = !hist.length;
+    $("clrBtn2").hidden = !hist.length;
+  }
+  function chip(txt, on, fn){
+    var b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = txt; b.setAttribute("aria-pressed", String(on)); b.addEventListener("click", fn); return b;
+  }
+  function paint(){
+    var t = T();
+    document.querySelector(".brand h1").textContent = t.title; document.title = t.title;
+    $("sub").textContent = t.sub; $("capL").textContent = t.capL; $("capC").textContent = t.capC;
+    $("lbTime").textContent = t.lbTime; $("lbCat").textContent = t.lbCat; $("catHint").textContent = t.catHint; $("lbHist").textContent = t.lbHist; $("clrBtn2").textContent = t.clr;
+    $("doneBtn").textContent = t.done;
+    $("goBtn").textContent = spinning ? t.running : (ever ? t.again : t.go);
+    if(!spinning){ $("prompt").innerHTML = cur ? promptHTML(cur) : t.idle; if(cur) setReels(cur); }
+    var tc = $("timeChips"); tc.textContent = "";
+    [0, 10, 20, 30].forEach(function(s){
+      tc.appendChild(chip(s ? s + " " + t.sec : t.none, timerSecs === s, function(){ timerSecs = s; sv("ti_timer", s); paint(); }));
+    });
+    var cc = $("catChips"); cc.textContent = "";
+    CATS.forEach(function(c){
+      var on = catOn.indexOf(c.k) >= 0;
+      cc.appendChild(chip(c.e + " " + cname(c), on, function(){
+        if(on){ if(catOn.length < 2) return; catOn = catOn.filter(function(k){ return k !== c.k; }); } else { catOn.push(c.k); }
+        sv("ti_cats", catOn); paint();
+      }));
+    });
+    paintHist();
+  }
+
+  /* ===== penghitung waktu ===== */
+  var raf = 0, endAt = 0, total = 0, lastSec = -1;
+  function stopTimer(hide){
+    if(raf){ cancelAnimationFrame(raf); raf = 0; }
+    if(hide){ $("tbar").hidden = true; $("doneBtn").hidden = true; }
+  }
+  function loop(){
+    var left = Math.max(0, endAt - Date.now()), sec = Math.ceil(left / 1000);
+    $("tfill").style.transform = "scaleX(" + (left / total) + ")";
+    if(sec !== lastSec){
+      lastSec = sec; $("tnum").textContent = "⏱ " + sec + " " + T().sec;
+      $("tbar").classList.toggle("low", sec <= 5);
+      if(sec > 0 && sec <= 3) beep(1000, 0.07, "square", 0.04);
+    }
+    if(left <= 0){ timeUp(); return; }
+    raf = requestAnimationFrame(loop);
+  }
+  function startTimer(s){
+    stopTimer(false); total = s * 1000; endAt = Date.now() + total; lastSec = -1;
+    $("tbar").hidden = false; $("tbar").classList.remove("low"); $("doneBtn").hidden = false; loop();
+  }
+  function timeUp(){
+    raf = 0; $("tnum").textContent = T().up; $("tfill").style.transform = "scaleX(0)"; $("tbar").classList.add("low"); $("doneBtn").hidden = true;
+    beep(190, 0.32, "sawtooth", 0.05); beep(160, 0.4, "sawtooth", 0.05, 0.36);
+    buzz(true); setTimeout(function(){ buzz(true); }, 420);
+  }
+
+  /* ===== memutar ===== */
+  function runReel(n, first, grow, step, end){
+    var i = 0, d = first;
+    (function tick(){
+      if(i >= n){ end(); return; }
+      step(i); i++; d *= grow; setTimeout(tick, d);
+    })();
+  }
+  function landed(el){
+    el.classList.remove("run", "idle", "land"); void el.offsetWidth; el.classList.add("land");
+    setTimeout(function(){ el.classList.remove("land"); }, 600);
+  }
+  function finish(r){
+    cur = r; spinning = false; ever = true;
+    hist.unshift({l:r.l, c:r.c}); hist = hist.slice(0, 30); sv("ti_hist", hist);
+    var p = $("prompt"); p.innerHTML = promptHTML(r); p.classList.remove("pop"); void p.offsetWidth; p.classList.add("pop");
+    $("goBtn").disabled = false; paint();
+    beep(660, 0.12, "triangle", 0.07); beep(880, 0.16, "triangle", 0.07, 0.11); beep(1320, 0.26, "triangle", 0.06, 0.22);
+    buzz(true);
+    if(timerSecs > 0) startTimer(timerSecs);
+  }
+  function spin(){
+    if(spinning) return;
+    spinning = true; stopTimer(true); actx(); sfxPress();
+    var r = pick(), t = T();
+    $("goBtn").disabled = true; $("goBtn").textContent = t.running;
+    var pr = $("prompt"); pr.classList.remove("pop"); pr.textContent = t.spinning;
+    if(!animOn){ setReels(r); landed($("reelL")); landed($("reelC")); finish(r); return; }
+    var rl = $("reelL"), rc = $("reelC"), lastL = "", lastC = "", pending = 2;
+    rl.classList.remove("idle"); rc.classList.remove("idle"); rl.classList.add("run"); rc.classList.add("run");
+    var pool = CATS.filter(function(c){ return catOn.indexOf(c.k) >= 0; });
+    if(pool.length < 2) pool = CATS;
+    function oneDone(){ if(--pending === 0) finish(r); }
+    runReel(12, 50, 1.12, function(){
+      var L; do{ L = LETTERS[rnd(26)]; }while(L === lastL); lastL = L; $("valL").textContent = L; beep(520 + rnd(5) * 40, 0.035, "triangle", 0.035);
+    }, function(){
+      $("valL").textContent = r.l; landed(rl); beep(700, 0.1, "triangle", 0.06); buzz(false); oneDone();
+    });
+    runReel(17, 50, 1.12, function(){
+      var c; do{ c = pool[rnd(pool.length)]; }while(c.k === lastC && pool.length > 1); lastC = c.k; $("emoC").textContent = c.e; $("valC").textContent = cname(c); beep(380 + rnd(5) * 40, 0.035, "triangle", 0.035);
+    }, function(){
+      var c = catOf(r.c); $("emoC").textContent = c.e; $("valC").textContent = cname(c); landed(rc); beep(780, 0.1, "triangle", 0.06); buzz(false); oneDone();
+    });
+  }
+
+  $("goBtn").addEventListener("click", spin);
+  $("doneBtn").addEventListener("click", function(){
+    stopTimer(false); $("tnum").textContent = T().nice; $("tbar").classList.remove("low"); $("tfill").style.transform = "scaleX(1)"; $("doneBtn").hidden = true;
+    beep(880, 0.14, "triangle", 0.07); beep(1320, 0.22, "triangle", 0.06, 0.12);
+  });
+  $("clrBtn2").addEventListener("click", function(){ hist = []; sv("ti_hist", hist); paintHist(); });
+  window.addEventListener("storage", function(e){
+    if(!e.key || e.key === "ti_lang" || e.key === "ti_fx" || e.key === "ti_anim"){ readSettings(); paint(); }
+  });
+  readSettings(); paint();
+})();
 </scr@@ipt>
 </body>
 </html>
