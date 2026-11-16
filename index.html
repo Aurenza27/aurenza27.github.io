@@ -9852,10 +9852,10 @@ button:disabled{opacity:.6}
 .rm-box{padding:16px 14px}.rm-box h3{font-size:17px}.rm-box p{font-size:13px}
 
 /* ===== Chat realtime ruangan (mode Online) ===== */
-.cfab{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;width:46px;height:46px;padding:0;border-radius:50%;border:1px solid var(--gold);background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font-size:20px;line-height:1;display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.45);cursor:pointer}
+.cfab{position:fixed;left:0;top:0;touch-action:none;user-select:none;-webkit-user-select:none;transition:left .18s ease,top .18s ease,transform .12s;z-index:40;width:46px;height:46px;padding:0;border-radius:50%;border:1px solid var(--gold);background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font-size:20px;line-height:1;display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.45);cursor:pointer}
 .cfab:active{transform:scale(.94)}
+.cfab.drag{transition:none;transform:scale(1.08);opacity:.92;box-shadow:0 10px 26px rgba(0,0,0,.55)}
 .cbadge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#e0453a;color:#fff;font:700 11px/18px Georgia,serif;text-align:center}
-body.inroom .app{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .csheet{position:fixed;left:0;right:0;bottom:0;z-index:45;max-width:420px;margin:0 auto;height:min(64vh,460px);display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg2),var(--card));border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.55)}
 .chd{display:flex;align-items:center;gap:8px;padding:10px 12px 6px}
 .chd b{flex:1;font-size:14px;letter-spacing:.04em;color:var(--gold2)}
@@ -11045,8 +11045,48 @@ body.inroom .app{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))}
     if(add && !CH.open){ CH.unread += add; paintBadge(); if(fxOn && typeof beep === "function") beep(740, 0.06, "sine", 0.04); }
     paintMsgs(false);
   }
+  /* tombol chat melayang: bisa digeser bebas, lepas jari = menempel ke sisi kiri atau kanan layar (posisi diingat) */
+  var CF = { s:"r", y:0.8, drag:false, moved:false };
+  (function(){ var v = lsj("ti_cfab", null); if(v && (v.s === "l" || v.s === "r") && typeof v.y === "number"){ CF.s = v.s; CF.y = Math.min(1, Math.max(0, v.y)); } })();
+  function vpW(){ return window.innerWidth || document.documentElement.clientWidth || 360; }
+  function vpH(){ return window.innerHeight || document.documentElement.clientHeight || 640; }
+  function placeFab(){
+    var f = $("cFab"); if(!f) return;
+    var z = 46, m = 8, x = CF.s === "l" ? m : Math.max(m, vpW() - z - m), y = m + CF.y * Math.max(0, vpH() - z - 2 * m);
+    f.style.left = Math.round(x) + "px"; f.style.top = Math.round(y) + "px";
+  }
+  function dragFab(f){
+    var sx = 0, sy = 0, ox = 0, oy = 0, on = false, pid = null;
+    f.addEventListener("pointerdown", function(e){
+      if(e.button > 0) return;
+      on = true; CF.drag = false; pid = e.pointerId; sx = e.clientX; sy = e.clientY;
+      var r = f.getBoundingClientRect(); ox = r.left; oy = r.top;
+      try{ f.setPointerCapture(pid); }catch(x){}
+    });
+    f.addEventListener("pointermove", function(e){
+      if(!on) return;
+      var dx = e.clientX - sx, dy = e.clientY - sy;
+      if(!CF.drag){ if(Math.abs(dx) + Math.abs(dy) < 8) return; CF.drag = true; f.classList.add("drag"); }
+      f.style.left = Math.min(Math.max(ox + dx, 0), vpW() - 46) + "px";
+      f.style.top = Math.min(Math.max(oy + dy, 0), vpH() - 46) + "px";
+    });
+    function end(){
+      if(!on) return; on = false;
+      try{ f.releasePointerCapture(pid); }catch(x){}
+      if(CF.drag){
+        var r = f.getBoundingClientRect(), span = Math.max(1, vpH() - 46 - 16);
+        CF.s = (r.left + r.width / 2) < vpW() / 2 ? "l" : "r";
+        CF.y = Math.min(1, Math.max(0, (r.top - 8) / span));
+        f.classList.remove("drag"); placeFab();
+        sv("ti_cfab", { s:CF.s, y:Math.round(CF.y * 1000) / 1000 });
+        CF.moved = true; setTimeout(function(){ CF.moved = false; }, 350);
+      }
+      CF.drag = false;
+    }
+    f.addEventListener("pointerup", end); f.addEventListener("pointercancel", end);
+  }
   function setChatOpen(v){
-    ensureChat(); CH.open = !!v; $("cSheet").hidden = !CH.open;
+    ensureChat(); CH.open = !!v; $("cSheet").hidden = !CH.open; $("cFab").hidden = CH.open || !CH.show;
     if(CH.open){ CH.unread = 0; paintBadge(); paintMsgs(true); paintMute(); setTimeout(function(){ var i = $("cIn"); if(i && !i.disabled) i.focus(); }, 60); }
   }
   function ensureChat(){
@@ -11055,7 +11095,8 @@ body.inroom .app{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))}
         x = btn("mini", "✕", function(){ setChatOpen(false); }), ru = el("p", "crules"), ls = el("div", "clist"), nt = el("p", "cnote"),
         fm = el("div", "cform"), inp = el("input", "cin"), sd = btn("cgo", "", sendChat);
     fab.id = "cFab"; fab.type = "button"; fab.hidden = true; fab.appendChild(el("span", "", "💬")); bd.id = "cBadge"; bd.hidden = true; fab.appendChild(bd);
-    fab.addEventListener("click", function(){ setChatOpen(!CH.open); });
+    fab.addEventListener("click", function(){ if(CF.moved){ CF.moved = false; return; } setChatOpen(!CH.open); });
+    dragFab(fab); window.addEventListener("resize", placeFab);
     sh.id = "cSheet"; sh.hidden = true; sh.setAttribute("role", "dialog");
     ti.id = "cTitle"; cn.id = "cCount"; x.id = "cClose"; ru.id = "cRules"; ls.id = "cList"; ls.setAttribute("aria-live", "polite");
     nt.id = "cNote"; nt.setAttribute("role", "status");
@@ -11065,13 +11106,14 @@ body.inroom .app{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))}
     hd.appendChild(ti); hd.appendChild(cn); hd.appendChild(x);
     fm.appendChild(inp); fm.appendChild(sd);
     sh.appendChild(hd); sh.appendChild(ru); sh.appendChild(ls); sh.appendChild(nt); sh.appendChild(fm);
-    document.body.appendChild(fab); document.body.appendChild(sh);
+    document.body.appendChild(fab); document.body.appendChild(sh); placeFab();
   }
   function updChat(){
     ensureChat();
     var show = mode === "on" && !!ON.code && !!ON.data && !!meU(), c = cT();
-    $("cFab").hidden = !show; document.body.classList.toggle("inroom", show);
+    CH.show = show; document.body.classList.toggle("inroom", show);
     if(!show && CH.open) setChatOpen(false);
+    $("cFab").hidden = !show || CH.open; if(show) placeFab();
     $("cTitle").textContent = "💬 " + c.title; $("cRules").textContent = c.rules; $("cIn").placeholder = c.ph; $("cSend").textContent = c.send;
     $("cFab").setAttribute("aria-label", c.openL); $("cClose").setAttribute("aria-label", c.closeL); $("cSheet").setAttribute("aria-label", c.title);
     $("cCount").textContent = ON.players.length ? "👥 " + ON.players.length : "";
