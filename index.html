@@ -172,6 +172,35 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 @keyframes frlbIn{from{opacity:0}to{opacity:1}}@keyframes frlbOut{from{opacity:1}to{opacity:0}}
 @keyframes frlbPop{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){#frpanel .frmenu,.frlb,.frlb.out,.frlbx{animation:none}}
+/* ===== Panel Teman versi ringkas + lampu status online ===== */
+#frpanel{width:min(280px,calc(100vw - 20px));padding:8px 9px;border-radius:14px}
+#frpanel .sh{margin-bottom:5px}
+#frpanel .sh b{font-size:12px}
+#frpanel .frbox{margin:0 0 7px;padding:6px 8px;border-radius:10px}
+#frpanel .frl{margin:0 0 3px;font-size:10.5px;letter-spacing:.12em}
+#frpanel .frh{margin:0 0 4px;font-size:11.5px;line-height:1.35}
+#frpanel input{min-height:34px;padding:0 10px;font-size:14px;border-radius:10px}
+#frpanel .erow{margin-top:6px}
+#frpanel button:not(.gear){min-height:30px;padding:0 10px;border-radius:9px;font-size:12px}
+#frpanel .erow button{min-height:34px;border-radius:10px;font-size:13px}
+#frpanel .frrow{gap:8px;padding:3px 0}
+#frpanel .fav{width:28px;height:28px;border-width:1.5px;font-size:12px}
+#frpanel .frnm{display:flex;align-items:center;font-size:13px;line-height:1.25}
+#frpanel .frid{margin:0;font-size:10.5px;line-height:1.25}
+#frpanel .frbt{gap:4px}
+#frpanel .frok,#frpanel .frerr{margin:6px 0 0;font-size:12px}
+#frpanel .frmore{font-size:15px}
+#frpanel .frmenu{gap:4px;margin:1px 0 5px;padding:7px;border-radius:10px}
+#frpanel .frmenu button{min-height:32px;padding:0 10px}
+.frinv{margin:-1px 0 5px 36px;gap:4px}
+.frinv button{min-height:28px;padding:3px 8px;font-size:11.5px}
+#frpanel .frdot{flex:none;width:8px;height:8px;margin-right:6px;border-radius:50%;background:#6b7280;box-shadow:0 0 0 1.5px var(--bg2)}
+#frpanel .frdot.on{background:#3ddc84;box-shadow:0 0 0 1.5px var(--bg2),0 0 6px rgba(61,220,132,.85)}
+#frpanel .fraddhd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#frpanel .fraddhd+*{margin-top:6px}
+#frpanel .fraddbtn{min-height:28px;padding:0 10px}
+#frpanel .frmeid{font-size:11px;color:var(--muted);letter-spacing:.04em}
+
 #svProfile .pav{display:flex;flex-direction:column;align-items:center;gap:10px;margin:4px 0 14px}
 #svProfile .pav .big{width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--gold2)}
 #svProfile .pav .big svg{width:48px;height:48px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
@@ -274,6 +303,29 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #bellPanel .nempty svg{width:34px;height:34px;fill:none;stroke:var(--gold);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
 #bellPanel .nft{flex:none;padding:6px 10px;border-top:1px solid var(--line);text-align:center}
 #bellPanel button:focus-visible{outline:2px solid var(--gold2);outline-offset:-2px}
+/* ===== Notifikasi versi ringkas ===== */
+#bellPanel{width:min(300px,calc(100vw - 32px));max-height:min(64vh,440px);border-radius:14px}
+#view > #bellPanel{width:min(300px,calc(100vw - 20px))}
+#bellPanel .nhd{gap:8px;padding:9px 12px 7px}
+#bellPanel .nht{font-size:12px}
+#bellPanel .nlnk{min-height:26px;padding:3px 4px;font-size:11.5px}
+#bellPanel .nmain{gap:8px;padding:8px 32px 8px 12px}
+#bellPanel .ni{width:26px;height:26px}
+#bellPanel .ni svg{width:14px;height:14px}
+#bellPanel .ntt{gap:5px;font-size:13px;line-height:1.25}
+#bellPanel .ndot{width:7px;height:7px}
+#bellPanel .nbd{margin:2px 0 0;font-size:12px;line-height:1.35}
+#bellPanel .nmt{margin:3px 0 0;font-size:10.5px}
+#bellPanel .nact{min-height:28px;margin-top:6px;padding:0 12px;font-size:12px}
+#bellPanel .nbtns{gap:6px;margin-top:6px}
+#bellPanel .nbtns .nact{min-width:64px}
+#bellPanel .ntag{margin-top:5px;margin-right:6px;padding:1px 8px;font-size:10.5px}
+#bellPanel .nx{top:4px;right:3px;width:26px;height:26px}
+#bellPanel .nx svg{width:12px;height:12px}
+#bellPanel .nempty{gap:6px;padding:18px 16px 20px;font-size:12.5px;line-height:1.4}
+#bellPanel .nempty svg{width:26px;height:26px}
+#bellPanel .nft{padding:3px 8px}
+
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .ic svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .bd{position:absolute;top:12px;right:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--gold);color:var(--gold2);font-size:11px;background:rgba(212,169,79,.1)}
@@ -1258,7 +1310,7 @@ const PV = {
   id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 14 November 2026", back:"‹ Beranda", secs:[
     {h:"1. Pendahuluan", p:["Satu Titik adalah aplikasi yang dikembangkan oleh Aurenza27 (“kami”). Kebijakan ini menjelaskan data apa yang diproses, untuk apa, dan pilihan yang kamu miliki saat memakai aplikasi ini. Dengan memakai aplikasi, kamu menyetujui kebijakan ini."]},
     {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, serta data turnamen) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google."]},
-    {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, dan hasil menu) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan."]},
+    {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, dan hasil menu) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu)."]},
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif."]},
     {p:["Pengecekan koneksi dan waktu:"], l:["Aplikasi mengirim permintaan sederhana ke server publik (Google, Cloudflare, dan WorldTimeAPI) untuk mengecek koneksi internet dan jam. Permintaan ini tidak berisi data pribadimu, tetapi seperti permintaan internet lainnya, alamat IP perangkat terlihat oleh server tersebut."]},
     {p:["Iklan (hanya pada versi aplikasi yang menampilkan iklan):"], l:["Versi aplikasi tertentu, misalnya versi APK, dapat menampilkan iklan dari jaringan iklan pihak ketiga seperti Google AdMob.","Jaringan iklan dapat memproses ID iklan perangkat, alamat IP, jenis perangkat, dan interaksi dengan iklan untuk menampilkan serta mengukur iklan. Pada wilayah yang mewajibkan, kamu akan diminta persetujuan terlebih dahulu.","Kamu dapat mengatur atau mereset ID iklan, dan membatasi personalisasi iklan, lewat pengaturan perangkat."]},
@@ -1274,7 +1326,7 @@ const PV = {
   en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 14 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. By using the app, you agree to this policy."]},
     {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, and tournament data) are stored on your own device.","This data is not sent to our servers unless you sign in with a Google account."]},
-    {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, and menu results) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests."]},
+    {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, and menu results) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see)."]},
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data."]},
     {p:["Connection and time checks:"], l:["The app sends simple requests to public servers (Google, Cloudflare, and WorldTimeAPI) to check your internet connection and the time. These requests do not contain your personal data, but as with any internet request, your device’s IP address is visible to those servers."]},
     {p:["Ads (only in app versions that show ads):"], l:["Certain app versions, such as the APK version, may show ads from third-party ad networks such as Google AdMob.","Ad networks may process the device advertising ID, IP address, device type, and your interactions with ads to serve and measure ads. Where required, you will be asked for consent first.","You can reset your advertising ID, and limit ad personalization, in your device settings."]},
@@ -12407,7 +12459,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   const $ = id => document.getElementById(id);
   const lang = () => (typeof S !== "undefined" && S && S.lang === "en") ? "en" : "id";
   const T = {
-    id:{ ttl:"Teman", sub0:"Daftar teman dan permintaan", add:"TAMBAH TEMAN", addH:"Masukkan ID Akun temanmu, misalnya ST-000004.", mine:"ID Akunmu: ", ph:"ST-000000", send:"Kirim permintaan", busy:"Mohon tunggu…",
+    id:{ ttl:"Teman", sub0:"Daftar teman dan permintaan", add:"TAMBAH TEMAN", addS:"Tambah teman", stOn:"Online", stOff:"Offline", addH:"Masukkan ID Akun temanmu, misalnya ST-000004.", mine:"ID Akunmu: ", ph:"ST-000000", send:"Kirim permintaan", busy:"Mohon tunggu…",
       inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
       sent:"Permintaan terkirim.", acd:"Kalian sekarang berteman.", rmd:"Teman dihapus.", decd:"Permintaan ditolak.", cand:"Permintaan dibatalkan.",
       e_fmt:"Format ID Akun: ST-000000.", e_self:"Itu ID Akunmu sendiri.", e_nf:"ID Akun tidak ditemukan.", e_already:"Kalian sudah berteman.", e_pending:"Permintaan sudah terkirim. Tunggu temanmu menerimanya.",
@@ -12418,7 +12470,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       e_max:"Daftar temanmu sudah penuh (maksimal 20 teman, termasuk permintaan terkirim).",
       e_invp:"Undangan masih menunggu jawaban.", e_banned:"Akun ini tidak bisa bergabung kembali ke ruangan ini karena sudah dikeluarkan pemilik ruangan.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
       invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
-    en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
+    en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addS:"Add friend", stOn:"Online", stOff:"Offline", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
       inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
       sent:"Request sent.", acd:"You are now friends.", rmd:"Friend removed.", decd:"Request declined.", cand:"Request cancelled.",
       e_fmt:"Account ID format: ST-000000.", e_self:"That is your own Account ID.", e_nf:"Account ID not found.", e_already:"You are already friends.", e_pending:"The request is already sent. Wait for your friend to accept.",
@@ -12437,9 +12489,12 @@ if(navigator.onLine !== false) init().catch(() => {});
   let lastSig = "", sigTimer = 0;
   let invOut = {}, unsubI = null;
   let rows = [], dir = {}, unsub = null, curUid = "", msg = "", msgOk = true, working = false, confirmId = "", menuId = "", inVal = "";
+  let addOpen = false, pw = {}, pwT = 0;
   const subs = new Set(), selfDel = new Set();
   const emit = () => { subs.forEach(f => { try{ f(); }catch(e){} }); try{ refresh(); }catch(e){} };
   const nameOf = acc => (dir[acc] && dir[acc].name) || acc;
+  /* online bila detak terakhir (accountIds/{ID}.seen) kurang dari 150 detik lalu; aplikasi mengirim detak tiap 60 detik */
+  const isOn = acc => { const v = dir[acc] && dir[acc].seen; return !!v && Math.abs(Date.now() - v) < 150000; };
   const norm = (id, d, uid) => {
     if(!d || !Array.isArray(d.u) || !Array.isArray(d.a)) return null;
     const i = d.u.indexOf(uid); if(i < 0) return null;
@@ -12450,7 +12505,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     const need = [...new Set(accs.filter(x => x && !dir[x]))]; if(!need.length) return;
     try{
       const { m, db } = await a.getDb();
-      await Promise.all(need.map(async id => { try{ const s = await m.getDoc(m.doc(db, "accountIds", id)); const d = s.exists() ? s.data() : {}; dir[id] = { name: String(d.name || ""), photo: String(d.photo || "") }; }catch(e){} }));
+      await Promise.all(need.map(async id => { try{ const s = await m.getDoc(m.doc(db, "accountIds", id)); const d = s.exists() ? s.data() : {}; dir[id] = { name: String(d.name || ""), photo: String(d.photo || ""), seen: +d.seen || 0 }; }catch(e){} }));
     }catch(e){}
   }
   /* teks notifikasi pertemanan menurut status: req (menunggu), ok (diterima), dn (ditolak olehku), cn (dibatalkan pengirim), rj (ditolak temanku) */
@@ -12473,11 +12528,39 @@ if(navigator.onLine !== false) init().catch(() => {});
     const x = ntx(r, { accepted: "ok", declined: "dn", cancelled: "cn" }[st]);
     N.patch(nid, { inv: { status: st }, title: x.title, body: x.body });
   }
+  /* pantau dokumen direktori tiap teman (maks 20) agar lampu online berubah langsung */
+  function unwatchPres(){ Object.keys(pw).forEach(k => { try{ pw[k](); }catch(e){} }); pw = {}; }
+  function watchPres(){
+    const a = A(); if(!a || !a.getDb) return;
+    const want = new Set(accepted().map(r => r.acc));
+    Object.keys(pw).forEach(k => { if(!want.has(k)){ try{ pw[k](); }catch(e){} delete pw[k]; } });
+    const need = [...want].filter(k => !pw[k]); if(!need.length) return;
+    a.getDb().then(({ m, db }) => need.forEach(acc => {
+      if(pw[acc] || !want.has(acc)) return;
+      try{ pw[acc] = m.onSnapshot(m.doc(db, "accountIds", acc), sn => {
+        const d = sn.exists() ? sn.data() : {}, o = dir[acc], n = { name: String(d.name || ""), photo: String(d.photo || ""), seen: +d.seen || 0 };
+        if(!o || o.name !== n.name || o.photo !== n.photo || o.seen !== n.seen){ dir[acc] = n; clearTimeout(pwT); pwT = setTimeout(() => { try{ refresh(); }catch(e){} }, 300); }
+      }, () => {}); }catch(e){}
+    })).catch(() => {});
+  }
+  /* detak "saya online": tulis waktu sekarang tiap 60 detik selama aplikasi terbuka; saat disembunyikan/ditutup ditandai offline (0) */
+  function beat(off){
+    const a = A(), me = myAcc(); if(!a || !a.user || !me || !a.getDb) return;
+    if(!off && (navigator.onLine === false || document.visibilityState === "hidden")) return;
+    a.getDb().then(({ m, db }) => m.setDoc(m.doc(db, "accountIds", me), { seen: off ? 0 : Date.now() }, { merge: true })).catch(() => {});
+  }
+  setInterval(() => beat(), 60000);
+  document.addEventListener("visibilitychange", () => beat(document.visibilityState === "hidden"));
+  addEventListener("pagehide", () => beat(true));
+  addEventListener("online", () => beat());
+  /* lampu yang kedaluwarsa (teman berhenti mengirim detak) ikut diperbarui saat panel terbuka */
+  setInterval(() => { if(isOpen() && !working) paint(); }, 30000);
   async function start(u){
     if(unsub){ try{ unsub(); }catch(e){} unsub = null; }
     if(unsubI){ try{ unsubI(); }catch(e){} unsubI = null; }
-    invOut = {}; rows = []; emit();
+    unwatchPres(); invOut = {}; rows = []; emit();
     if(!u) return;
+    setTimeout(() => beat(), 2500);
     const a = A(); if(!a || !a.getDb) return;
     try{
       const { m, db } = await a.getDb();
@@ -12496,7 +12579,7 @@ if(navigator.onLine !== false) init().catch(() => {});
             if(!r.mine) nPatch(r, "cancelled");               /* pengirim membatalkan */
             else if(!selfDel.has(r.id)) ev.push([r, "rj"]);   /* temanku menolak */
           } });
-        emit();
+        emit(); try{ watchPres(); }catch(e){}
         fetchDir(rows.map(r => r.acc)).then(() => { emit(); ev.forEach(x => notify(x[0], x[1])); });
       }, e => { console.warn("[teman] pendengar gagal:", e && (e.code || e.message)); });
     }catch(e){ console.warn("[teman] gagal mulai:", e && (e.code || e.message)); }
@@ -12556,7 +12639,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       catch(e){ const k = ferr(e); return { ok: false, err: T[lang()][k] || k }; }
     },
     /* untuk fitur lain: [{uid, acc, name, photo}] */
-    list: () => accepted().map(r => ({ uid: r.uid, acc: r.acc, name: nameOf(r.acc), photo: (dir[r.acc] && dir[r.acc].photo) || "" })),
+    list: () => accepted().map(r => ({ uid: r.uid, acc: r.acc, name: nameOf(r.acc), photo: (dir[r.acc] && dir[r.acc].photo) || "", online: isOn(r.acc) })),
     ready: () => !!(A() && A().user),
     open: () => setOpen(true), close: () => setOpen(false), isOpen: () => isOpen()
   };
@@ -12568,7 +12651,9 @@ if(navigator.onLine !== false) init().catch(() => {});
   function row(r, t, btns, onTap, open){
     const li = mk("div", "frrow" + (onTap ? " frtap" : "")); li.appendChild(avatar(r.acc));
     if(onTap){ li.tabIndex = 0; li.setAttribute("role", "button"); li.setAttribute("aria-expanded", String(!!open)); li.addEventListener("click", onTap); li.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); onTap(); } }); }
-    const w = mk("div", "frwho"); w.appendChild(mk("p", "frnm", nameOf(r.acc))); w.appendChild(mk("p", "frid", r.acc)); li.appendChild(w);
+    const w = mk("div", "frwho"), nmp = mk("p", "frnm");
+    if(r.st === "ok"){ const on = isOn(r.acc), tt = T[lang()], dt = mk("span", "frdot" + (on ? " on" : "")); dt.setAttribute("role", "img"); dt.setAttribute("aria-label", on ? tt.stOn : tt.stOff); dt.title = on ? tt.stOn : tt.stOff; nmp.appendChild(dt); }
+    nmp.appendChild(document.createTextNode(nameOf(r.acc))); w.appendChild(nmp); w.appendChild(mk("p", "frid", r.acc)); li.appendChild(w);
     const b = mk("div", "frbt"); btns.forEach(x => b.appendChild(x)); if(onTap) b.appendChild(mk("span", "frmore" + (open ? " on" : ""), "⌄")); li.appendChild(b); return li;
   }
   /* lihat foto profil teman: tampil besar di atas panel, ketuk di mana saja atau tekan Esc untuk menutup */
@@ -12641,13 +12726,18 @@ if(navigator.onLine !== false) init().catch(() => {});
     const ae = document.activeElement, hadFocus = ae && ae.id === "spFrIn", sel = hadFocus ? [ae.selectionStart, ae.selectionEnd] : null;
     pv.textContent = "";
     if(!u){ pv.appendChild(mk("p", "frh", t.login)); return; }
-    const box = mk("div", "frbox"); box.appendChild(mk("p", "frl", t.add)); box.appendChild(mk("p", "frh", t.addH));
-    const me = myAcc(); if(me) box.appendChild(mk("p", "frh", t.mine + me));
+    const box = mk("div", "frbox"), me = myAcc(), hd = mk("div", "fraddhd");
+    const tg = btn((addOpen ? "− " : "＋ ") + t.addS, "fraddbtn", () => { addOpen = !addOpen; paint(); if(addOpen){ const i0 = $("spFrIn"); if(i0) i0.focus(); } });
+    tg.setAttribute("aria-expanded", String(addOpen)); hd.appendChild(tg);
+    if(me){ const ie = mk("span", "frmeid", me); ie.title = t.mine + me; hd.appendChild(ie); }
+    box.appendChild(hd);
+    if(addOpen){ box.appendChild(mk("p", "frh", t.addH));
     const inp = mk("input"); inp.id = "spFrIn"; inp.type = "text"; inp.placeholder = t.ph; inp.maxLength = 12; inp.autocomplete = "off"; inp.autocapitalize = "characters"; inp.spellcheck = false; inp.value = inVal; inp.disabled = working;
     inp.addEventListener("input", () => { inVal = inp.value; });
-    const go = () => { const v = inp.value; run("sent", async () => { const k = await request(v); inVal = ""; return k; }); };
+    const go = () => { const v = inp.value; run("sent", async () => { const k = await request(v); inVal = ""; addOpen = false; return k; }); };
     inp.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); go(); } });
     const er = mk("div", "erow"); er.appendChild(btn(working ? t.busy : t.send, "ok", go)); box.append(inp, er);
+    }
     if(msg) box.appendChild(mk("p", msgOk ? "frok" : "frerr", msg));
     pv.appendChild(box);
     const out = outgoing();
@@ -12696,7 +12786,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       const bb = $("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click();
       confirmId = ""; menuId = ""; msg = "";
     }
-    panel.hidden = !on; btns.forEach(b => b.setAttribute("aria-expanded", String(on)));
+    if(on) addOpen = false; panel.hidden = !on; btns.forEach(b => b.setAttribute("aria-expanded", String(on)));
     clearInterval(sigTimer); sigTimer = 0;
     if(on){
       paint();
@@ -12729,7 +12819,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   if(typeof tp === "function") window.togglePanel = function(f){ if(f !== false && isOpen()) setOpen(false); return tp.apply(this, arguments); };
   (function hook(){
     const a = A();
-    if(a && a.onChange) a.onChange(x => { const uid = x.user ? x.user.uid : ""; if(uid !== curUid){ curUid = uid; confirmId = ""; menuId = ""; msg = ""; inVal = ""; start(x.user || null); } refresh(); });
+    if(a && a.onChange) a.onChange(x => { const uid = x.user ? x.user.uid : ""; if(uid !== curUid){ curUid = uid; confirmId = ""; menuId = ""; msg = ""; inVal = ""; addOpen = false; start(x.user || null); } refresh(); });
     else setTimeout(hook, 150);
   })();
   refresh();
