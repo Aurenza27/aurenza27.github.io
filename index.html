@@ -9987,6 +9987,15 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .cin:disabled{opacity:.5}
 .cgo{flex:none;min-height:40px;padding:0 14px;font:inherit;font-size:13px;font-weight:700;letter-spacing:.06em;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0;border-radius:10px;cursor:pointer}
 .cgo:disabled{opacity:.45}
+/* ===== Pemilik ruang: keluarkan pemain & sembunyikan kode ruang ===== */
+.rm-eye{flex:none;margin-left:auto;min-height:24px;padding:0 9px;font:inherit;font-size:10.5px;white-space:nowrap;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:9px;cursor:pointer}
+.rm-eye:active{background:rgba(212,169,79,.14)}
+.rm-top{display:flex;align-items:center;gap:8px}
+.rm-hero.codehid .rm-coderow{display:none}
+.rm-hero.codehid .rm-top{margin-bottom:0}
+.rm-hero.codehid .rm-meta{margin-top:6px}
+.rm-pl .kick{flex:none;min-height:20px;padding:0 7px;margin-left:2px;font:inherit;font-size:10.5px;white-space:nowrap;color:#e8a05a;background:transparent;border:1px solid rgba(232,160,90,.5);border-radius:8px;cursor:pointer}
+.rm-pl .kick[data-sure="1"]{color:#fff;background:#c0392b;border-color:#c0392b}
 </style>
 </head>
 <body>
@@ -10311,7 +10320,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       start:"▶ MULAI RONDE", next:"▶ RONDE BERIKUTNYA", waitStart:"Menunggu pemilik ruang memulai…", waitNext:"Menunggu pemilik ruang…", solo:"Butuh minimal 2 pemain untuk mulai. Bagikan kode ruang ke temanmu.",
       close:"Tutup ruang", leave:"Keluar dari ruangan", sure:"Ketuk lagi untuk memastikan",
       mkLim:"Jawaban yang diterima", mkLimHint:"Hanya jawaban tercepat yang dihitung. Jawaban salah atau ditolak membuka tempat bagi jawaban berikutnya.", limHint:"🎯 Hanya {n} jawaban tercepat yang diterima. Jawaban salah atau ditolak membuka tempat bagi jawaban berikutnya.", lateTag:"kuota penuh", wrongTag:"salah", n1:"jawaban",
-      vote:"Vote", voteOpen:"Voting jawaban", vYes:"Terima", vNo:"Tolak", vVoted:"sudah memilih", vApply:"Terapkan hasil", vCancel:"Batal", vOwn:"Jawabanmu sedang divote pemain lain.", vAcc:"Diterima lewat voting", vRej:"Ditolak lewat voting", boardHint:"Total skor dari semua ronde. Seri voting = jawaban diterima.", left:"keluar",
+      vote:"Vote", voteOpen:"Voting jawaban", vYes:"Terima", vNo:"Tolak", vVoted:"sudah memilih", vApply:"Terapkan hasil", vCancel:"Batal", vOwn:"Jawabanmu sedang divote pemain lain.", vAcc:"Diterima lewat voting", vRej:"Ditolak lewat voting", boardHint:"Total skor dari semua ronde. Seri voting = jawaban diterima.", left:"keluar", kick:"Keluarkan", kickSure:"Yakin?", kicked:"{n} dikeluarkan dari ruangan.", kickedMe:"Kamu dikeluarkan dari ruangan oleh pemilik ruang.", hideCode:"🙈 Sembunyikan kode", showCode:"👁 Tampilkan kode",
       rd:"Ronde", ph:"Ketik jawabanmu", send:"KIRIM", sent:"Terkirim ✓ (bisa diubah sebelum waktu habis)", cnt:"sudah menjawab", up:"⏰ Waktu habis!", hostNow:"Buka jawaban sekarang",
       none:"(tidak menjawab)", rej:"Tolak", acc:"Terima", rejd:"ditolak", board:"Klasemen", pts:"poin",
       nf:"Kode ruang tidak ditemukan.", full:"Ruang penuh (maksimal 8 pemain).", closed:"Ruang sudah ditutup.", took:"Kepemilikan ruang berpindah. Kamu sekarang pemilik ruang.", cats:"Kategori", all:"Pilih semua", catHostHint:"Ketuk untuk memilih kategori yang akan diacak. Minimal satu.", catMemHint:"Kategori dipilih oleh pemilik ruang.", minCat:"Pilih minimal satu kategori.", lobbyWait:"Menunggu pemain", lobbyReady:"Siap dimulai", leaveQ:"Keluar dari ruangan?", leaveHostMsg:"Kamu pemilik ruang. Jika keluar, ruang tetap berjalan dan kepemilikan pindah ke pemain yang paling awal masuk. Pilih Tutup ruang kalau ingin membubarkannya.", leaveSoloMsg:"Tidak ada pemain lain, jadi ruang akan ditutup.", leaveMemMsg:"Kamu akan keluar dari ruangan ini. Kamu bisa bergabung lagi dengan kode yang sama selama ruang masih dibuka.", stay:"Tetap di sini", leaveGo:"Keluar", denied:"Akses ditolak. Aturan Firestore untuk game ini belum dipasang.", fail:"Gagal, coba lagi.", off:"Tidak ada internet." },
@@ -10323,13 +10332,13 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       start:"▶ START ROUND", next:"▶ NEXT ROUND", waitStart:"Waiting for the room owner to start…", waitNext:"Waiting for the room owner…", solo:"At least 2 players are needed to start. Share the room code with a friend.",
       close:"Close room", leave:"Leave room", sure:"Tap again to confirm",
       mkLim:"Accepted answers", mkLimHint:"Only the fastest answers count. A wrong or rejected answer frees a spot for the next one.", limHint:"🎯 Only the fastest {n} answers are accepted. A wrong or rejected answer frees a spot for the next one.", lateTag:"quota full", wrongTag:"wrong", n1:"answers",
-      vote:"Vote", voteOpen:"Answer vote", vYes:"Accept", vNo:"Reject", vVoted:"voted", vApply:"Apply result", vCancel:"Cancel", vOwn:"Other players are voting on your answer.", vAcc:"Accepted by vote", vRej:"Rejected by vote", boardHint:"Total score across all rounds. A tied vote keeps the answer accepted.", left:"left",
+      vote:"Vote", voteOpen:"Answer vote", vYes:"Accept", vNo:"Reject", vVoted:"voted", vApply:"Apply result", vCancel:"Cancel", vOwn:"Other players are voting on your answer.", vAcc:"Accepted by vote", vRej:"Rejected by vote", boardHint:"Total score across all rounds. A tied vote keeps the answer accepted.", left:"left", kick:"Remove", kickSure:"Sure?", kicked:"{n} was removed from the room.", kickedMe:"The room owner removed you from the room.", hideCode:"🙈 Hide code", showCode:"👁 Show code",
       rd:"Round", ph:"Type your answer", send:"SEND", sent:"Sent ✓ (you can change it before time is up)", cnt:"answered", up:"⏰ Time is up!", hostNow:"Reveal answers now",
       none:"(no answer)", rej:"Reject", acc:"Accept", rejd:"rejected", board:"Scoreboard", pts:"pts",
       nf:"Room code not found.", full:"The room is full (max 8 players).", closed:"The room was closed.", took:"Room ownership changed. You are now the room owner.", cats:"Categories", all:"Select all", catHostHint:"Tap to choose which categories get drawn. At least one.", catMemHint:"Categories are chosen by the room owner.", minCat:"Pick at least one category.", lobbyWait:"Waiting for players", lobbyReady:"Ready to start", leaveQ:"Leave the room?", leaveHostMsg:"You are the room owner. If you leave, the room keeps running and ownership passes to the player who joined first. Choose Close room to dissolve it.", leaveSoloMsg:"There are no other players, so the room will be closed.", leaveMemMsg:"You are about to leave this room. You can rejoin with the same code while the room is open.", stay:"Stay here", leaveGo:"Leave", denied:"Access denied. The Firestore rules for this game are not installed yet.", fail:"Failed, please try again.", off:"No internet." }
   };
   var mode = "off";
-  var ON = { catOpen:false, names:{}, applying:false, spunRd:-1, spinTok:0, fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
+  var ON = { codeHid:(function(){ try{ return localStorage.getItem("ti_codehid") === "1"; }catch(e){ return false; } })(), seenMe:false, catOpen:false, names:{}, applying:false, spunRd:-1, spinTok:0, fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
              secs:(+ls("ti_osecs", 45) || 45), lim:(+ls("ti_olim", 5) || 5) };
   if([2, 3, 4, 5].indexOf(ON.lim) < 0) ON.lim = 5;
   if([30, 45, 60].indexOf(ON.secs) < 0) ON.secs = 45;
@@ -10405,11 +10414,20 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   async function attach(code){
     detach(false);
     var f = await lib(), m = f.m, db = f.db;
-    ON.code = code; ON.view = ""; ON.data = null; ON.players = []; ON.sentRd = -1; ON.spunRd = -1; ON.spFocus = -1;
+    ON.code = code; ON.seenMe = false; ON.leaving = false; ON.view = ""; ON.data = null; ON.players = []; ON.sentRd = -1; ON.spunRd = -1; ON.spFocus = -1;
     ON.uR = m.onSnapshot(m.doc(db, "ti_rooms", code), onRoom, function(e){ flash(errMsg(e)); });
     ON.uP = m.onSnapshot(m.collection(db, "ti_rooms", code, "p"), function(s){
       var a = []; s.forEach(function(x){ var v = x.data() || {}; a.push({ u:x.id, n:String(v.n || ""), d:+v.d || 0, j:+v.j || 0, vr:+v.vr || 0, vt:(v.vt && typeof v.vt === "object") ? v.vt : null }); });
-      a.sort(function(x, y){ return x.j - y.j; }); ON.players = a; renderO();
+      a.sort(function(x, y){ return x.j - y.j; }); ON.players = a;
+      var mu2 = meU(), inL = !!(mu2 && a.some(function(p){ return p.u === mu2.uid; }));
+      if(inL) ON.seenMe = true; else if(ON.seenMe && mu2 && !ON.leaving && !ON.kickT){
+        /* dokumen pemain hilang: tunggu sebentar; bila ruang ikut dihapus (ditutup) onRoom akan melepas ruang lebih dulu */
+        ON.kickT = setTimeout(function(){
+          ON.kickT = 0;
+          if(ON.code === code && !ON.leaving && ON.seenMe && !ON.players.some(function(q){ return q.u === mu2.uid; })) kickedOut();
+        }, 1500);
+      }
+      renderO();
     }, function(){});
     chatOn(m, db, code);
     if(!ON.tick) ON.tick = setInterval(tickO, 300);
@@ -10418,6 +10436,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   function detach(render){
     try{ if(ON.uR) ON.uR(); }catch(e){} try{ if(ON.uP) ON.uP(); }catch(e){}
     chatOff();
+    if(ON.kickT){ clearTimeout(ON.kickT); ON.kickT = 0; }
     ON.uR = ON.uP = null; ON.code = ""; ON.data = null; ON.players = []; ON.revealing = false; ON.allSince = 0;
     if(ON.tick){ clearInterval(ON.tick); ON.tick = 0; }
     wlOff(); ON.claiming = false;
@@ -10446,6 +10465,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     try{
       var f = await lib(), m = f.m, db = f.db, rs = await m.getDoc(m.doc(db, "ti_rooms", code));
       if(!rs.exists()) throw { code:"nf" };
+      var kkL = (rs.data() || {}).kk; if(Array.isArray(kkL) && kkL.indexOf(u.uid) >= 0){ flash(oT().kickedMe); setBusy(false); return; }
       var ps = await m.getDocs(m.collection(db, "ti_rooms", code, "p")), mine = false;
       ps.forEach(function(x){ if(x.id === u.uid) mine = true; });
       if(!mine && ps.size >= 8) throw { code:"full" };
@@ -10455,16 +10475,28 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     setBusy(false);
   }
   /* pemilik keluar: ruang tetap jalan, kepemilikan pindah ke pemain yang paling awal masuk (urutan j); bila sendirian, ruang ditutup */
+  /* pemilik ruang mengeluarkan pemain: tandai di daftar kk (supaya tidak bisa masuk lagi) lalu hapus dokumen pemainnya */
+  async function kickPlayer(uid){
+    var u = meU(), code = ON.code; if(!u || !code || !isHost() || !uid || uid === u.uid || ON.busy) return;
+    var nm = nameOf(uid);
+    try{
+      var f = await lib(), m = f.m;
+      try{ await m.updateDoc(m.doc(f.db, "ti_rooms", code), po({ kk:m.arrayUnion(uid) })); }catch(e){}
+      await m.deleteDoc(m.doc(f.db, "ti_rooms", code, "p", uid));
+      flash(oT().kicked.replace("{n}", nm));
+    }catch(e){ flash(errMsg(e)); }
+  }
+  function kickedOut(){ detach(true); flash(oT().kickedMe); }
   async function leaveRoom(){
-    var u = meU(), code = ON.code, d = ON.data;
+    var u = meU(), code = ON.code, d = ON.data; ON.leaving = true;
     if(u && code && d && d.host === u.uid){
       var nx = ON.players.filter(function(p){ return p.u !== u.uid; })[0];
       if(!nx){ await closeRoom(); return true; }
-      if(ON.busy) return false; setBusy(true);
+      if(ON.busy){ ON.leaving = false; return false; } setBusy(true);
       try{
         var f0 = await lib();
         await f0.m.updateDoc(f0.m.doc(f0.db, "ti_rooms", code), po({ host:nx.u, hn:String(nx.n || "").slice(0, 20) }));
-      }catch(e){ flash(errMsg(e)); setBusy(false); return false; }
+      }catch(e){ ON.leaving = false; flash(errMsg(e)); setBusy(false); return false; }
       try{ var f1 = await lib(); await f1.m.deleteDoc(f1.m.doc(f1.db, "ti_rooms", code, "p", u.uid)); }catch(e){}
       detach(true); setBusy(false); return true;
     }
@@ -10472,7 +10504,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     detach(true); return true;
   }
   async function closeRoom(){
-    var code = ON.code; if(!code || ON.busy) return; setBusy(true);
+    var code = ON.code; if(!code || ON.busy) return; ON.leaving = true; setBusy(true);
     try{
       var f = await lib(), m = f.m, db = f.db, refs = [], i;
       try{   /* hapus pesan chat dulu; bila ditolak aturan, penutupan ruang tetap jalan */
@@ -10491,6 +10523,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(!s.exists()){ var had = !!ON.data; detach(true); if(had) flash(oT().closed); return; }
     var d = s.data(), pst = ON.data ? ON.data.st : "", prd = ON.data ? ON.data.rd : -1, first = !ON.data, prevHost = ON.data ? ON.data.host : "";
     ON.data = d;
+    { var kkR = d.kk, mu = meU(); if(mu && Array.isArray(kkR) && kkR.indexOf(mu.uid) >= 0){ kickedOut(); return; } }
     updOff(d, s, first);
     if(isHost()) wlOn(); else wlOff();
     if(!first && prevHost !== d.host && meU() && d.host === meU().uid) flash(oT().took);
@@ -10876,7 +10909,13 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(d.st === "lobby"){
       p = el("section", "panel rm-hero");
       var rmTp = el("div", "rm-top"); rmTp.appendChild(el("span", "label", t.code));
-      var rmLv = el("span", "rm-live"); rmLv.id = "oLive"; rmLv.appendChild(el("i")); var rmLt = el("span"); rmLt.id = "oLiveT"; rmLv.appendChild(rmLt); rmTp.appendChild(rmLv); p.appendChild(rmTp);
+      var rmLv = el("span", "rm-live"); rmLv.id = "oLive"; rmLv.appendChild(el("i")); var rmLt = el("span"); rmLt.id = "oLiveT"; rmLv.appendChild(rmLt); rmTp.appendChild(rmLv);
+      var rmEye = btn("rm-eye", ON.codeHid ? t.showCode : t.hideCode, function(){
+        ON.codeHid = !ON.codeHid; try{ localStorage.setItem("ti_codehid", ON.codeHid ? "1" : "0"); }catch(e){}
+        var hero = rmEye.closest(".rm-hero"); if(hero) hero.classList.toggle("codehid", ON.codeHid);
+        rmEye.textContent = ON.codeHid ? oT().showCode : oT().hideCode;
+      });
+      rmTp.appendChild(rmEye); p.appendChild(rmTp); if(ON.codeHid) p.classList.add("codehid");
       var rmCr = el("div", "rm-coderow"); var cb = el("div", "codebig"); cb.id = "oCode"; rmCr.appendChild(cb);
       rmCr.appendChild(btn("mini rm-copy", t.copy, function(){
         var c = ON.code;
@@ -10977,6 +11016,16 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
           if(p.u === d.host) li.appendChild(el("span", "tag", "👑 " + t.hostTag));
           if(u && p.u === u.uid) li.appendChild(el("span", "tag me", t.me));
           if(d.st === "play" && p.d === d.rd) li.appendChild(document.createTextNode(" ✔"));
+          if(isHost() && u && p.u !== u.uid){
+            (function(pu){
+              var kb = btn("kick", "✕ " + t.kick, function(){
+                if(kb.getAttribute("data-sure") === "1"){ kickPlayer(pu); return; }
+                kb.setAttribute("data-sure", "1"); kb.textContent = oT().kickSure;
+                setTimeout(function(){ kb.removeAttribute("data-sure"); kb.textContent = "✕ " + oT().kick; }, 3000);
+              });
+              li.appendChild(kb);
+            })(p.u);
+          }
           ul.appendChild(li);
         });
       }
