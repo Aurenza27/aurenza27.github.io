@@ -12018,8 +12018,12 @@ const NSRC = (() => {
           if(ch.type === "removed"){ const ex = n.list().find(i => i.id === nid); if(!ex || !ex.inv || ex.inv.status !== "pending") return; st = "cancelled"; }
           const tt = invTx(x, st), inv = { docId: d.id, oid: String(x.oid || ""), status: st, kind: (x.kind === "follow" || x.kind === "room") ? x.kind : "mod", tName: String(x.tName || ""), ownerName: String(x.ownerName || "") };
           const prevN = n.list().find(i => i.id === nid), fresh = st === "pending" && prevN && (!prevN.inv || prevN.inv.status !== "pending");
-          /* undangan ulang (dokumen yang sama dibuat lagi): tampil sebagai notifikasi baru yang belum dibaca, bukan menempel di yang lama */
-          if(!n.patch(nid, Object.assign({ inv, title: tt.title, body: tt.body }, fresh ? { read: false, ts: +x.ts || Date.now() } : {})) && st === "pending") n.add({ id: nid, type: "invite", ts: +x.ts || Date.now(), inv, title: tt.title, body: tt.body });
+          /* undangan ulang (dokumen yang sama dibuat lagi, mis. setelah pemain dikeluarkan lalu diundang lagi): diganti jadi notifikasi baru
+             (belum dibaca, waktu baru, dan memicu pemberitahuan), bukan sekadar mengubah isi notifikasi lama secara diam-diam */
+          const nIt = { id: nid, type: "invite", ts: +x.ts || Date.now(), inv, title: tt.title, body: tt.body };
+          /* replace juga dipakai bila notifikasi lama sudah dihapus: id yang pernah tercatat di daftar "sudah dilihat" kalau tidak ditolak oleh add() */
+          if(fresh || (st === "pending" && !prevN)) n.add(nIt, { replace: true });
+          else n.patch(nid, { inv, title: tt.title, body: tt.body });
         });
       }, onErr));
       /* undangan keluar (dari saya): kabari saat diterima / ditolak */
