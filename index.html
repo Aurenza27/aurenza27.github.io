@@ -1872,7 +1872,10 @@ function closeMenu(){
 }
 function route(){
   const m = MENUS.find(x => x.id === location.hash.slice(1));
-  if(m){ if($("view").hidden) openMenu(m); } else closeMenu();
+  if(m){
+    if($("view").hidden) openMenu(m);
+    else if(curMenu !== m.id){ closeMenu(); openMenu(m); }   /* ada menu lain yang terbuka (mis. undangan diterima): ganti paksa ke menu tujuan */
+  } else closeMenu();
 }
 CATS.forEach(c => {
   const sec = document.createElement("section"), items = MENUS.filter(m => m.cat === c.id);
