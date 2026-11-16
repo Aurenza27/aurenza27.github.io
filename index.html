@@ -1639,7 +1639,7 @@ window.satuTitikNative = {
       if(cfg.banner !== false){
         /* Sisakan ruang di bawah halaman setinggi banner, supaya tulisan kaki beranda dan menu tidak tertutup iklan */
         const st = document.createElement("style");
-        st.textContent = "#home{padding-bottom:calc(28px + var(--adh,0px))!important}#view,#about,#privacy{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - var(--adh,0px))!important}";
+        st.textContent = "#home{padding-bottom:calc(4px + var(--adh,0px))!important}#view,#about,#privacy{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - var(--adh,0px))!important}";
         document.head.appendChild(st);
         const setH = h => { h = Math.round(+h || 0); if(h > 0) document.documentElement.style.setProperty("--adh", h + "px"); };
         try{ AdMob.addListener("bannerAdSizeChanged", e => setH(e && e.height)); }catch(e){}
