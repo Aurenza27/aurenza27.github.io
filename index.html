@@ -10077,7 +10077,7 @@ button:disabled{opacity:.6}
       close:"Tutup ruang", leave:"Keluar ruang", sure:"Ketuk lagi untuk memastikan",
       rd:"Ronde", ph:"Ketik jawabanmu", send:"KIRIM", sent:"Terkirim ✓ (bisa diubah sebelum waktu habis)", cnt:"sudah menjawab", up:"⏰ Waktu habis!", hostNow:"Buka jawaban sekarang",
       none:"(tidak menjawab)", rej:"Tolak", acc:"Terima", rejd:"ditolak", board:"Klasemen", pts:"poin",
-      nf:"Kode ruang tidak ditemukan.", full:"Ruang penuh (maksimal 8 pemain).", closed:"Ruang sudah ditutup.", denied:"Akses ditolak. Aturan Firestore untuk game ini belum dipasang.", fail:"Gagal, coba lagi.", off:"Tidak ada internet." },
+      nf:"Kode ruang tidak ditemukan.", full:"Ruang penuh (maksimal 8 pemain).", closed:"Ruang sudah ditutup.", took:"Pemilik ruang sebelumnya tidak merespons. Kamu sekarang pemilik ruang.", denied:"Akses ditolak. Aturan Firestore untuk game ini belum dipasang.", fail:"Gagal, coba lagi.", off:"Tidak ada internet." },
     en:{ tOff:"Together", tOn:"Online", sub:"Play with friends using a room code. One player creates a room, the others join.",
       anon:"Player", offline:"No internet. Online mode needs a connection.", needLogin:"Sign in with Google to play online.", login:"Sign in with Google",
       wait:"Please wait…", mk:"Create a room", mkTime:"Answer time", mkCats:"active categories (set in Together mode)", jn:"Join a room", jnPh:"CODE", jnGo:"Join",
@@ -10087,7 +10087,7 @@ button:disabled{opacity:.6}
       close:"Close room", leave:"Leave room", sure:"Tap again to confirm",
       rd:"Round", ph:"Type your answer", send:"SEND", sent:"Sent ✓ (you can change it before time is up)", cnt:"answered", up:"⏰ Time is up!", hostNow:"Reveal answers now",
       none:"(no answer)", rej:"Reject", acc:"Accept", rejd:"rejected", board:"Scoreboard", pts:"pts",
-      nf:"Room code not found.", full:"The room is full (max 8 players).", closed:"The room was closed.", denied:"Access denied. The Firestore rules for this game are not installed yet.", fail:"Failed, please try again.", off:"No internet." }
+      nf:"Room code not found.", full:"The room is full (max 8 players).", closed:"The room was closed.", took:"The previous owner stopped responding. You are now the room owner.", denied:"Access denied. The Firestore rules for this game are not installed yet.", fail:"Failed, please try again.", off:"No internet." }
   };
   var mode = "off";
   var ON = { fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
@@ -10159,6 +10159,7 @@ button:disabled{opacity:.6}
     try{ if(ON.uR) ON.uR(); }catch(e){} try{ if(ON.uP) ON.uP(); }catch(e){}
     ON.uR = ON.uP = null; ON.code = ""; ON.data = null; ON.players = []; ON.revealing = false; ON.allSince = 0;
     if(ON.tick){ clearInterval(ON.tick); ON.tick = 0; }
+    wlOff(); ON.claiming = false;
     ON.view = ""; if(render) renderO();
   }
   async function createRoom(){
@@ -10210,8 +10211,11 @@ button:disabled{opacity:.6}
   }
   function onRoom(s){
     if(!s.exists()){ var had = !!ON.data; detach(true); if(had) flash(oT().closed); return; }
-    var d = s.data(), pst = ON.data ? ON.data.st : "", prd = ON.data ? ON.data.rd : -1, first = !ON.data;
+    var d = s.data(), pst = ON.data ? ON.data.st : "", prd = ON.data ? ON.data.rd : -1, first = !ON.data, prevHost = ON.data ? ON.data.host : "";
     ON.data = d;
+    updOff(d, s, first);
+    if(isHost()) wlOn(); else wlOff();
+    if(!first && prevHost !== d.host && meU() && d.host === meU().uid) flash(oT().took);
     if(d.st !== pst || d.rd !== prd){
       ON.allSince = 0; ON.revealing = false;
       if(!first){
@@ -10233,7 +10237,7 @@ button:disabled{opacity:.6}
         ks = Object.keys(d.base || {}).concat(Object.keys(d.pts || {}));
         ks.forEach(function(k){ nb[k] = totalOf(d, k); });
       }
-      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), { st:"play", rd:(d.rd || 0) + 1, l:L, c:C.k, end:Date.now() + (d.secs || 45) * 1000, res:[], pts:{}, base:nb, exp:m.Timestamp.fromMillis(Date.now() + 86400000) });
+      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), { st:"play", rd:(d.rd || 0) + 1, l:L, c:C.k, end:Date.now() + (d.secs || 45) * 1000, ts:m.serverTimestamp(), res:[], pts:{}, base:nb, exp:m.Timestamp.fromMillis(Date.now() + 86400000) });
     }catch(e){ flash(errMsg(e)); }
     setBusy(false);
   }
@@ -10255,12 +10259,41 @@ button:disabled{opacity:.6}
     try{ var f = await lib(); await f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), { res:res, pts:scoreOf(res, d.l) }); }catch(e){ flash(errMsg(e)); }
   }
   function submitAns(){
-    var d = ON.data, u = meU(), inp = $("oAns"); if(!d || !u || !inp || d.st !== "play" || Date.now() > d.end + 1000) return;
+    var d = ON.data, u = meU(), inp = $("oAns"); if(!d || !u || !inp || d.st !== "play" || Date.now() > endMs(d) + 1000) return;
     var txt = String(inp.value || "").replace(/\s+/g, " ").trim().slice(0, 30); if(!txt) return;
     var rd = d.rd; ON.sentRd = rd; paintAnsStat(); beep(880, 0.1, "triangle", 0.06);
     lib().then(function(f){
       return Promise.all([ f.m.setDoc(f.m.doc(f.db, "ti_rooms", ON.code, "a", u.uid), { rd:rd, t:txt }), f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code, "p", u.uid), { d:rd }) ]);
     }).catch(function(e){ ON.sentRd = -1; flash(errMsg(e)); paintAnsStat(); });
+  }
+  /* ----- waktu ronde berbasis jam server (tidak tergantung jam HP pemilik ruang) ----- */
+  /* ON.off = selisih (jam server - jam HP ini). Diukur tiap ronde baru dari ts (serverTimestamp) milik ronde itu. */
+  function srvEnd(d){ return (d.ts && d.ts.toMillis) ? d.ts.toMillis() + (d.secs || 45) * 1000 : 0; }
+  function endMs(d){ var e = srvEnd(d); return e ? e - (ON.off || 0) : d.end; }
+  function updOff(d, s, first){
+    if(!d.ts || !d.ts.toMillis || s.metadata.hasPendingWrites || ON.offRd === d.rd) return;
+    ON.offRd = d.rd;
+    if(first){ if(ON.off == null){ ON.off = 0; ON.offOk = false; } return; }
+    var smp = d.ts.toMillis() - Date.now();
+    if(!ON.offOk || Math.abs(smp - ON.off) <= 4000){ ON.off = smp; ON.offOk = true; }
+  }
+  /* ----- layar HP pemilik ruang dijaga menyala selama ronde ----- */
+  var WL = null;
+  function wlOn(){
+    try{ if(navigator.wakeLock && !WL){ WL = true; navigator.wakeLock.request("screen").then(function(l){ WL = l; l.addEventListener("release", function(){ if(WL === l) WL = null; }); }).catch(function(){ WL = null; }); } }catch(e){ WL = null; }
+  }
+  function wlOff(){ try{ if(WL && WL !== true) WL.release(); }catch(e){} WL = null; }
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden && ON.code && isHost()){ WL = null; wlOn(); } });
+  /* ----- pemilik ruang tidak merespons: pemain lain mengambil alih supaya ronde tidak macet ----- */
+  function tryClaim(d){
+    var u = meU(); if(!u || ON.claiming || d.st !== "play") return;
+    var e = srvEnd(d); if(!e) return;
+    var cands = ON.players.filter(function(p){ return p.u !== d.host; }), rank = -1, i;
+    for(i = 0; i < cands.length; i++) if(cands[i].u === u.uid) rank = i;
+    if(rank < 0) return;
+    if(Date.now() + (ON.off || 0) < e + 8500 + rank * 6000) return;
+    ON.claiming = true; setTimeout(function(){ ON.claiming = false; }, 6000);
+    lib().then(function(f){ return f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), { host:u.uid, hn:meName() }); }).catch(function(){});
   }
   var lastSecO = -1;
   function tickO(){
@@ -10270,13 +10303,14 @@ button:disabled{opacity:.6}
       if(isHost() && !ON.revealing){
         var all = ON.players.length > 0 && ON.players.every(function(p){ return p.d === d.rd; });
         if(all){ if(!ON.allSince) ON.allSince = Date.now(); } else ON.allSince = 0;
-        if(Date.now() >= d.end + 1500 || (ON.allSince && Date.now() - ON.allSince > 3000)) doReveal();
+        if(Date.now() >= endMs(d) + 1500 || (ON.allSince && Date.now() - ON.allSince > 3000)) doReveal();
       }
+      if(!isHost()) tryClaim(d);
     }
   }
   function paintTimer(){
     var d = ON.data, tf = $("oTf"), tn = $("oTn"); if(!d || d.st !== "play" || !tf || !tn) return;
-    var tot = Math.max(1, (d.secs || 45) * 1000), left = Math.max(0, d.end - Date.now()), sec = Math.ceil(left / 1000);
+    var tot = Math.max(1, (d.secs || 45) * 1000), left = Math.max(0, endMs(d) - Date.now()), sec = Math.ceil(left / 1000);
     tf.style.transform = "scaleX(" + Math.min(1, left / tot) + ")";
     if(sec !== lastSecO){
       lastSecO = sec; tn.textContent = left > 0 ? "⏱ " + sec + " " + T().sec : oT().up; $("oTb").classList.toggle("low", sec <= 5);
