@@ -9731,6 +9731,7 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
 .seg2 .chip[aria-pressed=true]{background:rgba(212,169,79,.16);color:var(--gold2);font-weight:700}
 #onWrap{display:flex;flex-direction:column;gap:14px}
 #offWrap{display:flex;flex-direction:column;gap:14px}
+#oStart:disabled{opacity:.35;box-shadow:none;filter:grayscale(.5)}
 #onMsg{margin:0;min-height:0;text-align:center;color:var(--gold2)}
 #onMsg:empty{display:none}
 #onBody{display:flex;flex-direction:column;gap:14px}
@@ -10124,7 +10125,7 @@ button:disabled{opacity:.6}
       wait:"Mohon tunggu…", mk:"Buat ruang", mkTime:"Waktu menjawab", mkCats:"kategori aktif (atur di mode Bareng)", jn:"Gabung ke ruang", jnPh:"KODE", jnGo:"Gabung",
       rules:"Tulis jawaban yang berawalan huruf yang diminta. Jawaban unik dapat 10 poin, jawaban yang sama dengan pemain lain 5 poin. Pemilik ruang bisa menolak jawaban yang tidak cocok dengan kategori.",
       code:"KODE RUANG", copy:"Salin kode", copied:"Kode disalin.", pl:"Pemain", hostTag:"pemilik", me:"kamu",
-      start:"▶ MULAI RONDE", next:"▶ RONDE BERIKUTNYA", waitStart:"Menunggu pemilik ruang memulai…", waitNext:"Menunggu pemilik ruang…", solo:"Bisa dimulai sendirian untuk mencoba, tapi lebih seru bersama teman.",
+      start:"▶ MULAI RONDE", next:"▶ RONDE BERIKUTNYA", waitStart:"Menunggu pemilik ruang memulai…", waitNext:"Menunggu pemilik ruang…", solo:"Butuh minimal 2 pemain untuk mulai. Bagikan kode ruang ke temanmu.",
       close:"Tutup ruang", leave:"Keluar dari ruangan", sure:"Ketuk lagi untuk memastikan",
       mkLim:"Jawaban yang diterima", mkLimHint:"Hanya jawaban tercepat yang dihitung. Jawaban salah atau ditolak membuka tempat bagi jawaban berikutnya.", limHint:"🎯 Hanya {n} jawaban tercepat yang diterima. Jawaban salah atau ditolak membuka tempat bagi jawaban berikutnya.", lateTag:"kuota penuh", wrongTag:"salah", n1:"jawaban",
       vote:"Vote", voteOpen:"Voting jawaban", vYes:"Terima", vNo:"Tolak", vVoted:"sudah memilih", vApply:"Terapkan hasil", vCancel:"Batal", vOwn:"Jawabanmu sedang divote pemain lain.", vAcc:"Diterima lewat voting", vRej:"Ditolak lewat voting", boardHint:"Total skor dari semua ronde. Seri voting = jawaban diterima.", left:"keluar",
@@ -10136,7 +10137,7 @@ button:disabled{opacity:.6}
       wait:"Please wait…", mk:"Create a room", mkTime:"Answer time", mkCats:"active categories (set in Together mode)", jn:"Join a room", jnPh:"CODE", jnGo:"Join",
       rules:"Type an answer that starts with the given letter. A unique answer scores 10 points, the same as another player 5 points. The room owner can reject answers that do not fit the category.",
       code:"ROOM CODE", copy:"Copy code", copied:"Code copied.", pl:"Players", hostTag:"owner", me:"you",
-      start:"▶ START ROUND", next:"▶ NEXT ROUND", waitStart:"Waiting for the room owner to start…", waitNext:"Waiting for the room owner…", solo:"You can start alone to try it out, but it is more fun with friends.",
+      start:"▶ START ROUND", next:"▶ NEXT ROUND", waitStart:"Waiting for the room owner to start…", waitNext:"Waiting for the room owner…", solo:"At least 2 players are needed to start. Share the room code with a friend.",
       close:"Close room", leave:"Leave room", sure:"Tap again to confirm",
       mkLim:"Accepted answers", mkLimHint:"Only the fastest answers count. A wrong or rejected answer frees a spot for the next one.", limHint:"🎯 Only the fastest {n} answers are accepted. A wrong or rejected answer frees a spot for the next one.", lateTag:"quota full", wrongTag:"wrong", n1:"answers",
       vote:"Vote", voteOpen:"Answer vote", vYes:"Accept", vNo:"Reject", vVoted:"voted", vApply:"Apply result", vCancel:"Cancel", vOwn:"Other players are voting on your answer.", vAcc:"Accepted by vote", vRej:"Rejected by vote", boardHint:"Total score across all rounds. A tied vote keeps the answer accepted.", left:"left",
@@ -10194,7 +10195,8 @@ button:disabled{opacity:.6}
   function setBusy(b){ ON.busy = b; applyBusy(); }
   function applyBusy(){
     var host = $("onBody"); if(!host) return;
-    Array.prototype.forEach.call(host.querySelectorAll("button.act"), function(x){ x.disabled = ON.busy; });
+    Array.prototype.forEach.call(host.querySelectorAll("button.act"), function(x){ x.disabled = ON.busy || (x.id === "oStart" && ON.players.length < 2); });
+    var sh = $("oSolo"); if(sh) sh.hidden = ON.players.length >= 2;
   }
 
   /*SC-START*/
@@ -10313,7 +10315,7 @@ button:disabled{opacity:.6}
 
   /* ----- alur ronde (dijalankan pemilik ruang) ----- */
   async function startRound(){
-    var d = ON.data; if(!d || !isHost() || ON.busy) return; setBusy(true);
+    var d = ON.data; if(!d || !isHost() || ON.busy || ON.players.length < 2) return; setBusy(true);
     try{
       var f = await lib(), m = f.m, ks, nb = {}, tries = 0, L, C;
       var pool = CATS.filter(function(c){ return (d.cats || []).indexOf(c.k) >= 0; }); if(!pool.length) pool = CATS;
@@ -10586,6 +10588,8 @@ button:disabled{opacity:.6}
     });
     return b;
   }
+  function startBtn(txt){ var b = btn("go act", txt, startRound); b.id = "oStart"; b.disabled = ON.players.length < 2; return b; }
+  function soloHint(){ var h = el("p", "hint", oT().solo); h.id = "oSolo"; h.hidden = ON.players.length >= 2; return h; }
   function exitBtns(p){ var t = oT(); p.appendChild(confirmBtn("ghost act", t.leave, leaveRoom)); if(isHost()) p.appendChild(confirmBtn("ghost exit act", t.close, closeRoom)); }
   function panel(){ return el("section", "panel"); }
   function nameOf(u){
@@ -10698,7 +10702,7 @@ button:disabled{opacity:.6}
       host.appendChild(catPanel());
       p = el("div", "oact");
       if(isHost()){
-        p.appendChild(btn("go act", t.start, startRound)); p.appendChild(el("p", "hint", t.solo));
+        p.appendChild(startBtn(t.start)); p.appendChild(soloHint());
         exitBtns(p);
       }else{
         p.appendChild(el("p", "hint", t.waitStart)); exitBtns(p);
@@ -10754,7 +10758,7 @@ button:disabled{opacity:.6}
       p = panel(); p.appendChild(el("span", "label", t.board)); var bl = el("div"); bl.id = "oBoard"; p.appendChild(bl); p.appendChild(el("p", "hint", t.boardHint)); host.appendChild(p);
       host.appendChild(catPanel());
       p = el("div", "oact");
-      if(isHost()){ p.appendChild(btn("go act", t.next, startRound)); exitBtns(p); }
+      if(isHost()){ p.appendChild(startBtn(t.next)); p.appendChild(soloHint()); exitBtns(p); }
       else{ p.appendChild(el("p", "hint", t.waitNext)); exitBtns(p); }
       host.appendChild(p);
     }
