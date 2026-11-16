@@ -9804,6 +9804,79 @@ body.noanim .rm-live i{animation:none}
 .rm-catp .rollc{padding:10px 0 0}
 .rm-catp .rm-link{padding-top:8px}
 button:disabled{opacity:.6}
+
+/* ===== Tampilan kompak (Tebak Inisial): panel & tulisan diperkecil agar lebih lega ===== */
+.app{max-width:400px;padding:12px 14px calc(26px + env(safe-area-inset-bottom,0px));gap:10px}
+.brand{margin-top:0}.brand .icon{font-size:32px}.brand h1{margin:2px 0 0;font-size:19px;letter-spacing:.12em}
+.sub{font-size:12.5px;line-height:1.4}
+.panel{border-radius:13px;padding:12px}
+.label{font-size:11px;letter-spacing:.18em;margin:0 0 8px}
+.hint{font-size:11.5px;margin:8px 0 0}
+.stage{padding:12px 12px 14px}
+.reels{gap:10px}
+.reel{min-height:128px;padding:22px 6px 10px;border-radius:13px}
+.reel::before,.reel::after{height:16px}
+.cap{top:7px;font-size:9.5px;letter-spacing:.2em}
+#valL,#oL{font-size:clamp(56px,19vw,80px)}
+#emoC,#oE{font-size:34px;margin-bottom:6px}
+#valC,#oC{font-size:clamp(13px,4vw,17px)}
+.prompt{margin:12px 2px 0;min-height:44px;font-size:16px;line-height:1.4}
+.tbar{height:26px;margin:10px 0 0}.tbar span{line-height:24px;font-size:12.5px}
+.go{min-height:50px;font-size:16px;letter-spacing:.14em;border-radius:13px}
+.go.sm{min-height:44px;font-size:14px;margin-top:10px}
+.ghost{min-height:38px;margin-top:10px;font-size:13px;border-radius:10px}
+.chip{min-height:38px;padding:0 12px;font-size:13px}
+.hd{margin-bottom:8px}
+.mini{min-height:26px;padding:0 10px;font-size:11.5px}
+.hl{gap:6px}.hl li{padding:4px 10px;font-size:12px}
+.empty{font-size:12px}
+.set{padding:12px 12px 6px}.set .label{margin-bottom:6px}
+.seg4 .chip,.seg2 .chip{min-height:36px;font-size:12.5px}
+.sep{margin:10px -12px 2px}
+.acc{min-height:38px}
+.cnt{font-size:11.5px}
+.prev{font-size:15px;margin:0 0 6px}
+.grid{gap:6px}
+.tile{min-height:52px;font-size:10.5px;border-radius:10px}.tile .em{font-size:19px}
+.catbar .hint{font-size:11px}
+#onWrap,#offWrap,#onBody{gap:10px}
+.oin{min-height:44px;font-size:16px;border-radius:10px}
+.codebig{font-size:34px}
+.rm-hero{padding:12px}.rm-hero .codebig{font-size:36px;margin:8px 0 10px}
+.rm-live{font-size:11px}
+.rm-pill{padding:4px 10px;font-size:11.5px}
+.rm-count{font-size:11.5px}
+.orow{padding:8px 0}.orow .oa{font-size:15px}.orow .oa.dim{font-size:13px}
+.av{width:24px;height:24px;font-size:12px}
+.rm-cats .chip{min-height:34px;font-size:12px}
+.rm-box{padding:16px 14px}.rm-box h3{font-size:17px}.rm-box p{font-size:13px}
+
+/* ===== Chat realtime ruangan (mode Online) ===== */
+.cfab{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;width:46px;height:46px;padding:0;border-radius:50%;border:1px solid var(--gold);background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font-size:20px;line-height:1;display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.45);cursor:pointer}
+.cfab:active{transform:scale(.94)}
+.cbadge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#e0453a;color:#fff;font:700 11px/18px Georgia,serif;text-align:center}
+body.inroom .app{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+.csheet{position:fixed;left:0;right:0;bottom:0;z-index:45;max-width:420px;margin:0 auto;height:min(64vh,460px);display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg2),var(--card));border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.55)}
+.chd{display:flex;align-items:center;gap:8px;padding:10px 12px 6px}
+.chd b{flex:1;font-size:14px;letter-spacing:.04em;color:var(--gold2)}
+.ccount{font-size:11.5px;color:var(--muted)}
+.crules{margin:0;padding:0 12px 8px;font-size:11px;line-height:1.4;color:var(--muted);border-bottom:1px solid var(--line)}
+.clist{flex:1;min-height:0;overflow-y:auto;padding:10px 12px;overscroll-behavior:contain}
+.cempty{margin:18px 0;text-align:center;font-size:12.5px;font-style:italic;color:var(--muted)}
+.cm{display:flex;flex-direction:column;align-items:flex-start;margin:0 0 8px}
+.cm.me{align-items:flex-end}
+.cm .cn{margin:0 6px 2px;font-size:10.5px;color:var(--muted)}
+.cm .cb{max-width:82%;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04);font-size:14px;line-height:1.35;overflow-wrap:anywhere;white-space:pre-wrap}
+.cm.me .cb{background:rgba(212,169,79,.14);border-color:rgba(212,169,79,.45)}
+.cm .cb.hid{font-style:italic;font-size:12px;color:var(--muted)}
+.cnote{margin:0;padding:4px 12px 0;font-size:11.5px;line-height:1.35;color:#e8a05a}
+.cnote:empty{display:none}
+.cform{display:flex;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px))}
+.cin{flex:1;min-width:0;min-height:40px;padding:0 12px;font:inherit;font-size:15px;color:var(--text);background:#0d1017;border:1px solid var(--line);border-radius:10px;outline:0}
+.cin:focus{border-color:var(--gold)}
+.cin:disabled{opacity:.5}
+.cgo{flex:none;min-height:40px;padding:0 14px;font:inherit;font-size:13px;font-weight:700;letter-spacing:.06em;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0;border-radius:10px;cursor:pointer}
+.cgo:disabled{opacity:.45}
 </style>
 </head>
 <body>
@@ -10228,11 +10301,13 @@ button:disabled{opacity:.6}
       var a = []; s.forEach(function(x){ var v = x.data() || {}; a.push({ u:x.id, n:String(v.n || ""), d:+v.d || 0, j:+v.j || 0, vr:+v.vr || 0, vt:(v.vt && typeof v.vt === "object") ? v.vt : null }); });
       a.sort(function(x, y){ return x.j - y.j; }); ON.players = a; renderO();
     }, function(){});
+    chatOn(m, db, code);
     if(!ON.tick) ON.tick = setInterval(tickO, 300);
     renderO();
   }
   function detach(render){
     try{ if(ON.uR) ON.uR(); }catch(e){} try{ if(ON.uP) ON.uP(); }catch(e){}
+    chatOff();
     ON.uR = ON.uP = null; ON.code = ""; ON.data = null; ON.players = []; ON.revealing = false; ON.allSince = 0;
     if(ON.tick){ clearInterval(ON.tick); ON.tick = 0; }
     wlOff(); ON.claiming = false;
@@ -10290,6 +10365,11 @@ button:disabled{opacity:.6}
     var code = ON.code; if(!code || ON.busy) return; setBusy(true);
     try{
       var f = await lib(), m = f.m, db = f.db, refs = [], i;
+      try{   /* hapus pesan chat dulu; bila ditolak aturan, penutupan ruang tetap jalan */
+        var ms = await m.getDocs(m.collection(db, "ti_rooms", code, "m")), mr = [];
+        ms.forEach(function(x){ mr.push(x.ref); });
+        for(i = 0; i < mr.length; i += 400){ var b0 = m.writeBatch(db); mr.slice(i, i + 400).forEach(function(r){ b0.delete(r); }); await b0.commit(); }
+      }catch(e){}
       var ps = await m.getDocs(m.collection(db, "ti_rooms", code, "p")), as = await m.getDocs(m.collection(db, "ti_rooms", code, "a"));
       ps.forEach(function(x){ refs.push(x.ref); }); as.forEach(function(x){ refs.push(x.ref); });
       for(i = 0; i < refs.length; i += 400){ var b = m.writeBatch(db); refs.slice(i, i + 400).forEach(function(r){ b.delete(r); }); await b.commit(); }
@@ -10607,6 +10687,7 @@ button:disabled{opacity:.6}
     else key = ON.data.st + "|" + ON.data.rd + "|" + (isHost() ? "h" : "m");
     if(key !== ON.view){ ON.view = key; buildView(key); }
     updView();
+    updChat();
   }
   /* animasi acak awal ronde (sama seperti mode Bareng): huruf dan kategori berputar lalu mendarat */
   function fanfare(){ beep(660, 0.12, "triangle", 0.07); beep(880, 0.16, "triangle", 0.07, 0.11); beep(1320, 0.26, "triangle", 0.06, 0.22); buzz(true); }
@@ -10822,6 +10903,7 @@ button:disabled{opacity:.6}
     $("mOff").textContent = o.tOff; $("mOn").textContent = o.tOn;
     $("mOff").setAttribute("aria-pressed", String(mode === "off")); $("mOn").setAttribute("aria-pressed", String(mode === "on"));
     $("offWrap").hidden = mode === "on"; $("onWrap").hidden = mode !== "on";
+    updChat();
     if(mode === "on"){
       $("sub").textContent = o.sub;
       if(ON.lang !== lang){ ON.lang = lang; ON.view = ""; }
@@ -10845,6 +10927,187 @@ button:disabled{opacity:.6}
       }
     }catch(e){}
   });
+
+
+  /* ===== CHAT REALTIME ruangan online (Firestore: ti_rooms/{kode}/m). Aturan: dilarang spam dan kata kasar ===== */
+  var CT = {
+    id:{ title:"Chat ruangan", ph:"Ketik pesan…", send:"KIRIM", empty:"Belum ada pesan. Sapa pemain lain!",
+      rules:"Aturan chat: dilarang spam dan kata kasar. Pelanggaran berulang membuat chat dibisukan sementara.",
+      hid:"Pesan disembunyikan karena melanggar aturan", openL:"Buka chat", closeL:"Tutup chat",
+      slow:"Terlalu cepat, tunggu sebentar.", dup:"Jangan mengirim pesan yang sama berulang kali.", rep:"Terdeteksi spam: huruf atau kata diulang-ulang.",
+      link:"Tautan tidak diperbolehkan di chat.", bad:"Pesan mengandung kata kasar dan tidak dikirim.", spam:"Terlalu banyak pesan dalam waktu singkat.",
+      warn:"Peringatan {n}/3.", muted:"Chat dibisukan {s} detik.", mutedNow:"Chat dibisukan, tunggu {s} detik.",
+      noacc:"Chat belum aktif: aturan Firestore untuk chat belum dipasang.", fail:"Pesan gagal dikirim." },
+    en:{ title:"Room chat", ph:"Type a message…", send:"SEND", empty:"No messages yet. Say hi to the other players!",
+      rules:"Chat rules: no spam and no rude words. Repeated violations mute the chat for a while.",
+      hid:"Message hidden for breaking the rules", openL:"Open chat", closeL:"Close chat",
+      slow:"Too fast, please wait a moment.", dup:"Do not send the same message repeatedly.", rep:"Spam detected: repeated letters or words.",
+      link:"Links are not allowed in chat.", bad:"The message contains rude words and was not sent.", spam:"Too many messages in a short time.",
+      warn:"Warning {n}/3.", muted:"Chat muted for {s} seconds.", mutedNow:"Chat muted, wait {s} seconds.",
+      noacc:"Chat is not active yet: the Firestore rules for chat are not installed.", fail:"Message failed to send." }
+  };
+  function cT(){ return CT[lang] || CT.id; }
+  /*CHAT-START*/
+  var LEET = {"0":"o","1":"i","3":"e","4":"a","5":"s","7":"t","8":"b","@":"a","$":"s"};
+  function fold(s){
+    var x = String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""), o = "", i;
+    for(i = 0; i < x.length; i++) o += (LEET[x.charAt(i)] || x.charAt(i));
+    return o;
+  }
+  function squash(w){ return w.replace(/([a-z])\1+/g, "$1"); }
+  /* BAD_SUB: dicari sebagai potongan di dalam satu kata (menangkap "k0nt000l", "a.n.j.i.n.g"); BAD_WORD: hanya kata utuh */
+  var BAD_SUB = ["anjing","anjink","bangsat","bangke","bajingan","kontol","memek","ngentot","ngewe","jancok","jancuk","jembut","goblok","tolol","kampret","brengsek","keparat","bedebah","sialan","pelacur","lonte","pantek","fuck","shit","bitch","asshole","bastard","whore","nigger","nigga","pussy"].map(squash);
+  var BAD_WORD = ["asu","babi","anjir","anjg","anj","jing","cuk","tai","taik","bego","bodoh","dungu","idiot","dick","cunt","slut","retard","kntl","pepek","peler","entot","mampus","perek","jablay","gblk","goblog"].map(squash);
+  function isBad(text){
+    var f = fold(text), toks = f.split(/\s+/), i, j, t, ws;
+    for(i = 0; i < toks.length; i++){
+      t = squash(toks[i].replace(/[^a-z]/g, "")); if(!t) continue;
+      for(j = 0; j < BAD_SUB.length; j++) if(t.indexOf(BAD_SUB[j]) >= 0) return true;
+      if(BAD_WORD.indexOf(t) >= 0) return true;
+    }
+    ws = f.split(/[^a-z]+/);
+    for(i = 0; i < ws.length; i++) if(ws[i] && BAD_WORD.indexOf(squash(ws[i])) >= 0) return true;
+    t = squash(f.replace(/[^a-z]/g, ""));   /* huruf yang dipisah spasi, hanya untuk kata kasar panjang (aman dari salah deteksi) */
+    for(j = 0; j < BAD_SUB.length; j++) if(BAD_SUB[j].length >= 6 && t.indexOf(BAD_SUB[j]) >= 0) return true;
+    return false;
+  }
+  /* spam: tautan, huruf/kata diulang-ulang, variasi karakter sangat rendah */
+  function spamKind(txt){
+    if(/(https?:|www\.|\b[a-z0-9-]{2,}\.(com|net|org|id|co|io|xyz|me|link|gg|ly|app|site|top|click)\b)/i.test(txt)) return "link";
+    if(/(.)\1{5,}/u.test(txt)) return "rep";
+    if(/(^|\s)(\S+)(\s+\2){3,}(\s|$)/i.test(txt)) return "rep";
+    var seen = {}, n = 0, ch; for(ch of txt){ if(!seen[ch]){ seen[ch] = 1; n++; } }
+    if(txt.length >= 14 && n <= 2) return "rep";
+    return "";
+  }
+  /*CHAT-END*/
+  var CH = { open:false, msgs:[], seen:{}, ready:false, unread:0, uM:null, timer:0, times:[], last:null, strikes:0, strikeAt:0, muteUntil:0, wasMuted:false, noteT:0, err:"" };
+  function strike(key){
+    var c = cT(), now = Date.now(), secs;
+    if(CH.strikeAt && now - CH.strikeAt > 600000) CH.strikes = 0;
+    CH.strikeAt = now; CH.strikes++;
+    if(CH.strikes >= 3){
+      secs = Math.min(30 * Math.pow(2, CH.strikes - 3), 300);
+      CH.muteUntil = now + secs * 1000;
+      return c[key] + " " + c.muted.replace("{s}", secs);
+    }
+    return c[key] + " " + c.warn.replace("{n}", CH.strikes);
+  }
+  /* mengembalikan pesan penolakan, atau "" bila pesan boleh dikirim */
+  function checkChat(txt){
+    var c = cT(), now = Date.now(), k, nt;
+    if(now < CH.muteUntil) return c.mutedNow.replace("{s}", Math.ceil((CH.muteUntil - now) / 1000));
+    if(CH.last && now - CH.last.at < 2000) return c.slow;
+    k = spamKind(txt); if(k) return strike(k === "link" ? "link" : "rep");
+    if(isBad(txt)) return strike("bad");
+    nt = norm(txt);
+    if(CH.last && nt && nt === CH.last.n && now - CH.last.at < 60000) return strike("dup");
+    CH.times = CH.times.filter(function(x){ return now - x < 15000; });
+    if(CH.times.length >= 5) return strike("spam");
+    return "";
+  }
+  function cNote(msg, ms){
+    var n = $("cNote"); if(!n) return;
+    n.textContent = msg || ""; clearTimeout(CH.noteT);
+    if(msg && ms) CH.noteT = setTimeout(function(){ var x = $("cNote"); if(x && !CH.err && Date.now() >= CH.muteUntil) x.textContent = ""; }, ms);
+  }
+  function paintBadge(){ var b = $("cBadge"); if(!b) return; b.hidden = !CH.unread; b.textContent = CH.unread > 9 ? "9+" : String(CH.unread); }
+  function paintMute(){
+    var inp = $("cIn"), sb = $("cSend"); if(!inp || !sb) return;
+    var now = Date.now(), m = now < CH.muteUntil;
+    inp.disabled = sb.disabled = (m || !!CH.err);
+    if(m) cNote(cT().mutedNow.replace("{s}", Math.ceil((CH.muteUntil - now) / 1000)), 0);
+    else if(CH.wasMuted && !CH.err) cNote("", 0);
+    CH.wasMuted = m;
+  }
+  function paintMsgs(force){
+    var ls = $("cList"); if(!ls || !CH.open) return;
+    var near = ls.scrollHeight - ls.scrollTop - ls.clientHeight < 60, c = cT(), u = meU(), me = u ? u.uid : "";
+    ls.textContent = "";
+    if(!CH.msgs.length) ls.appendChild(el("p", "cempty", CH.err ? "" : c.empty));
+    CH.msgs.forEach(function(m){
+      var mine = m.u === me, row = el("div", "cm" + (mine ? " me" : "")), bad = isBad(m.t);
+      if(!mine) row.appendChild(el("span", "cn", m.n || "?"));
+      row.appendChild(el("div", "cb" + (bad ? " hid" : ""), bad ? c.hid : m.t));
+      ls.appendChild(row);
+    });
+    if(force || near) ls.scrollTop = ls.scrollHeight;
+  }
+  function onMsgs(s){
+    var a = [], u = meU(), me = u ? u.uid : "", add = 0;
+    s.forEach(function(x){
+      var v = x.data() || {};
+      a.push({ id:x.id, u:String(v.u || ""), n:String(v.n || "").slice(0, 20), t:String(v.t || "").slice(0, 120), at:(v.at && v.at.toMillis) ? v.at.toMillis() : Date.now() });
+    });
+    a.sort(function(p, q){ return (p.at - q.at) || (p.id < q.id ? -1 : 1); });
+    a.forEach(function(m){ if(!CH.seen[m.id]){ CH.seen[m.id] = 1; if(CH.ready && m.u !== me) add++; } });
+    CH.ready = true; CH.msgs = a;
+    if(add && !CH.open){ CH.unread += add; paintBadge(); if(fxOn && typeof beep === "function") beep(740, 0.06, "sine", 0.04); }
+    paintMsgs(false);
+  }
+  function setChatOpen(v){
+    ensureChat(); CH.open = !!v; $("cSheet").hidden = !CH.open;
+    if(CH.open){ CH.unread = 0; paintBadge(); paintMsgs(true); paintMute(); setTimeout(function(){ var i = $("cIn"); if(i && !i.disabled) i.focus(); }, 60); }
+  }
+  function ensureChat(){
+    if($("cFab")) return;
+    var fab = el("button", "cfab"), bd = el("span", "cbadge"), sh = el("section", "csheet"), hd = el("div", "chd"), ti = el("b"), cn = el("span", "ccount"),
+        x = btn("mini", "✕", function(){ setChatOpen(false); }), ru = el("p", "crules"), ls = el("div", "clist"), nt = el("p", "cnote"),
+        fm = el("div", "cform"), inp = el("input", "cin"), sd = btn("cgo", "", sendChat);
+    fab.id = "cFab"; fab.type = "button"; fab.hidden = true; fab.appendChild(el("span", "", "💬")); bd.id = "cBadge"; bd.hidden = true; fab.appendChild(bd);
+    fab.addEventListener("click", function(){ setChatOpen(!CH.open); });
+    sh.id = "cSheet"; sh.hidden = true; sh.setAttribute("role", "dialog");
+    ti.id = "cTitle"; cn.id = "cCount"; x.id = "cClose"; ru.id = "cRules"; ls.id = "cList"; ls.setAttribute("aria-live", "polite");
+    nt.id = "cNote"; nt.setAttribute("role", "status");
+    inp.id = "cIn"; inp.type = "text"; inp.maxLength = 120; inp.setAttribute("autocomplete", "off"); inp.setAttribute("enterkeyhint", "send");
+    inp.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); sendChat(); } });
+    sd.id = "cSend";
+    hd.appendChild(ti); hd.appendChild(cn); hd.appendChild(x);
+    fm.appendChild(inp); fm.appendChild(sd);
+    sh.appendChild(hd); sh.appendChild(ru); sh.appendChild(ls); sh.appendChild(nt); sh.appendChild(fm);
+    document.body.appendChild(fab); document.body.appendChild(sh);
+  }
+  function updChat(){
+    ensureChat();
+    var show = mode === "on" && !!ON.code && !!ON.data && !!meU(), c = cT();
+    $("cFab").hidden = !show; document.body.classList.toggle("inroom", show);
+    if(!show && CH.open) setChatOpen(false);
+    $("cTitle").textContent = "💬 " + c.title; $("cRules").textContent = c.rules; $("cIn").placeholder = c.ph; $("cSend").textContent = c.send;
+    $("cFab").setAttribute("aria-label", c.openL); $("cClose").setAttribute("aria-label", c.closeL); $("cSheet").setAttribute("aria-label", c.title);
+    $("cCount").textContent = ON.players.length ? "👥 " + ON.players.length : "";
+  }
+  async function sendChat(){
+    var u = meU(), inp = $("cIn"); if(!u || !ON.code || !inp || inp.disabled) return;
+    var raw = inp.value, txt = raw.replace(/\s+/g, " ").trim().slice(0, 120); if(!txt) return;
+    var why = checkChat(txt); if(why){ cNote(why, 4500); paintMute(); return; }
+    var now = Date.now(); CH.times.push(now); CH.last = { n:norm(txt), at:now };
+    inp.value = ""; cNote("", 0);
+    try{
+      var f = await lib(), m = f.m;
+      await m.addDoc(m.collection(f.db, "ti_rooms", ON.code, "m"), po({ u:u.uid, n:meName(), t:txt, at:m.serverTimestamp(), exp:m.Timestamp.fromMillis(Date.now() + 86400000) }));
+    }catch(e){
+      var cc = String((e && (e.code || e.message)) || "");
+      inp.value = raw; cNote(/permission/i.test(cc) ? cT().noacc : cT().fail, 4500);
+    }
+  }
+  function chatOn(m, db, code){
+    chatOff();
+    CH.msgs = []; CH.seen = {}; CH.ready = false; CH.unread = 0; CH.err = ""; CH.times = []; CH.last = null;
+    try{
+      CH.uM = m.onSnapshot(m.query(m.collection(db, "ti_rooms", code, "m"), m.orderBy("at", "desc"), m.limit(60)), onMsgs, function(e){
+        CH.err = String((e && e.code) || "err");
+        cNote(/permission/i.test(CH.err) ? cT().noacc : errMsg(e), 0); paintMute();
+      });
+    }catch(e){ CH.err = "err"; }
+    if(!CH.timer) CH.timer = setInterval(paintMute, 500);
+  }
+  function chatOff(){
+    try{ if(CH.uM) CH.uM(); }catch(e){}
+    CH.uM = null; if(CH.timer){ clearInterval(CH.timer); CH.timer = 0; }
+    CH.msgs = []; CH.seen = {}; CH.ready = false; CH.unread = 0; CH.err = "";
+    if(CH.open) setChatOpen(false);
+    paintBadge(); cNote("", 0);
+  }
 
   readSettings(); paint();
 })();
