@@ -1857,6 +1857,8 @@ CATS.forEach(c => {
 });
 paintHome();
 $("back").addEventListener("click", () => {
+  /* game online (Tebak Inisial) yang sedang berada di dalam ruangan menahan dulu dan meminta konfirmasi */
+  try{ const g = $("frame") && $("frame").contentWindow && $("frame").contentWindow.satuTitikLeaveGuard; if(typeof g === "function" && g()) return; }catch(e){}
   history.replaceState(null, "", location.pathname + location.search);
   closeMenu();
 });
@@ -9751,6 +9753,37 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
 .pts{flex:none;font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}
 .pts.bad{color:#e0453a;font-size:13px}
 .orow .mini{flex:none}
+.rm-hero{position:relative;text-align:center;padding:16px 16px 14px;border-color:rgba(212,169,79,.4);background:radial-gradient(ellipse at 50% 0%,rgba(212,169,79,.16),transparent 70%),linear-gradient(180deg,var(--bg2),var(--card))}
+.rm-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rm-top .label{margin:0}
+.rm-live{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.rm-live i{width:8px;height:8px;border-radius:50%;background:#e0b84a;animation:rmPulse 1.8s infinite}
+.rm-live.ok i{background:#5ec27f;animation:none}
+@keyframes rmPulse{0%{box-shadow:0 0 0 0 rgba(224,184,74,.55)}70%{box-shadow:0 0 0 8px rgba(224,184,74,0)}100%{box-shadow:0 0 0 0 rgba(224,184,74,0)}}
+body.noanim .rm-live i{animation:none}
+.rm-hero .codebig{margin:12px 0 12px;font-size:46px;text-shadow:0 2px 18px rgba(212,169,79,.25)}
+.rm-meta{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.rm-pill{padding:5px 12px;border:1px solid var(--line);border-radius:999px;font-size:12.5px;color:var(--muted);background:rgba(255,255,255,.03)}
+.rm-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.rm-head .label{margin:0}
+.rm-count{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rm-pl li{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;background:rgba(255,255,255,.03)}
+.rm-pl li b{margin:0;color:var(--text);font-weight:600;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.av{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold))}
+.tag{font-size:11px;letter-spacing:.03em;color:var(--gold2);border:1px solid rgba(212,169,79,.45);border-radius:999px;padding:1px 8px}
+.tag.me{color:var(--muted);border-color:var(--line)}
+.rm-cats .chip{flex:0 1 auto;min-height:38px;padding:0 12px;font-size:13px}
+.chip.ro{cursor:default;opacity:1}
+.chip.ro[aria-pressed=false]{opacity:.35}
+.rm-link{background:none;border:0;color:var(--gold2);font:inherit;font-size:12.5px;cursor:pointer;padding:10px 0 0;text-decoration:underline;text-underline-offset:3px}
+.rm-ov{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(5,7,10,.74)}
+.rm-box{width:100%;max-width:360px;padding:20px 18px;border:1px solid rgba(212,169,79,.4);border-radius:18px;background:linear-gradient(180deg,var(--bg2),var(--card));text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.rm-box h3{margin:0 0 8px;font-size:19px;color:var(--gold2)}
+.rm-box p{margin:0 0 14px;font-size:14px;line-height:1.5;color:var(--muted)}
+.rm-btns{display:grid;gap:8px}
+.rm-btns .ghost{margin-top:0}
+.rm-btns .go{min-height:48px;font-size:15px;letter-spacing:.08em;margin:0}
+.rm-btns .go.danger{background:linear-gradient(180deg,#e8776c,#c0504a);color:#fff;box-shadow:none}
 button:disabled{opacity:.6}
 </style>
 </head>
@@ -10074,10 +10107,10 @@ button:disabled{opacity:.6}
       rules:"Tulis jawaban yang berawalan huruf yang diminta. Jawaban unik dapat 10 poin, jawaban yang sama dengan pemain lain 5 poin. Pemilik ruang bisa menolak jawaban yang tidak cocok dengan kategori.",
       code:"KODE RUANG", copy:"Salin kode", copied:"Kode disalin.", pl:"Pemain", hostTag:"pemilik", me:"kamu",
       start:"▶ MULAI RONDE", next:"▶ RONDE BERIKUTNYA", waitStart:"Menunggu pemilik ruang memulai…", waitNext:"Menunggu pemilik ruang…", solo:"Bisa dimulai sendirian untuk mencoba, tapi lebih seru bersama teman.",
-      close:"Tutup ruang", leave:"Keluar ruang", sure:"Ketuk lagi untuk memastikan",
+      close:"Tutup ruang", leave:"Keluar dari ruangan", sure:"Ketuk lagi untuk memastikan",
       rd:"Ronde", ph:"Ketik jawabanmu", send:"KIRIM", sent:"Terkirim ✓ (bisa diubah sebelum waktu habis)", cnt:"sudah menjawab", up:"⏰ Waktu habis!", hostNow:"Buka jawaban sekarang",
       none:"(tidak menjawab)", rej:"Tolak", acc:"Terima", rejd:"ditolak", board:"Klasemen", pts:"poin",
-      nf:"Kode ruang tidak ditemukan.", full:"Ruang penuh (maksimal 8 pemain).", closed:"Ruang sudah ditutup.", took:"Pemilik ruang sebelumnya tidak merespons. Kamu sekarang pemilik ruang.", denied:"Akses ditolak. Aturan Firestore untuk game ini belum dipasang.", fail:"Gagal, coba lagi.", off:"Tidak ada internet." },
+      nf:"Kode ruang tidak ditemukan.", full:"Ruang penuh (maksimal 8 pemain).", closed:"Ruang sudah ditutup.", took:"Pemilik ruang sebelumnya tidak merespons. Kamu sekarang pemilik ruang.", cats:"Kategori", all:"Pilih semua", catHostHint:"Ketuk untuk memilih kategori yang akan diacak. Minimal satu.", catMemHint:"Kategori dipilih oleh pemilik ruang.", minCat:"Pilih minimal satu kategori.", lobbyWait:"Menunggu pemain", lobbyReady:"Siap dimulai", leaveQ:"Keluar dari ruangan?", leaveHostMsg:"Kamu pemilik ruang. Jika keluar, ruang ditutup dan semua pemain ikut keluar.", leaveMemMsg:"Kamu akan keluar dari ruangan ini. Kamu bisa bergabung lagi dengan kode yang sama selama ruang masih dibuka.", stay:"Tetap di sini", leaveGo:"Keluar", denied:"Akses ditolak. Aturan Firestore untuk game ini belum dipasang.", fail:"Gagal, coba lagi.", off:"Tidak ada internet." },
     en:{ tOff:"Together", tOn:"Online", sub:"Play with friends using a room code. One player creates a room, the others join.",
       anon:"Player", offline:"No internet. Online mode needs a connection.", needLogin:"Sign in with Google to play online.", login:"Sign in with Google",
       wait:"Please wait…", mk:"Create a room", mkTime:"Answer time", mkCats:"active categories (set in Together mode)", jn:"Join a room", jnPh:"CODE", jnGo:"Join",
@@ -10087,7 +10120,7 @@ button:disabled{opacity:.6}
       close:"Close room", leave:"Leave room", sure:"Tap again to confirm",
       rd:"Round", ph:"Type your answer", send:"SEND", sent:"Sent ✓ (you can change it before time is up)", cnt:"answered", up:"⏰ Time is up!", hostNow:"Reveal answers now",
       none:"(no answer)", rej:"Reject", acc:"Accept", rejd:"rejected", board:"Scoreboard", pts:"pts",
-      nf:"Room code not found.", full:"The room is full (max 8 players).", closed:"The room was closed.", took:"The previous owner stopped responding. You are now the room owner.", denied:"Access denied. The Firestore rules for this game are not installed yet.", fail:"Failed, please try again.", off:"No internet." }
+      nf:"Room code not found.", full:"The room is full (max 8 players).", closed:"The room was closed.", took:"The previous owner stopped responding. You are now the room owner.", cats:"Categories", all:"Select all", catHostHint:"Tap to choose which categories get drawn. At least one.", catMemHint:"Categories are chosen by the room owner.", minCat:"Pick at least one category.", lobbyWait:"Waiting for players", lobbyReady:"Ready to start", leaveQ:"Leave the room?", leaveHostMsg:"You are the room owner. If you leave, the room closes and every player is removed.", leaveMemMsg:"You are about to leave this room. You can rejoin with the same code while the room is open.", stay:"Stay here", leaveGo:"Leave", denied:"Access denied. The Firestore rules for this game are not installed yet.", fail:"Failed, please try again.", off:"No internet." }
   };
   var mode = "off";
   var ON = { fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
@@ -10306,6 +10339,54 @@ button:disabled{opacity:.6}
     ON.claiming = true; setTimeout(function(){ ON.claiming = false; }, 6000);
     lib().then(function(f){ return f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), po({ host:u.uid, hn:meName() })); }).catch(function(){});
   }
+  /* ----- pilihan kategori oleh pemilik ruang ----- */
+  async function setCats(arr){
+    try{ var f = await lib(); await f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), po({ cats:arr })); }catch(e){ flash(errMsg(e)); }
+  }
+  function toggleCat(k){
+    var d = ON.data; if(!d || !isHost()) return;
+    var cur = (d.cats || []).slice(), i = cur.indexOf(k);
+    if(i >= 0){ if(cur.length <= 1){ flash(oT().minCat); return; } cur.splice(i, 1); } else cur.push(k);
+    setCats(CATS.map(function(c){ return c.k; }).filter(function(x){ return cur.indexOf(x) >= 0; }));
+  }
+  function catPanel(){
+    var t = oT(), p = panel(), hd = el("div", "rm-head"), isH = isHost();
+    hd.appendChild(el("span", "label", t.cats)); var n = el("span", "rm-count"); n.id = "oCatN"; hd.appendChild(n); p.appendChild(hd);
+    var box = el("div", "chips rm-cats"); box.id = "oCats"; p.appendChild(box);
+    if(isH){ var all = el("button", "rm-link", t.all); all.type = "button"; all.addEventListener("click", function(){ setCats(CATS.map(function(c){ return c.k; })); }); p.appendChild(all); }
+    p.appendChild(el("p", "hint", isH ? t.catHostHint : t.catMemHint));
+    return p;
+  }
+  function updCats(){
+    var d = ON.data, box = $("oCats"); if(!d || !box) return;
+    var sel = d.cats || [], isH = isHost(), cn = $("oCatN");
+    if(cn) cn.textContent = sel.length + " / " + CATS.length;
+    var sig = sel.join(",") + "|" + (isH ? 1 : 0) + "|" + lang;
+    if(box.getAttribute("data-sig") === sig) return;
+    box.setAttribute("data-sig", sig); box.textContent = "";
+    CATS.forEach(function(c){
+      var on = sel.indexOf(c.k) >= 0, b = el("button", "chip", c.e + " " + cname(c)); b.type = "button"; b.setAttribute("aria-pressed", String(on));
+      if(isH) b.addEventListener("click", function(){ toggleCat(c.k); }); else{ b.disabled = true; b.classList.add("ro"); }
+      box.appendChild(b);
+    });
+  }
+  /* ----- keluar dari ruangan: konfirmasi dulu, baik lewat tombol maupun tombol Beranda / tombol kembali HP ----- */
+  function closeDlg(){ var o = $("rmDlg"); if(o && o.parentNode) o.parentNode.removeChild(o); }
+  function exitNow(){
+    ON.leaveOk = true; setTimeout(function(){ ON.leaveOk = false; }, 5000);
+    var done = function(){ closeDlg(); try{ var b = parent.document.getElementById("back"); if(b) b.click(); }catch(e){} };
+    (isHost() ? closeRoom() : leaveRoom()).then(done, done);
+  }
+  function askLeave(){
+    if($("rmDlg")) return;
+    var t = oT(), ov = el("div", "rm-ov"); ov.id = "rmDlg"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
+    var bx = el("div", "rm-box"); bx.appendChild(el("h3", "", t.leaveQ)); bx.appendChild(el("p", "", isHost() ? t.leaveHostMsg : t.leaveMemMsg));
+    var row = el("div", "rm-btns"); row.appendChild(btn("ghost", t.stay, closeDlg)); row.appendChild(btn("go sm danger", t.leaveGo, exitNow));
+    bx.appendChild(row); ov.appendChild(bx); document.body.appendChild(ov);
+    ov.addEventListener("click", function(e){ if(e.target === ov) closeDlg(); });
+  }
+  /* dipanggil oleh tombol kembali di Beranda: true = tahan dulu (dialog tampil) */
+  window.satuTitikLeaveGuard = function(){ if(!ON.code || ON.leaveOk) return false; askLeave(); return true; };
   var lastSecO = -1;
   function tickO(){
     var d = ON.data; if(!d) return;
@@ -10402,21 +10483,27 @@ button:disabled{opacity:.6}
     }
     if(!d) return;
     if(d.st === "lobby"){
-      p = panel(); p.appendChild(el("span", "label", t.code));
+      p = el("section", "panel rm-hero");
+      var rmTp = el("div", "rm-top"); rmTp.appendChild(el("span", "label", t.code));
+      var rmLv = el("span", "rm-live"); rmLv.id = "oLive"; rmLv.appendChild(el("i")); var rmLt = el("span"); rmLt.id = "oLiveT"; rmLv.appendChild(rmLt); rmTp.appendChild(rmLv); p.appendChild(rmTp);
       var cb = el("div", "codebig"); cb.id = "oCode"; p.appendChild(cb);
+      var rmMt = el("div", "rm-meta"); rmMt.appendChild(el("span", "rm-pill", "⏱ " + (d.secs || 45) + " " + T().sec));
+      var rmM2 = el("span", "rm-pill", ""); rmM2.id = "oMeta2"; rmMt.appendChild(rmM2); p.appendChild(rmMt);
       p.appendChild(btn("ghost", t.copy, function(){
         var c = ON.code;
         try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(c).then(function(){ flash(oT().copied); }, function(){ flash(c); }); return; } }catch(e){}
         flash(c);
       }));
       host.appendChild(p);
-      p = panel(); p.appendChild(el("span", "label", t.pl)); var ul = el("ul", "hl"); ul.id = "oPl"; p.appendChild(ul); host.appendChild(p);
+      p = panel(); var rmHd = el("div", "rm-head"); rmHd.appendChild(el("span", "label", t.pl)); var rmPc = el("span", "rm-count"); rmPc.id = "oPlN"; rmHd.appendChild(rmPc); p.appendChild(rmHd);
+      var ul = el("ul", "hl rm-pl"); ul.id = "oPl"; p.appendChild(ul); host.appendChild(p);
+      host.appendChild(catPanel());
       p = el("div", "oact");
       if(isHost()){
         p.appendChild(btn("go act", t.start, startRound)); p.appendChild(el("p", "hint", t.solo));
         p.appendChild(confirmBtn("ghost act", t.close, closeRoom));
       }else{
-        p.appendChild(el("p", "hint", t.waitStart)); p.appendChild(btn("ghost act", t.leave, leaveRoom));
+        p.appendChild(el("p", "hint", t.waitStart)); p.appendChild(confirmBtn("ghost act", t.leave, leaveRoom));
       }
       host.appendChild(p); return;
     }
@@ -10442,7 +10529,7 @@ button:disabled{opacity:.6}
       var st = el("p", "hint"); st.id = "oSt"; p.appendChild(st);
       var ct = el("p", "hint"); ct.id = "oCnt"; p.appendChild(ct);
       host.appendChild(p);
-      p = panel(); var ul2 = el("ul", "hl"); ul2.id = "oPl"; p.appendChild(ul2);
+      p = panel(); var ul2 = el("ul", "hl rm-pl"); ul2.id = "oPl"; p.appendChild(ul2);
       if(isHost()){ p.appendChild(btn("ghost act", t.hostNow, doReveal)); }
       host.appendChild(p);
       paintTimer(); setTimeout(function(){ var i2 = $("oAns"); if(i2 && !i2.disabled) try{ i2.focus(); }catch(e){} }, 150);
@@ -10456,9 +10543,10 @@ button:disabled{opacity:.6}
       p.appendChild(pr2); host.appendChild(p);
       p = panel(); var rl = el("div"); rl.id = "oRes"; p.appendChild(rl); host.appendChild(p);
       p = panel(); p.appendChild(el("span", "label", t.board)); var bl = el("div"); bl.id = "oBoard"; p.appendChild(bl); host.appendChild(p);
+      host.appendChild(catPanel());
       p = el("div", "oact");
       if(isHost()){ p.appendChild(btn("go act", t.next, startRound)); p.appendChild(confirmBtn("ghost act", t.close, closeRoom)); }
-      else{ p.appendChild(el("p", "hint", t.waitNext)); p.appendChild(btn("ghost act", t.leave, leaveRoom)); }
+      else{ p.appendChild(el("p", "hint", t.waitNext)); p.appendChild(confirmBtn("ghost act", t.leave, leaveRoom)); }
       host.appendChild(p);
     }
   }
@@ -10468,16 +10556,21 @@ button:disabled{opacity:.6}
     if(!d) return;
     if(d.st === "lobby"){
       var cb = $("oCode"); if(cb) cb.textContent = ON.code;
+      var m2 = $("oMeta2"); if(m2) m2.textContent = "👥 " + ON.players.length + " / 8";
+      var pn = $("oPlN"); if(pn) pn.textContent = ON.players.length + " / 8";
+      var lv = $("oLive"), lt = $("oLiveT"), rdy = ON.players.length > 1;
+      if(lv) lv.className = "rm-live" + (rdy ? " ok" : ""); if(lt) lt.textContent = rdy ? t.lobbyReady : t.lobbyWait;
+      updCats();
     }
+    if(d.st === "reveal") updCats();
     if(d.st === "lobby" || d.st === "play"){
       ul = $("oPl"); if(ul){
         ul.textContent = "";
         ON.players.forEach(function(p){
-          var li = el("li"), b = el("b", "", p.n || "?"); li.appendChild(b);
-          var tag = [];
-          if(p.u === d.host) tag.push(t.hostTag);
-          if(u && p.u === u.uid) tag.push(t.me);
-          if(tag.length) li.appendChild(document.createTextNode(" (" + tag.join(", ") + ")"));
+          var li = el("li"), b = el("b", "", p.n || "?");
+          li.appendChild(el("span", "av", (Array.from(p.n || "?")[0] || "?").toUpperCase())); li.appendChild(b);
+          if(p.u === d.host) li.appendChild(el("span", "tag", "👑 " + t.hostTag));
+          if(u && p.u === u.uid) li.appendChild(el("span", "tag me", t.me));
           if(d.st === "play" && p.d === d.rd) li.appendChild(document.createTextNode(" ✔"));
           ul.appendChild(li);
         });
