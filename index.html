@@ -201,6 +201,8 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 .frinv button{min-height:28px;padding:3px 8px;font-size:11.5px}
 #frpanel .frdot{flex:none;width:8px;height:8px;margin-right:6px;border-radius:50%;background:#6b7280;box-shadow:0 0 0 1.5px var(--bg2)}
 #frpanel .frdot.on{background:#3ddc84;box-shadow:0 0 0 1.5px var(--bg2),0 0 6px rgba(61,220,132,.85)}
+#frpanel .frls{margin:1px 0 0;font-size:11px;line-height:1.3;color:var(--muted,#8a8f98);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#frpanel .frls.on{color:#3ddc84}
 #frpanel .fraddhd{display:flex;align-items:center;justify-content:space-between;gap:8px}
 #frpanel .fraddhd+*{margin-top:6px}
 #frpanel .fraddbtn{min-height:28px;padding:0 10px}
@@ -12531,7 +12533,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   const $ = id => document.getElementById(id);
   const lang = () => (typeof S !== "undefined" && S && S.lang === "en") ? "en" : "id";
   const T = {
-    id:{ ttl:"Teman", sub0:"Daftar teman dan permintaan", add:"TAMBAH TEMAN", addS:"Tambah teman", stOn:"Online", stOff:"Offline", addH:"Masukkan ID Akun temanmu, misalnya ST-000004.", mine:"ID Akunmu: ", ph:"ST-000000", send:"Kirim permintaan", busy:"Mohon tunggu…",
+    id:{ ttl:"Teman", sub0:"Daftar teman dan permintaan", add:"TAMBAH TEMAN", addS:"Tambah teman", stOn:"Online", stOff:"Offline", lastOn:"Terakhir online {t}", lastUnk:"Terakhir online belum diketahui", agoNow:"baru saja", agoM:"{n} menit lalu", agoH:"{n} jam lalu", agoD:"{n} hari lalu", agoMo:"lebih dari sebulan lalu", addH:"Masukkan ID Akun temanmu, misalnya ST-000004.", mine:"ID Akunmu: ", ph:"ST-000000", send:"Kirim permintaan", busy:"Mohon tunggu…",
       inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", pm:"💬 Pesan pribadi", back:"Kembali", msgPh:"Tulis pesan…", msgNone:"Belum ada pesan. Sapa temanmu!", msgDel:"Hapus pesan", msgGone:"Pesan telah dihapus", msgSend:"Kirim", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
       sent:"Permintaan terkirim.", acd:"Kalian sekarang berteman.", rmd:"Teman dihapus.", decd:"Permintaan ditolak.", cand:"Permintaan dibatalkan.",
       e_fmt:"Format ID Akun: ST-000000.", e_self:"Itu ID Akunmu sendiri.", e_nf:"ID Akun tidak ditemukan.", e_already:"Kalian sudah berteman.", e_pending:"Permintaan sudah terkirim. Tunggu temanmu menerimanya.",
@@ -12542,7 +12544,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       e_max:"Daftar temanmu sudah penuh (maksimal 20 teman, termasuk permintaan terkirim).",
       e_invp:"Undangan masih menunggu jawaban.", e_banned:"Akun ini tidak bisa bergabung kembali ke ruangan ini karena sudah dikeluarkan pemilik ruangan.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
       invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
-    en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addS:"Add friend", stOn:"Online", stOff:"Offline", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
+    en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addS:"Add friend", stOn:"Online", stOff:"Offline", lastOn:"Last online {t}", lastUnk:"Last online unknown", agoNow:"just now", agoM:"{n} min ago", agoH:"{n} h ago", agoD:"{n} d ago", agoMo:"over a month ago", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
       inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", pm:"💬 Private message", back:"Back", msgPh:"Write a message…", msgNone:"No messages yet. Say hi!", msgDel:"Delete message", msgGone:"This message was deleted", msgSend:"Send", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
       sent:"Request sent.", acd:"You are now friends.", rmd:"Friend removed.", decd:"Request declined.", cand:"Request cancelled.",
       e_fmt:"Account ID format: ST-000000.", e_self:"That is your own Account ID.", e_nf:"Account ID not found.", e_already:"You are already friends.", e_pending:"The request is already sent. Wait for your friend to accept.",
@@ -12567,6 +12569,14 @@ if(navigator.onLine !== false) init().catch(() => {});
   const nameOf = acc => (dir[acc] && dir[acc].name) || acc;
   /* online bila detak terakhir (accountIds/{ID}.seen) kurang dari 150 detik lalu; aplikasi mengirim detak tiap 60 detik */
   const isOn = acc => { const v = dir[acc] && dir[acc].seen; return !!v && Math.abs(Date.now() - v) < 150000; };
+  /* teks "Terakhir online ..." untuk teman yang sedang offline */
+  const lastText = acc => {
+    const t = T[lang()], v = dir[acc] && Math.max(dir[acc].last || 0, dir[acc].seen || 0);
+    if(!v) return t.lastUnk;
+    const mnt = Math.max(0, Math.floor((Date.now() - v) / 60000)), f = (k, n) => t[k].replace("{n}", n);
+    const w = mnt < 1 ? t.agoNow : mnt < 60 ? f("agoM", mnt) : mnt < 1440 ? f("agoH", Math.floor(mnt / 60)) : mnt < 43200 ? f("agoD", Math.floor(mnt / 1440)) : t.agoMo;
+    return t.lastOn.replace("{t}", w);
+  };
   const norm = (id, d, uid) => {
     if(!d || !Array.isArray(d.u) || !Array.isArray(d.a)) return null;
     const i = d.u.indexOf(uid); if(i < 0) return null;
@@ -12577,7 +12587,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     const need = [...new Set(accs.filter(x => x && !dir[x]))]; if(!need.length) return;
     try{
       const { m, db } = await a.getDb();
-      await Promise.all(need.map(async id => { try{ const s = await m.getDoc(m.doc(db, "accountIds", id)); const d = s.exists() ? s.data() : {}; dir[id] = { name: String(d.name || ""), photo: String(d.photo || ""), seen: +d.seen || 0 }; }catch(e){} }));
+      await Promise.all(need.map(async id => { try{ const s = await m.getDoc(m.doc(db, "accountIds", id)); const d = s.exists() ? s.data() : {}; dir[id] = { name: String(d.name || ""), photo: String(d.photo || ""), seen: +d.seen || 0, last: +d.last || 0 }; }catch(e){} }));
     }catch(e){}
   }
   /* teks notifikasi pertemanan menurut status: req (menunggu), ok (diterima), dn (ditolak olehku), cn (dibatalkan pengirim), rj (ditolak temanku) */
@@ -12610,8 +12620,8 @@ if(navigator.onLine !== false) init().catch(() => {});
     a.getDb().then(({ m, db }) => need.forEach(acc => {
       if(pw[acc] || !want.has(acc)) return;
       try{ pw[acc] = m.onSnapshot(m.doc(db, "accountIds", acc), sn => {
-        const d = sn.exists() ? sn.data() : {}, o = dir[acc], n = { name: String(d.name || ""), photo: String(d.photo || ""), seen: +d.seen || 0 };
-        if(!o || o.name !== n.name || o.photo !== n.photo || o.seen !== n.seen){ dir[acc] = n; clearTimeout(pwT); pwT = setTimeout(() => { try{ refresh(); }catch(e){} }, 300); }
+        const d = sn.exists() ? sn.data() : {}, o = dir[acc], n = { name: String(d.name || ""), photo: String(d.photo || ""), seen: +d.seen || 0, last: +d.last || 0 };
+        if(!o || o.name !== n.name || o.photo !== n.photo || o.seen !== n.seen || o.last !== n.last){ dir[acc] = n; clearTimeout(pwT); pwT = setTimeout(() => { try{ refresh(); }catch(e){} }, 300); }
       }, () => {}); }catch(e){}
     })).catch(() => {});
   }
@@ -12634,7 +12644,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   function beat(off){
     const a = A(), me = myAcc(); if(!a || !a.user || !me || !a.getDb) return;
     if(!off && (navigator.onLine === false || document.visibilityState === "hidden")) return;
-    a.getDb().then(({ m, db }) => m.setDoc(m.doc(db, "accountIds", me), { seen: off ? 0 : Date.now() }, { merge: true })).catch(() => {});
+    a.getDb().then(({ m, db }) => m.setDoc(m.doc(db, "accountIds", me), { seen: off ? 0 : Date.now(), last: Date.now() }, { merge: true })).catch(() => {});
   }
   setInterval(() => beat(), 60000);
   document.addEventListener("visibilitychange", () => beat(document.visibilityState === "hidden"));
@@ -12740,7 +12750,9 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(onTap){ li.tabIndex = 0; li.setAttribute("role", "button"); li.setAttribute("aria-expanded", String(!!open)); li.addEventListener("click", onTap); li.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); onTap(); } }); }
     const w = mk("div", "frwho"), nmp = mk("p", "frnm");
     if(r.st === "ok"){ const on = isOn(r.acc), tt = T[lang()], dt = mk("span", "frdot" + (on ? " on" : "")); dt.setAttribute("role", "img"); dt.setAttribute("aria-label", on ? tt.stOn : tt.stOff); dt.title = on ? tt.stOn : tt.stOff; nmp.appendChild(dt); }
-    nmp.appendChild(document.createTextNode(nameOf(r.acc))); w.appendChild(nmp); w.appendChild(mk("p", "frid", r.acc)); li.appendChild(w);
+    nmp.appendChild(document.createTextNode(nameOf(r.acc))); w.appendChild(nmp); w.appendChild(mk("p", "frid", r.acc));
+    if(r.st === "ok"){ const lo = isOn(r.acc); w.appendChild(mk("p", "frls" + (lo ? " on" : ""), lo ? T[lang()].stOn : lastText(r.acc))); }
+    li.appendChild(w);
     const b = mk("div", "frbt"); btns.forEach(x => b.appendChild(x)); if(r.st === "ok" && unread[r.id]){ const ud = mk("span", "frun"); ud.setAttribute("aria-hidden", "true"); b.appendChild(ud); }
     if(onTap) b.appendChild(mk("span", "frmore" + (open ? " on" : ""), "⌄")); li.appendChild(b); return li;
   }
