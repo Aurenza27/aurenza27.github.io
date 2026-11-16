@@ -10118,7 +10118,8 @@ button:disabled{opacity:.6}
     if(c === "full") return t.full;
     if(/permission/i.test(c)) return t.denied;
     if(/unavailable|network|offline/i.test(c)) return t.off;
-    return t.fail;
+    try{ console.error("[tebak-inisial] gagal:", e); }catch(x){}
+    return t.fail + (c ? " (" + c.replace(/^firestore\//, "").replace(/^Firebase:\s*/i, "").replace(/\s+/g, " ").slice(0, 70) + ")" : "");   /* kode error ikut tampil supaya penyebabnya bisa dilacak */
   }
   function flash(msg){
     var m = $("onMsg"); if(!m) return; m.textContent = msg; clearTimeout(ON.msgT);
