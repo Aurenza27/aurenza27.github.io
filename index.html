@@ -9784,6 +9784,14 @@ body.noanim .rm-live i{animation:none}
 .rm-btns .ghost{margin-top:0}
 .rm-btns .go{min-height:48px;font-size:15px;letter-spacing:.08em;margin:0}
 .rm-btns .go.danger{background:linear-gradient(180deg,#e8776c,#c0504a);color:#fff;box-shadow:none}
+.ghost.exit{color:#e8776c;border-color:rgba(224,69,58,.45)}
+.ghost.exit:active{background:rgba(224,69,58,.12)}
+.exitrow{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.exitrow .ghost{margin-top:0}
+.rm-catp .acc{min-height:40px}
+.rm-catp .prev{margin:2px 0 0;font-size:16px;justify-content:flex-start;gap:6px;flex-wrap:nowrap}
+.rm-catp .rollc{padding:10px 0 0}
+.rm-catp .rm-link{padding-top:8px}
 button:disabled{opacity:.6}
 </style>
 </head>
@@ -10123,7 +10131,7 @@ button:disabled{opacity:.6}
       nf:"Room code not found.", full:"The room is full (max 8 players).", closed:"The room was closed.", took:"The previous owner stopped responding. You are now the room owner.", cats:"Categories", all:"Select all", catHostHint:"Tap to choose which categories get drawn. At least one.", catMemHint:"Categories are chosen by the room owner.", minCat:"Pick at least one category.", lobbyWait:"Waiting for players", lobbyReady:"Ready to start", leaveQ:"Leave the room?", leaveHostMsg:"You are the room owner. If you leave, the room closes and every player is removed.", leaveMemMsg:"You are about to leave this room. You can rejoin with the same code while the room is open.", stay:"Stay here", leaveGo:"Leave", denied:"Access denied. The Firestore rules for this game are not installed yet.", fail:"Failed, please try again.", off:"No internet." }
   };
   var mode = "off";
-  var ON = { fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
+  var ON = { catOpen:false, fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
              secs:(+ls("ti_osecs", 45) || 45) };
   if([30, 45, 60].indexOf(ON.secs) < 0) ON.secs = 45;
   function oT(){ return OT[lang]; }
@@ -10350,11 +10358,21 @@ button:disabled{opacity:.6}
     setCats(CATS.map(function(c){ return c.k; }).filter(function(x){ return cur.indexOf(x) >= 0; }));
   }
   function catPanel(){
-    var t = oT(), p = panel(), hd = el("div", "rm-head"), isH = isHost();
-    hd.appendChild(el("span", "label", t.cats)); var n = el("span", "rm-count"); n.id = "oCatN"; hd.appendChild(n); p.appendChild(hd);
-    var box = el("div", "chips rm-cats"); box.id = "oCats"; p.appendChild(box);
-    if(isH){ var all = el("button", "rm-link", t.all); all.type = "button"; all.addEventListener("click", function(){ setCats(CATS.map(function(c){ return c.k; })); }); p.appendChild(all); }
-    p.appendChild(el("p", "hint", isH ? t.catHostHint : t.catMemHint));
+    var t = oT(), p = panel(), isH = isHost(); p.className += " rm-catp";
+    var tg = el("button", "acc"); tg.type = "button"; tg.id = "oCatTg"; tg.setAttribute("aria-controls", "oCatRoll"); tg.setAttribute("aria-expanded", String(!!ON.catOpen));
+    tg.appendChild(el("span", "label", t.cats)); var n = el("span", "cnt"); n.id = "oCatN"; tg.appendChild(n); var cv = el("i", "chev"); cv.setAttribute("aria-hidden", "true"); tg.appendChild(cv);
+    p.appendChild(tg);
+    var pv = el("div", "prev"); pv.id = "oCatPv"; pv.setAttribute("aria-hidden", "true"); pv.hidden = !!ON.catOpen; p.appendChild(pv);
+    var roll = el("div", "roll" + (ON.catOpen ? " open" : "")); roll.id = "oCatRoll"; roll.inert = !ON.catOpen;
+    var rw = el("div", "rollw"), rc = el("div", "rollc");
+    var box = el("div", "chips rm-cats"); box.id = "oCats"; rc.appendChild(box);
+    if(isH){ var all = el("button", "rm-link", t.all); all.type = "button"; all.addEventListener("click", function(){ setCats(CATS.map(function(c){ return c.k; })); }); rc.appendChild(all); }
+    rc.appendChild(el("p", "hint", isH ? t.catHostHint : t.catMemHint));
+    rw.appendChild(rc); roll.appendChild(rw); p.appendChild(roll);
+    tg.addEventListener("click", function(){
+      ON.catOpen = !ON.catOpen; tg.setAttribute("aria-expanded", String(ON.catOpen));
+      roll.classList.toggle("open", ON.catOpen); roll.inert = !ON.catOpen; pv.hidden = ON.catOpen;
+    });
     return p;
   }
   function updCats(){
@@ -10364,6 +10382,7 @@ button:disabled{opacity:.6}
     var sig = sel.join(",") + "|" + (isH ? 1 : 0) + "|" + lang;
     if(box.getAttribute("data-sig") === sig) return;
     box.setAttribute("data-sig", sig); box.textContent = "";
+    var pvx = $("oCatPv"); if(pvx){ pvx.textContent = ""; CATS.forEach(function(c){ if(sel.indexOf(c.k) >= 0) pvx.appendChild(el("span", "", c.e)); }); }
     CATS.forEach(function(c){
       var on = sel.indexOf(c.k) >= 0, b = el("button", "chip", c.e + " " + cname(c)); b.type = "button"; b.setAttribute("aria-pressed", String(on));
       if(isH) b.addEventListener("click", function(){ toggleCat(c.k); }); else{ b.disabled = true; b.classList.add("ro"); }
@@ -10501,9 +10520,9 @@ button:disabled{opacity:.6}
       p = el("div", "oact");
       if(isHost()){
         p.appendChild(btn("go act", t.start, startRound)); p.appendChild(el("p", "hint", t.solo));
-        p.appendChild(confirmBtn("ghost act", t.close, closeRoom));
+        p.appendChild(confirmBtn("ghost exit act", t.close, closeRoom));
       }else{
-        p.appendChild(el("p", "hint", t.waitStart)); p.appendChild(confirmBtn("ghost act", t.leave, leaveRoom));
+        p.appendChild(el("p", "hint", t.waitStart)); p.appendChild(confirmBtn("ghost exit act", t.leave, leaveRoom));
       }
       host.appendChild(p); return;
     }
@@ -10531,6 +10550,7 @@ button:disabled{opacity:.6}
       host.appendChild(p);
       p = panel(); var ul2 = el("ul", "hl rm-pl"); ul2.id = "oPl"; p.appendChild(ul2);
       if(isHost()){ p.appendChild(btn("ghost act", t.hostNow, doReveal)); }
+      var xr = el("div", "exitrow"); xr.appendChild(confirmBtn("ghost exit act", isHost() ? t.close : t.leave, isHost() ? closeRoom : leaveRoom)); p.appendChild(xr);
       host.appendChild(p);
       paintTimer(); setTimeout(function(){ var i2 = $("oAns"); if(i2 && !i2.disabled) try{ i2.focus(); }catch(e){} }, 150);
       return;
@@ -10545,8 +10565,8 @@ button:disabled{opacity:.6}
       p = panel(); p.appendChild(el("span", "label", t.board)); var bl = el("div"); bl.id = "oBoard"; p.appendChild(bl); host.appendChild(p);
       host.appendChild(catPanel());
       p = el("div", "oact");
-      if(isHost()){ p.appendChild(btn("go act", t.next, startRound)); p.appendChild(confirmBtn("ghost act", t.close, closeRoom)); }
-      else{ p.appendChild(el("p", "hint", t.waitNext)); p.appendChild(confirmBtn("ghost act", t.leave, leaveRoom)); }
+      if(isHost()){ p.appendChild(btn("go act", t.next, startRound)); p.appendChild(confirmBtn("ghost exit act", t.close, closeRoom)); }
+      else{ p.appendChild(el("p", "hint", t.waitNext)); p.appendChild(confirmBtn("ghost exit act", t.leave, leaveRoom)); }
       host.appendChild(p);
     }
   }
