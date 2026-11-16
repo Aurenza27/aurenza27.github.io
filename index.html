@@ -8842,6 +8842,15 @@ window.__stInviteCtx = function(){
     return {oid:t.oid, name:String(t.name || ""), st};
   }catch(e){ return null; }
 };
+/* dipanggil Beranda setelah undangan pengikut / moderator diterima sementara menu Turnamen sedang terbuka */
+window.__ttFollowed = async function(oid){
+  try{
+    const u = ON.user(); if(!u) return;
+    const {m, db:f} = await ON.lib(), snap = await withTimeout(m.getDoc(m.doc(f, "tournaments", oid)));
+    if(!snap.exists()) return;
+    watch(oid); applyDoc(oid, snap.data()); view = "list"; curId = null; paint(); toTop();
+  }catch(e){}
+};
 window.__stInvite = async function(kind, fr){
   const t = cur(); if(!t || !t.oid || roleOf() !== "admin") throw new Error("e_noctx");
   if(fr.acc === ON.accountId()) throw new Error("e_invself");
@@ -11409,10 +11418,6 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
           bx.append(ok, no); bd.appendChild(bx);
         } else {
           bd.appendChild(mk("span", "ntag " + st, st === "accepted" ? t.acc : st === "declined" ? t.dec : t.canc));
-          if(st === "accepted"){
-            const a = mk("button", "nact nact2", t.open); a.type = "button";
-            a.addEventListener("click", e => { e.stopPropagation(); setOpen(false); if(n.inv.kind === "room" && window.satuTitikJoinRoom) window.satuTitikJoinRoom(n.inv.oid); else location.hash = "turnamen"; }); bd.appendChild(a);
-          }
         }
       }
       if(n.act && n.act.reload){
@@ -11902,6 +11907,12 @@ const NSRC = (() => {
       body: { id: ow + " mengundangmu " + (fl ? "mengikuti" : "menjadi moderator") + " turnamen \"" + nm + "\". Terima atau tolak undangan ini.", en: ow + " invited you to " + (fl ? "follow" : "be a moderator of") + " \"" + nm + "\". Accept or decline." } };
   };
   /* buka menu Tebak Inisial dan masuk ke ruangan: langsung bila menunya sudah terbuka, kalau belum dititipkan ke __tiPendingRoom */
+  /* undangan moderator / pengikut diterima: langsung ke menu Turnamen (bila sudah terbuka, turnamennya langsung dimuat) */
+  window.satuTitikOpenTournaments = function(oid){
+    try{ const f = document.getElementById("frame"), v = document.getElementById("view"), w = f && v && !v.hidden ? f.contentWindow : null;
+      if(w && typeof w.__ttFollowed === "function"){ w.__ttFollowed(oid); return; } }catch(e){}
+    location.hash = "turnamen";
+  };
   window.satuTitikJoinRoom = function(code){
     code = String(code || "");
     try{ const f = document.getElementById("frame"), v = document.getElementById("view"), w = f && v && !v.hidden ? f.contentWindow : null;
@@ -11913,6 +11924,7 @@ const NSRC = (() => {
     try{
       const u = A.user, acc = A.accountId;
       if(!u || !n || !n.inv) return { ok: false, err: "login" };
+      if(n.inv.kind === "friend"){ const F = window.satuTitikFriends; return F && F.respond ? await F.respond(n.inv.docId, accept) : { ok: false, err: "friends" }; }
       const fl = n.inv.kind === "follow";
       const rm = n.inv.kind === "room";
       if(accept && !fl && !rm && !acc) return { ok: false, err: "id" };
@@ -11930,6 +11942,9 @@ const NSRC = (() => {
       if(accept && rm){
         try{ const bb = document.getElementById("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click(); }catch(e){}
         try{ window.satuTitikJoinRoom(n.inv.oid); }catch(e){}
+      } else if(accept){
+        try{ const bb = document.getElementById("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click(); }catch(e){}
+        try{ window.satuTitikOpenTournaments(n.inv.oid); }catch(e){}
       }
       if(accept && fl){ try{ const j = JSON.parse(localStorage.getItem("tt_joined") || "[]"), a = Array.isArray(j) ? j : []; if(!a.includes(n.inv.oid)){ a.push(n.inv.oid); localStorage.setItem("tt_joined", JSON.stringify(a)); } }catch(e){} }
       const st = accept ? "accepted" : "declined", tt = invTx(n.inv, st);
@@ -12198,6 +12213,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       e_fmt:"Format ID Akun: ST-000000.", e_self:"Itu ID Akunmu sendiri.", e_nf:"ID Akun tidak ditemukan.", e_already:"Kalian sudah berteman.", e_pending:"Permintaan sudah terkirim. Tunggu temanmu menerimanya.",
       e_noacc:"ID Akunmu belum siap. Coba lagi sebentar lagi.", e_perm:"Izin ditolak oleh server. Pastikan aturan Firestore sudah diperbarui.", e_off:"Tidak ada koneksi internet.", e_fail:"Gagal. Coba lagi.", login:"Masuk dengan Google untuk memakai fitur teman.",
       rqT:"Permintaan pertemanan", rqB:"{n} ({a}) ingin berteman denganmu.", okT:"Pertemanan diterima", okB:"{n} ({a}) menerima permintaan pertemananmu.", nFr:"{n} teman", nRq:"{n} permintaan baru",
+      acT:"Pertemanan diterima", acB:"Kamu sekarang berteman dengan {n} ({a}).", dnT:"Permintaan ditolak", dnB:"Kamu menolak permintaan pertemanan {n} ({a}).", cnT:"Permintaan dibatalkan", cnB:"{n} ({a}) membatalkan permintaan pertemanannya.", rjT:"Permintaan pertemanan ditolak", rjB:"{n} ({a}) menolak permintaan pertemananmu.",
       invH:"Undang ke turnamen “{n}”:", invM:"Jadikan moderator", invF:"Undang pengikut", invW:"Menunggu…", invMem:"Moderator ✓", invFd:"Undang lagi", invMd:"Undang lagi (moderator)", invMok:"Undangan moderator terkirim.", invFok:"Undangan pengikut terkirim.",
       e_max:"Daftar temanmu sudah penuh (maksimal 20 teman, termasuk permintaan terkirim).",
       e_invp:"Undangan masih menunggu jawaban.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
@@ -12208,6 +12224,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       e_fmt:"Account ID format: ST-000000.", e_self:"That is your own Account ID.", e_nf:"Account ID not found.", e_already:"You are already friends.", e_pending:"The request is already sent. Wait for your friend to accept.",
       e_noacc:"Your Account ID is not ready yet. Try again in a moment.", e_perm:"Permission denied by the server. Make sure the Firestore rules are updated.", e_off:"No internet connection.", e_fail:"Failed. Please try again.", login:"Sign in with Google to use friends.",
       rqT:"Friend request", rqB:"{n} ({a}) wants to be your friend.", okT:"Friend request accepted", okB:"{n} ({a}) accepted your friend request.", nFr:"{n} friends", nRq:"{n} new requests",
+      acT:"Friend request accepted", acB:"You are now friends with {n} ({a}).", dnT:"Request declined", dnB:"You declined the friend request from {n} ({a}).", cnT:"Request cancelled", cnB:"{n} ({a}) cancelled their friend request.", rjT:"Friend request declined", rjB:"{n} ({a}) declined your friend request.",
       invH:"Invite to tournament “{n}”:", invM:"Make moderator", invF:"Invite follower", invW:"Pending…", invMem:"Moderator ✓", invFd:"Invite again", invMd:"Invite again (moderator)", invMok:"Moderator invite sent.", invFok:"Follower invite sent.",
       e_max:"Your friend list is full (maximum 20 friends, including sent requests).",
       e_invp:"The invite is still pending.", e_invmem:"They are already a moderator.", e_invmax:"At most 20 moderators.", e_noctx:"Open an online tournament’s detail (as admin) first.", e_invself:"That is your own account.",
@@ -12220,7 +12237,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   let lastSig = "", sigTimer = 0;
   let invOut = {}, unsubI = null;
   let rows = [], dir = {}, unsub = null, curUid = "", msg = "", msgOk = true, working = false, confirmId = "", inVal = "";
-  const subs = new Set();
+  const subs = new Set(), selfDel = new Set();
   const emit = () => { subs.forEach(f => { try{ f(); }catch(e){} }); try{ refresh(); }catch(e){} };
   const nameOf = acc => (dir[acc] && dir[acc].name) || acc;
   const norm = (id, d, uid) => {
@@ -12236,13 +12253,25 @@ if(navigator.onLine !== false) init().catch(() => {});
       await Promise.all(need.map(async id => { try{ const s = await m.getDoc(m.doc(db, "accountIds", id)); const d = s.exists() ? s.data() : {}; dir[id] = { name: String(d.name || ""), photo: String(d.photo || "") }; }catch(e){} }));
     }catch(e){}
   }
+  /* teks notifikasi pertemanan menurut status: req (menunggu), ok (diterima), dn (ditolak olehku), cn (dibatalkan pengirim), rj (ditolak temanku) */
+  function ntx(r, k){
+    const nm = nameOf(r.acc), f = (L, x) => x.replace("{n}", nm).replace("{a}", r.acc), ti = T.id, te = T.en;
+    const key = { req:["rqT", "rqB"], ok:["acT", "acB"], dn:["dnT", "dnB"], cn:["cnT", "cnB"], rj:["rjT", "rjB"], fa:["okT", "okB"] }[k];
+    return { title: { id: ti[key[0]], en: te[key[0]] }, body: { id: f(ti, ti[key[1]]), en: f(te, te[key[1]]) } };
+  }
   function notify(r, kind){
-    const N = window.satuTitikNotif, t = T[lang()]; if(!N || !N.add) return;
-    const nm = nameOf(r.acc), fill = s => s.replace("{n}", nm).replace("{a}", r.acc);
-    const ti = T.id, te = T.en;
-    const fillL = (L, s) => s.replace("{n}", nm).replace("{a}", r.acc);
-    if(kind === "req") N.add({ id: "fr_" + r.id + "_" + r.ts, type: "account", title: { id: ti.rqT, en: te.rqT }, body: { id: fillL(ti, ti.rqB), en: fillL(te, te.rqB) }, act: { view: "friends" } });
-    else N.add({ id: "fa_" + r.id + "_" + r.ts, type: "account", title: { id: ti.okT, en: te.okT }, body: { id: fillL(ti, ti.okB), en: fillL(te, te.okB) }, act: { view: "friends" } });
+    const N = window.satuTitikNotif; if(!N || !N.add) return;
+    if(kind === "req"){ const x = ntx(r, "req"); N.add({ id: "fr_" + r.id + "_" + r.ts, type: "account", title: x.title, body: x.body, inv: { docId: r.id, kind: "friend", status: "pending" } }); }
+    else if(kind === "rj"){ const x = ntx(r, "rj"); N.add({ id: "fd_" + r.id + "_" + r.ts, type: "account", title: x.title, body: x.body, act: { view: "friends" } }); }
+    else { const x = ntx(r, "fa"); N.add({ id: "fa_" + r.id + "_" + r.ts, type: "account", title: x.title, body: x.body, act: { view: "friends" } }); }
+  }
+  /* status notifikasi permintaan masuk berubah (dijawab dari lonceng, atau dibatalkan pengirim) */
+  function nPatch(r, st){
+    const N = window.satuTitikNotif; if(!N || !N.patch) return;
+    const nid = "fr_" + r.id + "_" + r.ts, ex = N.list && N.list().find(i => i.id === nid);
+    if(!ex || !ex.inv || ex.inv.status !== "pending") return;
+    const x = ntx(r, { accepted: "ok", declined: "dn", cancelled: "cn" }[st]);
+    N.patch(nid, { inv: { status: st }, title: x.title, body: x.body });
   }
   async function start(u){
     if(unsub){ try{ unsub(); }catch(e){} unsub = null; }
@@ -12262,7 +12291,11 @@ if(navigator.onLine !== false) init().catch(() => {});
         const ev = [];
         snap.docChanges().forEach(ch => { const r = norm(ch.doc.id, ch.doc.data(), u.uid); if(!r) return;
           if(ch.type === "added" && r.st === "pending" && !r.mine) ev.push([r, "req"]);
-          else if(ch.type === "modified" && r.st === "ok" && r.mine) ev.push([r, "ok"]); });
+          else if(ch.type === "modified" && r.st === "ok" && r.mine) ev.push([r, "ok"]);
+          else if(ch.type === "removed" && r.st === "pending"){
+            if(!r.mine) nPatch(r, "cancelled");               /* pengirim membatalkan */
+            else if(!selfDel.has(r.id)) ev.push([r, "rj"]);   /* temanku menolak */
+          } });
         emit();
         fetchDir(rows.map(r => r.acc)).then(() => { emit(); ev.forEach(x => notify(x[0], x[1])); });
       }, e => { console.warn("[teman] pendengar gagal:", e && (e.code || e.message)); });
@@ -12305,7 +12338,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(kind === "acc"){
       if(accepted().length >= MAX_FRIENDS) throw new Error("e_max");
       await m.updateDoc(ref, { st: "ok", ts: Date.now() });
-    } else await m.deleteDoc(ref);
+    } else { selfDel.add(r.id); await m.deleteDoc(ref); }
   }
   const incoming = () => rows.filter(r => r.st === "pending" && !r.mine).sort((x, y) => y.ts - x.ts);
   const outgoing = () => rows.filter(r => r.st === "pending" && r.mine).sort((x, y) => y.ts - x.ts);
@@ -12315,6 +12348,13 @@ if(navigator.onLine !== false) init().catch(() => {});
     title: () => T[lang()].ttl,
     summary(){ const t = T[lang()], f = accepted().length, q = incoming().length; return q ? t.nRq.replace("{n}", q) : f ? t.nFr.replace("{n}", f) : t.sub0; },
     pending: () => incoming().length,
+    /* dipanggil dari lonceng notifikasi (tombol Terima / Tolak) */
+    respond: async (id, accept) => {
+      const r = rows.find(x => x.id === id && x.st === "pending" && !x.mine);
+      if(!r) return { ok: false, err: "permintaan sudah tidak ada" };
+      try{ await act(accept ? "acc" : "del", r); nPatch(r, accept ? "accepted" : "declined"); return { ok: true }; }
+      catch(e){ const k = ferr(e); return { ok: false, err: T[lang()][k] || k }; }
+    },
     /* untuk fitur lain: [{uid, acc, name, photo}] */
     list: () => accepted().map(r => ({ uid: r.uid, acc: r.acc, name: nameOf(r.acc), photo: (dir[r.acc] && dir[r.acc].photo) || "" })),
     ready: () => !!(A() && A().user),
@@ -12392,12 +12432,6 @@ if(navigator.onLine !== false) init().catch(() => {});
     const er = mk("div", "erow"); er.appendChild(btn(working ? t.busy : t.send, "ok", go)); box.append(inp, er);
     if(msg) box.appendChild(mk("p", msgOk ? "frok" : "frerr", msg));
     pv.appendChild(box);
-    const inc = incoming();
-    if(inc.length){
-      const s = mk("div", "frbox"); s.appendChild(mk("p", "frl", t.inc + " (" + inc.length + ")"));
-      inc.forEach(r => s.appendChild(row(r, t, [btn(t.acc, "ok", () => run("acd", async () => { await act("acc", r); return "acd"; })), btn(t.dec, "", () => run("decd", async () => { await act("del", r); return "decd"; }))])));
-      pv.appendChild(s);
-    }
     const out = outgoing();
     if(out.length){
       const s = mk("div", "frbox"); s.appendChild(mk("p", "frl", t.out + " (" + out.length + ")"));
@@ -12444,7 +12478,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     btns.forEach(b => {
       b.hidden = !u; b.setAttribute("aria-label", t.ttl); b.title = t.ttl;
       if(!b.dataset.i){ b.innerHTML = ICON + '<span class="frb" hidden></span>'; b.dataset.i = "1"; }
-      const bd = b.querySelector(".frb"); if(bd){ bd.hidden = !q; bd.textContent = q > 9 ? "9+" : String(q); }
+      const bd = b.querySelector(".frb"); if(bd){ bd.hidden = true; }
     });
     const ti = $("frT"); if(ti) ti.textContent = t.ttl;
     const xb = $("frX"); if(xb){ xb.setAttribute("aria-label", t.no); xb.title = t.no; }
