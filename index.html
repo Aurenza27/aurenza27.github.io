@@ -10110,6 +10110,16 @@ button:disabled{opacity:.6}
     var a = authO(); if(!a || !a.getDb) return Promise.reject(new Error("nofb"));
     return a.getDb().then(function(x){ ON.fb = x; return x; });
   }
+  /* Firestore dimuat di Beranda (jendela induk): objek data harus dibuat dari Object/Array milik induk, kalau tidak ditolak ("invalid-argument: custom Object object") */
+  function po(src){
+    var P = window; try{ if(window.parent && window.parent !== window && window.parent.Object) P = window.parent; }catch(e){}
+    function cv(v){
+      if(Array.isArray(v)){ var a = new P.Array(); v.forEach(function(x){ a.push(cv(x)); }); return a; }
+      if(v && typeof v === "object" && Object.getPrototypeOf(v) === Object.prototype){ var o = new P.Object(); Object.keys(v).forEach(function(k){ o[k] = cv(v[k]); }); return o; }
+      return v;   /* nilai biasa dan objek Firestore (serverTimestamp, Timestamp) dibiarkan */
+    }
+    return cv(src);
+  }
   var CODE_CH = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
   function genCode(){ var s = "", i; for(i = 0; i < 5; i++) s += CODE_CH.charAt(rnd(CODE_CH.length)); return s; }
   function errMsg(e){
@@ -10171,9 +10181,9 @@ button:disabled{opacity:.6}
       var data = { host:u.uid, hn:meName(), st:"lobby", rd:0, l:"", c:"", secs:ON.secs, end:0, cats:catOn.slice(), res:[], pts:{}, base:{}, v:1, exp:m.Timestamp.fromMillis(Date.now() + 86400000) };
       for(i = 0; i < 6 && !ok; i++){
         code = genCode();
-        try{ await m.setDoc(m.doc(db, "ti_rooms", code), data); ok = true; }catch(e){ if(i === 5) throw e; }
+        try{ await m.setDoc(m.doc(db, "ti_rooms", code), po(data)); ok = true; }catch(e){ if(i === 5) throw e; }
       }
-      await m.setDoc(m.doc(db, "ti_rooms", code, "p", u.uid), { n:meName(), d:0, j:Date.now() });
+      await m.setDoc(m.doc(db, "ti_rooms", code, "p", u.uid), po({ n:meName(), d:0, j:Date.now() }));
       await attach(code);
     }catch(e){ flash(errMsg(e)); }
     setBusy(false);
@@ -10189,7 +10199,7 @@ button:disabled{opacity:.6}
       var ps = await m.getDocs(m.collection(db, "ti_rooms", code, "p")), mine = false;
       ps.forEach(function(x){ if(x.id === u.uid) mine = true; });
       if(!mine && ps.size >= 8) throw { code:"full" };
-      await m.setDoc(m.doc(db, "ti_rooms", code, "p", u.uid), { n:meName(), d:0, j:Date.now() });
+      await m.setDoc(m.doc(db, "ti_rooms", code, "p", u.uid), po({ n:meName(), d:0, j:Date.now() }));
       await attach(code);
     }catch(e){ flash(errMsg(e)); }
     setBusy(false);
@@ -10238,7 +10248,7 @@ button:disabled{opacity:.6}
         ks = Object.keys(d.base || {}).concat(Object.keys(d.pts || {}));
         ks.forEach(function(k){ nb[k] = totalOf(d, k); });
       }
-      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), { st:"play", rd:(d.rd || 0) + 1, l:L, c:C.k, end:Date.now() + (d.secs || 45) * 1000, ts:m.serverTimestamp(), res:[], pts:{}, base:nb, exp:m.Timestamp.fromMillis(Date.now() + 86400000) });
+      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), po({ st:"play", rd:(d.rd || 0) + 1, l:L, c:C.k, end:Date.now() + (d.secs || 45) * 1000, ts:m.serverTimestamp(), res:[], pts:{}, base:nb, exp:m.Timestamp.fromMillis(Date.now() + 86400000) }));
     }catch(e){ flash(errMsg(e)); }
     setBusy(false);
   }
@@ -10250,21 +10260,21 @@ button:disabled{opacity:.6}
       var snap = await m.getDocs(m.collection(f.db, "ti_rooms", ON.code, "a"));
       snap.forEach(function(x){ var v = x.data(); if(v && v.rd === d.rd) ans[x.id] = String(v.t || "").slice(0, 30); });
       var res = ON.players.map(function(p){ return { u:p.u, n:p.n, t:ans[p.u] || "", x:false }; });
-      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), { st:"reveal", res:res, pts:scoreOf(res, d.l) });
+      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), po({ st:"reveal", res:res, pts:scoreOf(res, d.l) }));
     }catch(e){ setTimeout(function(){ ON.revealing = false; }, 3000); }
   }
   async function toggleRej(i){
     var d = ON.data; if(!d || !isHost() || d.st !== "reveal") return;
     var res = (d.res || []).map(function(r){ return { u:r.u, n:r.n, t:r.t, x:!!r.x }; }); if(!res[i]) return;
     res[i].x = !res[i].x;
-    try{ var f = await lib(); await f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), { res:res, pts:scoreOf(res, d.l) }); }catch(e){ flash(errMsg(e)); }
+    try{ var f = await lib(); await f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), po({ res:res, pts:scoreOf(res, d.l) })); }catch(e){ flash(errMsg(e)); }
   }
   function submitAns(){
     var d = ON.data, u = meU(), inp = $("oAns"); if(!d || !u || !inp || d.st !== "play" || Date.now() > endMs(d) + 1000) return;
     var txt = String(inp.value || "").replace(/\s+/g, " ").trim().slice(0, 30); if(!txt) return;
     var rd = d.rd; ON.sentRd = rd; paintAnsStat(); beep(880, 0.1, "triangle", 0.06);
     lib().then(function(f){
-      return Promise.all([ f.m.setDoc(f.m.doc(f.db, "ti_rooms", ON.code, "a", u.uid), { rd:rd, t:txt }), f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code, "p", u.uid), { d:rd }) ]);
+      return Promise.all([ f.m.setDoc(f.m.doc(f.db, "ti_rooms", ON.code, "a", u.uid), po({ rd:rd, t:txt })), f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code, "p", u.uid), po({ d:rd })) ]);
     }).catch(function(e){ ON.sentRd = -1; flash(errMsg(e)); paintAnsStat(); });
   }
   /* ----- waktu ronde berbasis jam server (tidak tergantung jam HP pemilik ruang) ----- */
@@ -10294,7 +10304,7 @@ button:disabled{opacity:.6}
     if(rank < 0) return;
     if(Date.now() + (ON.off || 0) < e + 8500 + rank * 6000) return;
     ON.claiming = true; setTimeout(function(){ ON.claiming = false; }, 6000);
-    lib().then(function(f){ return f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), { host:u.uid, hn:meName() }); }).catch(function(){});
+    lib().then(function(f){ return f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), po({ host:u.uid, hn:meName() })); }).catch(function(){});
   }
   var lastSecO = -1;
   function tickO(){
