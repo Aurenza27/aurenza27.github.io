@@ -544,6 +544,10 @@ h1{font-size:26px;line-height:1.15}
 #spanel .sc[aria-pressed="true"]{border-color:var(--gold)}
 #spAcc,#frpanel .frbox{border-color:rgba(255,255,255,.08)}
 #netbar{z-index:60;max-width:calc(100vw - 24px)}
+#frpanel{transform-origin:top right;will-change:transform,opacity}
+#frpanel.in{animation:spIn .36s cubic-bezier(.2,.9,.25,1) both}
+#frpanel.out{animation:spOut .24s cubic-bezier(.5,0,.75,.4) forwards;pointer-events:none}
+@media (prefers-reduced-motion:reduce){#frpanel.in,#frpanel.out{animation:none}}
 @media (max-width:360px){h1{font-size:23px}.cgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.item{padding:12px}}
 </style>
 </head>
@@ -1675,7 +1679,7 @@ window.satuTitikNative = {
       if(cfg.banner !== false){
         /* Sisakan ruang di bawah halaman setinggi banner, supaya tulisan kaki beranda dan menu tidak tertutup iklan */
         const st = document.createElement("style");
-        st.textContent = "#home{padding-bottom:calc(56px + var(--adh,0px))!important}#view,#about,#privacy{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - var(--adh,0px))!important}";
+        st.textContent = "#home{padding-bottom:calc(96px + var(--adh,0px) + env(safe-area-inset-bottom,0px))!important}#view,#about,#privacy{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - var(--adh,0px))!important}";
         document.head.appendChild(st);
         const setH = h => { h = Math.round(+h || 0); if(h > 0) document.documentElement.style.setProperty("--adh", h + "px"); };
         try{ AdMob.addListener("bannerAdSizeChanged", e => setH(e && e.height)); }catch(e){}
@@ -12935,7 +12939,28 @@ if(navigator.onLine !== false) init().catch(() => {});
   /* ===== panel Teman sendiri (terpisah dari Pengaturan): tombolnya di bawah tombol Pengaturan di beranda dan di bilah menu ===== */
   const ICON = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 13.7c2.6.2 4.5 2 4.5 4.8"/></svg>';
   const panel = $("frpanel"), btns = [$("frHome"), $("frBar")].filter(Boolean);
-  function isOpen(){ return !!(panel && !panel.hidden); }
+  function isOpen(){ return !!(panel && !panel.hidden && !panel.classList.contains("out")); }
+  /* animasi buka/tutup: panel muncul dari ikon Teman dan menyusut kembali ke ikon itu (sama seperti panel Pengaturan) */
+  let frTimer = 0;
+  function frOrigin(){
+    try{
+      const r = btns.map(x => x.getBoundingClientRect()).find(q => q.width > 0 && q.height > 0);
+      if(r) panel.style.transformOrigin = (r.left + r.width / 2 - panel.offsetLeft) + "px " + (r.top + r.height / 2 - panel.offsetTop) + "px";
+    }catch(e){}
+  }
+  function show(on){
+    const calm = window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches;
+    clearTimeout(frTimer); panel.classList.remove("in", "out");
+    if(on){
+      const top = $("view").hidden ? 90 : 62;
+      panel.style.top = "calc(" + top + "px + env(safe-area-inset-top,0px))"; panel.style.maxHeight = "calc(100% - " + (top + 16) + "px)";
+      panel.hidden = false; frOrigin();
+      if(!calm){ void panel.offsetWidth; panel.classList.add("in"); }
+    } else if(!panel.hidden && !calm){
+      frOrigin(); panel.classList.add("out");
+      frTimer = setTimeout(() => { panel.hidden = true; panel.classList.remove("out"); }, 240);
+    } else { panel.hidden = true; }
+  }
   function setOpen(on){
     if(!panel) return;
     on = !!on && !!(A() && A().user);
@@ -12945,7 +12970,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       const bb = $("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click();
       confirmId = ""; menuId = ""; msg = "";
     }
-    if(on) addOpen = false; else dropChat(); panel.hidden = !on; btns.forEach(b => b.setAttribute("aria-expanded", String(on)));
+    if(on) addOpen = false; else dropChat(); show(on); btns.forEach(b => b.setAttribute("aria-expanded", String(on)));
     clearInterval(sigTimer); sigTimer = 0;
     if(on){
       paint();
