@@ -9994,8 +9994,13 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .rm-hero.codehid .rm-coderow{display:none}
 .rm-hero.codehid .rm-top{margin-bottom:0}
 .rm-hero.codehid .rm-meta{margin-top:6px}
-.rm-pl .kick{flex:none;min-height:20px;padding:0 7px;margin-left:2px;font:inherit;font-size:10.5px;white-space:nowrap;color:#e8a05a;background:transparent;border:1px solid rgba(232,160,90,.5);border-radius:8px;cursor:pointer}
-.rm-pl .kick[data-sure="1"]{color:#fff;background:#c0392b;border-color:#c0392b}
+.rm-pl .kick{flex:none;width:22px;height:22px;padding:0;margin-left:2px;display:inline-grid;place-items:center;font:inherit;font-size:11px;line-height:1;color:#e8a05a;background:transparent;border:1px solid rgba(232,160,90,.45);border-radius:50%;cursor:pointer}
+.rm-pl .kick:hover,.rm-pl .kick:focus-visible{color:#fff;background:#c0392b;border-color:#c0392b;outline:0}
+.rm-kbox .rm-kwho{display:flex;align-items:center;gap:10px;justify-content:center;margin:0 0 10px}
+.rm-kbox .rm-kwho .av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:17px;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold))}
+.rm-kbox .rm-kwho b{font-size:16px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+.rm-kban{display:flex;align-items:center;gap:8px;margin:10px 0 2px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:12.5px;color:var(--text);cursor:pointer;text-align:left}
+.rm-kban input{width:16px;height:16px;flex:none;accent-color:#c0392b}
 </style>
 </head>
 <body>
@@ -10320,7 +10325,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       start:"▶ MULAI RONDE", next:"▶ RONDE BERIKUTNYA", waitStart:"Menunggu pemilik ruang memulai…", waitNext:"Menunggu pemilik ruang…", solo:"Butuh minimal 2 pemain untuk mulai. Bagikan kode ruang ke temanmu.",
       close:"Tutup ruang", leave:"Keluar dari ruangan", sure:"Ketuk lagi untuk memastikan",
       mkLim:"Jawaban yang diterima", mkLimHint:"Hanya jawaban tercepat yang dihitung. Jawaban salah atau ditolak membuka tempat bagi jawaban berikutnya.", limHint:"🎯 Hanya {n} jawaban tercepat yang diterima. Jawaban salah atau ditolak membuka tempat bagi jawaban berikutnya.", lateTag:"kuota penuh", wrongTag:"salah", n1:"jawaban",
-      vote:"Vote", voteOpen:"Voting jawaban", vYes:"Terima", vNo:"Tolak", vVoted:"sudah memilih", vApply:"Terapkan hasil", vCancel:"Batal", vOwn:"Jawabanmu sedang divote pemain lain.", vAcc:"Diterima lewat voting", vRej:"Ditolak lewat voting", boardHint:"Total skor dari semua ronde. Seri voting = jawaban diterima.", left:"keluar", kick:"Keluarkan", kickSure:"Yakin?", kicked:"{n} dikeluarkan dari ruangan.", kickedMe:"Kamu dikeluarkan dari ruangan oleh pemilik ruang.", hideCode:"🙈 Sembunyikan kode", showCode:"👁 Tampilkan kode",
+      vote:"Vote", voteOpen:"Voting jawaban", vYes:"Terima", vNo:"Tolak", vVoted:"sudah memilih", vApply:"Terapkan hasil", vCancel:"Batal", vOwn:"Jawabanmu sedang divote pemain lain.", vAcc:"Diterima lewat voting", vRej:"Ditolak lewat voting", boardHint:"Total skor dari semua ronde. Seri voting = jawaban diterima.", left:"keluar", kick:"Keluarkan", kickQ:"Keluarkan pemain ini?", kickMsg:"{n} akan dikeluarkan dari ruangan dan kembali ke menu awal.", kickBan:"Larang bergabung lagi ke ruangan ini", kickGo:"Keluarkan", kickBusy:"Memproses…", kicked:"{n} dikeluarkan dari ruangan.", kickedT:"Kamu dikeluarkan", kickedMe:"Pemilik ruang mengeluarkan kamu dari ruangan ini.", kickedBan:"Pemilik ruang mengeluarkan kamu dan kamu tidak bisa bergabung lagi ke ruangan ini.", kickedOk:"Mengerti", hideCode:"🙈 Sembunyikan kode", showCode:"👁 Tampilkan kode",
       rd:"Ronde", ph:"Ketik jawabanmu", send:"KIRIM", sent:"Terkirim ✓ (bisa diubah sebelum waktu habis)", cnt:"sudah menjawab", up:"⏰ Waktu habis!", hostNow:"Buka jawaban sekarang",
       none:"(tidak menjawab)", rej:"Tolak", acc:"Terima", rejd:"ditolak", board:"Klasemen", pts:"poin",
       nf:"Kode ruang tidak ditemukan.", full:"Ruang penuh (maksimal 8 pemain).", closed:"Ruang sudah ditutup.", took:"Kepemilikan ruang berpindah. Kamu sekarang pemilik ruang.", cats:"Kategori", all:"Pilih semua", catHostHint:"Ketuk untuk memilih kategori yang akan diacak. Minimal satu.", catMemHint:"Kategori dipilih oleh pemilik ruang.", minCat:"Pilih minimal satu kategori.", lobbyWait:"Menunggu pemain", lobbyReady:"Siap dimulai", leaveQ:"Keluar dari ruangan?", leaveHostMsg:"Kamu pemilik ruang. Jika keluar, ruang tetap berjalan dan kepemilikan pindah ke pemain yang paling awal masuk. Pilih Tutup ruang kalau ingin membubarkannya.", leaveSoloMsg:"Tidak ada pemain lain, jadi ruang akan ditutup.", leaveMemMsg:"Kamu akan keluar dari ruangan ini. Kamu bisa bergabung lagi dengan kode yang sama selama ruang masih dibuka.", stay:"Tetap di sini", leaveGo:"Keluar", denied:"Akses ditolak. Aturan Firestore untuk game ini belum dipasang.", fail:"Gagal, coba lagi.", off:"Tidak ada internet." },
@@ -10332,7 +10337,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       start:"▶ START ROUND", next:"▶ NEXT ROUND", waitStart:"Waiting for the room owner to start…", waitNext:"Waiting for the room owner…", solo:"At least 2 players are needed to start. Share the room code with a friend.",
       close:"Close room", leave:"Leave room", sure:"Tap again to confirm",
       mkLim:"Accepted answers", mkLimHint:"Only the fastest answers count. A wrong or rejected answer frees a spot for the next one.", limHint:"🎯 Only the fastest {n} answers are accepted. A wrong or rejected answer frees a spot for the next one.", lateTag:"quota full", wrongTag:"wrong", n1:"answers",
-      vote:"Vote", voteOpen:"Answer vote", vYes:"Accept", vNo:"Reject", vVoted:"voted", vApply:"Apply result", vCancel:"Cancel", vOwn:"Other players are voting on your answer.", vAcc:"Accepted by vote", vRej:"Rejected by vote", boardHint:"Total score across all rounds. A tied vote keeps the answer accepted.", left:"left", kick:"Remove", kickSure:"Sure?", kicked:"{n} was removed from the room.", kickedMe:"The room owner removed you from the room.", hideCode:"🙈 Hide code", showCode:"👁 Show code",
+      vote:"Vote", voteOpen:"Answer vote", vYes:"Accept", vNo:"Reject", vVoted:"voted", vApply:"Apply result", vCancel:"Cancel", vOwn:"Other players are voting on your answer.", vAcc:"Accepted by vote", vRej:"Rejected by vote", boardHint:"Total score across all rounds. A tied vote keeps the answer accepted.", left:"left", kick:"Remove", kickQ:"Remove this player?", kickMsg:"{n} will be removed from the room and sent back to the start menu.", kickBan:"Don't allow them to rejoin this room", kickGo:"Remove", kickBusy:"Working…", kicked:"{n} was removed from the room.", kickedT:"You were removed", kickedMe:"The room owner removed you from this room.", kickedBan:"The room owner removed you and you cannot rejoin this room.", kickedOk:"Got it", hideCode:"🙈 Hide code", showCode:"👁 Show code",
       rd:"Round", ph:"Type your answer", send:"SEND", sent:"Sent ✓ (you can change it before time is up)", cnt:"answered", up:"⏰ Time is up!", hostNow:"Reveal answers now",
       none:"(no answer)", rej:"Reject", acc:"Accept", rejd:"rejected", board:"Scoreboard", pts:"pts",
       nf:"Room code not found.", full:"The room is full (max 8 players).", closed:"The room was closed.", took:"Room ownership changed. You are now the room owner.", cats:"Categories", all:"Select all", catHostHint:"Tap to choose which categories get drawn. At least one.", catMemHint:"Categories are chosen by the room owner.", minCat:"Pick at least one category.", lobbyWait:"Waiting for players", lobbyReady:"Ready to start", leaveQ:"Leave the room?", leaveHostMsg:"You are the room owner. If you leave, the room keeps running and ownership passes to the player who joined first. Choose Close room to dissolve it.", leaveSoloMsg:"There are no other players, so the room will be closed.", leaveMemMsg:"You are about to leave this room. You can rejoin with the same code while the room is open.", stay:"Stay here", leaveGo:"Leave", denied:"Access denied. The Firestore rules for this game are not installed yet.", fail:"Failed, please try again.", off:"No internet." }
@@ -10465,7 +10470,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     try{
       var f = await lib(), m = f.m, db = f.db, rs = await m.getDoc(m.doc(db, "ti_rooms", code));
       if(!rs.exists()) throw { code:"nf" };
-      var kkL = (rs.data() || {}).kk; if(Array.isArray(kkL) && kkL.indexOf(u.uid) >= 0){ flash(oT().kickedMe); setBusy(false); return; }
+      var kkL = (rs.data() || {}).kk; if(Array.isArray(kkL) && kkL.indexOf(u.uid) >= 0){ flash(oT().kickedBan); setBusy(false); return; }
       var ps = await m.getDocs(m.collection(db, "ti_rooms", code, "p")), mine = false;
       ps.forEach(function(x){ if(x.id === u.uid) mine = true; });
       if(!mine && ps.size >= 8) throw { code:"full" };
@@ -10475,18 +10480,43 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     setBusy(false);
   }
   /* pemilik keluar: ruang tetap jalan, kepemilikan pindah ke pemain yang paling awal masuk (urutan j); bila sendirian, ruang ditutup */
-  /* pemilik ruang mengeluarkan pemain: tandai di daftar kk (supaya tidak bisa masuk lagi) lalu hapus dokumen pemainnya */
-  async function kickPlayer(uid){
-    var u = meU(), code = ON.code; if(!u || !code || !isHost() || !uid || uid === u.uid || ON.busy) return;
+  /* ----- keluarkan pemain (khusus pemilik ruang): dialog konfirmasi, opsi larang gabung lagi (daftar kk), lalu hapus dokumen pemain ----- */
+  async function kickPlayer(uid, ban){
+    var u = meU(), code = ON.code; if(!u || !code || !isHost() || !uid || uid === u.uid) return false;
     var nm = nameOf(uid);
     try{
       var f = await lib(), m = f.m;
-      try{ await m.updateDoc(m.doc(f.db, "ti_rooms", code), po({ kk:m.arrayUnion(uid) })); }catch(e){}
+      if(ban){ try{ await m.updateDoc(m.doc(f.db, "ti_rooms", code), po({ kk:m.arrayUnion(uid) })); }catch(e){} }
       await m.deleteDoc(m.doc(f.db, "ti_rooms", code, "p", uid));
-      flash(oT().kicked.replace("{n}", nm));
-    }catch(e){ flash(errMsg(e)); }
+      flash(oT().kicked.replace("{n}", nm)); return true;
+    }catch(e){ flash(errMsg(e)); return false; }
   }
-  function kickedOut(){ detach(true); flash(oT().kickedMe); }
+  function askKick(uid){
+    if($("rmDlg") || !isHost()) return;
+    var t = oT(), nm = nameOf(uid) || "?", busy = false;
+    var ov = el("div", "rm-ov"); ov.id = "rmDlg"; ov.setAttribute("role", "alertdialog"); ov.setAttribute("aria-modal", "true");
+    var bx = el("div", "rm-box rm-kbox");
+    var who = el("div", "rm-kwho"); who.appendChild(el("span", "av", (Array.from(nm)[0] || "?").toUpperCase())); who.appendChild(el("b", "", nm)); bx.appendChild(who);
+    bx.appendChild(el("h3", "", t.kickQ)); bx.appendChild(el("p", "", t.kickMsg.replace("{n}", nm)));
+    var lb = el("label", "rm-kban"), cb = el("input"); cb.type = "checkbox"; cb.checked = true; lb.appendChild(cb); lb.appendChild(el("span", "", t.kickBan)); bx.appendChild(lb);
+    var row = el("div", "rm-btns"), no = btn("ghost", t.vCancel, function(){ if(!busy) closeDlg(); });
+    var go = btn("go sm danger", t.kickGo, function(){
+      if(busy) return; busy = true; go.disabled = true; no.disabled = true; go.textContent = oT().kickBusy;
+      kickPlayer(uid, cb.checked).then(function(){ closeDlg(); }, function(){ closeDlg(); });
+    });
+    row.appendChild(no); row.appendChild(go); bx.appendChild(row); ov.appendChild(bx); document.body.appendChild(ov);
+    ov.addEventListener("click", function(e){ if(e.target === ov && !busy) closeDlg(); });
+    ov.addEventListener("keydown", function(e){ if(e.key === "Escape" && !busy) closeDlg(); });
+    try{ no.focus(); }catch(e){}
+  }
+  function kickedOut(banned){
+    detach(true); closeDlg();
+    var t = oT(), ov = el("div", "rm-ov"); ov.id = "rmDlg"; ov.setAttribute("role", "alertdialog"); ov.setAttribute("aria-modal", "true");
+    var bx = el("div", "rm-box"); bx.appendChild(el("h3", "", t.kickedT)); bx.appendChild(el("p", "", banned ? t.kickedBan : t.kickedMe));
+    var row = el("div", "rm-btns"), ok = btn("go sm", t.kickedOk, closeDlg); row.appendChild(ok); bx.appendChild(row); ov.appendChild(bx); document.body.appendChild(ov);
+    ov.addEventListener("click", function(e){ if(e.target === ov) closeDlg(); });
+    try{ ok.focus(); }catch(e){}
+  }
   async function leaveRoom(){
     var u = meU(), code = ON.code, d = ON.data; ON.leaving = true;
     if(u && code && d && d.host === u.uid){
@@ -10523,7 +10553,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     if(!s.exists()){ var had = !!ON.data; detach(true); if(had) flash(oT().closed); return; }
     var d = s.data(), pst = ON.data ? ON.data.st : "", prd = ON.data ? ON.data.rd : -1, first = !ON.data, prevHost = ON.data ? ON.data.host : "";
     ON.data = d;
-    { var kkR = d.kk, mu = meU(); if(mu && Array.isArray(kkR) && kkR.indexOf(mu.uid) >= 0){ kickedOut(); return; } }
+    { var kkR = d.kk, mu = meU(); if(mu && Array.isArray(kkR) && kkR.indexOf(mu.uid) >= 0){ kickedOut(true); return; } }
     updOff(d, s, first);
     if(isHost()) wlOn(); else wlOff();
     if(!first && prevHost !== d.host && meU() && d.host === meU().uid) flash(oT().took);
@@ -11018,11 +11048,8 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
           if(d.st === "play" && p.d === d.rd) li.appendChild(document.createTextNode(" ✔"));
           if(isHost() && u && p.u !== u.uid){
             (function(pu){
-              var kb = btn("kick", "✕ " + t.kick, function(){
-                if(kb.getAttribute("data-sure") === "1"){ kickPlayer(pu); return; }
-                kb.setAttribute("data-sure", "1"); kb.textContent = oT().kickSure;
-                setTimeout(function(){ kb.removeAttribute("data-sure"); kb.textContent = "✕ " + oT().kick; }, 3000);
-              });
+              var kb = btn("kick", "✕", function(){ askKick(pu); });
+              kb.setAttribute("aria-label", t.kick + " " + (p.n || "")); kb.title = t.kick;
               li.appendChild(kb);
             })(p.u);
           }
