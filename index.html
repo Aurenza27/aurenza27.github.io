@@ -10471,9 +10471,9 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   });
   /* ===== MODE ONLINE: main bersama lewat kode ruang (Firestore: koleksi ti_rooms) ===== */
   var OT = {
-    id:{ tOff:"Bareng", tOn:"Online", sub:"Main bersama teman lewat kode ruang. Satu pemain membuat ruang, yang lain bergabung.",
+    id:{ tOff:"Offline", tOn:"Online", sub:"Main bersama teman lewat kode ruang. Satu pemain membuat ruang, yang lain bergabung.",
       anon:"Pemain", offline:"Tidak ada internet. Mode online butuh koneksi.", needLogin:"Masuk dengan Google untuk bermain online.", login:"Masuk dengan Google",
-      wait:"Mohon tunggu…", mk:"Buat ruang", mkTime:"Waktu menjawab", mkCats:"kategori aktif (atur di mode Bareng)", jn:"Gabung ke ruang", jnPh:"KODE", jnGo:"Gabung",
+      wait:"Mohon tunggu…", mk:"Buat ruang", mkTime:"Waktu menjawab", mkCats:"kategori aktif (atur di mode Offline)", jn:"Gabung ke ruang", jnPh:"KODE", jnGo:"Gabung",
       rules:"Tulis jawaban yang berawalan huruf yang diminta. Jawaban unik dapat 10 poin, jawaban yang sama dengan pemain lain 5 poin. Pemilik ruang bisa menolak jawaban yang tidak cocok dengan kategori.",
       code:"KODE RUANG", copy:"Salin kode", copied:"Kode disalin.", pl:"Pemain", hostTag:"pemilik", me:"kamu",
       start:"▶ MULAI RONDE", next:"▶ RONDE BERIKUTNYA", waitStart:"Menunggu pemilik ruang memulai…", waitNext:"Menunggu pemilik ruang…", solo:"Butuh minimal 2 pemain untuk mulai. Bagikan kode ruang ke temanmu.",
@@ -10483,9 +10483,9 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       rd:"Ronde", ph:"Ketik jawabanmu", send:"KIRIM", sent:"Terkirim ✓ (bisa diubah sebelum waktu habis)", cnt:"sudah menjawab", up:"⏰ Waktu habis!", hostNow:"Buka jawaban sekarang",
       none:"(tidak menjawab)", rej:"Tolak", acc:"Terima", rejd:"ditolak", board:"Klasemen", pts:"poin",
       nf:"Kode ruang tidak ditemukan.", full:"Ruang penuh (maksimal 8 pemain).", closed:"Ruang sudah ditutup.", took:"Kepemilikan ruang berpindah. Kamu sekarang pemilik ruang.", cats:"Kategori", all:"Pilih semua", catHostHint:"Ketuk untuk memilih kategori yang akan diacak. Minimal satu.", catMemHint:"Kategori dipilih oleh pemilik ruang.", minCat:"Pilih minimal satu kategori.", lobbyWait:"Menunggu pemain", lobbyReady:"Siap dimulai", leaveQ:"Keluar dari ruangan?", leaveHostMsg:"Kamu pemilik ruang. Jika keluar, ruang tetap berjalan dan kepemilikan pindah ke pemain yang paling awal masuk. Pilih Tutup ruang kalau ingin membubarkannya.", leaveSoloMsg:"Tidak ada pemain lain, jadi ruang akan ditutup.", leaveMemMsg:"Kamu akan keluar dari ruangan ini. Kamu bisa bergabung lagi dengan kode yang sama selama ruang masih dibuka.", stay:"Tetap di sini", leaveGo:"Keluar", denied:"Akses ditolak. Aturan Firestore untuk game ini belum dipasang.", fail:"Gagal, coba lagi.", off:"Tidak ada internet." },
-    en:{ tOff:"Together", tOn:"Online", sub:"Play with friends using a room code. One player creates a room, the others join.",
+    en:{ tOff:"Offline", tOn:"Online", sub:"Play with friends using a room code. One player creates a room, the others join.",
       anon:"Player", offline:"No internet. Online mode needs a connection.", needLogin:"Sign in with Google to play online.", login:"Sign in with Google",
-      wait:"Please wait…", mk:"Create a room", mkTime:"Answer time", mkCats:"active categories (set in Together mode)", jn:"Join a room", jnPh:"CODE", jnGo:"Join",
+      wait:"Please wait…", mk:"Create a room", mkTime:"Answer time", mkCats:"active categories (set in Offline mode)", jn:"Join a room", jnPh:"CODE", jnGo:"Join",
       rules:"Type an answer that starts with the given letter. A unique answer scores 10 points, the same as another player 5 points. The room owner can reject answers that do not fit the category.",
       code:"ROOM CODE", copy:"Copy code", copied:"Code copied.", pl:"Players", hostTag:"owner", me:"you",
       start:"▶ START ROUND", next:"▶ NEXT ROUND", waitStart:"Waiting for the room owner to start…", waitNext:"Waiting for the room owner…", solo:"At least 2 players are needed to start. Share the room code with a friend.",
@@ -11467,12 +11467,16 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* tombol chat melayang: bisa digeser bebas, lepas jari = menempel ke sisi kiri atau kanan layar (posisi diingat) */
   var CF = { s:"r", y:0.8, drag:false, moved:false };
   (function(){ var v = lsj("ti_cfab", null); if(v && (v.s === "l" || v.s === "r") && typeof v.y === "number"){ CF.s = v.s; CF.y = Math.min(1, Math.max(0, v.y)); } })();
-  function vpW(){ return window.innerWidth || document.documentElement.clientWidth || 360; }
-  function vpH(){ return window.innerHeight || document.documentElement.clientHeight || 640; }
+  /* ukuran layar nyata: ambil yang terkecil dari layout viewport, visual viewport, dan innerWidth (innerWidth di HP bisa lebih lebar dari layar) */
+  function vpDim(a, b, c){ var v = [a, b, c].filter(function(n){ return n > 0; }); return v.length ? Math.min.apply(null, v) : 0; }
+  function vpW(){ var vv = window.visualViewport; return vpDim(document.documentElement.clientWidth, vv && vv.width, window.innerWidth) || 360; }
+  function vpH(){ var vv = window.visualViewport; return vpDim(document.documentElement.clientHeight, vv && vv.height, window.innerHeight) || 640; }
   function placeFab(){
     var f = $("cFab"); if(!f) return;
     var z = 46, m = 8, x = CF.s === "l" ? m : Math.max(m, vpW() - z - m), y = m + CF.y * Math.max(0, vpH() - z - 2 * m);
-    f.style.left = Math.round(x) + "px"; f.style.top = Math.round(y) + "px";
+    /* sisi kanan dikunci lewat CSS right supaya selalu menempel ke tepi layar di semua HP */
+    if(CF.s === "r"){ f.style.left = "auto"; f.style.right = m + "px"; } else { f.style.right = "auto"; f.style.left = m + "px"; }
+    f.style.top = Math.round(y) + "px";
     placeSheet(Math.round(x), Math.round(y));
   }
   /* panel chat = overlay yang menempel pada bubble: muncul di atas bubble (atau di bawahnya bila ruang atas kurang), sisinya sejajar dengan bubble, dan ikut bergerak saat bubble digeser */
@@ -11503,7 +11507,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
       var dx = e.clientX - sx, dy = e.clientY - sy;
       if(!CF.drag){ if(Math.abs(dx) + Math.abs(dy) < 8) return; CF.drag = true; f.classList.add("drag"); }
       var nx = Math.min(Math.max(ox + dx, 0), vpW() - 46), ny = Math.min(Math.max(oy + dy, 0), vpH() - 46);
-      f.style.left = nx + "px"; f.style.top = ny + "px";
+      f.style.right = "auto"; f.style.left = nx + "px"; f.style.top = ny + "px";
       placeSheet(nx, ny);
     });
     function end(){
@@ -11532,7 +11536,8 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
         fm = el("div", "cform"), inp = el("input", "cin"), sd = btn("cgo", "", sendChat);
     fab.id = "cFab"; fab.type = "button"; fab.hidden = true; fab.appendChild(el("span", "", "💬")); bd.id = "cBadge"; bd.hidden = true; fab.appendChild(bd);
     fab.addEventListener("click", function(){ if(CF.moved){ CF.moved = false; return; } setChatOpen(!CH.open); });
-    dragFab(fab); window.addEventListener("resize", placeFab);
+    dragFab(fab); window.addEventListener("resize", placeFab); window.addEventListener("orientationchange", function(){ setTimeout(placeFab, 250); });
+    if(window.visualViewport) window.visualViewport.addEventListener("resize", placeFab);
     sh.id = "cSheet"; sh.hidden = true; sh.setAttribute("role", "dialog");
     ti.id = "cTitle"; cn.id = "cCount"; x.id = "cClose"; ru.id = "cRules"; ls.id = "cList"; ls.setAttribute("aria-live", "polite");
     nt.id = "cNote"; nt.setAttribute("role", "status");
