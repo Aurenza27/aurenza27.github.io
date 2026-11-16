@@ -201,6 +201,10 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 @media (prefers-reduced-motion:reduce){#bellBtn.has,#bellBtn.has svg,#bellBtn .bdg.pop,#bellBtn.ring,#bellBtn.ring svg,#bellBtn.ring .bclap,#bellBtn.tap svg,#bellBtn.settle svg{animation:none!important}#bellBtn.ring::after,#bellBtn.ring::before{animation:none;display:none}}
 #bellPanel{position:absolute;z-index:30;top:52px;left:0;display:flex;flex-direction:column;width:min(350px,calc(100vw - 32px));max-height:min(72vh,540px);padding:0;overflow:hidden;text-align:left;border:1px solid var(--gold);border-radius:16px;background:var(--bg2);box-shadow:0 10px 30px rgba(0,0,0,.6);transform-origin:22px -30px;will-change:transform,opacity;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 #bellPanel[hidden]{display:none}
+/* di dalam menu: lonceng pindah ke bilah atas (sebelum tombol Teman dan Pengaturan), panelnya melayang di kanan atas seperti panel Teman */
+#view .bar #bellBtn{position:relative;top:auto;left:auto;margin-left:auto;flex:none}
+#view .bar #bellBtn ~ #frBar,#view .bar #bellBtn ~ #gear{margin-left:0}
+#view > #bellPanel{position:fixed;top:calc(54px + env(safe-area-inset-top,0px));left:auto;right:10px;width:min(350px,calc(100vw - 20px));max-height:calc(100% - 70px)}
 #bellPanel.in{animation:bnIn .4s cubic-bezier(.2,.9,.25,1.08) both}
 #bellPanel.out{animation:bnOut .24s cubic-bezier(.5,0,.75,.4) forwards;pointer-events:none}
 #bellPanel.in .nrow{animation:nrowIn .36s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(110ms + var(--i,0) * 40ms)}
@@ -11005,23 +11009,29 @@ button:disabled{opacity:.6}
   window.__tiJoin = async function(code){
     code = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5);
     if(code.length !== 5 || !meU()) return false;
-    if(ON.code === code) return true;
+    if(ON.code === code){ if(mode !== "on"){ mode = "on"; try{ paint(); }catch(e){} } return true; }
     if(ON.busy) return false;
-    if(ON.code) await leaveRoom();
-    mode = "on"; paint();
+    try{ if(ON.code) await leaveRoom(); }catch(e){}
+    mode = "on"; try{ paint(); }catch(e){}
     await joinRoom(code);
+    if(ON.code === code){ mode = "on"; try{ paint(); }catch(e){} try{ renderO(); }catch(e){} }
     return ON.code === code;
   };
-  /* undangan yang diterima saat menu ini belum terbuka: Beranda menitipkan kodenya di __tiPendingRoom */
+  /* undangan yang diterima saat menu ini belum terbuka: Beranda menitipkan kodenya di __tiPendingRoom.
+     Baru dikerjakan setelah menu selesai dimuat dan akun siap; bila gagal, dicoba lagi sampai kedaluwarsa (90 detik) */
   (function pend(){
+    var again = true;
     try{
       var P = parent, v = P && P.__tiPendingRoom;
-      if(v && v.code && meU() && !ON.busy){
-        P.__tiPendingRoom = null;
-        if(Date.now() - (+v.at || 0) < 90000) window.__tiJoin(v.code);
+      if(v && v.code){
+        if(Date.now() - (+v.at || 0) >= 90000){ P.__tiPendingRoom = null; }
+        else if(document.readyState === "complete" && meU() && !ON.busy){
+          P.__tiPendingRoom = null;
+          window.__tiJoin(v.code).catch(function(){ try{ P.__tiPendingRoom = v; }catch(e){} });
+        }
       }
     }catch(e){}
-    setTimeout(pend, 600);
+    setTimeout(pend, 700);
   })();
 
   /* ===== CHAT REALTIME ruangan online (Firestore: ti_rooms/{kode}/m). Aturan: dilarang spam dan kata kasar ===== */
@@ -11441,6 +11451,26 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
   if(typeof ph === "function") window.paintHome = function(){ const r = ph.apply(this, arguments); try{ paintBell(); if(opened) paintPanel(); }catch(e){} return r; };
   setInterval(() => { if(opened) paintPanel(); }, 60000);   /* waktu relatif ("5 menit lalu") ikut berjalan */
   paintBell();
+})();
+</script>
+<script>
+/* ===== Lonceng tetap ada di dalam menu: tombol dan panel yang sama dipindah ke bilah menu saat menu terbuka, dikembalikan ke beranda saat menu ditutup ===== */
+(function(){
+  const g = id => document.getElementById(id);
+  const v = g("view"), btn = g("bellBtn"), pan = g("bellPanel"), live = g("bellLive"), home = btn && btn.parentNode;
+  const bar = v && v.querySelector(".bar");
+  if(!v || !btn || !pan || !bar || !home) return;
+  function place(){
+    if(!v.hidden){
+      if(btn.parentNode !== bar) bar.insertBefore(btn, g("frBar") || g("gear"));
+      if(pan.parentNode !== v) v.appendChild(pan);
+    } else {
+      if(btn.parentNode !== home) home.insertBefore(btn, live);
+      if(pan.parentNode !== home) home.insertBefore(pan, live);
+    }
+  }
+  new MutationObserver(place).observe(v, { attributes: true, attributeFilter: ["hidden"] });
+  place();
 })();
 </script>
 <script type="module">
@@ -12169,6 +12199,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       e_noacc:"ID Akunmu belum siap. Coba lagi sebentar lagi.", e_perm:"Izin ditolak oleh server. Pastikan aturan Firestore sudah diperbarui.", e_off:"Tidak ada koneksi internet.", e_fail:"Gagal. Coba lagi.", login:"Masuk dengan Google untuk memakai fitur teman.",
       rqT:"Permintaan pertemanan", rqB:"{n} ({a}) ingin berteman denganmu.", okT:"Pertemanan diterima", okB:"{n} ({a}) menerima permintaan pertemananmu.", nFr:"{n} teman", nRq:"{n} permintaan baru",
       invH:"Undang ke turnamen “{n}”:", invM:"Jadikan moderator", invF:"Undang pengikut", invW:"Menunggu…", invMem:"Moderator ✓", invFd:"Undang lagi", invMd:"Undang lagi (moderator)", invMok:"Undangan moderator terkirim.", invFok:"Undangan pengikut terkirim.",
+      e_max:"Daftar temanmu sudah penuh (maksimal 20 teman, termasuk permintaan terkirim).",
       e_invp:"Undangan masih menunggu jawaban.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
       invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
     en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
@@ -12178,9 +12209,11 @@ if(navigator.onLine !== false) init().catch(() => {});
       e_noacc:"Your Account ID is not ready yet. Try again in a moment.", e_perm:"Permission denied by the server. Make sure the Firestore rules are updated.", e_off:"No internet connection.", e_fail:"Failed. Please try again.", login:"Sign in with Google to use friends.",
       rqT:"Friend request", rqB:"{n} ({a}) wants to be your friend.", okT:"Friend request accepted", okB:"{n} ({a}) accepted your friend request.", nFr:"{n} friends", nRq:"{n} new requests",
       invH:"Invite to tournament “{n}”:", invM:"Make moderator", invF:"Invite follower", invW:"Pending…", invMem:"Moderator ✓", invFd:"Invite again", invMd:"Invite again (moderator)", invMok:"Moderator invite sent.", invFok:"Follower invite sent.",
+      e_max:"Your friend list is full (maximum 20 friends, including sent requests).",
       e_invp:"The invite is still pending.", e_invmem:"They are already a moderator.", e_invmax:"At most 20 moderators.", e_noctx:"Open an online tournament’s detail (as admin) first.", e_invself:"That is your own account.",
       invRH:"Invite to Guess the Initial room “{n}”:", invR:"Invite to room", invRin:"Already in the room ✓", invRf:"Room is full", invRok:"Room invite sent." }
   };
+  const MAX_FRIENDS = 20;
   const A = () => window.satuTitikAuth || null;
   const myAcc = () => { const a = A(); return a && a.accountId ? String(a.accountId).toUpperCase() : ""; };
   const mk = (tag, cls, txt) => { const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; };
@@ -12249,6 +12282,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(!/^ST-\d{6}$/.test(id)) throw new Error("e_fmt");
     const me = myAcc(); if(!me) throw new Error("e_noacc");
     if(id === me) throw new Error("e_self");
+    if(accepted().length + outgoing().length >= MAX_FRIENDS) throw new Error("e_max");
     if(navigator.onLine === false) throw new Error("e_off");
     const { m, db } = await a.getDb();
     const ds = await m.getDoc(m.doc(db, "accountIds", id));
@@ -12268,7 +12302,10 @@ if(navigator.onLine !== false) init().catch(() => {});
   async function act(kind, r){
     const a = A(); if(!a || !a.getDb) throw new Error("e_fail");
     const { m, db } = await a.getDb(), ref = m.doc(db, "friendships", r.id);
-    if(kind === "acc") await m.updateDoc(ref, { st: "ok", ts: Date.now() }); else await m.deleteDoc(ref);
+    if(kind === "acc"){
+      if(accepted().length >= MAX_FRIENDS) throw new Error("e_max");
+      await m.updateDoc(ref, { st: "ok", ts: Date.now() });
+    } else await m.deleteDoc(ref);
   }
   const incoming = () => rows.filter(r => r.st === "pending" && !r.mine).sort((x, y) => y.ts - x.ts);
   const outgoing = () => rows.filter(r => r.st === "pending" && r.mine).sort((x, y) => y.ts - x.ts);
@@ -12368,7 +12405,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       pv.appendChild(s);
     }
     const fr = accepted(), s = mk("div", "frbox"), tc = tctx(), rc = tc ? null : rctx(); lastSig = sigNow();
-    s.appendChild(mk("p", "frl", t.fr + " (" + fr.length + ")"));
+    s.appendChild(mk("p", "frl", t.fr + " (" + fr.length + "/" + MAX_FRIENDS + ")"));
     if(tc && fr.length) s.appendChild(mk("p", "frh", t.invH.replace("{n}", tc.name || tc.oid)));
     else if(rc && fr.length) s.appendChild(mk("p", "frh", t.invRH.replace("{n}", rc.code)));
     if(!fr.length) s.appendChild(mk("p", "frh", t.none));
