@@ -63,7 +63,14 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #back:active{background:rgba(212,169,79,.22);transform:scale(.94)}
 #back:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
 #vt{font-weight:700;letter-spacing:.08em;font-size:15px}
-#frame{flex:1;min-height:0;width:100%;border:0;background:var(--bg)}
+#frame{flex:1;min-height:0;width:100%;border:0;background:var(--bg);opacity:0;transition:opacity .38s ease}
+#frame.rdy{opacity:1}
+/* transisi buka menu: panel naik pelan sambil memudar masuk, isi menu menyusul setelah selesai dimuat (tidak ada kilatan kosong) */
+@keyframes viewIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes homeIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+#view.vin{animation:viewIn .36s cubic-bezier(.22,.7,.2,1) both}
+#home.hin{animation:homeIn .3s ease-out both}
+@media (prefers-reduced-motion:reduce){#view.vin,#home.hin{animation:none}#frame{opacity:1;transition:none}}
 .gear{font:inherit;font-size:18px;min-width:44px;min-height:44px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--gold2);cursor:pointer}
 #gear{margin-left:auto}
 #gearHome{margin-left:auto;flex:none}
@@ -1854,6 +1861,8 @@ function openMenu(m){
   curMenu = m.id; writeKeys(S); f.addEventListener("load", () => { try{ watchFrame(); }catch(e){} try{ paintMenuTitles(); }catch(e){} try{ medisHookFrame(); }catch(e){} try{ hibHookFrame(); }catch(e){} try{ hapticHook(); }catch(e){} }); f.srcdoc = menuSrc(m);
   $("view").appendChild(f);
   $("home").hidden = true; $("view").hidden = false;
+  { const v = $("view"); v.classList.remove("vin"); void v.offsetWidth; v.classList.add("vin"); }
+  { const show = () => f.classList.add("rdy"); f.addEventListener("load", () => setTimeout(show, 70)); setTimeout(show, 2500); }
   document.title = mTitle(m);
   try{ medisSync(true); }catch(e){}   /* musik kategori medis mulai di sini (masih dalam sentuhan pengguna) */
   try{ hibSync(true); }catch(e){}   /* musik kategori hiburan, sama */
@@ -1864,7 +1873,8 @@ function closeMenu(){
   try{ speechSynthesis.cancel(); }catch(e){}
   try{ const fd = $("frame").contentWindow.document, ae = fd.activeElement; if(ae && ae !== fd.body && ae.blur) ae.blur(); }catch(e){}   /* simpan isian yang sedang diketik (mis. skor) sebelum menu dibuang */
   $("frame").remove();   /* musik dan suara AI ikut berhenti */
-  curMenu = null; $("view").hidden = true; $("home").hidden = false;
+  curMenu = null; $("view").hidden = true; $("view").classList.remove("vin"); $("home").hidden = false;
+  { const h = $("home"); h.classList.remove("hin"); void h.offsetWidth; h.classList.add("hin"); }
   try{ medisSync(true); }catch(e){}
   try{ hibSync(true); }catch(e){}
   try{ if(window.satuTitikAds) window.satuTitikAds.onMenuClosed(); }catch(e){}
@@ -8852,6 +8862,7 @@ window.__ttFollowed = async function(oid){
     const {m, db:f} = await ON.lib(), snap = await withTimeout(m.getDoc(m.doc(f, "tournaments", oid)));
     if(!snap.exists()) return;
     watch(oid); applyDoc(oid, snap.data()); view = "list"; curId = null; paint(); toTop();
+    try{ const mm = $("main"); if(mm && mm.animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) mm.animate([{opacity:0, transform:"translateY(12px)"}, {opacity:1, transform:"none"}], {duration:340, easing:"cubic-bezier(.22,.7,.2,1)"}); }catch(e){}
   }catch(e){}
 };
 window.__stInvite = async function(kind, fr){
@@ -9987,6 +9998,11 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .cin:disabled{opacity:.5}
 .cgo{flex:none;min-height:40px;padding:0 14px;font:inherit;font-size:13px;font-weight:700;letter-spacing:.06em;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0;border-radius:10px;cursor:pointer}
 .cgo:disabled{opacity:.45}
+/* transisi halus saat masuk ruangan / pindah tahap: panel muncul berurutan */
+@keyframes tiIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#onBody>*{animation:tiIn .34s cubic-bezier(.22,.7,.2,1) both}
+#onBody>*:nth-child(2){animation-delay:.05s}#onBody>*:nth-child(3){animation-delay:.1s}#onBody>*:nth-child(4){animation-delay:.15s}#onBody>*:nth-child(n+5){animation-delay:.2s}
+@media (prefers-reduced-motion:reduce){#onBody>*{animation:none}}
 /* ===== Pemilik ruang: keluarkan pemain & sembunyikan kode ruang ===== */
 .rm-eye{flex:none;margin-left:auto;min-height:24px;padding:0 9px;font:inherit;font-size:10.5px;white-space:nowrap;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:9px;cursor:pointer}
 .rm-eye:active{background:rgba(212,169,79,.14)}
@@ -11163,12 +11179,19 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     var nap = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }, i, w, r;
     for(i = 0; i < 4; i++){
       for(w = 0; w < 20 && (ON.busy || !meU()); w++) await nap(300);
-      if(ON.code === code){ if(mode !== "on"){ mode = "on"; try{ paint(); }catch(e){} } return true; }
+      if(ON.code === code){
+        /* layar masih menganggap kita ada di ruangan ini, tapi bisa jadi sudah dikeluarkan pemilik dan kabarnya belum sampai (aplikasi di latar belakang / sinyal lambat):
+           cek ke server, bila dokumen pemain kita sudah tidak ada, lepas ruangan lama dan gabung ulang */
+        var still = true;
+        try{ var fz = await lib(), me0 = meU(); still = !!me0 && (await fz.m.getDoc(fz.m.doc(fz.db, "ti_rooms", code, "p", me0.uid))).exists(); }catch(e){ still = true; }
+        if(still){ if(mode !== "on"){ mode = "on"; try{ paint(); }catch(e){} } return true; }
+        detach(false);
+      }
       if(ON.busy || !meU()) return false;
       try{ if(ON.code) await leaveRoom(); }catch(e){}
       mode = "on"; try{ paint(); }catch(e){}
       r = await joinRoom(code);
-      if(ON.code === code){ mode = "on"; try{ paint(); }catch(e){} try{ renderO(); }catch(e){} return true; }
+      if(ON.code === code){ closeDlg(); mode = "on"; try{ paint(); }catch(e){} try{ renderO(); }catch(e){} return true; }
       if(r === "stop") return "stop";
       await nap(700);
     }
