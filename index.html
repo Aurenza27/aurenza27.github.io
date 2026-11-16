@@ -9666,7 +9666,7 @@ body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#1
 .val{display:block;font-weight:700;color:var(--gold2);line-height:1}
 #valL{font-size:clamp(76px,26vw,108px)}
 #emoC{display:block;margin-bottom:8px;font-size:46px;line-height:1}
-#valC{font-size:clamp(19px,6vw,25px);letter-spacing:.06em;text-transform:uppercase;overflow-wrap:anywhere}
+#valC{font-size:clamp(16px,5vw,22px);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
 .reel.idle .val,.reel.idle #emoC{opacity:.45}
 .reel.run .val,.reel.run #emoC{animation:flick .11s linear infinite}
 @keyframes flick{0%{transform:translateY(-16px);opacity:.3}100%{transform:none;opacity:1}}
@@ -9694,8 +9694,64 @@ body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#1
 .hl li b{color:var(--gold2);margin-right:4px}
 .empty{margin:0;color:var(--muted);font-style:italic;font-size:13px}
 button:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.set{padding:14px 14px 8px}
+.set .label{margin-bottom:8px}
+.seg4{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg4 .chip{flex:none;min-height:42px;padding:0 4px;font-size:13px;border:0;border-left:1px solid var(--line);border-radius:0;background:transparent}
+.seg4 .chip:first-child{border-left:0}
+.seg4 .chip[aria-pressed=true]{background:rgba(212,169,79,.16);color:var(--gold2);font-weight:700}
+.sep{height:1px;margin:14px -14px 4px;background:var(--line)}
+.acc{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0;margin:0;font:inherit;color:inherit;background:none;border:0;text-align:left;cursor:pointer}
+.acc .label{flex:1;margin:0}
+.cnt{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chev{flex:none;width:18px;text-align:center;font-style:normal;color:var(--muted);font-size:20px;line-height:1;transform:rotate(90deg);transition:transform .2s}
+.chev::before{content:"\203A"}
+.acc[aria-expanded=true] .chev{transform:rotate(-90deg)}
+.prev{display:flex;justify-content:space-between;gap:4px;overflow:hidden;margin:0 0 8px;font-size:17px;line-height:1.2;white-space:nowrap}
+.roll{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.3,.8,.3,1)}
+.roll.open{grid-template-rows:1fr}
+.rollw{overflow:hidden;min-height:0}
+.rollc{padding:6px 0 8px;opacity:0;transform:translateY(-6px);transition:opacity .22s,transform .28s}
+.roll.open .rollc{opacity:1;transform:none}
+.catbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}
+.catbar .hint{margin:0;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:62px;padding:6px 2px;font:inherit;font-size:11.5px;line-height:1.2;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:12px;cursor:pointer;overflow:hidden}
+.tile .em{font-size:22px;line-height:1}
+.tile span:last-child{max-width:100%;white-space:nowrap}
+.tile[aria-pressed=true]{border-color:var(--gold);color:var(--gold2);background:rgba(212,169,79,.1)}
+@media (prefers-reduced-motion:reduce){.roll,.rollc,.chev{transition:none}}
 body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,body.noanim .prompt.pop{animation:none}
 @media (prefers-reduced-motion:reduce){.reel.run .val,.reel.run #emoC,.reel.land,.prompt.pop{animation:none}}
+.seg2{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg2 .chip{flex:none;min-height:42px;padding:0 6px;font-size:14px;border:0;border-left:1px solid var(--line);border-radius:0;background:transparent}
+.seg2 .chip:first-child{border-left:0}
+.seg2 .chip[aria-pressed=true]{background:rgba(212,169,79,.16);color:var(--gold2);font-weight:700}
+#onWrap{display:flex;flex-direction:column;gap:14px}
+#offWrap{display:flex;flex-direction:column;gap:14px}
+#onMsg{margin:0;min-height:0;text-align:center;color:var(--gold2)}
+#onMsg:empty{display:none}
+#onBody{display:flex;flex-direction:column;gap:14px}
+#oL{font-size:clamp(76px,26vw,108px)}
+#oE{display:block;margin-bottom:8px;font-size:46px;line-height:1}
+#oC{font-size:clamp(16px,5vw,22px);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.go.sm{min-height:52px;font-size:16px;margin-top:12px;letter-spacing:.12em}
+.oin{width:100%;min-height:52px;padding:0 14px;font:inherit;font-size:18px;color:var(--text);background:#0d1017;border:1px solid var(--line);border-radius:12px;outline:0}
+.oin:focus{border-color:var(--gold)}
+.oin:disabled{opacity:.55}
+.orow2{display:flex;gap:8px;align-items:center}
+.codebig{margin:2px 0 6px;text-align:center;font-size:42px;font-weight:700;letter-spacing:.3em;color:var(--gold2);padding-left:.3em}
+.oact{display:flex;flex-direction:column;gap:2px}
+.oact .hint{text-align:center}
+.orow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.orow:first-child{border-top:0}
+.orow .ol{flex:1;min-width:0}
+.orow .oa{margin-top:2px;font-size:17px;color:var(--gold2);overflow-wrap:anywhere}
+.orow .oa.dim{color:var(--muted);font-style:italic;font-size:14px}
+.pts{flex:none;font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}
+.pts.bad{color:#e0453a;font-size:13px}
+.orow .mini{flex:none}
+button:disabled{opacity:.6}
 </style>
 </head>
 <body>
@@ -9703,6 +9759,9 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
   <header class="brand"><div class="icon" aria-hidden="true">🔤</div><h1>TEBAK INISIAL</h1></header>
   <p class="sub" id="sub"></p>
 
+  <div class="seg2" id="modeSeg" role="group"><button class="chip" id="mOff" type="button" aria-pressed="true"></button><button class="chip" id="mOn" type="button" aria-pressed="false"></button></div>
+
+  <div id="offWrap">
   <section class="panel stage" aria-label="Pengacak">
     <div class="reels">
       <div class="reel idle" id="reelL"><span class="cap" id="capL"></span><b class="val" id="valL">?</b></div>
@@ -9715,15 +9774,18 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
 
   <button class="go" id="goBtn" type="button"></button>
 
-  <section class="panel">
+  <section class="panel set" aria-label="Pengaturan permainan">
     <span class="label" id="lbTime"></span>
-    <div class="chips" id="timeChips"></div>
-  </section>
-
-  <section class="panel">
-    <span class="label" id="lbCat"></span>
-    <div class="chips" id="catChips"></div>
-    <p class="hint" id="catHint"></p>
+    <div class="seg4" id="timeChips" role="group" aria-labelledby="lbTime"></div>
+    <div class="sep"></div>
+    <button class="acc" id="catTog" type="button" aria-expanded="false" aria-controls="catRoll">
+      <span class="label" id="lbCat"></span><span class="cnt" id="catCnt"></span><i class="chev" aria-hidden="true"></i>
+    </button>
+    <div class="prev" id="catPrev" aria-hidden="true"></div>
+    <div class="roll" id="catRoll" inert><div class="rollw"><div class="rollc">
+      <div class="catbar"><p class="hint" id="catHint"></p><button class="mini" id="catAll" type="button"></button></div>
+      <div class="grid" id="catChips" role="group" aria-labelledby="lbCat"></div>
+    </div></div></div>
   </section>
 
   <section class="panel">
@@ -9731,6 +9793,9 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
     <ul class="hl" id="histList"></ul>
     <p class="empty" id="histEmpty"></p>
   </section>
+  </div>
+
+  <div id="onWrap" hidden><p id="onMsg" class="hint" role="status" aria-live="polite"></p><div id="onBody"></div></div>
 </main>
 
 <script>
@@ -9739,25 +9804,32 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
   var $ = function(id){ return document.getElementById(id); };
   var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   var CATS = [
-    {k:"hewan", e:"🐾", id:"Hewan",  en:"Animal",    pid:"hewan",  pen:"an animal"},
-    {k:"buah",  e:"🍎", id:"Buah",   en:"Fruit",     pid:"buah",   pen:"a fruit"},
-    {k:"artis", e:"🎤", id:"Artis",  en:"Celebrity", pid:"artis",  pen:"a celebrity"},
-    {k:"atlet", e:"🏅", id:"Atlet",  en:"Athlete",   pid:"atlet",  pen:"an athlete"},
-    {k:"benda", e:"🧸", id:"Benda",  en:"Object",    pid:"benda",  pen:"an object"},
-    {k:"game",  e:"🎮", id:"Game",   en:"Game",      pid:"game",   pen:"a game"}
+    {k:"hewan",     e:"🐾", id:"Hewan",     en:"Animal",    pid:"hewan",              pen:"an animal"},
+    {k:"buah",      e:"🍎", id:"Buah",      en:"Fruit",     pid:"buah",               pen:"a fruit"},
+    {k:"artis",     e:"🎤", id:"Artis",     en:"Celebrity", pid:"artis",              pen:"a celebrity"},
+    {k:"atlet",     e:"🏅", id:"Atlet",     en:"Athlete",   pid:"atlet",              pen:"an athlete"},
+    {k:"benda",     e:"📦", id:"Benda",     en:"Object",    pid:"benda",              pen:"an object"},
+    {k:"game",      e:"🎮", id:"Game",      en:"Game",      pid:"game",               pen:"a game"},
+    {k:"makanan",   e:"🍜", id:"Makanan",   en:"Food",      pid:"makanan atau jajanan", pen:"a food or snack"},
+    {k:"kota",      e:"🏙️", id:"Kota",      en:"City",      pid:"kota atau daerah",   pen:"a city or region"},
+    {k:"negara",    e:"🌍", id:"Negara",    en:"Country",   pid:"negara",             pen:"a country"},
+    {k:"profesi",   e:"👷", id:"Profesi",   en:"Job",       pid:"profesi",            pen:"a job"},
+    {k:"kendaraan", e:"🚗", id:"Kendaraan", en:"Vehicle",   pid:"kendaraan",          pen:"a vehicle"},
+    {k:"mainan",    e:"🧸", id:"Mainan",    en:"Toy",       pid:"mainan",             pen:"a toy"},
+    {k:"pahlawan",  e:"🎖️", id:"Pahlawan",  en:"Hero",      pid:"pahlawan nasional",  pen:"a national hero"}
   ];
   var TT = {
     id:{ title:"TEBAK INISIAL", sub:"Putar huruf dan kategori, lalu tebak bersama-sama!", capL:"HURUF", capC:"KATEGORI",
          idle:"Tekan ACAK untuk menentukan huruf dan kategorinya.", spinning:"Mengacak…",
          go:"🎲 ACAK", again:"🎲 ACAK LAGI", running:"MENGACAK…",
          done:"✔ Sudah ditebak", sec:"dtk", up:"⏰ Waktu habis!", nice:"👍 Mantap!",
-         lbTime:"Batas waktu", none:"Tanpa waktu", lbCat:"Kategori yang dimainkan", catHint:"Pilih minimal satu kategori.",
+         lbTime:"Batas waktu", none:"Tanpa", lbCat:"Kategori", catOf:"dari", catAll:"Pilih semua", catHint:"Minimal satu kategori.",
          lbHist:"Riwayat", clr:"Hapus", noHist:"Belum ada putaran." },
     en:{ title:"GUESS THE INITIAL", sub:"Spin the letter and category, then guess together!", capL:"LETTER", capC:"CATEGORY",
          idle:"Press SPIN to pick a letter and a category.", spinning:"Spinning…",
          go:"🎲 SPIN", again:"🎲 SPIN AGAIN", running:"SPINNING…",
          done:"✔ Guessed it", sec:"s", up:"⏰ Time is up!", nice:"👍 Nice one!",
-         lbTime:"Time limit", none:"No timer", lbCat:"Categories in play", catHint:"Pick at least one category.",
+         lbTime:"Time limit", none:"Off", lbCat:"Categories", catOf:"of", catAll:"Select all", catHint:"At least one.",
          lbHist:"History", clr:"Clear", noHist:"No rounds yet." }
   };
 
@@ -9787,9 +9859,12 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
   /* ===== keadaan permainan ===== */
   var timerSecs = +lsj("ti_timer", 0) || 0; if([0,10,20,30].indexOf(timerSecs) < 0) timerSecs = 0;
   var catOn = lsj("ti_cats", null); if(!Array.isArray(catOn)) catOn = CATS.map(function(c){ return c.k; });
+  var known = lsj("ti_known", null); if(!Array.isArray(known)) known = ["hewan","buah","artis","atlet","benda","game"];
+  CATS.forEach(function(c){ if(known.indexOf(c.k) < 0 && catOn.indexOf(c.k) < 0) catOn.push(c.k); });
+  sv("ti_known", CATS.map(function(c){ return c.k; }));
   catOn = catOn.filter(function(k){ return CATS.some(function(c){ return c.k === k; }); }); if(!catOn.length) catOn = CATS.map(function(c){ return c.k; });
   var hist = lsj("ti_hist", []); if(!Array.isArray(hist)) hist = []; hist = hist.filter(function(h){ return h && LETTERS.indexOf(h.l) >= 0 && CATS.some(function(c){ return c.k === h.c; }); }).slice(0, 30);
-  var cur = null, spinning = false, ever = false;
+  var cur = null, spinning = false, ever = false, catOpen = false;
   function catOf(k){ for(var i = 0; i < CATS.length; i++) if(CATS[i].k === k) return CATS[i]; return CATS[0]; }
   function cname(c){ return lang === "en" ? c.en : c.id; }
 
@@ -9850,12 +9925,18 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
       ? "Name <b>" + c.pen + "</b> that starts with <b>" + r.l + "</b>!"
       : "Sebutkan <b>" + c.pid + "</b> yang berawalan huruf <b>" + r.l + "</b>!";
   }
+  /* nama kategori selalu satu baris: huruf mengecil sendiri bila namanya panjang (mis. KENDARAAN di layar sempit) */
+  function setC(txt){
+    var v = $("valC"); v.textContent = txt; v.style.fontSize = "";
+    var fs = parseFloat(getComputedStyle(v).fontSize) || 20;
+    while(v.scrollWidth > v.clientWidth + 0.5 && fs > 11){ fs -= 1; v.style.fontSize = fs + "px"; }
+  }
   function setReels(r){
     var idle = !r;
     $("reelL").classList.toggle("idle", idle); $("reelC").classList.toggle("idle", idle);
     $("valL").textContent = idle ? "?" : r.l;
     $("emoC").textContent = idle ? "❓" : catOf(r.c).e;
-    $("valC").textContent = idle ? "" : cname(catOf(r.c));
+    setC(idle ? "" : cname(catOf(r.c)));
   }
   function paintHist(){
     var ul = $("histList"); ul.textContent = "";
@@ -9873,22 +9954,32 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
     var t = T();
     document.querySelector(".brand h1").textContent = t.title; document.title = t.title;
     $("sub").textContent = t.sub; $("capL").textContent = t.capL; $("capC").textContent = t.capC;
-    $("lbTime").textContent = t.lbTime; $("lbCat").textContent = t.lbCat; $("catHint").textContent = t.catHint; $("lbHist").textContent = t.lbHist; $("clrBtn2").textContent = t.clr;
+    $("lbTime").textContent = t.lbTime; $("lbCat").textContent = t.lbCat; $("catAll").textContent = t.catAll; $("catAll").hidden = catOn.length === CATS.length; $("catHint").textContent = t.catHint; $("lbHist").textContent = t.lbHist; $("clrBtn2").textContent = t.clr;
     $("doneBtn").textContent = t.done;
     $("goBtn").textContent = spinning ? t.running : (ever ? t.again : t.go);
     if(!spinning){ $("prompt").innerHTML = cur ? promptHTML(cur) : t.idle; if(cur) setReels(cur); }
     var tc = $("timeChips"); tc.textContent = "";
-    [0, 10, 20, 30].forEach(function(s){
-      tc.appendChild(chip(s ? s + " " + t.sec : t.none, timerSecs === s, function(){ timerSecs = s; sv("ti_timer", s); paint(); }));
+    [0, 10, 20, 30].forEach(function(sc){
+      tc.appendChild(chip(sc ? sc + " " + t.sec : t.none, timerSecs === sc, function(){ timerSecs = sc; sv("ti_timer", sc); paint(); }));
     });
     var cc = $("catChips"); cc.textContent = "";
     CATS.forEach(function(c){
-      var on = catOn.indexOf(c.k) >= 0;
-      cc.appendChild(chip(c.e + " " + cname(c), on, function(){
+      var on = catOn.indexOf(c.k) >= 0, b = document.createElement("button");
+      b.type = "button"; b.className = "tile"; b.setAttribute("aria-pressed", String(on));
+      var em = document.createElement("span"), nm = document.createElement("span");
+      em.className = "em"; em.textContent = c.e; nm.textContent = cname(c); b.appendChild(em); b.appendChild(nm);
+      b.addEventListener("click", function(){
         if(on){ if(catOn.length < 2) return; catOn = catOn.filter(function(k){ return k !== c.k; }); } else { catOn.push(c.k); }
         sv("ti_cats", catOn); paint();
-      }));
+      });
+      cc.appendChild(b);
     });
+    $("catCnt").textContent = catOn.length + " " + t.catOf + " " + CATS.length;
+    var pv = $("catPrev"); pv.textContent = "";
+    CATS.forEach(function(c){ if(catOn.indexOf(c.k) < 0) return; var e = document.createElement("span"); e.textContent = c.e; pv.appendChild(e); });
+    $("catPrev").hidden = catOpen;
+    $("catTog").setAttribute("aria-expanded", String(catOpen));
+    $("catRoll").classList.toggle("open", catOpen); $("catRoll").inert = !catOpen;
     paintHist();
   }
 
@@ -9958,9 +10049,9 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
       $("valL").textContent = r.l; landed(rl); beep(700, 0.1, "triangle", 0.06); buzz(false); oneDone();
     });
     runReel(17, 50, 1.12, function(){
-      var c; do{ c = pool[rnd(pool.length)]; }while(c.k === lastC && pool.length > 1); lastC = c.k; $("emoC").textContent = c.e; $("valC").textContent = cname(c); beep(380 + rnd(5) * 40, 0.035, "triangle", 0.035);
+      var c; do{ c = pool[rnd(pool.length)]; }while(c.k === lastC && pool.length > 1); lastC = c.k; $("emoC").textContent = c.e; setC(cname(c)); beep(380 + rnd(5) * 40, 0.035, "triangle", 0.035);
     }, function(){
-      var c = catOf(r.c); $("emoC").textContent = c.e; $("valC").textContent = cname(c); landed(rc); beep(780, 0.1, "triangle", 0.06); buzz(false); oneDone();
+      var c = catOf(r.c); $("emoC").textContent = c.e; setC(cname(c)); landed(rc); beep(780, 0.1, "triangle", 0.06); buzz(false); oneDone();
     });
   }
 
@@ -9969,10 +10060,441 @@ body.noanim .reel.run .val,body.noanim .reel.run #emoC,body.noanim .reel.land,bo
     stopTimer(false); $("tnum").textContent = T().nice; $("tbar").classList.remove("low"); $("tfill").style.transform = "scaleX(1)"; $("doneBtn").hidden = true;
     beep(880, 0.14, "triangle", 0.07); beep(1320, 0.22, "triangle", 0.06, 0.12);
   });
+  $("catTog").addEventListener("click", function(){ catOpen = !catOpen; paint(); });
+  $("catAll").addEventListener("click", function(){ catOn = CATS.map(function(c){ return c.k; }); sv("ti_cats", catOn); paint(); });
   $("clrBtn2").addEventListener("click", function(){ hist = []; sv("ti_hist", hist); paintHist(); });
   window.addEventListener("storage", function(e){
     if(!e.key || e.key === "ti_lang" || e.key === "ti_fx" || e.key === "ti_anim"){ readSettings(); paint(); }
   });
+  /* ===== MODE ONLINE: main bersama lewat kode ruang (Firestore: koleksi ti_rooms) ===== */
+  var OT = {
+    id:{ tOff:"Bareng", tOn:"Online", sub:"Main bersama teman lewat kode ruang. Satu pemain membuat ruang, yang lain bergabung.",
+      anon:"Pemain", offline:"Tidak ada internet. Mode online butuh koneksi.", needLogin:"Masuk dengan Google untuk bermain online.", login:"Masuk dengan Google",
+      wait:"Mohon tunggu…", mk:"Buat ruang", mkTime:"Waktu menjawab", mkCats:"kategori aktif (atur di mode Bareng)", jn:"Gabung ke ruang", jnPh:"KODE", jnGo:"Gabung",
+      rules:"Tulis jawaban yang berawalan huruf yang diminta. Jawaban unik dapat 10 poin, jawaban yang sama dengan pemain lain 5 poin. Pemilik ruang bisa menolak jawaban yang tidak cocok dengan kategori.",
+      code:"KODE RUANG", copy:"Salin kode", copied:"Kode disalin.", pl:"Pemain", hostTag:"pemilik", me:"kamu",
+      start:"▶ MULAI RONDE", next:"▶ RONDE BERIKUTNYA", waitStart:"Menunggu pemilik ruang memulai…", waitNext:"Menunggu pemilik ruang…", solo:"Bisa dimulai sendirian untuk mencoba, tapi lebih seru bersama teman.",
+      close:"Tutup ruang", leave:"Keluar ruang", sure:"Ketuk lagi untuk memastikan",
+      rd:"Ronde", ph:"Ketik jawabanmu", send:"KIRIM", sent:"Terkirim ✓ (bisa diubah sebelum waktu habis)", cnt:"sudah menjawab", up:"⏰ Waktu habis!", hostNow:"Buka jawaban sekarang",
+      none:"(tidak menjawab)", rej:"Tolak", acc:"Terima", rejd:"ditolak", board:"Klasemen", pts:"poin",
+      nf:"Kode ruang tidak ditemukan.", full:"Ruang penuh (maksimal 8 pemain).", closed:"Ruang sudah ditutup.", denied:"Akses ditolak. Aturan Firestore untuk game ini belum dipasang.", fail:"Gagal, coba lagi.", off:"Tidak ada internet." },
+    en:{ tOff:"Together", tOn:"Online", sub:"Play with friends using a room code. One player creates a room, the others join.",
+      anon:"Player", offline:"No internet. Online mode needs a connection.", needLogin:"Sign in with Google to play online.", login:"Sign in with Google",
+      wait:"Please wait…", mk:"Create a room", mkTime:"Answer time", mkCats:"active categories (set in Together mode)", jn:"Join a room", jnPh:"CODE", jnGo:"Join",
+      rules:"Type an answer that starts with the given letter. A unique answer scores 10 points, the same as another player 5 points. The room owner can reject answers that do not fit the category.",
+      code:"ROOM CODE", copy:"Copy code", copied:"Code copied.", pl:"Players", hostTag:"owner", me:"you",
+      start:"▶ START ROUND", next:"▶ NEXT ROUND", waitStart:"Waiting for the room owner to start…", waitNext:"Waiting for the room owner…", solo:"You can start alone to try it out, but it is more fun with friends.",
+      close:"Close room", leave:"Leave room", sure:"Tap again to confirm",
+      rd:"Round", ph:"Type your answer", send:"SEND", sent:"Sent ✓ (you can change it before time is up)", cnt:"answered", up:"⏰ Time is up!", hostNow:"Reveal answers now",
+      none:"(no answer)", rej:"Reject", acc:"Accept", rejd:"rejected", board:"Scoreboard", pts:"pts",
+      nf:"Room code not found.", full:"The room is full (max 8 players).", closed:"The room was closed.", denied:"Access denied. The Firestore rules for this game are not installed yet.", fail:"Failed, please try again.", off:"No internet." }
+  };
+  var mode = "off";
+  var ON = { fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
+             secs:(+ls("ti_osecs", 45) || 45) };
+  if([30, 45, 60].indexOf(ON.secs) < 0) ON.secs = 45;
+  function oT(){ return OT[lang]; }
+  function el(tag, cls, txt){ var e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+  function btn(cls, txt, fn){ var b = el("button", cls, txt); b.type = "button"; b.addEventListener("click", fn); return b; }
+  function authO(){ try{ return (parent && parent !== window) ? (parent.satuTitikAuth || null) : null; }catch(e){ return null; } }
+  function meU(){ var a = authO(); return (a && a.user) || null; }
+  function meName(){
+    var a = authO(), u = meU(); if(!u) return "";
+    var n = (a.username && a.usernameUid === u.uid) ? a.username : (u.displayName || "");
+    n = String(n).replace(/\s+/g, " ").trim().slice(0, 20);
+    return n || oT().anon;
+  }
+  function isHost(){ var u = meU(); return !!(u && ON.data && ON.data.host === u.uid); }
+  function lib(){
+    if(ON.fb) return Promise.resolve(ON.fb);
+    var a = authO(); if(!a || !a.getDb) return Promise.reject(new Error("nofb"));
+    return a.getDb().then(function(x){ ON.fb = x; return x; });
+  }
+  var CODE_CH = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  function genCode(){ var s = "", i; for(i = 0; i < 5; i++) s += CODE_CH.charAt(rnd(CODE_CH.length)); return s; }
+  function errMsg(e){
+    var c = String((e && (e.code || e.message)) || ""), t = oT();
+    if(c === "nf") return t.nf;
+    if(c === "full") return t.full;
+    if(/permission/i.test(c)) return t.denied;
+    if(/unavailable|network|offline/i.test(c)) return t.off;
+    return t.fail;
+  }
+  function flash(msg){
+    var m = $("onMsg"); if(!m) return; m.textContent = msg; clearTimeout(ON.msgT);
+    ON.msgT = setTimeout(function(){ var x = $("onMsg"); if(x) x.textContent = ""; }, 4500);
+  }
+  function setBusy(b){ ON.busy = b; applyBusy(); }
+  function applyBusy(){
+    var host = $("onBody"); if(!host) return;
+    Array.prototype.forEach.call(host.querySelectorAll("button.act"), function(x){ x.disabled = ON.busy; });
+  }
+
+  /*SC-START*/
+  function norm(t){ return String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, ""); }
+  function okAns(r, l){ var n = norm(r.t); return !r.x && n.length >= 2 && n.charAt(0) === String(l).toLowerCase(); }
+  function scoreOf(res, l){
+    var cnt = {}, out = {};
+    res.forEach(function(r){ if(okAns(r, l)){ var n = norm(r.t); cnt[n] = (cnt[n] || 0) + 1; } });
+    res.forEach(function(r){ out[r.u] = okAns(r, l) ? (cnt[norm(r.t)] > 1 ? 5 : 10) : 0; });
+    return out;
+  }
+  function totalOf(d, u){ return ((d.base && d.base[u]) || 0) + ((d.pts && d.pts[u]) || 0); }
+  /*SC-END*/
+
+  /* ----- ruang: buat, gabung, keluar ----- */
+  async function attach(code){
+    detach(false);
+    var f = await lib(), m = f.m, db = f.db;
+    ON.code = code; ON.view = ""; ON.data = null; ON.players = []; ON.sentRd = -1;
+    ON.uR = m.onSnapshot(m.doc(db, "ti_rooms", code), onRoom, function(e){ flash(errMsg(e)); });
+    ON.uP = m.onSnapshot(m.collection(db, "ti_rooms", code, "p"), function(s){
+      var a = []; s.forEach(function(x){ var v = x.data() || {}; a.push({ u:x.id, n:String(v.n || ""), d:+v.d || 0, j:+v.j || 0 }); });
+      a.sort(function(x, y){ return x.j - y.j; }); ON.players = a; renderO();
+    }, function(){});
+    if(!ON.tick) ON.tick = setInterval(tickO, 300);
+    renderO();
+  }
+  function detach(render){
+    try{ if(ON.uR) ON.uR(); }catch(e){} try{ if(ON.uP) ON.uP(); }catch(e){}
+    ON.uR = ON.uP = null; ON.code = ""; ON.data = null; ON.players = []; ON.revealing = false; ON.allSince = 0;
+    if(ON.tick){ clearInterval(ON.tick); ON.tick = 0; }
+    ON.view = ""; if(render) renderO();
+  }
+  async function createRoom(){
+    var u = meU(); if(!u || ON.busy) return;
+    setBusy(true);
+    try{
+      var f = await lib(), m = f.m, db = f.db, code = "", ok = false, i;
+      var data = { host:u.uid, hn:meName(), st:"lobby", rd:0, l:"", c:"", secs:ON.secs, end:0, cats:catOn.slice(), res:[], pts:{}, base:{}, v:1, exp:m.Timestamp.fromMillis(Date.now() + 86400000) };
+      for(i = 0; i < 6 && !ok; i++){
+        code = genCode();
+        try{ await m.setDoc(m.doc(db, "ti_rooms", code), data); ok = true; }catch(e){ if(i === 5) throw e; }
+      }
+      await m.setDoc(m.doc(db, "ti_rooms", code, "p", u.uid), { n:meName(), d:0, j:Date.now() });
+      await attach(code);
+    }catch(e){ flash(errMsg(e)); }
+    setBusy(false);
+  }
+  async function joinRoom(raw){
+    var u = meU(); if(!u || ON.busy) return;
+    var code = String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5);
+    if(code.length !== 5){ flash(oT().nf); return; }
+    setBusy(true);
+    try{
+      var f = await lib(), m = f.m, db = f.db, rs = await m.getDoc(m.doc(db, "ti_rooms", code));
+      if(!rs.exists()) throw { code:"nf" };
+      var ps = await m.getDocs(m.collection(db, "ti_rooms", code, "p")), mine = false;
+      ps.forEach(function(x){ if(x.id === u.uid) mine = true; });
+      if(!mine && ps.size >= 8) throw { code:"full" };
+      await m.setDoc(m.doc(db, "ti_rooms", code, "p", u.uid), { n:meName(), d:0, j:Date.now() });
+      await attach(code);
+    }catch(e){ flash(errMsg(e)); }
+    setBusy(false);
+  }
+  async function leaveRoom(){
+    var u = meU(), code = ON.code;
+    if(u && code){ try{ var f = await lib(); await f.m.deleteDoc(f.m.doc(f.db, "ti_rooms", code, "p", u.uid)); }catch(e){} }
+    detach(true);
+  }
+  async function closeRoom(){
+    var code = ON.code; if(!code || ON.busy) return; setBusy(true);
+    try{
+      var f = await lib(), m = f.m, db = f.db, refs = [], i;
+      var ps = await m.getDocs(m.collection(db, "ti_rooms", code, "p")), as = await m.getDocs(m.collection(db, "ti_rooms", code, "a"));
+      ps.forEach(function(x){ refs.push(x.ref); }); as.forEach(function(x){ refs.push(x.ref); });
+      for(i = 0; i < refs.length; i += 400){ var b = m.writeBatch(db); refs.slice(i, i + 400).forEach(function(r){ b.delete(r); }); await b.commit(); }
+      await m.deleteDoc(m.doc(db, "ti_rooms", code));
+    }catch(e){ flash(errMsg(e)); }
+    detach(true); setBusy(false);
+  }
+  function onRoom(s){
+    if(!s.exists()){ var had = !!ON.data; detach(true); if(had) flash(oT().closed); return; }
+    var d = s.data(), pst = ON.data ? ON.data.st : "", prd = ON.data ? ON.data.rd : -1, first = !ON.data;
+    ON.data = d;
+    if(d.st !== pst || d.rd !== prd){
+      ON.allSince = 0; ON.revealing = false;
+      if(!first){
+        if(d.st === "play"){ beep(660, 0.12, "triangle", 0.07); beep(880, 0.16, "triangle", 0.07, 0.11); beep(1320, 0.26, "triangle", 0.06, 0.22); buzz(true); }
+        else if(d.st === "reveal"){ beep(520, 0.1, "triangle", 0.06); beep(780, 0.2, "triangle", 0.06, 0.1); buzz(false); }
+      }
+    }
+    renderO();
+  }
+
+  /* ----- alur ronde (dijalankan pemilik ruang) ----- */
+  async function startRound(){
+    var d = ON.data; if(!d || !isHost() || ON.busy) return; setBusy(true);
+    try{
+      var f = await lib(), m = f.m, ks, nb = {}, tries = 0, L, C;
+      var pool = CATS.filter(function(c){ return (d.cats || []).indexOf(c.k) >= 0; }); if(!pool.length) pool = CATS;
+      do{ L = LETTERS[rnd(26)]; C = pool[rnd(pool.length)]; tries++; }while(L === d.l && C.k === d.c && tries < 20);
+      if(d.st === "reveal"){
+        ks = Object.keys(d.base || {}).concat(Object.keys(d.pts || {}));
+        ks.forEach(function(k){ nb[k] = totalOf(d, k); });
+      }
+      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), { st:"play", rd:(d.rd || 0) + 1, l:L, c:C.k, end:Date.now() + (d.secs || 45) * 1000, res:[], pts:{}, base:nb, exp:m.Timestamp.fromMillis(Date.now() + 86400000) });
+    }catch(e){ flash(errMsg(e)); }
+    setBusy(false);
+  }
+  async function doReveal(){
+    if(ON.revealing || !ON.data || ON.data.st !== "play" || !isHost()) return;
+    ON.revealing = true;
+    try{
+      var f = await lib(), m = f.m, d = ON.data, ans = {};
+      var snap = await m.getDocs(m.collection(f.db, "ti_rooms", ON.code, "a"));
+      snap.forEach(function(x){ var v = x.data(); if(v && v.rd === d.rd) ans[x.id] = String(v.t || "").slice(0, 30); });
+      var res = ON.players.map(function(p){ return { u:p.u, n:p.n, t:ans[p.u] || "", x:false }; });
+      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), { st:"reveal", res:res, pts:scoreOf(res, d.l) });
+    }catch(e){ setTimeout(function(){ ON.revealing = false; }, 3000); }
+  }
+  async function toggleRej(i){
+    var d = ON.data; if(!d || !isHost() || d.st !== "reveal") return;
+    var res = (d.res || []).map(function(r){ return { u:r.u, n:r.n, t:r.t, x:!!r.x }; }); if(!res[i]) return;
+    res[i].x = !res[i].x;
+    try{ var f = await lib(); await f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code), { res:res, pts:scoreOf(res, d.l) }); }catch(e){ flash(errMsg(e)); }
+  }
+  function submitAns(){
+    var d = ON.data, u = meU(), inp = $("oAns"); if(!d || !u || !inp || d.st !== "play" || Date.now() > d.end + 1000) return;
+    var txt = String(inp.value || "").replace(/\s+/g, " ").trim().slice(0, 30); if(!txt) return;
+    var rd = d.rd; ON.sentRd = rd; paintAnsStat(); beep(880, 0.1, "triangle", 0.06);
+    lib().then(function(f){
+      return Promise.all([ f.m.setDoc(f.m.doc(f.db, "ti_rooms", ON.code, "a", u.uid), { rd:rd, t:txt }), f.m.updateDoc(f.m.doc(f.db, "ti_rooms", ON.code, "p", u.uid), { d:rd }) ]);
+    }).catch(function(e){ ON.sentRd = -1; flash(errMsg(e)); paintAnsStat(); });
+  }
+  var lastSecO = -1;
+  function tickO(){
+    var d = ON.data; if(!d) return;
+    if(d.st === "play"){
+      if(mode === "on") paintTimer();
+      if(isHost() && !ON.revealing){
+        var all = ON.players.length > 0 && ON.players.every(function(p){ return p.d === d.rd; });
+        if(all){ if(!ON.allSince) ON.allSince = Date.now(); } else ON.allSince = 0;
+        if(Date.now() >= d.end + 1500 || (ON.allSince && Date.now() - ON.allSince > 3000)) doReveal();
+      }
+    }
+  }
+  function paintTimer(){
+    var d = ON.data, tf = $("oTf"), tn = $("oTn"); if(!d || d.st !== "play" || !tf || !tn) return;
+    var tot = Math.max(1, (d.secs || 45) * 1000), left = Math.max(0, d.end - Date.now()), sec = Math.ceil(left / 1000);
+    tf.style.transform = "scaleX(" + Math.min(1, left / tot) + ")";
+    if(sec !== lastSecO){
+      lastSecO = sec; tn.textContent = left > 0 ? "⏱ " + sec + " " + T().sec : oT().up; $("oTb").classList.toggle("low", sec <= 5);
+      if(sec > 0 && sec <= 3) beep(1000, 0.07, "square", 0.04);
+      if(sec === 0){ beep(190, 0.32, "sawtooth", 0.05); buzz(true); }
+    }
+    var inp = $("oAns"), sd = $("oSend");
+    if(inp && sd){ var over = left <= 0; if(inp.disabled !== over){ inp.disabled = over; sd.disabled = over; } }
+  }
+  function paintAnsStat(){
+    var s = $("oSt"); if(!s || !ON.data) return;
+    s.textContent = ON.sentRd === ON.data.rd ? oT().sent : "";
+  }
+
+  /* ----- tampilan ----- */
+  function fit(node, txt){
+    node.textContent = txt; node.style.fontSize = "";
+    var fs = parseFloat(getComputedStyle(node).fontSize) || 20;
+    while(node.scrollWidth > node.clientWidth + 0.5 && fs > 11){ fs -= 1; node.style.fontSize = fs + "px"; }
+  }
+  function confirmBtn(cls, txt, fn){
+    var b = btn(cls, txt, function(){
+      if(b.getAttribute("data-sure") === "1"){ fn(); return; }
+      b.setAttribute("data-sure", "1"); b.textContent = oT().sure;
+      setTimeout(function(){ b.removeAttribute("data-sure"); b.textContent = txt; }, 3000);
+    });
+    return b;
+  }
+  function panel(){ return el("section", "panel"); }
+  function nameOf(u){
+    var i, d = ON.data;
+    for(i = 0; i < ON.players.length; i++) if(ON.players[i].u === u) return ON.players[i].n;
+    if(d && d.res) for(i = 0; i < d.res.length; i++) if(d.res[i].u === u) return d.res[i].n;
+    return "?";
+  }
+  function renderO(){
+    var host = $("onBody"); if(!host) return;
+    var u = meU(), key;
+    if(!u) key = "login";
+    else if(!ON.code) key = (navigator.onLine === false) ? "offline" : "home";
+    else if(!ON.data) key = "load";
+    else key = ON.data.st + "|" + ON.data.rd;
+    if(key !== ON.view){ ON.view = key; buildView(key); }
+    updView();
+  }
+  function buildView(key){
+    var host = $("onBody"), t = oT(), d = ON.data, p, row, inp, seg;
+    host.textContent = "";
+    if(key === "login" || key === "offline" || key === "load"){
+      p = panel(); p.appendChild(el("p", "hint", key === "login" ? t.needLogin : key === "offline" ? t.offline : t.wait)); p.lastChild.style.margin = "0 0 4px";
+      if(key === "login") p.appendChild(btn("go sm", t.login, function(){ var a = authO(); if(a && a.login) a.login(); }));
+      host.appendChild(p); return;
+    }
+    if(key === "home"){
+      p = panel(); p.appendChild(el("span", "label", t.mk));
+      p.appendChild(el("p", "hint", t.mkTime)); p.lastChild.style.margin = "0 0 8px";
+      seg = el("div", "seg4"); seg.style.gridTemplateColumns = "repeat(3,1fr)";
+      [30, 45, 60].forEach(function(s){
+        var c = el("button", "chip", s + " " + T().sec); c.type = "button"; c.setAttribute("aria-pressed", String(ON.secs === s));
+        c.addEventListener("click", function(){
+          ON.secs = s; sv("ti_osecs", s);
+          Array.prototype.forEach.call(seg.children, function(x, i){ x.setAttribute("aria-pressed", String([30, 45, 60][i] === s)); });
+        });
+        seg.appendChild(c);
+      });
+      p.appendChild(seg);
+      p.appendChild(el("p", "hint", catOn.length + " / " + CATS.length + " " + t.mkCats));
+      p.appendChild(btn("go sm act", t.mk, createRoom));
+      host.appendChild(p);
+      p = panel(); p.appendChild(el("span", "label", t.jn));
+      row = el("div", "orow2");
+      inp = el("input", "oin"); inp.id = "oJoin"; inp.type = "text"; inp.maxLength = 5; inp.placeholder = t.jnPh; inp.autocomplete = "off"; inp.setAttribute("autocapitalize", "characters"); inp.spellcheck = false;
+      inp.style.textTransform = "uppercase"; inp.style.letterSpacing = ".25em"; inp.style.textAlign = "center";
+      inp.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); joinRoom(inp.value); } });
+      row.appendChild(inp); row.appendChild(btn("ghost act", t.jnGo, function(){ joinRoom(inp.value); })); row.lastChild.style.marginTop = "0"; row.lastChild.style.width = "auto"; row.lastChild.style.padding = "0 18px";
+      p.appendChild(row); p.appendChild(el("p", "hint", t.rules));
+      host.appendChild(p); return;
+    }
+    if(!d) return;
+    if(d.st === "lobby"){
+      p = panel(); p.appendChild(el("span", "label", t.code));
+      var cb = el("div", "codebig"); cb.id = "oCode"; p.appendChild(cb);
+      p.appendChild(btn("ghost", t.copy, function(){
+        var c = ON.code;
+        try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(c).then(function(){ flash(oT().copied); }, function(){ flash(c); }); return; } }catch(e){}
+        flash(c);
+      }));
+      host.appendChild(p);
+      p = panel(); p.appendChild(el("span", "label", t.pl)); var ul = el("ul", "hl"); ul.id = "oPl"; p.appendChild(ul); host.appendChild(p);
+      p = el("div", "oact");
+      if(isHost()){
+        p.appendChild(btn("go act", t.start, startRound)); p.appendChild(el("p", "hint", t.solo));
+        p.appendChild(confirmBtn("ghost act", t.close, closeRoom));
+      }else{
+        p.appendChild(el("p", "hint", t.waitStart)); p.appendChild(btn("ghost act", t.leave, leaveRoom));
+      }
+      host.appendChild(p); return;
+    }
+    if(d.st === "play"){
+      lastSecO = -1;
+      p = el("section", "panel stage");
+      p.appendChild(el("span", "label", t.rd + " " + d.rd));
+      var rs = el("div", "reels"), r1 = el("div", "reel"), r2 = el("div", "reel");
+      r1.appendChild(el("span", "cap", T().capL)); var vl = el("b", "val", ""); vl.id = "oL"; r1.appendChild(vl);
+      r2.appendChild(el("span", "cap", T().capC)); var ve = el("i", "val", ""); ve.id = "oE"; ve.style.fontStyle = "normal"; r2.appendChild(ve);
+      var vc = el("b", "val", ""); vc.id = "oC"; r2.appendChild(vc);
+      rs.appendChild(r1); rs.appendChild(r2); p.appendChild(rs);
+      var pr = el("p", "prompt"); pr.id = "oPrompt"; p.appendChild(pr);
+      var tb = el("div", "tbar"); tb.id = "oTb"; var tf = el("i"); tf.id = "oTf"; var tn = el("span"); tn.id = "oTn"; tb.appendChild(tf); tb.appendChild(tn); p.appendChild(tb);
+      host.appendChild(p);
+      var L = /^[A-Z]$/.test(String(d.l)) ? d.l : "?", C = catOf(d.c);
+      vl.textContent = L; ve.textContent = C.e; fit(vc, cname(C)); pr.innerHTML = promptHTML({ l:L, c:C.k });
+      p = panel();
+      inp = el("input", "oin"); inp.id = "oAns"; inp.type = "text"; inp.maxLength = 30; inp.placeholder = t.ph; inp.autocomplete = "off"; inp.spellcheck = false;
+      inp.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); submitAns(); } });
+      p.appendChild(inp);
+      var sd = btn("go sm", t.send, submitAns); sd.id = "oSend"; p.appendChild(sd);
+      var st = el("p", "hint"); st.id = "oSt"; p.appendChild(st);
+      var ct = el("p", "hint"); ct.id = "oCnt"; p.appendChild(ct);
+      host.appendChild(p);
+      p = panel(); var ul2 = el("ul", "hl"); ul2.id = "oPl"; p.appendChild(ul2);
+      if(isHost()){ p.appendChild(btn("ghost act", t.hostNow, doReveal)); }
+      host.appendChild(p);
+      paintTimer(); setTimeout(function(){ var i2 = $("oAns"); if(i2 && !i2.disabled) try{ i2.focus(); }catch(e){} }, 150);
+      return;
+    }
+    if(d.st === "reveal"){
+      p = el("section", "panel stage");
+      p.appendChild(el("span", "label", t.rd + " " + d.rd));
+      var pr2 = el("p", "prompt"); pr2.style.margin = "0"; pr2.style.minHeight = "0";
+      var L2 = /^[A-Z]$/.test(String(d.l)) ? d.l : "?"; pr2.innerHTML = promptHTML({ l:L2, c:catOf(d.c).k });
+      p.appendChild(pr2); host.appendChild(p);
+      p = panel(); var rl = el("div"); rl.id = "oRes"; p.appendChild(rl); host.appendChild(p);
+      p = panel(); p.appendChild(el("span", "label", t.board)); var bl = el("div"); bl.id = "oBoard"; p.appendChild(bl); host.appendChild(p);
+      p = el("div", "oact");
+      if(isHost()){ p.appendChild(btn("go act", t.next, startRound)); p.appendChild(confirmBtn("ghost act", t.close, closeRoom)); }
+      else{ p.appendChild(el("p", "hint", t.waitNext)); p.appendChild(btn("ghost act", t.leave, leaveRoom)); }
+      host.appendChild(p);
+    }
+  }
+  function updView(){
+    var d = ON.data, t = oT(), ul, u = meU();
+    applyBusy();
+    if(!d) return;
+    if(d.st === "lobby"){
+      var cb = $("oCode"); if(cb) cb.textContent = ON.code;
+    }
+    if(d.st === "lobby" || d.st === "play"){
+      ul = $("oPl"); if(ul){
+        ul.textContent = "";
+        ON.players.forEach(function(p){
+          var li = el("li"), b = el("b", "", p.n || "?"); li.appendChild(b);
+          var tag = [];
+          if(p.u === d.host) tag.push(t.hostTag);
+          if(u && p.u === u.uid) tag.push(t.me);
+          if(tag.length) li.appendChild(document.createTextNode(" (" + tag.join(", ") + ")"));
+          if(d.st === "play" && p.d === d.rd) li.appendChild(document.createTextNode(" ✔"));
+          ul.appendChild(li);
+        });
+      }
+    }
+    if(d.st === "play"){
+      var c = $("oCnt");
+      if(c){ var n = 0; ON.players.forEach(function(p){ if(p.d === d.rd) n++; }); c.textContent = n + " / " + ON.players.length + " " + t.cnt; }
+      paintAnsStat();
+    }
+    if(d.st === "reveal"){
+      var rl = $("oRes"), bl = $("oBoard"), res = d.res || [];
+      if(rl){
+        rl.textContent = "";
+        res.forEach(function(r, i){
+          var row = el("div", "orow"), left = el("div", "ol"), nm = el("b", "", r.n || "?");
+          if(u && r.u === u.uid) nm.appendChild(document.createTextNode(" (" + t.me + ")"));
+          var tx = el("div", "oa" + (r.t ? "" : " dim"), r.t ? r.t : t.none);
+          left.appendChild(nm); left.appendChild(tx);
+          var pts = (d.pts && d.pts[r.u]) || 0, pb = el("span", "pts" + (r.x ? " bad" : ""), r.x ? t.rejd : "+" + pts);
+          row.appendChild(left); row.appendChild(pb);
+          if(isHost() && r.t){ var tg = btn("mini", r.x ? t.acc : t.rej, function(){ toggleRej(i); }); row.appendChild(tg); }
+          rl.appendChild(row);
+        });
+      }
+      if(bl){
+        bl.textContent = "";
+        var ids = {}; res.forEach(function(r){ ids[r.u] = 1; }); Object.keys(d.base || {}).forEach(function(k){ ids[k] = 1; });
+        Object.keys(ids).sort(function(a, b){ return totalOf(d, b) - totalOf(d, a); }).forEach(function(k, i){
+          var row = el("div", "orow"), left = el("div", "ol"); left.appendChild(el("b", "", (i + 1) + ". " + nameOf(k)));
+          row.appendChild(left); row.appendChild(el("span", "pts", totalOf(d, k) + " " + t.pts)); bl.appendChild(row);
+        });
+      }
+    }
+  }
+
+  /* ----- pergantian mode dan hubungan ke pengaturan Beranda ----- */
+  function paintMode(){
+    var o = oT();
+    $("mOff").textContent = o.tOff; $("mOn").textContent = o.tOn;
+    $("mOff").setAttribute("aria-pressed", String(mode === "off")); $("mOn").setAttribute("aria-pressed", String(mode === "on"));
+    $("offWrap").hidden = mode === "on"; $("onWrap").hidden = mode !== "on";
+    if(mode === "on"){
+      $("sub").textContent = o.sub;
+      if(ON.lang !== lang){ ON.lang = lang; ON.view = ""; }
+      renderO();
+    }
+  }
+  var paintOff = paint;
+  paint = function(){ paintOff(); paintMode(); };
+  $("mOff").addEventListener("click", function(){ mode = "off"; paint(); });
+  $("mOn").addEventListener("click", function(){ mode = "on"; paint(); });
+  (function hookAuth(n){ var a = authO(); if(a && a.onChange){ a.onChange(function(){ if(mode === "on") renderO(); }); } else if(n < 40) setTimeout(function(){ hookAuth(n + 1); }, 250); })(0);
+  window.addEventListener("pagehide", function(){
+    try{
+      var u = meU(); if(!ON.code || !ON.fb || !u) return;
+      var m = ON.fb.m, db = ON.fb.db;
+      if(isHost()) m.deleteDoc(m.doc(db, "ti_rooms", ON.code));
+      else m.deleteDoc(m.doc(db, "ti_rooms", ON.code, "p", u.uid));
+    }catch(e){}
+  });
+
   readSettings(); paint();
 })();
 </scr@@ipt>
