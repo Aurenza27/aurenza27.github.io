@@ -10145,7 +10145,7 @@ button:disabled{opacity:.6}
       nf:"Room code not found.", full:"The room is full (max 8 players).", closed:"The room was closed.", took:"Room ownership changed. You are now the room owner.", cats:"Categories", all:"Select all", catHostHint:"Tap to choose which categories get drawn. At least one.", catMemHint:"Categories are chosen by the room owner.", minCat:"Pick at least one category.", lobbyWait:"Waiting for players", lobbyReady:"Ready to start", leaveQ:"Leave the room?", leaveHostMsg:"You are the room owner. If you leave, the room keeps running and ownership passes to the player who joined first. Choose Close room to dissolve it.", leaveSoloMsg:"There are no other players, so the room will be closed.", leaveMemMsg:"You are about to leave this room. You can rejoin with the same code while the room is open.", stay:"Stay here", leaveGo:"Leave", denied:"Access denied. The Firestore rules for this game are not installed yet.", fail:"Failed, please try again.", off:"No internet." }
   };
   var mode = "off";
-  var ON = { catOpen:false, names:{}, applying:false, fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
+  var ON = { catOpen:false, names:{}, applying:false, spunRd:-1, spinTok:0, fb:null, code:"", data:null, players:[], uR:null, uP:null, view:"", lang:"", busy:false, revealing:false, allSince:0, tick:0, sentRd:-1, msgT:0,
              secs:(+ls("ti_osecs", 45) || 45), lim:(+ls("ti_olim", 5) || 5) };
   if([2, 3, 4, 5].indexOf(ON.lim) < 0) ON.lim = 5;
   if([30, 45, 60].indexOf(ON.secs) < 0) ON.secs = 45;
@@ -10220,7 +10220,7 @@ button:disabled{opacity:.6}
   async function attach(code){
     detach(false);
     var f = await lib(), m = f.m, db = f.db;
-    ON.code = code; ON.view = ""; ON.data = null; ON.players = []; ON.sentRd = -1;
+    ON.code = code; ON.view = ""; ON.data = null; ON.players = []; ON.sentRd = -1; ON.spunRd = -1; ON.spFocus = -1;
     ON.uR = m.onSnapshot(m.doc(db, "ti_rooms", code), onRoom, function(e){ flash(errMsg(e)); });
     ON.uP = m.onSnapshot(m.collection(db, "ti_rooms", code, "p"), function(s){
       var a = []; s.forEach(function(x){ var v = x.data() || {}; a.push({ u:x.id, n:String(v.n || ""), d:+v.d || 0, j:+v.j || 0, vr:+v.vr || 0, vt:(v.vt && typeof v.vt === "object") ? v.vt : null }); });
@@ -10305,8 +10305,7 @@ button:disabled{opacity:.6}
     if(d.st !== pst || d.rd !== prd){
       ON.allSince = 0; ON.revealing = false;
       if(!first){
-        if(d.st === "play"){ beep(660, 0.12, "triangle", 0.07); beep(880, 0.16, "triangle", 0.07, 0.11); beep(1320, 0.26, "triangle", 0.06, 0.22); buzz(true); }
-        else if(d.st === "reveal"){ beep(520, 0.1, "triangle", 0.06); beep(780, 0.2, "triangle", 0.06, 0.1); buzz(false); }
+        if(d.st === "reveal"){ beep(520, 0.1, "triangle", 0.06); beep(780, 0.2, "triangle", 0.06, 0.1); buzz(false); }
       }
     }
     renderO();
@@ -10323,7 +10322,7 @@ button:disabled{opacity:.6}
         ks = Object.keys(d.base || {}).concat(Object.keys(d.pts || {}));
         ks.forEach(function(k){ nb[k] = totalOf(d, k); });
       }
-      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), po({ st:"play", rd:(d.rd || 0) + 1, l:L, c:C.k, end:Date.now() + (d.secs || 45) * 1000, ts:m.serverTimestamp(), res:[], pts:{}, base:nb, exp:m.Timestamp.fromMillis(Date.now() + 86400000) }));
+      await m.updateDoc(m.doc(f.db, "ti_rooms", ON.code), po({ st:"play", rd:(d.rd || 0) + 1, l:L, c:C.k, end:Date.now() + SPIN + (d.secs || 45) * 1000, ts:m.serverTimestamp(), res:[], pts:{}, base:nb, exp:m.Timestamp.fromMillis(Date.now() + 86400000) }));
     }catch(e){ flash(errMsg(e)); }
     setBusy(false);
   }
@@ -10430,7 +10429,7 @@ button:disabled{opacity:.6}
     });
   }
   function submitAns(){
-    var d = ON.data, u = meU(), inp = $("oAns"); if(!d || !u || !inp || d.st !== "play" || Date.now() > endMs(d) + 1000) return;
+    var d = ON.data, u = meU(), inp = $("oAns"); if(!d || !u || !inp || d.st !== "play" || Date.now() > endMs(d) + 1000 || Date.now() < spinEndMs(d) - 300) return;
     var txt = String(inp.value || "").replace(/\s+/g, " ").trim().slice(0, 30); if(!txt) return;
     var rd = d.rd, first = ON.sentRd !== rd; ON.sentRd = rd; paintAnsStat(); beep(880, 0.1, "triangle", 0.06);
     lib().then(function(f){
@@ -10441,7 +10440,9 @@ button:disabled{opacity:.6}
   }
   /* ----- waktu ronde berbasis jam server (tidak tergantung jam HP pemilik ruang) ----- */
   /* ON.off = selisih (jam server - jam HP ini). Diukur tiap ronde baru dari ts (serverTimestamp) milik ronde itu. */
-  function srvEnd(d){ return (d.ts && d.ts.toMillis) ? d.ts.toMillis() + (d.secs || 45) * 1000 : 0; }
+  var SPIN = 3000;   /* jeda animasi acak di awal ronde; waktu menjawab baru mulai setelah ini */
+  function srvEnd(d){ return (d.ts && d.ts.toMillis) ? d.ts.toMillis() + SPIN + (d.secs || 45) * 1000 : 0; }
+  function spinEndMs(d){ return (d.ts && d.ts.toMillis) ? d.ts.toMillis() + SPIN - (ON.off || 0) : (d.end ? d.end - (d.secs || 45) * 1000 : 0); }
   function endMs(d){ var e = srvEnd(d); return e ? e - (ON.off || 0) : d.end; }
   function updOff(d, s, first){
     if(!d.ts || !d.ts.toMillis || s.metadata.hasPendingWrites || ON.offRd === d.rd) return;
@@ -10550,6 +10551,13 @@ button:disabled{opacity:.6}
   function paintTimer(){
     var d = ON.data, tf = $("oTf"), tn = $("oTn"); if(!d || d.st !== "play" || !tf || !tn) return;
     var tot = Math.max(1, (d.secs || 45) * 1000), left = Math.max(0, endMs(d) - Date.now()), sec = Math.ceil(left / 1000);
+    var sp = Date.now() < spinEndMs(d), inp0 = $("oAns"), sd0 = $("oSend");
+    if(sp){
+      tf.style.transform = "scaleX(1)"; tn.textContent = "🎲 " + T().spinning; lastSecO = -1; $("oTb").classList.remove("low");
+      if(inp0 && sd0){ inp0.disabled = true; sd0.disabled = true; }
+      return;
+    }
+    if(ON.spFocus !== d.rd){ ON.spFocus = d.rd; setTimeout(function(){ var i3 = $("oAns"); if(i3 && !i3.disabled) try{ i3.focus(); }catch(e){} }, 50); }
     tf.style.transform = "scaleX(" + Math.min(1, left / tot) + ")";
     if(sec !== lastSecO){
       lastSecO = sec; tn.textContent = left > 0 ? "⏱ " + sec + " " + T().sec : oT().up; $("oTb").classList.toggle("low", sec <= 5);
@@ -10595,6 +10603,35 @@ button:disabled{opacity:.6}
     else key = ON.data.st + "|" + ON.data.rd + "|" + (isHost() ? "h" : "m");
     if(key !== ON.view){ ON.view = key; buildView(key); }
     updView();
+  }
+  /* animasi acak awal ronde (sama seperti mode Bareng): huruf dan kategori berputar lalu mendarat */
+  function fanfare(){ beep(660, 0.12, "triangle", 0.07); beep(880, 0.16, "triangle", 0.07, 0.11); beep(1320, 0.26, "triangle", 0.06, 0.22); buzz(true); }
+  function spinOnline(d, L, ck, tok){
+    var vl = $("oL"), ve = $("oE"), vc = $("oC"), pr = $("oPrompt"); if(!vl || !ve || !vc || !pr) return;
+    var rl = vl.parentNode, rc = vc.parentNode, pending = 2, lastL = "", lastC = "";
+    var pool = CATS.filter(function(c){ return (d.cats || []).indexOf(c.k) >= 0; }); if(pool.length < 2) pool = CATS;
+    function alive(){ return ON.spinTok === tok && $("oL") === vl; }
+    rl.classList.add("run"); rc.classList.add("run"); pr.textContent = T().spinning;
+    actx(); sfxPress();
+    function oneDone(){
+      if(--pending !== 0 || !alive()) return;
+      pr.innerHTML = promptHTML({ l:L, c:ck }); pr.classList.remove("pop"); void pr.offsetWidth; pr.classList.add("pop");
+      fanfare();
+    }
+    runReel(12, 50, 1.12, function(){
+      if(!alive()) return;
+      var x; do{ x = LETTERS[rnd(26)]; }while(x === lastL); lastL = x; vl.textContent = x; beep(520 + rnd(5) * 40, 0.035, "triangle", 0.035);
+    }, function(){
+      if(!alive()) return;
+      vl.textContent = L; landed(rl); beep(700, 0.1, "triangle", 0.06); buzz(false); oneDone();
+    });
+    runReel(17, 50, 1.12, function(){
+      if(!alive()) return;
+      var c; do{ c = pool[rnd(pool.length)]; }while(c.k === lastC && pool.length > 1); lastC = c.k; ve.textContent = c.e; fit(vc, cname(c)); beep(380 + rnd(5) * 40, 0.035, "triangle", 0.035);
+    }, function(){
+      if(!alive()) return;
+      var c = catOf(ck); ve.textContent = c.e; fit(vc, cname(c)); landed(rc); beep(780, 0.1, "triangle", 0.06); buzz(false); oneDone();
+    });
   }
   function buildView(key){
     var host = $("onBody"), t = oT(), d = ON.data, p, row, inp, seg;
@@ -10681,7 +10718,15 @@ button:disabled{opacity:.6}
       var tb = el("div", "tbar"); tb.id = "oTb"; var tf = el("i"); tf.id = "oTf"; var tn = el("span"); tn.id = "oTn"; tb.appendChild(tf); tb.appendChild(tn); p.appendChild(tb);
       host.appendChild(p);
       var L = /^[A-Z]$/.test(String(d.l)) ? d.l : "?", C = catOf(d.c);
-      vl.textContent = L; ve.textContent = C.e; fit(vc, cname(C)); pr.innerHTML = promptHTML({ l:L, c:C.k });
+      var prevSpun = ON.spunRd, tok = ++ON.spinTok, spLeft = spinEndMs(d) - Date.now();
+      ON.spunRd = d.rd;
+      if(animOn && prevSpun !== d.rd && spLeft > 1200){
+        vl.textContent = "?"; ve.textContent = "❓"; fit(vc, ""); pr.textContent = T().spinning;
+        setTimeout(function(){ spinOnline(d, L, C.k, tok); }, 0);
+      }else{
+        vl.textContent = L; ve.textContent = C.e; fit(vc, cname(C)); pr.innerHTML = promptHTML({ l:L, c:C.k });
+        if(prevSpun !== d.rd && spLeft > -1000) fanfare();
+      }
       p = panel();
       inp = el("input", "oin"); inp.id = "oAns"; inp.type = "text"; inp.maxLength = 30; inp.placeholder = t.ph; inp.autocomplete = "off"; inp.spellcheck = false;
       inp.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); submitAns(); } });
