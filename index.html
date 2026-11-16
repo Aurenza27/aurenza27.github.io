@@ -10467,21 +10467,23 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     setBusy(false);
   }
   async function joinRoom(raw){
-    var u = meU(); if(!u || ON.busy) return;
+    /* hasil: "ok" berhasil, "stop" gagal permanen (kode salah, penuh, dilarang), "retry" gagal sementara (sibuk / jaringan) */
+    var u = meU(); if(!u || ON.busy) return "retry";
     var code = String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5);
-    if(code.length !== 5){ flash(oT().nf); return; }
+    if(code.length !== 5){ flash(oT().nf); return "stop"; }
+    var res = "retry";
     setBusy(true);
     try{
       var f = await lib(), m = f.m, db = f.db, rs = await m.getDoc(m.doc(db, "ti_rooms", code));
       if(!rs.exists()) throw { code:"nf" };
-      var kkL = (rs.data() || {}).kk; if(Array.isArray(kkL) && kkL.indexOf(u.uid) >= 0){ flash(oT().kickedBan); setBusy(false); return; }
+      var kkL = (rs.data() || {}).kk; if(Array.isArray(kkL) && kkL.indexOf(u.uid) >= 0){ flash(oT().kickedBan); setBusy(false); return "stop"; }
       var ps = await m.getDocs(m.collection(db, "ti_rooms", code, "p")), mine = false;
       ps.forEach(function(x){ if(x.id === u.uid) mine = true; });
       if(!mine && ps.size >= 8) throw { code:"full" };
       await m.setDoc(m.doc(db, "ti_rooms", code, "p", u.uid), po({ n:meName(), d:0, j:Date.now() }));
-      await attach(code);
-    }catch(e){ flash(errMsg(e)); }
-    setBusy(false);
+      await attach(code); res = "ok";
+    }catch(e){ flash(errMsg(e)); res = (e && (e.code === "nf" || e.code === "full" || /permission/i.test(String(e.code || "")))) ? "stop" : "retry"; }
+    setBusy(false); return res;
   }
   /* pemilik keluar: ruang tetap jalan, kepemilikan pindah ke pemain yang paling awal masuk (urutan j); bila sendirian, ruang ditutup */
   /* ----- keluarkan pemain (khusus pemilik ruang): dialog konfirmasi, opsi larang gabung lagi (daftar kk), lalu hapus dokumen pemain ----- */
@@ -11153,16 +11155,24 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
     }catch(e){ return null; }
   };
   /* gabung ke ruangan dari undangan: pindah ke mode Online, keluar dari ruangan lama bila ada */
+  /* hasil: true = sudah di ruangan, "stop" = gagal permanen, false = gagal sementara (pemanggil boleh mencoba lagi).
+     Menunggu sampai akun siap dan tidak sibuk, lalu mencoba sampai 4 kali, supaya undangan yang sudah diterima tidak hilang begitu saja */
   window.__tiJoin = async function(code){
     code = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5);
-    if(code.length !== 5 || !meU()) return false;
-    if(ON.code === code){ if(mode !== "on"){ mode = "on"; try{ paint(); }catch(e){} } return true; }
-    if(ON.busy) return false;
-    try{ if(ON.code) await leaveRoom(); }catch(e){}
-    mode = "on"; try{ paint(); }catch(e){}
-    await joinRoom(code);
-    if(ON.code === code){ mode = "on"; try{ paint(); }catch(e){} try{ renderO(); }catch(e){} }
-    return ON.code === code;
+    if(code.length !== 5) return "stop";
+    var nap = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }, i, w, r;
+    for(i = 0; i < 4; i++){
+      for(w = 0; w < 20 && (ON.busy || !meU()); w++) await nap(300);
+      if(ON.code === code){ if(mode !== "on"){ mode = "on"; try{ paint(); }catch(e){} } return true; }
+      if(ON.busy || !meU()) return false;
+      try{ if(ON.code) await leaveRoom(); }catch(e){}
+      mode = "on"; try{ paint(); }catch(e){}
+      r = await joinRoom(code);
+      if(ON.code === code){ mode = "on"; try{ paint(); }catch(e){} try{ renderO(); }catch(e){} return true; }
+      if(r === "stop") return "stop";
+      await nap(700);
+    }
+    return false;
   };
   /* undangan yang diterima saat menu ini belum terbuka: Beranda menitipkan kodenya di __tiPendingRoom.
      Baru dikerjakan setelah menu selesai dimuat dan akun siap; bila gagal, dicoba lagi sampai kedaluwarsa (90 detik) */
@@ -11174,7 +11184,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
         if(Date.now() - (+v.at || 0) >= 90000){ P.__tiPendingRoom = null; }
         else if(document.readyState === "complete" && meU() && !ON.busy){
           P.__tiPendingRoom = null;
-          window.__tiJoin(v.code).catch(function(){ try{ P.__tiPendingRoom = v; }catch(e){} });
+          window.__tiJoin(v.code).then(function(ok){ if(ok === false){ try{ P.__tiPendingRoom = v; }catch(e){} } }, function(){ try{ P.__tiPendingRoom = v; }catch(e){} });
         }
       }
     }catch(e){}
@@ -12007,7 +12017,9 @@ const NSRC = (() => {
           let st = String(x.status || "pending");
           if(ch.type === "removed"){ const ex = n.list().find(i => i.id === nid); if(!ex || !ex.inv || ex.inv.status !== "pending") return; st = "cancelled"; }
           const tt = invTx(x, st), inv = { docId: d.id, oid: String(x.oid || ""), status: st, kind: (x.kind === "follow" || x.kind === "room") ? x.kind : "mod", tName: String(x.tName || ""), ownerName: String(x.ownerName || "") };
-          if(!n.patch(nid, { inv, title: tt.title, body: tt.body }) && st === "pending") n.add({ id: nid, type: "invite", ts: +x.ts || Date.now(), inv, title: tt.title, body: tt.body });
+          const prevN = n.list().find(i => i.id === nid), fresh = st === "pending" && prevN && (!prevN.inv || prevN.inv.status !== "pending");
+          /* undangan ulang (dokumen yang sama dibuat lagi): tampil sebagai notifikasi baru yang belum dibaca, bukan menempel di yang lama */
+          if(!n.patch(nid, Object.assign({ inv, title: tt.title, body: tt.body }, fresh ? { read: false, ts: +x.ts || Date.now() } : {})) && st === "pending") n.add({ id: nid, type: "invite", ts: +x.ts || Date.now(), inv, title: tt.title, body: tt.body });
         });
       }, onErr));
       /* undangan keluar (dari saya): kabari saat diterima / ditolak */
@@ -12054,7 +12066,11 @@ const NSRC = (() => {
   window.satuTitikJoinRoom = function(code){
     code = String(code || "");
     try{ const f = document.getElementById("frame"), v = document.getElementById("view"), w = f && v && !v.hidden ? f.contentWindow : null;
-      if(w && typeof w.__tiJoin === "function"){ w.__tiJoin(code); return; } }catch(e){}
+      if(w && typeof w.__tiJoin === "function"){
+        const keep = { code, at: Date.now() };
+        Promise.resolve(w.__tiJoin(code)).then(ok => { if(ok === false) window.__tiPendingRoom = keep; }, () => { window.__tiPendingRoom = keep; });
+        return;
+      } }catch(e){}
     window.__tiPendingRoom = { code, at: Date.now() };
     location.hash = "tebak-inisial";
   };
