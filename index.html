@@ -200,6 +200,26 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #frpanel .fraddhd+*{margin-top:6px}
 #frpanel .fraddbtn{min-height:28px;padding:0 10px}
 #frpanel .frmeid{font-size:11px;color:var(--muted);letter-spacing:.04em}
+/* ===== Pesan pribadi ===== */
+#frpanel .frbt{align-items:center}
+#frpanel .frun{flex:none;width:8px;height:8px;border-radius:50%;background:#ff5a4d;box-shadow:0 0 0 1.5px var(--bg2)}
+#frpanel .frchat{display:flex;flex-direction:column;gap:6px}
+#frpanel .frchd{display:flex;align-items:center;gap:8px}
+#frpanel .frchd .frback{flex:none;min-width:30px;min-height:30px;padding:0;font-size:20px;line-height:1;border-radius:9px}
+#frpanel .frmsgs{display:flex;flex-direction:column;gap:4px;height:min(42vh,250px);overflow-y:auto;overscroll-behavior:contain;padding:6px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
+#frpanel .frmsgempty{margin:auto;text-align:center}
+#frpanel .frday{align-self:center;margin:3px 0 1px;font-size:10px;color:var(--muted)}
+#frpanel .frmsg{max-width:84%;padding:5px 8px;border-radius:12px;font-size:13px;line-height:1.35;overflow-wrap:anywhere;word-break:break-word}
+#frpanel .frmsg.me{align-self:flex-end;background:rgba(212,169,79,.2);border:1px solid rgba(212,169,79,.38);border-bottom-right-radius:4px;cursor:pointer}
+#frpanel .frmsg.th{align-self:flex-start;background:rgba(255,255,255,.07);border:1px solid var(--line);border-bottom-left-radius:4px}
+#frpanel .frmt{color:var(--text);white-space:pre-wrap}
+#frpanel .frmtm{display:block;margin-top:1px;font-size:9.5px;color:var(--muted);text-align:right}
+#frpanel .frmdel{display:block;margin:4px 0 0 auto;min-height:24px!important;padding:0 8px!important;font-size:11px!important;border-color:#c0605a!important;color:#f0a0a0!important}
+#frpanel .frcmp{display:flex;gap:6px}
+#frpanel .frcmp input{flex:1;min-width:0;text-transform:none}
+#frpanel .frcmp .frsend{flex:none;min-width:42px;min-height:34px;padding:0 10px;border-radius:10px;border:1px solid var(--gold);background:var(--gold);color:#1a1405;font:inherit;font-size:15px;cursor:pointer}
+#frpanel .frcmp .frsend:focus-visible,#frpanel .frchd .frback:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#frpanel .frchat .frerr{margin:0}
 
 #svProfile .pav{display:flex;flex-direction:column;align-items:center;gap:10px;margin:4px 0 14px}
 #svProfile .pav .big{width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--gold2)}
@@ -1310,7 +1330,7 @@ const PV = {
   id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 14 November 2026", back:"‹ Beranda", secs:[
     {h:"1. Pendahuluan", p:["Satu Titik adalah aplikasi yang dikembangkan oleh Aurenza27 (“kami”). Kebijakan ini menjelaskan data apa yang diproses, untuk apa, dan pilihan yang kamu miliki saat memakai aplikasi ini. Dengan memakai aplikasi, kamu menyetujui kebijakan ini."]},
     {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, serta data turnamen) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google."]},
-    {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, dan hasil menu) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu)."]},
+    {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, dan hasil menu) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, dan dihapus saat pertemanan dihapus."]},
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif."]},
     {p:["Pengecekan koneksi dan waktu:"], l:["Aplikasi mengirim permintaan sederhana ke server publik (Google, Cloudflare, dan WorldTimeAPI) untuk mengecek koneksi internet dan jam. Permintaan ini tidak berisi data pribadimu, tetapi seperti permintaan internet lainnya, alamat IP perangkat terlihat oleh server tersebut."]},
     {p:["Iklan (hanya pada versi aplikasi yang menampilkan iklan):"], l:["Versi aplikasi tertentu, misalnya versi APK, dapat menampilkan iklan dari jaringan iklan pihak ketiga seperti Google AdMob.","Jaringan iklan dapat memproses ID iklan perangkat, alamat IP, jenis perangkat, dan interaksi dengan iklan untuk menampilkan serta mengukur iklan. Pada wilayah yang mewajibkan, kamu akan diminta persetujuan terlebih dahulu.","Kamu dapat mengatur atau mereset ID iklan, dan membatasi personalisasi iklan, lewat pengaturan perangkat."]},
@@ -1326,7 +1346,7 @@ const PV = {
   en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 14 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. By using the app, you agree to this policy."]},
     {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, and tournament data) are stored on your own device.","This data is not sent to our servers unless you sign in with a Google account."]},
-    {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, and menu results) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see)."]},
+    {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, and menu results) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, and are deleted when the friendship is removed."]},
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data."]},
     {p:["Connection and time checks:"], l:["The app sends simple requests to public servers (Google, Cloudflare, and WorldTimeAPI) to check your internet connection and the time. These requests do not contain your personal data, but as with any internet request, your device’s IP address is visible to those servers."]},
     {p:["Ads (only in app versions that show ads):"], l:["Certain app versions, such as the APK version, may show ads from third-party ad networks such as Google AdMob.","Ad networks may process the device advertising ID, IP address, device type, and your interactions with ads to serve and measure ads. Where required, you will be asked for consent first.","You can reset your advertising ID, and limit ad personalization, in your device settings."]},
@@ -1478,7 +1498,7 @@ async function wipeServer(A, joined){
   /* 2) undangan yang dikirim atau diterima */
   for(const f of ["ownerUid", "toUid"]) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "invites"), m.where(f, "==", uid))); await Promise.all(sn.docs.map(d => soft(() => m.deleteDoc(d.ref)))); });
   /* 2b) pertemanan dan permintaan teman */
-  await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "friendships"), m.where("u", "array-contains", uid))); await Promise.all(sn.docs.map(d => soft(() => m.deleteDoc(d.ref)))); });
+  await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "friendships"), m.where("u", "array-contains", uid))); await Promise.all(sn.docs.map(d => soft(async () => { try{ for(let i = 0; i < 12; i++){ const ms = await m.getDocs(m.query(m.collection(d.ref, "msgs"), m.limit(100))); if(ms.empty) break; await Promise.all(ms.docs.map(x => m.deleteDoc(x.ref))); } }catch(e){} await m.deleteDoc(d.ref); }))); });
   /* 3) keluar dari turnamen orang lain: moderator, pengikut, suara */
   if(acc) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "tournaments"), m.where("modIds", "array-contains", acc))); await Promise.all(sn.docs.filter(d => d.data().owner !== uid).map(d => soft(() => m.updateDoc(d.ref, { modIds: m.arrayRemove(acc) })))); });
   for(const oid of joined){ await soft(() => m.deleteDoc(m.doc(db, "tournaments", oid, "followers", uid))); await soft(() => m.deleteDoc(m.doc(db, "tournaments", oid, "votes", uid))); }
@@ -12460,7 +12480,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   const lang = () => (typeof S !== "undefined" && S && S.lang === "en") ? "en" : "id";
   const T = {
     id:{ ttl:"Teman", sub0:"Daftar teman dan permintaan", add:"TAMBAH TEMAN", addS:"Tambah teman", stOn:"Online", stOff:"Offline", addH:"Masukkan ID Akun temanmu, misalnya ST-000004.", mine:"ID Akunmu: ", ph:"ST-000000", send:"Kirim permintaan", busy:"Mohon tunggu…",
-      inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
+      inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", pm:"💬 Pesan pribadi", back:"Kembali", msgPh:"Tulis pesan…", msgNone:"Belum ada pesan. Sapa temanmu!", msgDel:"Hapus pesan", msgSend:"Kirim", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
       sent:"Permintaan terkirim.", acd:"Kalian sekarang berteman.", rmd:"Teman dihapus.", decd:"Permintaan ditolak.", cand:"Permintaan dibatalkan.",
       e_fmt:"Format ID Akun: ST-000000.", e_self:"Itu ID Akunmu sendiri.", e_nf:"ID Akun tidak ditemukan.", e_already:"Kalian sudah berteman.", e_pending:"Permintaan sudah terkirim. Tunggu temanmu menerimanya.",
       e_noacc:"ID Akunmu belum siap. Coba lagi sebentar lagi.", e_perm:"Izin ditolak oleh server. Pastikan aturan Firestore sudah diperbarui.", e_off:"Tidak ada koneksi internet.", e_fail:"Gagal. Coba lagi.", login:"Masuk dengan Google untuk memakai fitur teman.",
@@ -12471,7 +12491,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       e_invp:"Undangan masih menunggu jawaban.", e_banned:"Akun ini tidak bisa bergabung kembali ke ruangan ini karena sudah dikeluarkan pemilik ruangan.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
       invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
     en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addS:"Add friend", stOn:"Online", stOff:"Offline", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
-      inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
+      inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", pm:"💬 Private message", back:"Back", msgPh:"Write a message…", msgNone:"No messages yet. Say hi!", msgDel:"Delete message", msgSend:"Send", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
       sent:"Request sent.", acd:"You are now friends.", rmd:"Friend removed.", decd:"Request declined.", cand:"Request cancelled.",
       e_fmt:"Account ID format: ST-000000.", e_self:"That is your own Account ID.", e_nf:"Account ID not found.", e_already:"You are already friends.", e_pending:"The request is already sent. Wait for your friend to accept.",
       e_noacc:"Your Account ID is not ready yet. Try again in a moment.", e_perm:"Permission denied by the server. Make sure the Firestore rules are updated.", e_off:"No internet connection.", e_fail:"Failed. Please try again.", login:"Sign in with Google to use friends.",
@@ -12489,7 +12509,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   let lastSig = "", sigTimer = 0;
   let invOut = {}, unsubI = null;
   let rows = [], dir = {}, unsub = null, curUid = "", msg = "", msgOk = true, working = false, confirmId = "", menuId = "", inVal = "";
-  let addOpen = false, pw = {}, pwT = 0;
+  let addOpen = false, pw = {}, pwT = 0, pm = {}, pmT = 0, lastM = {}, unread = {}, chatId = "", chatUnsub = null, chatMsgs = [], chatLoaded = false, chatErr = "", delId = "", lastSend = 0;
   const subs = new Set(), selfDel = new Set();
   const emit = () => { subs.forEach(f => { try{ f(); }catch(e){} }); try{ refresh(); }catch(e){} };
   const nameOf = acc => (dir[acc] && dir[acc].name) || acc;
@@ -12529,7 +12549,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     N.patch(nid, { inv: { status: st }, title: x.title, body: x.body });
   }
   /* pantau dokumen direktori tiap teman (maks 20) agar lampu online berubah langsung */
-  function unwatchPres(){ Object.keys(pw).forEach(k => { try{ pw[k](); }catch(e){} }); pw = {}; }
+  function unwatchPres(){ Object.keys(pw).forEach(k => { try{ pw[k](); }catch(e){} }); pw = {}; Object.keys(pm).forEach(k => { try{ pm[k](); }catch(e){} }); pm = {}; lastM = {}; unread = {}; }
   function watchPres(){
     const a = A(); if(!a || !a.getDb) return;
     const want = new Set(accepted().map(r => r.acc));
@@ -12540,6 +12560,21 @@ if(navigator.onLine !== false) init().catch(() => {});
       try{ pw[acc] = m.onSnapshot(m.doc(db, "accountIds", acc), sn => {
         const d = sn.exists() ? sn.data() : {}, o = dir[acc], n = { name: String(d.name || ""), photo: String(d.photo || ""), seen: +d.seen || 0 };
         if(!o || o.name !== n.name || o.photo !== n.photo || o.seen !== n.seen){ dir[acc] = n; clearTimeout(pwT); pwT = setTimeout(() => { try{ refresh(); }catch(e){} }, 300); }
+      }, () => {}); }catch(e){}
+    })).catch(() => {});
+  }
+  /* pantau pesan terakhir tiap teman supaya muncul titik "belum dibaca" */
+  function watchPm(){
+    const a = A(); if(!a || !a.getDb || !a.user) return;
+    const want = new Set(accepted().map(r => r.id));
+    Object.keys(pm).forEach(k => { if(!want.has(k)){ try{ pm[k](); }catch(e){} delete pm[k]; delete lastM[k]; delete unread[k]; } });
+    const need = [...want].filter(k => !pm[k]); if(!need.length) return;
+    a.getDb().then(({ m, db }) => need.forEach(id => {
+      if(pm[id] || !want.has(id)) return;
+      try{ pm[id] = m.onSnapshot(m.query(m.collection(db, "friendships", id, "msgs"), m.orderBy("at", "desc"), m.limit(1)), sn => {
+        const d = sn.docs[0], x = d ? d.data({ serverTimestamps: "estimate" }) : null;
+        lastM[id] = x ? { u: String(x.u || ""), ms: x.at && x.at.toMillis ? x.at.toMillis() : Date.now() } : null;
+        calcUnread(id); clearTimeout(pmT); pmT = setTimeout(() => { try{ refresh(); }catch(e){} }, 200);
       }, () => {}); }catch(e){}
     })).catch(() => {});
   }
@@ -12579,7 +12614,7 @@ if(navigator.onLine !== false) init().catch(() => {});
             if(!r.mine) nPatch(r, "cancelled");               /* pengirim membatalkan */
             else if(!selfDel.has(r.id)) ev.push([r, "rj"]);   /* temanku menolak */
           } });
-        emit(); try{ watchPres(); }catch(e){}
+        emit(); try{ watchPres(); }catch(e){} try{ watchPm(); }catch(e){}
         fetchDir(rows.map(r => r.acc)).then(() => { emit(); ev.forEach(x => notify(x[0], x[1])); });
       }, e => { console.warn("[teman] pendengar gagal:", e && (e.code || e.message)); });
     }catch(e){ console.warn("[teman] gagal mulai:", e && (e.code || e.message)); }
@@ -12621,7 +12656,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(kind === "acc"){
       if(accepted().length >= MAX_FRIENDS) throw new Error("e_max");
       await m.updateDoc(ref, { st: "ok", ts: Date.now() });
-    } else { selfDel.add(r.id); await m.deleteDoc(ref); }
+    } else { selfDel.add(r.id); if(r.st === "ok") await purgeMsgs(m, db, r.id); await m.deleteDoc(ref); }
   }
   const incoming = () => rows.filter(r => r.st === "pending" && !r.mine).sort((x, y) => y.ts - x.ts);
   const outgoing = () => rows.filter(r => r.st === "pending" && r.mine).sort((x, y) => y.ts - x.ts);
@@ -12654,7 +12689,8 @@ if(navigator.onLine !== false) init().catch(() => {});
     const w = mk("div", "frwho"), nmp = mk("p", "frnm");
     if(r.st === "ok"){ const on = isOn(r.acc), tt = T[lang()], dt = mk("span", "frdot" + (on ? " on" : "")); dt.setAttribute("role", "img"); dt.setAttribute("aria-label", on ? tt.stOn : tt.stOff); dt.title = on ? tt.stOn : tt.stOff; nmp.appendChild(dt); }
     nmp.appendChild(document.createTextNode(nameOf(r.acc))); w.appendChild(nmp); w.appendChild(mk("p", "frid", r.acc)); li.appendChild(w);
-    const b = mk("div", "frbt"); btns.forEach(x => b.appendChild(x)); if(onTap) b.appendChild(mk("span", "frmore" + (open ? " on" : ""), "⌄")); li.appendChild(b); return li;
+    const b = mk("div", "frbt"); btns.forEach(x => b.appendChild(x)); if(r.st === "ok" && unread[r.id]){ const ud = mk("span", "frun"); ud.setAttribute("aria-hidden", "true"); b.appendChild(ud); }
+    if(onTap) b.appendChild(mk("span", "frmore" + (open ? " on" : ""), "⌄")); li.appendChild(b); return li;
   }
   /* lihat foto profil teman: tampil besar di atas panel, ketuk di mana saja atau tekan Esc untuk menutup */
   function showPhoto(acc){
@@ -12714,6 +12750,89 @@ if(navigator.onLine !== false) init().catch(() => {});
     return bar;
   }
   function btn(label, cls, fn, disabled){ const b = mk("button", cls, label); b.type = "button"; b.disabled = !!disabled || working; b.addEventListener("click", fn); return b; }
+  /* ===== PESAN PRIBADI: friendships/{fid}/msgs/{id} = { u: uid pengirim, t: isi (maks. 500), at: jam server, exp: batas simpan 30 hari } ===== */
+  const myUid = () => (A() && A().user && A().user.uid) || "";
+  const getRead = id => { try{ return +localStorage.getItem("st_pm_r_" + id) || 0; }catch(e){ return 0; } };
+  const setRead = (id, ms) => { try{ if(ms > getRead(id)) localStorage.setItem("st_pm_r_" + id, String(ms)); }catch(e){} };
+  const calcUnread = id => { const l = lastM[id]; if(l && chatId === id) setRead(id, l.ms); unread[id] = !!l && l.u !== myUid() && l.ms > getRead(id); };
+  const hhmm = ms => { try{ return new Date(ms).toLocaleTimeString(lang() === "en" ? "en-GB" : "id-ID", { hour: "2-digit", minute: "2-digit" }); }catch(e){ return ""; } };
+  const dayLbl = ms => { try{ return new Date(ms).toLocaleDateString(lang() === "en" ? "en-GB" : "id-ID", { day: "numeric", month: "short", year: "numeric" }); }catch(e){ return ""; } };
+  function dropChat(){ if(chatUnsub){ try{ chatUnsub(); }catch(e){} chatUnsub = null; } chatId = ""; chatMsgs = []; chatLoaded = false; chatErr = ""; delId = ""; }
+  async function openChat(r){
+    dropChat(); chatId = r.id; menuId = ""; confirmId = ""; msg = ""; unread[r.id] = false;
+    if(lastM[r.id]) setRead(r.id, lastM[r.id].ms);
+    paint();
+    const a = A(); if(!a || !a.getDb) return;
+    try{
+      const { m, db } = await a.getDb(); if(chatId !== r.id) return;
+      chatUnsub = m.onSnapshot(m.query(m.collection(db, "friendships", r.id, "msgs"), m.orderBy("at", "desc"), m.limit(60)), sn => {
+        if(chatId !== r.id) return;
+        chatMsgs = sn.docs.map(d => { const x = d.data({ serverTimestamps: "estimate" }) || {}; return { id: d.id, u: String(x.u || ""), t: String(x.t || ""), ms: x.at && x.at.toMillis ? x.at.toMillis() : Date.now() }; }).reverse();
+        chatLoaded = true; const last = chatMsgs[chatMsgs.length - 1];
+        if(last) setRead(r.id, last.ms); unread[r.id] = false;
+        try{ refresh(); }catch(e){}
+      }, e => { chatLoaded = true; chatErr = ferr(e); try{ refresh(); }catch(x){} });
+    }catch(e){ chatLoaded = true; chatErr = ferr(e); paintChat(); }
+  }
+  async function sendMsg(raw){
+    const a = A(), u = a && a.user; if(!u || !chatId) throw new Error("e_fail");
+    const txt = String(raw || "").replace(/\r?\n/g, " ").trim().slice(0, 500); if(!txt) return;
+    if(navigator.onLine === false) throw new Error("e_off");
+    if(Date.now() - lastSend < 700) throw new Error("e_fail"); lastSend = Date.now();
+    const { m, db } = await a.getDb();
+    await m.addDoc(m.collection(db, "friendships", chatId, "msgs"), { u: u.uid, t: txt, at: m.serverTimestamp(), exp: m.Timestamp.fromMillis(Date.now() + 30 * 86400000) });
+  }
+  async function delMsg(id){
+    const a = A(), fid = chatId; delId = ""; chatErr = "";
+    try{ const { m, db } = await a.getDb(); await m.deleteDoc(m.doc(db, "friendships", fid, "msgs", id)); }catch(e){ chatErr = ferr(e); }
+    paintChat();
+  }
+  /* hapus semua pesan sebuah pertemanan (dipanggil sebelum teman dihapus) */
+  async function purgeMsgs(m, db, fid){
+    try{ for(let i = 0; i < 12; i++){ const sn = await m.getDocs(m.query(m.collection(db, "friendships", fid, "msgs"), m.limit(100))); if(sn.empty) break; await Promise.all(sn.docs.map(d => m.deleteDoc(d.ref))); } }catch(e){}
+  }
+  function chatErrPaint(){ const e = $("frMsgErr"); if(!e) return; const t = T[lang()]; e.textContent = chatErr ? (t[chatErr] || t.e_fail) : ""; e.hidden = !chatErr; }
+  function paintChat(){
+    const pv = $("spFrBody"); if(!pv) return;
+    const t = T[lang()], r = rows.find(x => x.id === chatId && x.st === "ok");
+    if(!r){ dropChat(); paint(); return; }
+    const me = myUid(); let ch = $("frChat"), fresh = false;
+    if(!ch || ch.dataset.id !== chatId){
+      fresh = true; pv.textContent = ""; ch = mk("div", "frchat"); ch.id = "frChat"; ch.dataset.id = chatId;
+      const hd = mk("div", "frchd"), bk = mk("button", "frback", "‹"); bk.type = "button"; bk.setAttribute("aria-label", t.back); bk.title = t.back;
+      bk.addEventListener("click", () => { dropChat(); paint(); });
+      hd.appendChild(bk); hd.appendChild(avatar(r.acc));
+      const w = mk("div", "frwho"), nm = mk("p", "frnm"); nm.id = "frChN"; w.appendChild(nm); w.appendChild(mk("p", "frid", r.acc)); hd.appendChild(w);
+      const lg = mk("div", "frmsgs"); lg.id = "frMsgs"; lg.setAttribute("role", "log"); lg.setAttribute("aria-live", "polite");
+      const fm = mk("div", "frcmp"), inp = mk("input"); inp.id = "frMsgIn"; inp.type = "text"; inp.maxLength = 500; inp.placeholder = t.msgPh; inp.autocomplete = "off"; inp.spellcheck = false;
+      const go = async () => { const v = inp.value; if(!v.trim()) return; inp.value = ""; chatErr = ""; chatErrPaint(); try{ await sendMsg(v); }catch(e){ chatErr = ferr(e); inp.value = v; chatErrPaint(); } };
+      inp.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); go(); } });
+      const sb = mk("button", "frsend", "➤"); sb.type = "button"; sb.setAttribute("aria-label", t.msgSend); sb.title = t.msgSend; sb.addEventListener("click", go);
+      fm.append(inp, sb);
+      const er = mk("p", "frerr"); er.id = "frMsgErr"; er.hidden = true;
+      ch.append(hd, lg, fm, er); pv.appendChild(ch);
+    }
+    const nm = $("frChN");
+    if(nm){ nm.textContent = ""; const on = isOn(r.acc), dt = mk("span", "frdot" + (on ? " on" : "")); dt.title = on ? t.stOn : t.stOff; nm.appendChild(dt); nm.appendChild(document.createTextNode(nameOf(r.acc))); }
+    const lg = $("frMsgs"), stick = fresh || lg.scrollHeight - lg.scrollTop - lg.clientHeight < 50;
+    lg.textContent = "";
+    if(!chatMsgs.length) lg.appendChild(mk("p", "frh frmsgempty", chatLoaded ? t.msgNone : "…"));
+    let pd = "";
+    chatMsgs.forEach(x => {
+      const dk = new Date(x.ms).toDateString(); if(dk !== pd){ pd = dk; lg.appendChild(mk("p", "frday", dayLbl(x.ms))); }
+      const mine = x.u === me, b = mk("div", "frmsg " + (mine ? "me" : "th"));
+      b.appendChild(mk("span", "frmt", x.t)); b.appendChild(mk("span", "frmtm", hhmm(x.ms)));
+      if(mine){
+        const tg = () => { delId = delId === x.id ? "" : x.id; paintChat(); };
+        b.tabIndex = 0; b.setAttribute("role", "button"); b.addEventListener("click", tg);
+        b.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); tg(); } });
+        if(delId === x.id){ const d = mk("button", "frmdel", t.msgDel); d.type = "button"; d.addEventListener("click", ev => { ev.stopPropagation(); delMsg(x.id); }); b.appendChild(d); }
+      }
+      lg.appendChild(b);
+    });
+    if(stick) lg.scrollTop = lg.scrollHeight;
+    chatErrPaint(); lastSig = sigNow();
+  }
   async function run(okKey, fn){
     working = true; msg = ""; paint();
     try{ const k = await fn(); msg = T[lang()][k || okKey] || ""; msgOk = true; }
@@ -12722,6 +12841,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   }
   function paint(){
     const pv = $("spFrBody"); if(!pv) return;
+    if(chatId){ if(A() && A().user){ paintChat(); return; } dropChat(); }
     const t = T[lang()], a = A(), u = a && a.user;
     const ae = document.activeElement, hadFocus = ae && ae.id === "spFrIn", sel = hadFocus ? [ae.selectionStart, ae.selectionEnd] : null;
     pv.textContent = "";
@@ -12761,6 +12881,7 @@ if(navigator.onLine !== false) init().catch(() => {});
         if(open){
           const mn = mk("div", "frmenu"), hasPh = !!(dir[r.acc] && dir[r.acc].photo);
           mn.appendChild(mk("p", "frh", t.mnuH));
+          mn.appendChild(btn(t.pm + (unread[r.id] ? " ●" : ""), "ok", () => openChat(r)));
           const bp = btn(hasPh ? t.pf : t.nopf, "", () => showPhoto(r.acc)); if(!hasPh) bp.disabled = true;
           mn.appendChild(bp);
           mn.appendChild(btn(t.rmf, "dng", () => { confirmId = r.id; menuId = ""; paint(); }));
@@ -12786,7 +12907,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       const bb = $("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click();
       confirmId = ""; menuId = ""; msg = "";
     }
-    if(on) addOpen = false; panel.hidden = !on; btns.forEach(b => b.setAttribute("aria-expanded", String(on)));
+    if(on) addOpen = false; else dropChat(); panel.hidden = !on; btns.forEach(b => b.setAttribute("aria-expanded", String(on)));
     clearInterval(sigTimer); sigTimer = 0;
     if(on){
       paint();
@@ -12799,7 +12920,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     btns.forEach(b => {
       b.hidden = !u; b.setAttribute("aria-label", t.ttl); b.title = t.ttl;
       if(!b.dataset.i){ b.innerHTML = ICON + '<span class="frb" hidden></span>'; b.dataset.i = "1"; }
-      const bd = b.querySelector(".frb"); if(bd){ bd.hidden = true; }
+      const bd = b.querySelector(".frb"), un = Object.keys(unread).filter(k => unread[k]).length; if(bd){ bd.textContent = un ? String(un) : ""; bd.hidden = !un; }
     });
     const ti = $("frT"); if(ti) ti.textContent = t.ttl;
     const xb = $("frX"); if(xb){ xb.setAttribute("aria-label", t.no); xb.title = t.no; }
@@ -12819,7 +12940,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   if(typeof tp === "function") window.togglePanel = function(f){ if(f !== false && isOpen()) setOpen(false); return tp.apply(this, arguments); };
   (function hook(){
     const a = A();
-    if(a && a.onChange) a.onChange(x => { const uid = x.user ? x.user.uid : ""; if(uid !== curUid){ curUid = uid; confirmId = ""; menuId = ""; msg = ""; inVal = ""; addOpen = false; start(x.user || null); } refresh(); });
+    if(a && a.onChange) a.onChange(x => { const uid = x.user ? x.user.uid : ""; if(uid !== curUid){ curUid = uid; confirmId = ""; menuId = ""; msg = ""; inVal = ""; addOpen = false; dropChat(); start(x.user || null); } refresh(); });
     else setTimeout(hook, 150);
   })();
   refresh();
