@@ -13219,6 +13219,62 @@ if(navigator.onLine !== false) init().catch(() => {});
   setTimeout(start, 1200);
   /* pasang pemantau login begitu modul login siap */
   (function hook(){ const A = AA(); if(A && A.onChange) A.onChange(x => { if(x && x.user) start(); }); else setTimeout(hook, 200); })();
+
+  /* ===== Tombol "Notifikasi" di Pengaturan: cek status, minta izin (Android 13+), atau buka pengaturan HP bila mati =====
+     Android tidak mengizinkan aplikasi menyalakan notifikasi diam-diam, jadi pengguna diarahkan ke sakelarnya.
+     Plugin opsional (bila ada di APK): LocalNotifications (membaca status asli di Android 12 ke bawah) dan NativeSettings (membuka pengaturan). */
+  const plug = n => { try{ return (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null); }catch(e){ return null; } };
+  const LN = plug("LocalNotifications"), NS = plug("NativeSettings");
+  function say(msg){
+    try{
+      const d = document.createElement("div"); d.textContent = msg;
+      d.style.cssText = "position:fixed;left:12px;right:12px;bottom:24px;z-index:99999;background:#222;color:#fff;padding:12px 14px;border-radius:10px;font:14px/1.4 sans-serif;text-align:center";
+      document.body.appendChild(d); setTimeout(() => d.remove(), 5000);
+    }catch(e){}
+  }
+  /* hasil: "on" | "off" | "prompt" */
+  async function notifState(){
+    try{
+      if(LN && LN.checkPermissions){ const r = await LN.checkPermissions(); if(r.display === "granted") return "on"; if(r.display === "prompt" || r.display === "prompt-with-rationale") return "prompt"; return "off"; }
+    }catch(e){}
+    try{ const r = await PN.checkPermissions(); if(r.receive === "granted") return "on"; if(r.receive === "prompt") return "prompt"; return "off"; }catch(e){}
+    return "off";
+  }
+  async function openNotifSettings(){
+    if(NS && NS.openAndroid){
+      for(const opt of ["app_notification_settings", "application_details"]){
+        try{ await NS.openAndroid({ option: opt }); return true; }catch(e){}
+      }
+    }
+    say("Buka Pengaturan HP → Aplikasi → Satu Titik → Notifikasi, lalu nyalakan.");
+    return false;
+  }
+  function mountNotifBtn(){
+    const host = document.getElementById("sv0"), anchor = document.getElementById("gSound");
+    if(!host || document.getElementById("stNotifBtn")) return;
+    const b = document.createElement("button");
+    b.className = "sc"; b.id = "stNotifBtn"; b.type = "button";
+    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span id="stNotifTxt">Notifikasi</span>';
+    host.insertBefore(b, anchor || null);
+    const txt = () => document.getElementById("stNotifTxt");
+    async function refresh(){ const s = await notifState(); if(txt()) txt().textContent = s === "on" ? "Notifikasi: aktif ✓" : "Notifikasi: mati. Ketuk untuk menyalakan"; return s; }
+    b.addEventListener("click", async () => {
+      b.disabled = true;
+      try{
+        const s = await notifState();
+        if(s === "on"){ say("Notifikasi sudah aktif."); start(); }
+        else if(s === "prompt"){
+          try{ await PN.requestPermissions(); }catch(e){}
+          start();
+        }else{ await openNotifSettings(); }
+      }catch(e){}
+      b.disabled = false; refresh();
+    });
+    refresh();
+    /* setelah pengguna kembali dari pengaturan HP: perbarui tampilan dan daftarkan token bila sudah aktif */
+    document.addEventListener("visibilitychange", () => { if(!document.hidden) refresh().then(s => { if(s === "on") start(); }); });
+  }
+  mountNotifBtn();
 })();
 </script>
 </body>
