@@ -13169,10 +13169,12 @@ if(navigator.onLine !== false) init().catch(() => {});
     }catch(_){}
   }
   dbg("push v2 dimuat");
-  const A = window.satuTitikAuth; if(!A){ dbg("STOP: satuTitikAuth belum ada"); return; }
+  /* modul login (type="module") baru jalan setelah skrip ini, jadi satuTitikAuth diambil belakangan, bukan di awal */
+  const AA = () => window.satuTitikAuth || null;
   window.stPush = function(type, data){
     try{
       if(!PUSH_URL || PUSH_URL.indexOf("GANTI") === 0) return;
+      const A = AA(); if(!A) return;
       const u = A.user; if(!u || !u.getIdToken) return;
       u.getIdToken().then(t => fetch(PUSH_URL + "/notify", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + t }, body: JSON.stringify(Object.assign({ type: type }, data)), keepalive: true })).catch(() => {});
     }catch(e){}
@@ -13186,6 +13188,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   if(!PN) return;
   let token = "", wired = false, savedFor = "";
   async function save(){
+    const A = AA(); if(!A) return;
     const u = A.user; if(!u || !token || savedFor === u.uid + token) return;
     try{
       const { m, db } = await A.getDb();
@@ -13227,7 +13230,8 @@ if(navigator.onLine !== false) init().catch(() => {});
     }finally{ starting = false; }
   }
   setTimeout(start, 1200);
-  A.onChange(x => { if(x && x.user) start(); });
+  /* pasang pemantau login begitu modul login siap */
+  (function hook(){ const A = AA(); if(A && A.onChange) A.onChange(x => { if(x && x.user) start(); }); else setTimeout(hook, 200); })();
 })();
 </script>
 </body>
