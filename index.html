@@ -13189,10 +13189,8 @@ if(navigator.onLine !== false) init().catch(() => {});
     starting = true;
     try{
       let p = await PN.checkPermissions();
-      if(p.receive === "prompt" || p.receive === "prompt-with-rationale"){
-        let asked = false; try{ asked = localStorage.getItem("stPushAsked") === "1"; }catch(e){}
-        if(asked) return;
-        try{ localStorage.setItem("stPushAsked", "1"); }catch(e){}
+      /* hanya diminta bila belum pernah ditanya ("prompt"); status sistem sendiri yang mencegah tanya berulang */
+      if(p.receive === "prompt"){
         p = await PN.requestPermissions();
       }
       if(p.receive !== "granted") return;
@@ -13202,8 +13200,18 @@ if(navigator.onLine !== false) init().catch(() => {});
       PN.addListener("registrationError", e => console.warn("[push] registrasi gagal:", e && (e.error || e.message)));
       PN.addListener("pushNotificationActionPerformed", () => { setTimeout(() => { const b = document.getElementById("bellBtn"); if(b && b.getAttribute("aria-expanded") !== "true") b.click(); }, 700); });
       await PN.register();
-    }catch(e){ console.warn("[push] gagal mulai:", e && (e.message || e)); }
-    starting = false;
+    }catch(e){
+      console.warn("[push] gagal mulai:", e && (e.message || e));
+      /* plugin push tidak ada di APK: beri tahu di layar supaya tidak gagal diam-diam */
+      try{
+        if(/not implemented|not available|unimplemented/i.test(String(e && (e.message || e)))){
+          const d = document.createElement("div");
+          d.textContent = "Notifikasi belum aktif: APK ini belum memuat plugin push. Build ulang dan pasang APK terbaru.";
+          d.style.cssText = "position:fixed;left:12px;right:12px;bottom:24px;z-index:99999;background:#222;color:#fff;padding:12px 14px;border-radius:10px;font:14px/1.4 sans-serif;text-align:center";
+          document.body.appendChild(d); setTimeout(() => d.remove(), 7000);
+        }
+      }catch(_){}
+    }finally{ starting = false; }
   }
   setTimeout(start, 1200);
   A.onChange(x => { if(x && x.user) start(); });
