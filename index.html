@@ -48,6 +48,7 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 .cat .cb>.cin{overflow:hidden;min-height:0}
 .cat.min .cb{grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .28s ease,visibility 0s .28s}
 .cat .cgrid,.cat .soon{padding:2px 2px 4px}
+.cat .cw{margin:8px 4px 4px;font-size:12px;line-height:1.5;color:var(--muted);text-align:center}
 @media (prefers-reduced-motion:reduce){.cat .cb,.cat.min .cb,.cat h2 .cv{transition:none}}
 .cat .cs{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.4}
 .cat .soon{padding:18px 16px;border:1px dashed var(--line);border-radius:16px;color:var(--muted);font-size:13px;line-height:1.5;text-align:center}
@@ -67,6 +68,8 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #back:active{background:rgba(212,169,79,.22);transform:scale(.94)}
 #back:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
 #vt{font-weight:700;letter-spacing:.08em;font-size:15px}
+#vwarn{flex:none;margin:0;padding:6px 14px;font-size:12px;line-height:1.4;text-align:center;color:var(--muted);background:var(--bg2);border-bottom:1px solid var(--line)}
+#vwarn[hidden]{display:none}
 #frame{flex:1;min-height:0;width:100%;border:0;background:var(--bg);opacity:0;transition:opacity .38s ease}
 #frame.rdy{opacity:1}
 /* transisi buka menu: panel naik pelan sambil memudar masuk, isi menu menyusul setelah selesai dimuat (tidak ada kilatan kosong) */
@@ -594,6 +597,7 @@ h1{font-size:26px;line-height:1.15}
 <div id="netbar" role="status" aria-live="polite"></div>
 <div id="view" hidden>
   <header class="bar"><button id="back" type="button">‹ Beranda</button><span id="vt"></span><button class="gear" id="frBar" type="button" aria-controls="frpanel" aria-expanded="false" aria-haspopup="true" hidden></button><button class="gear" id="gear" type="button" aria-controls="spanel" aria-expanded="false"></button></header>
+  <p id="vwarn" hidden></p>
 </div>
 
 
@@ -738,7 +742,13 @@ const MTITLE = {
 };
 const mTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 1 : 0] : m.title; };
 const fTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 3 : 2] : m.title; };
+function paintWarn(){
+  const w = $("vwarn"); if(!w) return;
+  const m = curMenu && MENUS.find(x => x.id === curMenu), c = m && CATS.find(x => x.id === m.cat);
+  if(c && c.warn){ w.textContent = S.lang === "en" ? c.warnEn : c.warn; w.hidden = false; } else { w.textContent = ""; w.hidden = true; }
+}
 function paintMenuTitles(){
+  try{ paintWarn(); }catch(e){}
   MENUS.forEach(m => { const e = $("list").querySelector('.item[data-m="' + m.id + '"] .mt'); if(e) e.textContent = mTitle(m); });
   const m = curMenu && MENUS.find(x => x.id === curMenu); if(!m) return;
   $("vt").textContent = mTitle(m); document.title = mTitle(m);
@@ -748,9 +758,11 @@ function paintMenuTitles(){
 }
 const CATS = [
   { id:"hiburan", icon:"🎭", title:"Hiburan", titleEn:"Entertainment", sub:"Uji kemampuan dan seru-seruan.", subEn:"Test your skills and have fun." },
-  { id:"primbon", icon:"🔮", title:"Primbon & Ramalan", titleEn:"Primbon & Fortune", sub:"Weton, shio, numerologi, khodam, dan jodoh.", subEn:"Weton, zodiac, numerology, khodam, and compatibility." },
+  { id:"primbon", icon:"🔮", title:"Primbon & Ramalan", titleEn:"Primbon & Fortune", sub:"Weton, shio, numerologi, khodam, dan jodoh.", subEn:"Weton, zodiac, numerology, khodam, and compatibility.",
+    warn:"Hasil primbon dan ramalan hanya hiburan dan kepercayaan tradisional, bukan kepastian atau dasar untuk keputusan penting.", warnEn:"Primbon and fortune results are entertainment and traditional belief only, not certainty or a basis for important decisions." },
   { id:"medis", icon:"🩺", title:"Kesehatan & Medis", titleEn:"Health & Medical", sub:"Informasi kesehatan umum.", subEn:"General health information.",
-    soon:"Segera hadir", soonEn:"Coming soon", note:"Menu di sini hanya informasi umum, bukan diagnosis atau pengganti dokter.", noteEn:"Menus here are general information only, not a diagnosis or a substitute for a doctor." }
+    soon:"Segera hadir", soonEn:"Coming soon", note:"Menu di sini hanya informasi umum, bukan diagnosis atau pengganti dokter.", noteEn:"Menus here are general information only, not a diagnosis or a substitute for a doctor.",
+    warn:"Informasi kesehatan umum, bukan diagnosis, nasihat medis, atau pengganti pemeriksaan dokter. Konsultasikan kondisimu dengan tenaga kesehatan.", warnEn:"General health information, not a diagnosis, medical advice, or a substitute for seeing a doctor. Consult a health professional about your condition." }
 ];
 const ICONS = {
   "th-analytics":'<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><circle cx="10.5" cy="10.5" r="1.4" fill="currentColor"/></svg>',
@@ -1343,7 +1355,7 @@ function paintHome(){
   paintMenuTitles();
   CATS.forEach(c => {
     const q = x => $("list").querySelector('[data-c="' + c.id + '"] ' + x), set = (x, v) => { const e = q(x); if(e) e.textContent = v; };
-    set("h2 .ct", en ? c.titleEn : c.title); set(".cs", en ? c.subEn : c.sub);
+    set("h2 .ct", en ? c.titleEn : c.title); set(".cs", en ? c.subEn : c.sub); if(c.warn) set(".cw", en ? c.warnEn : c.warn);
     if(c.soon){ set(".soon b", en ? c.soonEn : c.soon); set(".soon p", en ? c.noteEn : c.note); }
   });
 }
@@ -1404,7 +1416,7 @@ const PV = {
     {h:"3. Untuk apa data dipakai", l:["Menjalankan fitur aplikasi dan menampilkan hasil menu.","Memungkinkan masuk akun, sinkronisasi data, dan fitur turnamen online (undangan moderator memakai ID Akun).","Menampilkan profilmu, serta menerima dan membaca saran dari pengguna.","Menampilkan iklan pada versi aplikasi yang memuat iklan, sebagai sumber pendanaan pengembangan."], p:["Kami tidak menjual data pribadimu. Kami juga tidak membagikan data akun, username, atau hasil menumu kepada pengiklan."]},
     {h:"4. Layanan pihak ketiga", l:["Google Firebase (Authentication dan Cloud Firestore): untuk masuk akun dan menyimpan data akun.","Web3Forms: untuk mengirim pesan dari Kotak Saran.","Saweria: tautan Dukung Kami membuka halaman eksternal yang punya kebijakan privasinya sendiri.","Google, Cloudflare, dan WorldTimeAPI: untuk pengecekan koneksi dan waktu.","Jaringan iklan (misalnya Google AdMob): hanya pada versi yang menampilkan iklan."], p:["Layanan-layanan ini punya kebijakan privasi sendiri yang berlaku saat data diproses oleh mereka."]},
     {h:"5. Penyimpanan dan keamanan", p:["Data lokal tersimpan di perangkatmu dan hilang bila data aplikasi atau browser dihapus. Data akun disimpan di layanan Google Firebase dan dikirim lewat koneksi terenkripsi (HTTPS). Tidak ada metode penyimpanan atau pengiriman data yang sepenuhnya bebas risiko, jadi kami tidak dapat menjamin keamanan mutlak."]},
-    {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk dengan Google, data di server ikut dihapus).","Hapus akun dan data cloud kapan saja lewat Pengaturan > Akun > Lihat profil > Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri."]},
+    {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk dengan Google, data di server ikut dihapus).","Hapus akun dan data cloud kapan saja lewat Pengaturan > Akun > Lihat profil > Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri.","Penghapusan akun menghapus ID Akun, username, foto profil, daftar teman dan pesan pribadi, salinan data yang tersinkron, serta turnamen online yang kamu buat. Laporan yang pernah kamu kirim dapat tetap disimpan pengelola untuk keperluan keamanan.","Tanpa memasang aplikasi: buka https://aurenza27.github.io di browser, masuk dengan Google, lalu pilih Hapus akun di halaman Profil. Bila tidak bisa masuk, kirim permintaan penghapusan lewat Kotak Saran di halaman yang sama dengan menyebut ID Akunmu (ST-xxxxxx)."]},
     {h:"7. Anak-anak", p:["Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun, dan kami tidak dengan sengaja mengumpulkan data mereka. Bila kamu orang tua dan menemukan data anak di aplikasi ini, hubungi kami lewat Kotak Saran."]},
     {h:"8. Hasil menu", p:["Hasil menu primbon dan hiburan bersifat hiburan. Hasil BMI, kalori, dan kehamilan adalah informasi umum, bukan pengganti nasihat tenaga kesehatan."]},
     {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini."]},
@@ -1421,7 +1433,7 @@ const PV = {
     {h:"3. How data is used", l:["To run the app’s features and show menu results.","To enable sign-in, data sync, and online tournaments (moderator invitations use the Account ID).","To show your profile, and to receive and read user suggestions.","To show ads in app versions that contain ads, as a way to fund development."], p:["We do not sell your personal data. We also do not share your account data, username, or menu results with advertisers."]},
     {h:"4. Third-party services", l:["Google Firebase (Authentication and Cloud Firestore): for sign-in and storing account data.","Web3Forms: to deliver messages from the Suggestion Box.","Saweria: the Support Us link opens an external page with its own privacy policy.","Google, Cloudflare, and WorldTimeAPI: for connection and time checks.","Ad networks (for example Google AdMob): only in versions that show ads."], p:["These services have their own privacy policies, which apply when they process data."]},
     {h:"5. Storage and security", p:["Local data stays on your device and is lost if you clear the app or browser data. Account data is stored in Google Firebase and sent over encrypted connections (HTTPS). No method of storage or transmission is completely risk-free, so we cannot guarantee absolute security."]},
-    {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in with Google, server data is deleted too).","Delete your account and cloud data at any time via Settings > Account > View profile > Delete account. Data on this device stays until you delete it yourself."]},
+    {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in with Google, server data is deleted too).","Delete your account and cloud data at any time via Settings > Account > View profile > Delete account. Data on this device stays until you delete it yourself.","Deleting your account removes the Account ID, username, profile photo, friend list and private messages, synced data, and the online tournaments you created. Reports you submitted may still be kept by the administrators for safety purposes.","Without installing the app: open https://aurenza27.github.io in a browser, sign in with Google, and choose Delete account on the Profile page. If you cannot sign in, send a deletion request through the Suggestion Box on the same page, stating your Account ID (ST-xxxxxx)."]},
     {h:"7. Children", p:["This app is not intended for children under 13, and we do not knowingly collect their data. If you are a parent and find a child’s data in this app, contact us through the Suggestion Box."]},
     {h:"8. Menu results", p:["Primbon and entertainment menu results are for entertainment. BMI, calorie, and pregnancy results are general information, not a substitute for advice from a health professional."]},
     {h:"9. Changes to this policy", p:["This policy may be updated. The date of the latest update is shown at the top of this page."]},
@@ -2019,7 +2031,7 @@ function openMenu(m){
   $("vt").textContent = mTitle(m);
   const f = document.createElement("iframe");
   f.id = "frame"; f.title = mTitle(m); f.setAttribute("allow", "autoplay");
-  curMenu = m.id; writeKeys(S); f.addEventListener("load", () => { try{ watchFrame(); }catch(e){} try{ paintMenuTitles(); }catch(e){} try{ medisHookFrame(); }catch(e){} try{ hibHookFrame(); }catch(e){} try{ hapticHook(); }catch(e){} }); f.srcdoc = menuSrc(m);
+  curMenu = m.id; try{ paintWarn(); }catch(e){} writeKeys(S); f.addEventListener("load", () => { try{ watchFrame(); }catch(e){} try{ paintMenuTitles(); }catch(e){} try{ medisHookFrame(); }catch(e){} try{ hibHookFrame(); }catch(e){} try{ hapticHook(); }catch(e){} }); f.srcdoc = menuSrc(m);
   $("view").appendChild(f);
   $("home").hidden = true; $("view").hidden = false;
   { const v = $("view"); v.classList.remove("vin"); void v.offsetWidth; v.classList.add("vin"); }
@@ -2034,7 +2046,7 @@ function closeMenu(){
   try{ speechSynthesis.cancel(); }catch(e){}
   try{ const fd = $("frame").contentWindow.document, ae = fd.activeElement; if(ae && ae !== fd.body && ae.blur) ae.blur(); }catch(e){}   /* simpan isian yang sedang diketik (mis. skor) sebelum menu dibuang */
   $("frame").remove();   /* musik dan suara AI ikut berhenti */
-  curMenu = null; $("view").hidden = true; $("view").classList.remove("vin"); $("home").hidden = false;
+  curMenu = null; try{ paintWarn(); }catch(e){} $("view").hidden = true; $("view").classList.remove("vin"); $("home").hidden = false;
   { const h = $("home"); h.classList.remove("hin"); void h.offsetWidth; h.classList.add("hin"); }
   try{ medisSync(true); }catch(e){}
   try{ hibSync(true); }catch(e){}
@@ -2068,6 +2080,7 @@ CATS.forEach(c => {
     grid.appendChild(b);
   });
   if(items.length) cin.appendChild(grid);
+  if(c.warn){ const w = document.createElement("p"); w.className = "cw"; w.textContent = c.warn; cin.appendChild(w); }
   else { const d = document.createElement("div"); d.className = "soon"; d.innerHTML = c.icon + '<b></b><p style="margin:0"></p>'; cin.appendChild(d); }
   $("list").appendChild(sec);
 });
@@ -12602,8 +12615,8 @@ if(navigator.onLine !== false) init().catch(() => {});
   const subs = new Set(), selfDel = new Set();
   const emit = () => { subs.forEach(f => { try{ f(); }catch(e){} }); try{ refresh(); }catch(e){} };
   const nameOf = acc => (dir[acc] && dir[acc].name) || acc;
-  /* online bila detak terakhir (accountIds/{ID}.seen) kurang dari 150 detik lalu; aplikasi mengirim detak tiap 60 detik */
-  const isOn = acc => { const v = dir[acc] && dir[acc].seen; return !!v && Math.abs(Date.now() - v) < 150000; };
+  /* online bila detak terakhir (accountIds/{ID}.seen) kurang dari 400 detik lalu; aplikasi mengirim detak tiap 150 detik (hemat penulisan Firestore) */
+  const isOn = acc => { const v = dir[acc] && dir[acc].seen; return !!v && Math.abs(Date.now() - v) < 400000; };
   /* teks "Terakhir online ..." untuk teman yang sedang offline */
   const lastText = acc => {
     const t = T[lang()], v = dir[acc] && Math.max(dir[acc].last || 0, dir[acc].seen || 0);
@@ -12675,13 +12688,13 @@ if(navigator.onLine !== false) init().catch(() => {});
       }, () => {}); }catch(e){}
     })).catch(() => {});
   }
-  /* detak "saya online": tulis waktu sekarang tiap 60 detik selama aplikasi terbuka; saat disembunyikan/ditutup ditandai offline (0) */
+  /* detak "saya online": tulis waktu sekarang tiap 150 detik selama aplikasi terbuka; saat disembunyikan/ditutup ditandai offline (0) */
   function beat(off){
     const a = A(), me = myAcc(); if(!a || !a.user || !me || !a.getDb) return;
     if(!off && (navigator.onLine === false || document.visibilityState === "hidden")) return;
     a.getDb().then(({ m, db }) => m.setDoc(m.doc(db, "accountIds", me), { seen: off ? 0 : Date.now(), last: Date.now() }, { merge: true })).catch(() => {});
   }
-  setInterval(() => beat(), 60000);
+  setInterval(() => beat(), 150000);
   document.addEventListener("visibilitychange", () => beat(document.visibilityState === "hidden"));
   addEventListener("pagehide", () => beat(true));
   addEventListener("online", () => beat());
