@@ -13182,11 +13182,19 @@ if(navigator.onLine !== false) init().catch(() => {});
       savedFor = u.uid + token;
     }catch(e){ console.warn("[push] simpan token gagal:", e && (e.code || e.message)); }
   }
+  let starting = false;
   async function start(){
     if(wired){ save(); return; }
+    if(starting) return;
+    starting = true;
     try{
       let p = await PN.checkPermissions();
-      if(p.receive === "prompt" || p.receive === "prompt-with-rationale") p = await PN.requestPermissions();
+      if(p.receive === "prompt" || p.receive === "prompt-with-rationale"){
+        let asked = false; try{ asked = localStorage.getItem("stPushAsked") === "1"; }catch(e){}
+        if(asked) return;
+        try{ localStorage.setItem("stPushAsked", "1"); }catch(e){}
+        p = await PN.requestPermissions();
+      }
       if(p.receive !== "granted") return;
       wired = true;
       try{ await PN.createChannel({ id: "satutitik", name: "Notifikasi", description: "Undangan, pertemanan, pesan, dan kabar terbaru", importance: 4, visibility: 1, vibration: true }); }catch(e){}
@@ -13195,7 +13203,9 @@ if(navigator.onLine !== false) init().catch(() => {});
       PN.addListener("pushNotificationActionPerformed", () => { setTimeout(() => { const b = document.getElementById("bellBtn"); if(b && b.getAttribute("aria-expanded") !== "true") b.click(); }, 700); });
       await PN.register();
     }catch(e){ console.warn("[push] gagal mulai:", e && (e.message || e)); }
+    starting = false;
   }
+  setTimeout(start, 1200);
   A.onChange(x => { if(x && x.user) start(); });
 })();
 </script>
