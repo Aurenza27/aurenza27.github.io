@@ -8974,6 +8974,7 @@ async function inviteMod(t, id, pr, kind){
     await m.deleteDoc(ref);
   }
   await m.setDoc(ref, po({oid:String(t.oid), kind, tName:String(t.name || ""), ownerUid:String(u.uid), ownerName:String(ON.nm(u) || u.email || ""), toUid:String(pr.uid), toAccountId:String(id), toName:String(pr.name || ""), status:"pending", ts:Date.now()}));
+  try{ window.stPush && window.stPush("invite", { iid: ref.id }); }catch(e){}
   toast(L("Undangan terkirim ke " + (pr.name || id) + ".", "Invite sent to " + (pr.name || id) + "."));
   return true;
 }
@@ -12265,6 +12266,7 @@ const NSRC = (() => {
         b.set(m.doc(db, "tournaments", n.inv.oid, "followers", u.uid), { n: nm, t: Date.now() });
       } else if(accept && !rm) b.update(m.doc(db, "tournaments", n.inv.oid), { modIds: m.arrayUnion(acc) });
       await b.commit();
+      try{ window.stPush && window.stPush("invite_reply", { iid: n.inv.docId }); }catch(e){}
       if(accept && rm){
         try{ const bb = document.getElementById("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click(); }catch(e){}
         try{ window.satuTitikJoinRoom(n.inv.oid); }catch(e){}
@@ -12707,9 +12709,10 @@ if(navigator.onLine !== false) init().catch(() => {});
       const d = ex.data();
       if(d.st === "ok") throw new Error("e_already");
       if(d.by === u.uid) throw new Error("e_pending");
-      await m.updateDoc(ref, { st: "ok", ts: Date.now() }); return "acd";
+      await m.updateDoc(ref, { st: "ok", ts: Date.now() }); try{ window.stPush && window.stPush("friend_ok", { fid }); }catch(e){} return "acd";
     }
     await m.setDoc(ref, { u: pair, a: pair.map(x => accOf[x]), by: u.uid, st: "pending", ts: Date.now() });
+    try{ window.stPush && window.stPush("friend_req", { fid }); }catch(e){}
     return "sent";
   }
   async function act(kind, r){
@@ -12718,6 +12721,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(kind === "acc"){
       if(accepted().length >= MAX_FRIENDS) throw new Error("e_max");
       await m.updateDoc(ref, { st: "ok", ts: Date.now() });
+      try{ window.stPush && window.stPush("friend_ok", { fid: r.id }); }catch(e){}
     } else { selfDel.add(r.id); if(r.st === "ok") await purgeMsgs(m, db, r.id); await m.deleteDoc(ref); }
   }
   const incoming = () => rows.filter(r => r.st === "pending" && !r.mine).sort((x, y) => y.ts - x.ts);
@@ -12795,6 +12799,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     }
     const nm = String((a.username && a.usernameUid === u.uid ? a.username : "") || u.displayName || u.email || "");
     await m.setDoc(ref, { oid: rc.code, kind: "room", tName: "Tebak Inisial · " + rc.code, ownerUid: u.uid, ownerName: nm, toUid: r.uid, toAccountId: r.acc, toName: nameOf(r.acc), status: "pending", ts: Date.now() });
+    try{ window.stPush && window.stPush("invite", { iid: id }); }catch(e){}
   }
   function roomBar(r, t, c){
     const bar = mk("div", "frinv"), o = invOut["ti_" + c.code + "_" + r.acc], inRoom = c.pl.includes(r.uid), pend = !!o && o.st === "pending" && Date.now() - o.ts < 600000, full = c.n >= 8;
@@ -12844,7 +12849,8 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(navigator.onLine === false) throw new Error("e_off");
     if(Date.now() - lastSend < 700) throw new Error("e_fail"); lastSend = Date.now();
     const { m, db } = await a.getDb();
-    await m.addDoc(m.collection(db, "friendships", chatId, "msgs"), { u: u.uid, t: txt, at: m.serverTimestamp(), exp: m.Timestamp.fromMillis(Date.now() + 30 * 86400000) });
+    const mref = await m.addDoc(m.collection(db, "friendships", chatId, "msgs"), { u: u.uid, t: txt, at: m.serverTimestamp(), exp: m.Timestamp.fromMillis(Date.now() + 30 * 86400000) });
+    try{ window.stPush && window.stPush("friend_msg", { fid: chatId, mid: mref.id }); }catch(e){}
   }
   async function delMsg(id){
     const a = A(), fid = chatId; delId = ""; chatErr = "";
@@ -13147,6 +13153,50 @@ if(navigator.onLine !== false) init().catch(() => {});
       });
     }catch(e){ console.warn("backButton gagal dipasang:", e && (e.message || e)); }
   })();
+})();
+
+/* ===== PUSH NOTIFIKASI (FCM): lonceng tetap tampil di HP walau aplikasi ditutup =====
+   Android (Capacitor) + sudah login. Token perangkat disimpan di Firestore "pushTokens/{token}".
+   Pengiriman dilakukan server push gratis (Cloudflare Worker, lihat push-worker/worker.js). Di web/PWA tidak ada yang berubah. */
+(function(){
+  const PUSH_URL = "https://satutitik-push.randiaudiayogeza75.workers.dev"; /* contoh: https://satutitik-push.namamu.workers.dev */
+  const A = window.satuTitikAuth; if(!A) return;
+  window.stPush = function(type, data){
+    try{
+      if(!PUSH_URL || PUSH_URL.indexOf("GANTI") === 0) return;
+      const u = A.user; if(!u || !u.getIdToken) return;
+      u.getIdToken().then(t => fetch(PUSH_URL + "/notify", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + t }, body: JSON.stringify(Object.assign({ type: type }, data)), keepalive: true })).catch(() => {});
+    }catch(e){}
+  };
+  const C = window.Capacitor; let native = false;
+  try{ native = !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){}
+  if(!native) return;
+  const PN = (C.Plugins && C.Plugins.PushNotifications) || (C.registerPlugin ? C.registerPlugin("PushNotifications") : null);
+  if(!PN) return;
+  let token = "", wired = false, savedFor = "";
+  async function save(){
+    const u = A.user; if(!u || !token || savedFor === u.uid + token) return;
+    try{
+      const { m, db } = await A.getDb();
+      await m.setDoc(m.doc(db, "pushTokens", token), { uid: u.uid, platform: "android", ts: Date.now() });
+      savedFor = u.uid + token;
+    }catch(e){ console.warn("[push] simpan token gagal:", e && (e.code || e.message)); }
+  }
+  async function start(){
+    if(wired){ save(); return; }
+    try{
+      let p = await PN.checkPermissions();
+      if(p.receive === "prompt" || p.receive === "prompt-with-rationale") p = await PN.requestPermissions();
+      if(p.receive !== "granted") return;
+      wired = true;
+      try{ await PN.createChannel({ id: "satutitik", name: "Notifikasi", description: "Undangan, pertemanan, pesan, dan kabar terbaru", importance: 4, visibility: 1, vibration: true }); }catch(e){}
+      PN.addListener("registration", t => { token = t && t.value || ""; save(); });
+      PN.addListener("registrationError", e => console.warn("[push] registrasi gagal:", e && (e.error || e.message)));
+      PN.addListener("pushNotificationActionPerformed", () => { setTimeout(() => { const b = document.getElementById("bellBtn"); if(b && b.getAttribute("aria-expanded") !== "true") b.click(); }, 700); });
+      await PN.register();
+    }catch(e){ console.warn("[push] gagal mulai:", e && (e.message || e)); }
+  }
+  A.onChange(x => { if(x && x.user) start(); });
 })();
 </script>
 </body>
