@@ -725,7 +725,7 @@ const MENUS = [
   { id:"cek-jodoh", cat:"primbon", icon:"💞", title:"JODOH", desc:"Cocokkah kalian berdua?", descEn:"Are the two of you a match?", src:"src-cek-jodoh" },
   { id:"cek-bmi", cat:"medis", icon:"⚖️", title:"BMI & KALORI", desc:"IMT (standar Kemenkes dan WHO), target berat, dan kebutuhan kalori harian (FAO/WHO/UNU)", descEn:"BMI (Indonesian MoH and WHO standards), weight target, and daily calorie needs (FAO/WHO/UNU)", src:"src-cek-bmi" },
   { id:"cek-hamil", cat:"medis", icon:"🤰", title:"KEHAMILAN", desc:"Usia kehamilan, perkiraan lahir (HPL), jadwal periksa, dan kenaikan berat badan", descEn:"Gestational age, due date (EDD), checkup schedule, and weight gain", src:"src-cek-hamil" },
-  { id:"turnamen", cat:"hiburan", icon:"🏆", title:"TURNAMEN", desc:"Atur turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor", descEn:"Run a sports or eSports tournament: fixtures, scores, standings, knockout bracket, and top scorers", src:"src-turnamen" },
+  { id:"turnamen", cat:"manajemen", icon:"🏆", title:"TURNAMEN", desc:"Atur turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor", descEn:"Run a sports or eSports tournament: fixtures, scores, standings, knockout bracket, and top scorers", src:"src-turnamen" },
   { id:"tebak-inisial", cat:"hiburan", icon:"🔤", title:"TEBAK INISIAL", desc:"Acak huruf A–Z dan kategori untuk tebak-tebakan seru anak-anak", descEn:"Random letter A–Z and category for fun kids' guessing games", src:"src-tebak-inisial" }
 ];
 /* judul menu per bahasa: [beranda ID, beranda EN, judul di dalam menu ID, judul di dalam menu EN]. Nama aplikasi "Satu Titik" tidak diterjemahkan. */
@@ -758,11 +758,9 @@ function paintMenuTitles(){
 }
 const CATS = [
   { id:"hiburan", icon:"🎭", title:"Hiburan", titleEn:"Entertainment", sub:"Uji kemampuan dan seru-seruan.", subEn:"Test your skills and have fun." },
-  { id:"primbon", icon:"🔮", title:"Primbon & Ramalan", titleEn:"Primbon & Fortune", sub:"Weton, shio, numerologi, khodam, dan jodoh.", subEn:"Weton, zodiac, numerology, khodam, and compatibility.",
-    warn:"Hasil primbon dan ramalan hanya hiburan dan kepercayaan tradisional, bukan kepastian atau dasar untuk keputusan penting.", warnEn:"Primbon and fortune results are entertainment and traditional belief only, not certainty or a basis for important decisions." },
-  { id:"medis", icon:"🩺", title:"Kesehatan & Medis", titleEn:"Health & Medical", sub:"Informasi kesehatan umum.", subEn:"General health information.",
-    soon:"Segera hadir", soonEn:"Coming soon", note:"Menu di sini hanya informasi umum, bukan diagnosis atau pengganti dokter.", noteEn:"Menus here are general information only, not a diagnosis or a substitute for a doctor.",
-    warn:"Informasi kesehatan umum, bukan diagnosis, nasihat medis, atau pengganti pemeriksaan dokter. Konsultasikan kondisimu dengan tenaga kesehatan.", warnEn:"General health information, not a diagnosis, medical advice, or a substitute for seeing a doctor. Consult a health professional about your condition." }
+  { id:"primbon", icon:"🔮", title:"Primbon & Ramalan", titleEn:"Primbon & Fortune", sub:"Weton, shio, numerologi, khodam, dan jodoh.", subEn:"Weton, zodiac, numerology, khodam, and compatibility." },
+  { id:"medis", icon:"🩺", title:"Kesehatan & Medis", titleEn:"Health & Medical", sub:"Informasi kesehatan umum.", subEn:"General health information." },
+  { id:"manajemen", icon:"🗂️", title:"Manajemen", titleEn:"Management", sub:"Atur dan kelola kegiatan.", subEn:"Organize and manage activities." }
 ];
 const ICONS = {
   "th-analytics":'<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><circle cx="10.5" cy="10.5" r="1.4" fill="currentColor"/></svg>',
@@ -800,10 +798,8 @@ let clockOffset = 0, remoteRelease = {};
 const nowMs = () => Date.now() + clockOffset;
 let clockSynced = false;   /* true setelah jam server berhasil dibaca */
 window.stClock = {now: () => nowMs(), synced: () => clockSynced};   /* dipakai semua menu (STime) */
-const badgeOn = id => {
-  const rel = remoteRelease[id] ? new Date(remoteRelease[id] + "T00:00:00").getTime() : (BADGE[id] ? BADGE_RELEASE.getTime() : badgeSeen[id]);
-  return rel > 0 && nowMs() < rel + BADGE_DAYS * DAY;
-};
+/* Label "Baru" dinonaktifkan untuk semua menu. */
+const badgeOn = id => false;
 function refreshBadges(){
   document.querySelectorAll("#list .item").forEach(b => {
     const id = b.dataset.m, has = b.querySelector(".bd"), on = badgeOn(id);
@@ -1355,7 +1351,7 @@ function paintHome(){
   paintMenuTitles();
   CATS.forEach(c => {
     const q = x => $("list").querySelector('[data-c="' + c.id + '"] ' + x), set = (x, v) => { const e = q(x); if(e) e.textContent = v; };
-    set("h2 .ct", en ? c.titleEn : c.title); set(".cs", en ? c.subEn : c.sub); if(c.warn) set(".cw", en ? c.warnEn : c.warn);
+    set("h2 .ct", en ? c.titleEn : c.title); set(".cs", en ? c.subEn : c.sub);
     if(c.soon){ set(".soon b", en ? c.soonEn : c.soon); set(".soon p", en ? c.noteEn : c.note); }
   });
 }
@@ -1418,7 +1414,7 @@ const PV = {
     {h:"5. Penyimpanan dan keamanan", p:["Data lokal tersimpan di perangkatmu dan hilang bila data aplikasi atau browser dihapus. Data akun disimpan di layanan Google Firebase dan dikirim lewat koneksi terenkripsi (HTTPS). Tidak ada metode penyimpanan atau pengiriman data yang sepenuhnya bebas risiko, jadi kami tidak dapat menjamin keamanan mutlak."]},
     {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk dengan Google, data di server ikut dihapus).","Hapus akun dan data cloud kapan saja lewat Pengaturan > Akun > Lihat profil > Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri.","Penghapusan akun menghapus ID Akun, username, foto profil, daftar teman dan pesan pribadi, salinan data yang tersinkron, serta turnamen online yang kamu buat. Laporan yang pernah kamu kirim dapat tetap disimpan pengelola untuk keperluan keamanan.","Tanpa memasang aplikasi: buka https://aurenza27.github.io di browser, masuk dengan Google, lalu pilih Hapus akun di halaman Profil. Bila tidak bisa masuk, kirim permintaan penghapusan lewat Kotak Saran di halaman yang sama dengan menyebut ID Akunmu (ST-xxxxxx)."]},
     {h:"7. Anak-anak", p:["Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun, dan kami tidak dengan sengaja mengumpulkan data mereka. Bila kamu orang tua dan menemukan data anak di aplikasi ini, hubungi kami lewat Kotak Saran."]},
-    {h:"8. Hasil menu", p:["Hasil menu primbon dan hiburan bersifat hiburan. Hasil BMI, kalori, dan kehamilan adalah informasi umum, bukan pengganti nasihat tenaga kesehatan."]},
+    {h:"8. Hasil menu", p:["Hasil menu primbon, ramalan, dan hiburan hanya untuk hiburan dan kepercayaan tradisional, bukan kepastian atau dasar untuk keputusan penting. Hasil BMI, kalori, dan kehamilan adalah informasi umum, bukan diagnosis, nasihat medis, atau pengganti pemeriksaan tenaga kesehatan; konsultasikan kondisimu dengan dokter atau bidan."]},
     {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini."]},
     {h:"10. Kontak", p:["Pertanyaan tentang privasi dapat dikirim lewat Kotak Saran di Pengaturan."]}
   ]},
@@ -1435,7 +1431,7 @@ const PV = {
     {h:"5. Storage and security", p:["Local data stays on your device and is lost if you clear the app or browser data. Account data is stored in Google Firebase and sent over encrypted connections (HTTPS). No method of storage or transmission is completely risk-free, so we cannot guarantee absolute security."]},
     {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in with Google, server data is deleted too).","Delete your account and cloud data at any time via Settings > Account > View profile > Delete account. Data on this device stays until you delete it yourself.","Deleting your account removes the Account ID, username, profile photo, friend list and private messages, synced data, and the online tournaments you created. Reports you submitted may still be kept by the administrators for safety purposes.","Without installing the app: open https://aurenza27.github.io in a browser, sign in with Google, and choose Delete account on the Profile page. If you cannot sign in, send a deletion request through the Suggestion Box on the same page, stating your Account ID (ST-xxxxxx)."]},
     {h:"7. Children", p:["This app is not intended for children under 13, and we do not knowingly collect their data. If you are a parent and find a child’s data in this app, contact us through the Suggestion Box."]},
-    {h:"8. Menu results", p:["Primbon and entertainment menu results are for entertainment. BMI, calorie, and pregnancy results are general information, not a substitute for advice from a health professional."]},
+    {h:"8. Menu results", p:["Primbon, fortune, and entertainment menu results are for entertainment and traditional belief only, not a certainty or a basis for important decisions. BMI, calorie, and pregnancy results are general information, not a diagnosis, medical advice, or a substitute for an examination by a health professional; consult a doctor or midwife about your condition."]},
     {h:"9. Changes to this policy", p:["This policy may be updated. The date of the latest update is shown at the top of this page."]},
     {h:"10. Contact", p:["Privacy questions can be sent through the Suggestion Box in Settings."]}
   ]}
@@ -2081,7 +2077,7 @@ CATS.forEach(c => {
   });
   if(items.length) cin.appendChild(grid);
   if(c.warn){ const w = document.createElement("p"); w.className = "cw"; w.textContent = c.warn; cin.appendChild(w); }
-  else { const d = document.createElement("div"); d.className = "soon"; d.innerHTML = c.icon + '<b></b><p style="margin:0"></p>'; cin.appendChild(d); }
+  else if(!items.length){ const d = document.createElement("div"); d.className = "soon"; d.innerHTML = c.icon + '<b></b><p style="margin:0"></p>'; cin.appendChild(d); }
   $("list").appendChild(sec);
 });
 paintHome();
@@ -7029,7 +7025,7 @@ function paint(){
   $("gapBtn").textContent = L("⏱️ Jeda: ", "⏱️ Gap: ") + GAPS[gapI] + L(" dtk", " s");
   $("langBtn").textContent = "🌐 " + (lang === "en" ? "English" : "Indonesia");
   renderQueue();
-  $("note").textContent = L("Kategori hasil (weton, Liu He/Liu Chong, siklus unsur, angka numerologi) mengikuti sumber yang tercantum di “Sumber & dasar rumus”. Persentase total (bobot Jawa 40% · Tionghoa 30% · Numerologi 30%), bukan angka dari kitab. Untuk wawasan tradisi, bukan kepastian.", "Result categories (weton, Liu He/Liu Chong, element cycle, numerology numbers) follow the sources listed in “Sources & formula basis”. The overall percentage (weights Javanese 40% · Chinese 30% · Numerology 30%) is not a figure from the classical texts. For insight into tradition, not a certainty.");
+  $("note").textContent = L("Kategori hasil (weton, Liu He/Liu Chong, siklus unsur, angka numerologi) mengikuti sumber yang tercantum di “Sumber & dasar rumus”. Persentase total (bobot Jawa 40% · Tionghoa 30% · Numerologi 30%), bukan angka dari kitab.", "Result categories (weton, Liu He/Liu Chong, element cycle, numerology numbers) follow the sources listed in “Sources & formula basis”. The overall percentage (weights Javanese 40% · Chinese 30% · Numerology 30%) is not a figure from the classical texts.");
 }
 /* bersihkan layar: hasil dihapus dan tampilan kembali ke beranda; antrean tetap */
 function clearScreen(){
@@ -7491,8 +7487,8 @@ function paint(){
   $("gapBtn").textContent = L("⏱️ Jeda: ", "⏱️ Gap: ") + GAPS[gapI] + L(" dtk", " s");
   $("langBtn").textContent = "🌐 " + (lang === "en" ? "English" : "Indonesia");
   renderQueue();
-  $("note").textContent = L("Informasi umum, bukan diagnosis dan bukan pengganti pemeriksaan dokter. IMT tidak mengukur lemak tubuh maupun sebaran lemaknya. Tidak berlaku untuk ibu hamil atau menyusui, atlet, dan orang dengan kondisi medis tertentu. Kategori Kemenkes memakai kriteria Asia-Pasifik, sehingga batas berat badan lebih (23,0) lebih rendah daripada WHO (25,0). Sumber: Kemenkes RI, KMK No. HK.01.07/MENKES/509/2025 (PNPK Obesitas Dewasa, kategori IMT dewasa); WHO (klasifikasi IMT dewasa); FAO/WHO/UNU 2001, Human Energy Requirements (persamaan Schofield dan nilai PAL).",
-    "General information, not a diagnosis and not a substitute for seeing a doctor. BMI does not measure body fat or where it is carried. Not valid for pregnant or breastfeeding women, athletes, or people with certain medical conditions. The Ministry of Health categories use Asia-Pacific criteria, so its overweight threshold (23.0) is lower than WHO (25.0). Sources: Indonesian Ministry of Health, KMK No. HK.01.07/MENKES/509/2025 (adult obesity national guideline, BMI categories); WHO (adult BMI classification); FAO/WHO/UNU 2001, Human Energy Requirements (Schofield equations and PAL values).");
+  $("note").textContent = L("IMT tidak mengukur lemak tubuh maupun sebaran lemaknya. Tidak berlaku untuk ibu hamil atau menyusui, atlet, dan orang dengan kondisi medis tertentu. Kategori Kemenkes memakai kriteria Asia-Pasifik, sehingga batas berat badan lebih (23,0) lebih rendah daripada WHO (25,0). Sumber: Kemenkes RI, KMK No. HK.01.07/MENKES/509/2025 (PNPK Obesitas Dewasa, kategori IMT dewasa); WHO (klasifikasi IMT dewasa); FAO/WHO/UNU 2001, Human Energy Requirements (persamaan Schofield dan nilai PAL).",
+    "BMI does not measure body fat or where it is carried. Not valid for pregnant or breastfeeding women, athletes, or people with certain medical conditions. The Ministry of Health categories use Asia-Pacific criteria, so its overweight threshold (23.0) is lower than WHO (25.0). Sources: Indonesian Ministry of Health, KMK No. HK.01.07/MENKES/509/2025 (adult obesity national guideline, BMI categories); WHO (adult BMI classification); FAO/WHO/UNU 2001, Human Energy Requirements (Schofield equations and PAL values).");
 }
 function clearScreen(){
   clearAuto(); stopSpeak(); cur = null;
@@ -7983,8 +7979,8 @@ function paint(){
   $("gapBtn").textContent = L("⏱️ Jeda: ", "⏱️ Gap: ") + GAPS[gapI] + L(" dtk", " s");
   $("langBtn").textContent = "🌐 " + (lang === "en" ? "English" : "Indonesia");
   renderQueue();
-  $("note").textContent = L("Informasi umum, bukan diagnosis dan bukan pengganti pemeriksaan dokter atau bidan. Hitungan mengasumsikan siklus teratur dan kehamilan tunggal; USG trimester pertama lebih akurat untuk menentukan HPL. Sumber: aturan Naegele, ACOG, Permenkes No. 21 Tahun 2021, IOM 2009, WHO.",
-    "General information, not a diagnosis and not a substitute for seeing a doctor or midwife. Calculations assume regular cycles and a single pregnancy; a first-trimester ultrasound is more accurate for dating. Sources: Naegele's rule, ACOG, Indonesian MoH Reg. No. 21/2021, IOM 2009, WHO.");
+  $("note").textContent = L("Hitungan mengasumsikan siklus teratur dan kehamilan tunggal; USG trimester pertama lebih akurat untuk menentukan HPL. Sumber: aturan Naegele, ACOG, Permenkes No. 21 Tahun 2021, IOM 2009, WHO.",
+    "Calculations assume regular cycles and a single pregnancy; a first-trimester ultrasound is more accurate for dating. Sources: Naegele's rule, ACOG, Indonesian MoH Reg. No. 21/2021, IOM 2009, WHO.");
 }
 function clearScreen(){
   clearAuto(); stopSpeak(); cur = null;
@@ -13538,7 +13534,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       {h:"5. Melapor dan memblokir", l:["Di chat pribadi: ketuk pesan temanmu lalu pilih Laporkan. Di menu teman, kamu juga bisa memilih Blokir atau Laporkan pengguna.","Di komentar turnamen: pilih Laporkan di bawah komentar.","Pengguna yang kamu blokir tidak bisa mengirim pesan atau permintaan pertemanan kepadamu. Kamu bisa membuka blokir kapan saja lewat menu teman.","Laporan berisi alasan, ID akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan. Laporan hanya dibaca pengelola."]},
       {h:"6. Tindakan kami", p:["Kami meninjau laporan dan dapat menghapus konten, membatasi fitur, atau menutup akun yang melanggar syarat ini, termasuk tanpa pemberitahuan lebih dulu untuk pelanggaran berat. Kami dapat menyerahkan data kepada pihak berwenang bila diwajibkan oleh hukum."]},
       {h:"7. Pesan pribadi", p:["Pesan pribadi hanya antar teman dan disimpan paling lama 30 hari. Jangan memakainya untuk data yang sangat rahasia."]},
-      {h:"8. Hasil menu", p:["Hasil menu primbon dan hiburan bersifat hiburan. Hasil BMI, kalori, dan kehamilan adalah informasi umum, bukan pengganti nasihat tenaga kesehatan."]},
+      {h:"8. Hasil menu", p:["Ketentuan tentang hasil menu ada di Kebijakan Privasi bagian 8."]},
       {h:"9. Iklan", p:["Versi aplikasi tertentu menampilkan iklan dari pihak ketiga. Rinciannya ada di Kebijakan Privasi."]},
       {h:"10. Menghapus akun", p:["Kamu bisa menghapus akunmu lewat halaman Profil di Pengaturan. Data akun dan pesan terkait ikut dihapus."]},
       {h:"11. Perubahan syarat", p:["Syarat ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Bila ada perubahan penting, kamu akan diminta menyetujui lagi."]},
@@ -13552,7 +13548,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       {h:"5. Reporting and blocking", l:["In private chat: tap your friend’s message and choose Report. In the friend menu you can also choose Block or Report user.","In tournament comments: choose Report under the comment.","A user you block cannot send you messages or friend requests. You can unblock at any time from the friend menu.","A report contains the reason, the Account IDs of the reporter and the reported user, the time, and a copy of the reported text. Reports are read only by the maintainer."]},
       {h:"6. Our actions", p:["We review reports and may remove content, restrict features, or close accounts that break these terms, including without prior notice for serious violations. We may hand over data to the authorities when required by law."]},
       {h:"7. Private messages", p:["Private messages are only between friends and are kept for at most 30 days. Do not use them for highly confidential data."]},
-      {h:"8. Menu results", p:["Primbon and entertainment menu results are for entertainment. BMI, calorie, and pregnancy results are general information, not a substitute for advice from a health professional."]},
+      {h:"8. Menu results", p:["Terms about menu results are in section 8 of the Privacy Policy."]},
       {h:"9. Ads", p:["Certain app versions show third-party ads. Details are in the Privacy Policy."]},
       {h:"10. Deleting your account", p:["You can delete your account from the Profile page in Settings. Account data and related messages are deleted as well."]},
       {h:"11. Changes to these terms", p:["These terms may be updated. The date of the latest update is shown at the top of this page. For important changes you will be asked to agree again."]},
