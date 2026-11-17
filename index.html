@@ -13272,7 +13272,9 @@ if(navigator.onLine !== false) init().catch(() => {});
       const paint = s => {
         devState = s;
         st.textContent = s === "on" ? "Aktif. Notifikasi muncul walau aplikasi ditutup." : s === "prompt" ? "Belum diizinkan. Ketuk untuk mengizinkan." : s === "off" ? "Mati. Ketuk untuk menyalakan." : "Memeriksa…";
-        row.classList.toggle("un", s === "off" || s === "prompt");
+        const bad = s === "off" || s === "prompt";
+        row.classList.toggle("un", bad);
+        st.style.color = bad ? "#e5484d" : ""; st.style.fontWeight = bad ? "600" : "";
       };
       paint(devState);
       notifState().then(paint);
