@@ -432,26 +432,36 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 /* ===== HALAMAN TENTANG (teks murni, bisa direvisi di objek HT: kunci "ab") ===== */
 #about{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;background:var(--bg);color:var(--text)}
 #privacy{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;background:var(--bg);color:var(--text)}
+#stTerms{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;background:var(--bg);color:var(--text)}
 #about .abbar{flex:none;display:flex;align-items:center;padding:calc(6px + env(safe-area-inset-top,0px)) 12px 6px;border-bottom:1px solid var(--line);background:var(--bg2)}
 #privacy .abbar{flex:none;display:flex;align-items:center;padding:calc(6px + env(safe-area-inset-top,0px)) 12px 6px;border-bottom:1px solid var(--line);background:var(--bg2)}
-#abBack,#pvBack{font:inherit;font-size:15px;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--gold2);cursor:pointer}
-#abBack:focus-visible,#pvBack:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#stTerms .abbar{flex:none;display:flex;align-items:center;padding:calc(6px + env(safe-area-inset-top,0px)) 12px 6px;border-bottom:1px solid var(--line);background:var(--bg2)}
+#abBack,#pvBack,#tmBack{font:inherit;font-size:15px;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--gold2);cursor:pointer}
+#abBack:focus-visible,#pvBack:focus-visible,#tmBack:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
 #about .abscroll{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
 #privacy .abscroll{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+#stTerms .abscroll{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
 #about .abwrap{max-width:560px;margin:0 auto;padding:22px 20px calc(34px + env(safe-area-inset-bottom,0px))}
 #privacy .abwrap{max-width:560px;margin:0 auto;padding:22px 20px calc(34px + env(safe-area-inset-bottom,0px))}
+#stTerms .abwrap{max-width:560px;margin:0 auto;padding:22px 20px calc(34px + env(safe-area-inset-bottom,0px))}
 #about .abh{text-align:center;padding-bottom:22px;border-bottom:1px solid var(--line)}
 #privacy .abh{text-align:center;padding-bottom:22px;border-bottom:1px solid var(--line)}
+#stTerms .abh{text-align:center;padding-bottom:22px;border-bottom:1px solid var(--line)}
 #about .abh h1{font:600 32px/1.1 var(--head);letter-spacing:.02em;text-transform:uppercase}
 #privacy .abh h1{font:600 32px/1.1 var(--head);letter-spacing:.02em;text-transform:uppercase}
+#stTerms .abh h1{font:600 32px/1.1 var(--head);letter-spacing:.02em;text-transform:uppercase}
 #about .abh p{margin:10px 0 0;font-size:14px;color:var(--muted)}
 #privacy .abh p{margin:10px 0 0;font-size:14px;color:var(--muted)}
+#stTerms .abh p{margin:10px 0 0;font-size:14px;color:var(--muted)}
 #about .absec{padding:24px 0;border-bottom:1px solid var(--line)}
 #privacy .absec{padding:24px 0;border-bottom:1px solid var(--line)}
+#stTerms .absec{padding:24px 0;border-bottom:1px solid var(--line)}
 #about .absec h2{margin:0 0 14px;font:600 19px/1.2 var(--head)}
 #privacy .absec h2{margin:0 0 14px;font:600 19px/1.2 var(--head)}
+#stTerms .absec h2{margin:0 0 14px;font:600 19px/1.2 var(--head)}
 #about .absec p{margin:0;font-size:16.5px;line-height:1.75}
 #privacy .absec p{margin:0;font-size:16.5px;line-height:1.75}
+#stTerms .absec p{margin:0;font-size:16.5px;line-height:1.75}
 #about .abbrand{margin:24px 0 0;padding:28px 20px 26px;border-radius:22px;text-align:center;background:linear-gradient(180deg,#1b2f58,#172a50);border:1px solid rgba(120,160,230,.18)}
 #about .abbrand .abbrandlogo{display:block;width:min(260px,80%);height:auto;margin:0 auto 18px;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35))}
 #about .abbrand h2{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:-1px!important;padding:0;border:0;margin:0;font:600 30px/1.1 var(--head);letter-spacing:.02em;text-transform:uppercase;color:#fff}
@@ -472,11 +482,17 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #about .abcard p{margin:0;font-size:13.5px;line-height:1.5;color:var(--muted)}
 #about .abft{margin:22px 0 0;text-align:center;font-size:13px;color:var(--muted)}
 #privacy .absec p{font-size:15px;line-height:1.7;margin:0 0 10px}
+#stTerms .absec p{font-size:15px;line-height:1.7;margin:0 0 10px}
 #privacy .absec p:last-child{margin-bottom:0}
+#stTerms .absec p:last-child{margin-bottom:0}
 #privacy .absec h2{font-size:17px}
+#stTerms .absec h2{font-size:17px}
 #privacy .pvl{margin:0 0 10px;padding:0 0 0 20px;font-size:15px;line-height:1.7}
+#stTerms .pvl{margin:0 0 10px;padding:0 0 0 20px;font-size:15px;line-height:1.7}
 #privacy .pvl li{margin:0 0 6px}
+#stTerms .pvl li{margin:0 0 6px}
 #privacy .abh .pvu{margin:10px 0 0;font-size:12px;color:var(--muted)}
+#stTerms .abh .pvu{margin:10px 0 0;font-size:12px;color:var(--muted)}
 #about .abver{margin:6px 0 0;text-align:center;font-size:11px;letter-spacing:.04em;color:var(--muted);opacity:.75}
 @media (max-width:360px){#about .abgrid{grid-template-columns:1fr}}
 #splash{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--bg);transition:opacity .5s}
@@ -1377,10 +1393,11 @@ $("abBack").addEventListener("click", closeAbout);
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("about").hidden) closeAbout(); });
 /* ===== Kebijakan Privasi: halaman penuh seperti Tentang, dibuka dari tulisan di kaki beranda ===== */
 const PV = {
-  id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 14 November 2026", back:"‹ Beranda", secs:[
+  id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 17 November 2026", back:"‹ Beranda", secs:[
     {h:"1. Pendahuluan", p:["Satu Titik adalah aplikasi yang dikembangkan oleh Aurenza27 (“kami”). Kebijakan ini menjelaskan data apa yang diproses, untuk apa, dan pilihan yang kamu miliki saat memakai aplikasi ini. Dengan memakai aplikasi, kamu menyetujui kebijakan ini."]},
     {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, serta data turnamen) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google."]},
     {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, dan hasil menu) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, dan dihapus saat pertemanan dihapus."]},
+    {p:["Blokir dan laporan:"], l:["Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.","Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan. Laporan hanya dibaca pengelola untuk meninjau pelanggaran."]},
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif."]},
     {p:["Pengecekan koneksi dan waktu:"], l:["Aplikasi mengirim permintaan sederhana ke server publik (Google, Cloudflare, dan WorldTimeAPI) untuk mengecek koneksi internet dan jam. Permintaan ini tidak berisi data pribadimu, tetapi seperti permintaan internet lainnya, alamat IP perangkat terlihat oleh server tersebut."]},
     {p:["Iklan (hanya pada versi aplikasi yang menampilkan iklan):"], l:["Versi aplikasi tertentu, misalnya versi APK, dapat menampilkan iklan dari jaringan iklan pihak ketiga seperti Google AdMob.","Jaringan iklan dapat memproses ID iklan perangkat, alamat IP, jenis perangkat, dan interaksi dengan iklan untuk menampilkan serta mengukur iklan. Pada wilayah yang mewajibkan, kamu akan diminta persetujuan terlebih dahulu.","Kamu dapat mengatur atau mereset ID iklan, dan membatasi personalisasi iklan, lewat pengaturan perangkat."]},
@@ -1393,10 +1410,11 @@ const PV = {
     {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini."]},
     {h:"10. Kontak", p:["Pertanyaan tentang privasi dapat dikirim lewat Kotak Saran di Pengaturan."]}
   ]},
-  en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 14 November 2026", back:"‹ Home", secs:[
+  en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 17 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. By using the app, you agree to this policy."]},
     {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, and tournament data) are stored on your own device.","This data is not sent to our servers unless you sign in with a Google account."]},
     {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, and menu results) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, and are deleted when the friendship is removed."]},
+    {p:["Blocking and reports:"], l:["The list of users you block is stored in your account so blocking applies on all your devices.","When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, and a copy of the reported text. Reports are read only by the maintainer to review violations."]},
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data."]},
     {p:["Connection and time checks:"], l:["The app sends simple requests to public servers (Google, Cloudflare, and WorldTimeAPI) to check your internet connection and the time. These requests do not contain your personal data, but as with any internet request, your device’s IP address is visible to those servers."]},
     {p:["Ads (only in app versions that show ads):"], l:["Certain app versions, such as the APK version, may show ads from third-party ad networks such as Google AdMob.","Ad networks may process the device advertising ID, IP address, device type, and your interactions with ads to serve and measure ads. Where required, you will be asked for consent first.","You can reset your advertising ID, and limit ad personalization, in your device settings."]},
@@ -1549,6 +1567,8 @@ async function wipeServer(A, joined){
   for(const f of ["ownerUid", "toUid"]) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "invites"), m.where(f, "==", uid))); await Promise.all(sn.docs.map(d => soft(() => m.deleteDoc(d.ref)))); });
   /* 2b) pertemanan dan permintaan teman */
   await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "friendships"), m.where("u", "array-contains", uid))); await Promise.all(sn.docs.map(d => soft(async () => { try{ for(let i = 0; i < 12; i++){ const ms = await m.getDocs(m.query(m.collection(d.ref, "msgs"), m.limit(100))); if(ms.empty) break; await Promise.all(ms.docs.map(x => m.deleteDoc(x.ref))); } }catch(e){} try{ await Promise.all(String(d.id).split("_").map(x => m.deleteDoc(m.doc(d.ref, "reads", x)))); }catch(e){} await m.deleteDoc(d.ref); }))); });
+  /* 2c) daftar blokir milik pengguna */
+  await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "blocks"), m.where("by", "==", uid))); await Promise.all(sn.docs.map(d => soft(() => m.deleteDoc(d.ref)))); });
   /* 3) keluar dari turnamen orang lain: moderator, pengikut, suara */
   if(acc) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "tournaments"), m.where("modIds", "array-contains", acc))); await Promise.all(sn.docs.filter(d => d.data().owner !== uid).map(d => soft(() => m.updateDoc(d.ref, { modIds: m.arrayRemove(acc) })))); });
   for(const oid of joined){ await soft(() => m.deleteDoc(m.doc(db, "tournaments", oid, "followers", uid))); await soft(() => m.deleteDoc(m.doc(db, "tournaments", oid, "votes", uid))); }
@@ -9330,17 +9350,23 @@ async function delComment(t, c){
   if(!confirm(L("Hapus komentar ini?", "Delete this comment?"))) return;
   try{ const {m, db:f} = await ON.lib(); await withTimeout(m.deleteDoc(m.doc(f, "tournaments", t.oid, "comments", c.id))); }catch(e){ toast(errTxt(e)); }
 }
+function safeP(){ try{ return (window.parent && window.parent !== window && window.parent.stSafety) || null; }catch(e){ return null; } }
+function visCom(){ const SS = safeP(); return SS ? HS.com.filter(c => !SS.isBlocked(c.u)) : HS.com; }
+function reportComment(t, c){
+  const SS = safeP(); if(!SS) return;
+  SS.report({ kind: "comment", uid: c.u, name: c.n, ref: "tournaments/" + t.oid + "/comments/" + c.id, text: c.x }).then(r => { if(r && r.blocked) fillComments(); });
+}
 function fillComments(){
   const box = HS.ui.list, t = cur(); if(!box || !t || !t.oid) return;
-  const n = HS.com.length; if(HS.ui.cnt) HS.ui.cnt.textContent = L("KOMENTAR", "COMMENTS") + (HS.cReady && !HS.cErr ? " · " + n + (n >= HS.max ? "+" : "") : "");
+  const com = visCom(), n = com.length; if(HS.ui.cnt) HS.ui.cnt.textContent = L("KOMENTAR", "COMMENTS") + (HS.cReady && !HS.cErr ? " · " + n + (n >= HS.max ? "+" : "") : "");
   box.textContent = "";
   if(!ON.user()) return;
   if(!HS.cReady){ box.append(el("p", "hint", L("Memuat komentar…", "Loading comments…"))); return; }
   if(HS.cErr){ box.append(el("p", "err", L("Komentar tidak bisa dimuat. Pastikan aturan Firestore sudah diperbarui.", "Comments could not be loaded. Make sure the Firestore rules are updated."))); return; }
   if(!n){ const e = el("div", "hm-empty"); e.append(el("div", "hm-eic", "💬"), el("p", "", L("Belum ada komentar. Jadilah yang pertama!", "No comments yet. Be the first!"))); box.append(e); return; }
   const role = roleOf(), mt = ON.meta[t.oid] || {}, me = ON.user();
-  const ids = new Set(HS.com.map(c => c.id)), kids = {}, roots = [], canReply = !!me && role !== "local";
-  HS.com.forEach(c => { if(c.r && ids.has(c.r)) (kids[c.r] = kids[c.r] || []).push(c); else roots.push(c); });
+  const ids = new Set(com.map(c => c.id)), kids = {}, roots = [], canReply = !!me && role !== "local";
+  com.forEach(c => { if(c.r && ids.has(c.r)) (kids[c.r] = kids[c.r] || []).push(c); else roots.push(c); });
   const one = (c, isRep) => {
     const rr = c.u && mt.owner && c.u === mt.owner ? "admin" : (c.a && (mt.mods || []).includes(c.a)) ? "mod" : "";
     const row = el("div", "hm-c" + (isRep ? " hm-rep" : "")), av = mkAv({name:c.n}), body = el("div", "hm-cb"), hd = el("div", "hm-ch");
@@ -9355,6 +9381,7 @@ function fillComments(){
     if(c.rn) body.append(el("p", "hm-rq", "↪ " + L("Membalas ", "Replying to ") + censor(c.rn).t));
     body.append(el("p", "hm-cx", censor(c.x).t));
     if(canReply){ const rb = el("button", "hm-rb", L("Balas", "Reply")); rb.type = "button"; rb.onclick = () => startReply(c); body.append(rb); }
+    if(me && c.u && c.u !== me.uid && safeP()){ const rp = el("button", "hm-rb", L("Laporkan", "Report")); rp.type = "button"; rp.onclick = () => reportComment(t, c); body.append(rp); }
     row.append(av, body); box.append(row);
   };
   roots.forEach(c => { one(c, false); (kids[c.id] || []).slice().sort((x, y) => (x.t || 0) - (y.t || 0)).forEach(k => one(k, true)); });
@@ -12542,7 +12569,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   const lang = () => (typeof S !== "undefined" && S && S.lang === "en") ? "en" : "id";
   const T = {
     id:{ ttl:"Teman", sub0:"Daftar teman dan permintaan", add:"TAMBAH TEMAN", addS:"Tambah teman", stOn:"Online", stOff:"Offline", lastOn:"Terakhir online {t}", lastUnk:"Terakhir online belum diketahui", agoNow:"baru saja", agoM:"{n} menit lalu", agoH:"{n} jam lalu", agoD:"{n} hari lalu", agoMo:"lebih dari sebulan lalu", addH:"Masukkan ID Akun temanmu, misalnya ST-000004.", mine:"ID Akunmu: ", ph:"ST-000000", send:"Kirim permintaan", busy:"Mohon tunggu…",
-      inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", pm:"💬 Pesan pribadi", back:"Kembali", msgPh:"Tulis pesan…", msgNone:"Belum ada pesan. Sapa temanmu!", msgDel:"Hapus pesan", msgGone:"Pesan telah dihapus", msgSend:"Kirim", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
+      inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", pm:"💬 Pesan pribadi", back:"Kembali", msgPh:"Tulis pesan…", msgNone:"Belum ada pesan. Sapa temanmu!", msgDel:"Hapus pesan", msgGone:"Pesan telah dihapus", msgSend:"Kirim", blk:"🚫 Blokir pengguna", ublk:"✅ Buka blokir", rpt:"⚠ Laporkan pengguna", rptm:"⚠ Laporkan", blkd:"Kamu memblokir pengguna ini. Dia tidak bisa mengirim pesan kepadamu.", blkOk:"Pengguna diblokir.", ublkOk:"Blokir dibuka.", e_nosend:"Pesan tidak dapat dikirim ke pengguna ini.", e_noreq:"Permintaan tidak dapat dikirim ke pengguna ini.", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
       sent:"Permintaan terkirim.", acd:"Kalian sekarang berteman.", rmd:"Teman dihapus.", decd:"Permintaan ditolak.", cand:"Permintaan dibatalkan.",
       e_fmt:"Format ID Akun: ST-000000.", e_self:"Itu ID Akunmu sendiri.", e_nf:"ID Akun tidak ditemukan.", e_already:"Kalian sudah berteman.", e_pending:"Permintaan sudah terkirim. Tunggu temanmu menerimanya.",
       e_noacc:"ID Akunmu belum siap. Coba lagi sebentar lagi.", e_perm:"Izin ditolak oleh server. Pastikan aturan Firestore sudah diperbarui.", e_off:"Tidak ada koneksi internet.", e_fail:"Gagal. Coba lagi.", login:"Masuk dengan Google untuk memakai fitur teman.",
@@ -12553,7 +12580,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       e_invp:"Undangan masih menunggu jawaban.", e_banned:"Akun ini tidak bisa bergabung kembali ke ruangan ini karena sudah dikeluarkan pemilik ruangan.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
       invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
     en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addS:"Add friend", stOn:"Online", stOff:"Offline", lastOn:"Last online {t}", lastUnk:"Last online unknown", agoNow:"just now", agoM:"{n} min ago", agoH:"{n} h ago", agoD:"{n} d ago", agoMo:"over a month ago", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
-      inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", pm:"💬 Private message", back:"Back", msgPh:"Write a message…", msgNone:"No messages yet. Say hi!", msgDel:"Delete message", msgGone:"This message was deleted", msgSend:"Send", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
+      inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", pm:"💬 Private message", back:"Back", msgPh:"Write a message…", msgNone:"No messages yet. Say hi!", msgDel:"Delete message", msgGone:"This message was deleted", msgSend:"Send", blk:"🚫 Block user", ublk:"✅ Unblock", rpt:"⚠ Report user", rptm:"⚠ Report", blkd:"You blocked this user. They cannot send you messages.", blkOk:"User blocked.", ublkOk:"User unblocked.", e_nosend:"The message could not be sent to this user.", e_noreq:"The request could not be sent to this user.", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
       sent:"Request sent.", acd:"You are now friends.", rmd:"Friend removed.", decd:"Request declined.", cand:"Request cancelled.",
       e_fmt:"Account ID format: ST-000000.", e_self:"That is your own Account ID.", e_nf:"Account ID not found.", e_already:"You are already friends.", e_pending:"The request is already sent. Wait for your friend to accept.",
       e_noacc:"Your Account ID is not ready yet. Try again in a moment.", e_perm:"Permission denied by the server. Make sure the Firestore rules are updated.", e_off:"No internet connection.", e_fail:"Failed. Please try again.", login:"Sign in with Google to use friends.",
@@ -12571,7 +12598,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   let lastSig = "", sigTimer = 0;
   let invOut = {}, unsubI = null;
   let rows = [], dir = {}, unsub = null, curUid = "", msg = "", msgOk = true, working = false, confirmId = "", menuId = "", inVal = "";
-  let addOpen = false, pw = {}, pwT = 0, pm = {}, pmT = 0, lastM = {}, unread = {}, chatId = "", chatUnsub = null, chatMsgs = [], chatLoaded = false, chatErr = "", delId = "", lastSend = 0;
+  let addOpen = false, pw = {}, pwT = 0, pm = {}, pmT = 0, lastM = {}, unread = {}, chatId = "", chatUnsub = null, chatMsgs = [], chatLoaded = false, chatErr = "", delId = "", repId = "", lastSend = 0;
   const subs = new Set(), selfDel = new Set();
   const emit = () => { subs.forEach(f => { try{ f(); }catch(e){} }); try{ refresh(); }catch(e){} };
   const nameOf = acc => (dir[acc] && dir[acc].name) || acc;
@@ -12717,7 +12744,8 @@ if(navigator.onLine !== false) init().catch(() => {});
       if(d.by === u.uid) throw new Error("e_pending");
       await m.updateDoc(ref, { st: "ok", ts: Date.now() }); try{ window.stPush && window.stPush("friend_ok", { fid }); }catch(e){} return "acd";
     }
-    await m.setDoc(ref, { u: pair, a: pair.map(x => accOf[x]), by: u.uid, st: "pending", ts: Date.now() });
+    try{ await m.setDoc(ref, { u: pair, a: pair.map(x => accOf[x]), by: u.uid, st: "pending", ts: Date.now() }); }
+    catch(e){ if(/permission/i.test(String((e && (e.code || e.message)) || ""))) throw new Error("e_noreq"); throw e; }
     try{ window.stPush && window.stPush("friend_req", { fid }); }catch(e){}
     return "sent";
   }
@@ -12730,7 +12758,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       try{ window.stPush && window.stPush("friend_ok", { fid: r.id }); }catch(e){}
     } else { selfDel.add(r.id); if(r.st === "ok") await purgeMsgs(m, db, r.id); await m.deleteDoc(ref); }
   }
-  const incoming = () => rows.filter(r => r.st === "pending" && !r.mine).sort((x, y) => y.ts - x.ts);
+  const incoming = () => rows.filter(r => r.st === "pending" && !r.mine && !(SAFE() && SAFE().isBlocked(otherUid(r.id)))).sort((x, y) => y.ts - x.ts);
   const outgoing = () => rows.filter(r => r.st === "pending" && r.mine).sort((x, y) => y.ts - x.ts);
   const accepted = () => rows.filter(r => r.st === "ok").sort((x, y) => nameOf(x.acc).localeCompare(nameOf(y.acc)));
   const FR = window.satuTitikFriends = {
@@ -12827,6 +12855,8 @@ if(navigator.onLine !== false) init().catch(() => {});
   function btn(label, cls, fn, disabled){ const b = mk("button", cls, label); b.type = "button"; b.disabled = !!disabled || working; b.addEventListener("click", fn); return b; }
   /* ===== PESAN PRIBADI: friendships/{fid}/msgs/{id} = { u: uid pengirim, t: isi (maks. 500), at: jam server, exp: batas simpan 30 hari } ===== */
   const myUid = () => (A() && A().user && A().user.uid) || "";
+  const otherUid = id => String(id || "").split("_").find(x => x && x !== myUid()) || "";
+  const SAFE = () => window.stSafety || null;
   /* tanda dibaca: friendships/{fid}/reads/{uid} = { t: jam server } = kapan orang itu terakhir membuka chat */
   let frRead = 0, readUnsub = null, lastMarked = 0;
   async function markRead(){
@@ -12842,7 +12872,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   const calcUnread = id => { const l = lastM[id]; if(l && chatId === id) setRead(id, l.ms); unread[id] = !!l && l.u !== myUid() && l.ms > getRead(id); };
   const hhmm = ms => { try{ return new Date(ms).toLocaleTimeString(lang() === "en" ? "en-GB" : "id-ID", { hour: "2-digit", minute: "2-digit" }); }catch(e){ return ""; } };
   const dayLbl = ms => { try{ return new Date(ms).toLocaleDateString(lang() === "en" ? "en-GB" : "id-ID", { day: "numeric", month: "short", year: "numeric" }); }catch(e){ return ""; } };
-  function dropChat(){ if(chatUnsub){ try{ chatUnsub(); }catch(e){} chatUnsub = null; } if(readUnsub){ try{ readUnsub(); }catch(e){} readUnsub = null; } frRead = 0; lastMarked = 0; chatId = ""; chatMsgs = []; chatLoaded = false; chatErr = ""; delId = ""; }
+  function dropChat(){ if(chatUnsub){ try{ chatUnsub(); }catch(e){} chatUnsub = null; } if(readUnsub){ try{ readUnsub(); }catch(e){} readUnsub = null; } frRead = 0; lastMarked = 0; chatId = ""; chatMsgs = []; chatLoaded = false; chatErr = ""; delId = ""; repId = ""; }
   async function openChat(r){
     dropChat(); chatId = r.id; menuId = ""; confirmId = ""; msg = ""; unread[r.id] = false;
     if(lastM[r.id]) setRead(r.id, lastM[r.id].ms);
@@ -12899,17 +12929,30 @@ if(navigator.onLine !== false) init().catch(() => {});
       bk.addEventListener("click", () => { dropChat(); paint(); });
       hd.appendChild(bk); hd.appendChild(avatar(r.acc));
       const w = mk("div", "frwho"), nm = mk("p", "frnm"); nm.id = "frChN"; w.appendChild(nm); w.appendChild(mk("p", "frid", r.acc)); hd.appendChild(w);
+      { const SS = SAFE(), ou = otherUid(chatId);
+        if(SS && ou){
+          const bl = mk("button", "frback", "🚫"); bl.type = "button"; bl.id = "frChBlk";
+          bl.addEventListener("click", async () => { try{ if(SS.isBlocked(ou)) await SS.unblock(ou); else await SS.block(ou); chatErr = ""; }catch(e){ chatErr = ferr(e); } paintChat(); });
+          const rp = mk("button", "frback", "⚠"); rp.type = "button"; rp.title = t.rpt; rp.setAttribute("aria-label", t.rpt);
+          rp.addEventListener("click", () => SS.report({ kind: "user", uid: ou, name: nameOf(r.acc), ref: "friendships/" + chatId }));
+          hd.append(bl, rp);
+        } }
       const lg = mk("div", "frmsgs"); lg.id = "frMsgs"; lg.setAttribute("role", "log"); lg.setAttribute("aria-live", "polite");
       const fm = mk("div", "frcmp"), inp = mk("input"); inp.id = "frMsgIn"; inp.type = "text"; inp.maxLength = 500; inp.placeholder = t.msgPh; inp.autocomplete = "off"; inp.spellcheck = false;
-      const go = async () => { const v = inp.value; if(!v.trim()) return; inp.value = ""; chatErr = ""; chatErrPaint(); try{ await sendMsg(v); }catch(e){ chatErr = ferr(e); inp.value = v; chatErrPaint(); } };
+      const go = async () => { const v = inp.value; if(!v.trim()) return; inp.value = ""; chatErr = ""; chatErrPaint(); try{ await sendMsg(v); }catch(e){ chatErr = /permission/i.test(String((e && (e.code || e.message)) || "")) ? "e_nosend" : ferr(e); inp.value = v; chatErrPaint(); } };
       inp.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); go(); } });
       const sb = mk("button", "frsend", "➤"); sb.type = "button"; sb.setAttribute("aria-label", t.msgSend); sb.title = t.msgSend; sb.addEventListener("click", go);
       fm.append(inp, sb);
       const er = mk("p", "frerr"); er.id = "frMsgErr"; er.hidden = true;
-      ch.append(hd, lg, fm, er); pv.appendChild(ch);
+      const bm = mk("p", "frerr"); bm.id = "frBlkMsg"; bm.hidden = true;
+      ch.append(hd, lg, fm, bm, er); pv.appendChild(ch);
     }
     const nm = $("frChN");
     if(nm){ nm.textContent = ""; const on = isOn(r.acc), dt = mk("span", "frdot" + (on ? " on" : "")); dt.title = on ? t.stOn : t.stOff; nm.appendChild(dt); nm.appendChild(document.createTextNode(nameOf(r.acc))); }
+    { const SS = SAFE(), ou = otherUid(chatId), isB = !!(SS && ou && SS.isBlocked(ou));
+      const bb = $("frChBlk"); if(bb){ bb.textContent = isB ? "✅" : "🚫"; bb.title = isB ? t.ublk : t.blk; bb.setAttribute("aria-label", bb.title); }
+      const bi = $("frMsgIn"), bs = ch.querySelector(".frsend"); if(bi) bi.disabled = isB; if(bs) bs.disabled = isB;
+      const bm = $("frBlkMsg"); if(bm){ bm.hidden = !isB; bm.textContent = isB ? t.blkd : ""; } }
     const lg = $("frMsgs"), stick = fresh || lg.scrollHeight - lg.scrollTop - lg.clientHeight < 50;
     lg.textContent = "";
     if(!chatMsgs.length) lg.appendChild(mk("p", "frh frmsgempty", chatLoaded ? t.msgNone : "…"));
@@ -12926,6 +12969,16 @@ if(navigator.onLine !== false) init().catch(() => {});
         tk.setAttribute("aria-label", tk.title); tm.appendChild(document.createTextNode(" ")); tm.appendChild(tk);
       }
       b.appendChild(tm);
+      if(!mine && !x.g){
+        const tg2 = () => { repId = repId === x.id ? "" : x.id; paintChat(); };
+        b.tabIndex = 0; b.setAttribute("role", "button"); b.style.cursor = "pointer"; b.addEventListener("click", tg2);
+        b.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); tg2(); } });
+        if(repId === x.id){
+          const d = mk("button", "frmdel", t.rptm); d.type = "button";
+          d.addEventListener("click", ev => { ev.stopPropagation(); repId = ""; const SS = SAFE(); if(SS) SS.report({ kind: "msg", uid: otherUid(chatId), name: nameOf(r.acc), ref: "friendships/" + chatId + "/msgs/" + x.id, text: x.t }); paintChat(); });
+          b.appendChild(d);
+        }
+      }
       if(mine && !x.g){
         const tg = () => { delId = delId === x.id ? "" : x.id; paintChat(); };
         b.tabIndex = 0; b.setAttribute("role", "button"); b.addEventListener("click", tg);
@@ -12988,6 +13041,12 @@ if(navigator.onLine !== false) init().catch(() => {});
           mn.appendChild(btn(t.pm + (unread[r.id] ? " ●" : ""), "ok", () => openChat(r)));
           const bp = btn(hasPh ? t.pf : t.nopf, "", () => showPhoto(r.acc)); if(!hasPh) bp.disabled = true;
           mn.appendChild(bp);
+          { const SS = SAFE(), ou = otherUid(r.id);
+            if(SS && ou){
+              const isB = SS.isBlocked(ou);
+              mn.appendChild(btn(isB ? t.ublk : t.blk, isB ? "" : "dng", () => run(isB ? "ublkOk" : "blkOk", async () => { await (isB ? SS.unblock(ou) : SS.block(ou)); return isB ? "ublkOk" : "blkOk"; })));
+              mn.appendChild(btn(t.rpt, "", () => { menuId = ""; paint(); SS.report({ kind: "user", uid: ou, name: nameOf(r.acc), ref: "friendships/" + r.id }); }));
+            } }
           mn.appendChild(btn(t.rmf, "dng", () => { confirmId = r.id; menuId = ""; paint(); }));
           mn.appendChild(btn(t.cl, "", () => { menuId = ""; paint(); }));
           s.appendChild(mn);
@@ -13052,6 +13111,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(!u && isOpen()) setOpen(false);
     if(isOpen()) paint();
   }
+  document.addEventListener("stsafety", () => { try{ refresh(); }catch(e){} });
   btns.forEach(b => b.addEventListener("click", () => setOpen(!isOpen())));
   { const xb = $("frX"); if(xb) xb.addEventListener("click", () => setOpen(false)); }
   /* tutup bila mengetuk di luar panel (composedPath dipakai karena isi panel digambar ulang saat diketuk) */
@@ -13099,6 +13159,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     }
     const ab = $("about"); if(ab && !ab.hidden) L.push(() => closeAbout());
     const pv = $("privacy"); if(pv && !pv.hidden) L.push(() => closePrivacy());
+    const tm = $("stTerms"); if(tm && !tm.hidden) L.push(() => { tm.hidden = true; });
     return L;
   }
   const stl = () => (history.state && history.state.stl) || 0;
@@ -13323,6 +13384,252 @@ if(navigator.onLine !== false) init().catch(() => {});
   };
   /* setelah pengguna kembali dari pengaturan HP: daftarkan token bila notifikasi sudah aktif */
   document.addEventListener("visibilitychange", () => { if(!document.hidden) notifState().then(s => { devState = s; if(s === "on") start(); }); });
+})();
+</script>
+<script>
+/* ===== KEAMANAN PENGGUNA: blokir, lapor, Syarat Penggunaan + persetujuan setelah login =====
+   Firestore: blocks/{pemblokir_uid}_{diblokir_uid} = { by, to, ts }   reports/{auto} = { by, kind, to, ref, txt, why, note, ts }
+   Dipakai oleh panel Teman (parent) dan menu Turnamen (iframe, lewat window.parent.stSafety). */
+(function(){
+  const $ = id => document.getElementById(id);
+  const en = () => (typeof S !== "undefined" && S && S.lang === "en");
+  const tr = (i, e) => en() ? e : i;
+  const A = () => window.satuTitikAuth || null;
+  const TERMS_V = "1";
+  const mk = (tag, cls, txt) => { const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; };
+
+  /* ---------- gaya ---------- */
+  const st = document.createElement("style");
+  st.textContent = [
+    ".stov{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.62);overflow:auto}",
+    ".stcard{width:min(420px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--bg2,#141821);color:var(--text,#ece7da);border:1px solid var(--line,#2a3040);border-radius:16px;padding:18px 16px;font-family:var(--ui,system-ui,sans-serif);font-size:14.5px;line-height:1.5;box-shadow:0 18px 50px rgba(0,0,0,.55)}",
+    ".stcard h2{margin:0 0 6px;font:600 19px/1.25 var(--head,Georgia,serif);color:var(--gold2,#f0cf86)}",
+    ".stcard p{margin:0 0 10px}",
+    ".stcard .stsub{color:var(--muted,#a3a9b8);font-size:13px}",
+    ".stcard .stq{margin:0 0 10px;padding:8px 10px;border-left:3px solid var(--gold,#d4a94f);background:rgba(255,255,255,.04);border-radius:6px;font-size:13px;color:var(--muted,#a3a9b8);overflow-wrap:anywhere}",
+    ".stcard ul{margin:0 0 12px;padding:0 0 0 20px}.stcard li{margin:0 0 6px}",
+    ".stcard label.strd{display:flex;align-items:flex-start;gap:10px;padding:9px 4px;cursor:pointer}",
+    ".stcard label.strd input{margin-top:3px;width:18px;height:18px;flex:none}",
+    ".stcard textarea{width:100%;box-sizing:border-box;min-height:64px;margin:6px 0 10px;padding:8px 10px;border-radius:10px;border:1px solid var(--line,#2a3040);background:rgba(255,255,255,.04);color:inherit;font:inherit;resize:vertical}",
+    ".stcard .strow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:6px}",
+    ".stcard button{font:inherit;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line,#2a3040);background:transparent;color:var(--text,#ece7da);cursor:pointer}",
+    ".stcard button.stok{background:var(--gold,#d4a94f);border-color:var(--gold,#d4a94f);color:#1a1405;font-weight:600}",
+    ".stcard button.stdng{color:#ff8b8b;border-color:rgba(255,139,139,.5)}",
+    ".stcard button.stlnk{border:0;min-height:36px;padding:0 4px;color:var(--gold2,#f0cf86);text-decoration:underline;text-underline-offset:3px}",
+    ".stcard button:disabled{opacity:.5;cursor:default}",
+    ".stcard .sterr{color:#ff8b8b;font-size:13px;margin:0 0 8px}",
+    ".stcard .stok2{color:#8fe3a0;font-size:14px;margin:0 0 10px}",
+    ".hft .hflink.stl2{pointer-events:auto}"
+  ].join("\n");
+  document.head.appendChild(st);
+
+  /* ---------- blokir ---------- */
+  let blocked = new Set(), unsub = null, curUid = "";
+  const subs = new Set();
+  const emit = () => { subs.forEach(f => { try{ f(); }catch(e){} }); try{ document.dispatchEvent(new Event("stsafety")); }catch(e){} };
+  async function watch(u){
+    if(unsub){ try{ unsub(); }catch(e){} unsub = null; }
+    blocked = new Set(); emit();
+    if(!u) return;
+    try{
+      const a = A(); if(!a || !a.getDb) return;
+      const { m, db } = await a.getDb(); if(curUid !== u.uid) return;
+      unsub = m.onSnapshot(m.query(m.collection(db, "blocks"), m.where("by", "==", u.uid)), sn => {
+        blocked = new Set(sn.docs.map(d => String((d.data() || {}).to || "")).filter(Boolean)); emit();
+      }, () => {});
+    }catch(e){}
+  }
+  async function setBlock(uid, on){
+    const a = A(), u = a && a.user; if(!u || !uid || uid === u.uid) throw new Error("e_fail");
+    const { m, db } = await a.getDb(), ref = m.doc(db, "blocks", u.uid + "_" + uid);
+    if(on){ await m.setDoc(ref, { by: u.uid, to: uid, ts: Date.now() }); blocked.add(uid); }
+    else { await m.deleteDoc(ref); blocked.delete(uid); }
+    emit();
+  }
+
+  /* ---------- lapor ---------- */
+  const REASONS = [
+    ["abuse", "Pelecehan, perundungan, atau ancaman", "Harassment, bullying, or threats"],
+    ["hate", "Ujaran kebencian (SARA)", "Hate speech"],
+    ["sexual", "Konten seksual atau vulgar", "Sexual or vulgar content"],
+    ["spam", "Spam atau penipuan", "Spam or scam"],
+    ["other", "Alasan lain", "Something else"]
+  ];
+  let lastReport = 0;
+  function closeOv(ov){ try{ ov.remove(); }catch(e){} }
+  function report(o){
+    return new Promise(res => {
+      const a = A(), u = a && a.user;
+      if(!u){ res(null); return; }
+      if(o.uid && o.uid === u.uid){ res(null); return; }
+      const ov = mk("div", "stov"), card = mk("div", "stcard"); ov.appendChild(card);
+      ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
+      card.appendChild(mk("h2", null, tr("Laporkan", "Report")));
+      if(o.name) card.appendChild(mk("p", "stsub", tr("Pengguna: ", "User: ") + o.name));
+      if(o.text) card.appendChild(mk("p", "stq", String(o.text).slice(0, 160) + (String(o.text).length > 160 ? "…" : "")));
+      card.appendChild(mk("p", null, tr("Apa yang salah dengan ini?", "What is wrong with this?")));
+      let why = "";
+      const err = mk("p", "sterr"); err.hidden = true;
+      const send = mk("button", "stok", tr("Kirim laporan", "Send report")); send.type = "button"; send.disabled = true;
+      REASONS.forEach(r => {
+        const lb = mk("label", "strd"), rd = document.createElement("input"); rd.type = "radio"; rd.name = "strsn";
+        rd.addEventListener("change", () => { why = r[0]; send.disabled = false; });
+        lb.append(rd, mk("span", null, tr(r[1], r[2]))); card.appendChild(lb);
+      });
+      const ta = document.createElement("textarea"); ta.maxLength = 300; ta.placeholder = tr("Keterangan tambahan (opsional)", "Additional details (optional)");
+      card.appendChild(ta);
+      let bx = null;
+      if(o.uid && !blocked.has(o.uid)){
+        const lb = mk("label", "strd"); bx = document.createElement("input"); bx.type = "checkbox"; bx.checked = true;
+        lb.append(bx, mk("span", null, tr("Blokir pengguna ini juga", "Also block this user"))); card.appendChild(lb);
+      }
+      card.appendChild(err);
+      const row = mk("div", "strow"), cancel = mk("button", null, tr("Batal", "Cancel")); cancel.type = "button";
+      row.append(cancel, send); card.appendChild(row);
+      cancel.addEventListener("click", () => { closeOv(ov); res(null); });
+      ov.addEventListener("click", e => { if(e.target === ov){ closeOv(ov); res(null); } });
+      send.addEventListener("click", async () => {
+        if(!why) return;
+        if(Date.now() - lastReport < 4000){ err.textContent = tr("Tunggu sebentar sebelum melapor lagi.", "Wait a moment before reporting again."); err.hidden = false; return; }
+        if(navigator.onLine === false){ err.textContent = tr("Tidak ada koneksi internet.", "No internet connection."); err.hidden = false; return; }
+        send.disabled = true; cancel.disabled = true; err.hidden = true;
+        try{
+          const { m, db } = await a.getDb();
+          await m.addDoc(m.collection(db, "reports"), { by: u.uid, kind: String(o.kind || "user"), to: String(o.uid || ""), ref: String(o.ref || "").slice(0, 200), txt: String(o.text || "").slice(0, 500), why, note: ta.value.trim().slice(0, 300), ts: Date.now() });
+          lastReport = Date.now();
+          let didBlock = false;
+          if(bx && bx.checked){ try{ await setBlock(o.uid, true); didBlock = true; }catch(e){} }
+          card.textContent = "";
+          card.appendChild(mk("h2", null, tr("Laporan terkirim", "Report sent")));
+          card.appendChild(mk("p", "stok2", tr("Terima kasih. Laporanmu akan ditinjau pengelola.", "Thank you. Your report will be reviewed.") + (didBlock ? tr(" Pengguna ini sudah kamu blokir.", " This user is now blocked.") : "")));
+          const ok = mk("button", "stok", tr("Tutup", "Close")); ok.type = "button";
+          ok.addEventListener("click", () => { closeOv(ov); res({ sent: true, blocked: didBlock }); });
+          const r2 = mk("div", "strow"); r2.appendChild(ok); card.appendChild(r2); ok.focus();
+        }catch(e){
+          send.disabled = false; cancel.disabled = false;
+          err.textContent = /permission/i.test(String(e && (e.code || e.message))) ? tr("Laporan ditolak server. Pastikan aturan Firestore sudah diperbarui.", "Report rejected by the server. Make sure the Firestore rules are updated.") : tr("Gagal mengirim laporan. Coba lagi.", "Could not send the report. Try again.");
+          err.hidden = false;
+        }
+      });
+      document.body.appendChild(ov); send.focus({ preventScroll: true });
+    });
+  }
+
+  /* ---------- Syarat Penggunaan (halaman penuh) ---------- */
+  const TM = {
+    id:{ t:"Syarat Penggunaan", sub:"Satu Titik", upd:"Terakhir diperbarui: 17 November 2026", back:"‹ Kembali", secs:[
+      {h:"1. Penerimaan", p:["Dengan masuk dan memakai fitur sosial Satu Titik (teman, pesan pribadi, komentar turnamen, dan ruangan game), kamu menyetujui Syarat Penggunaan ini beserta Kebijakan Privasi. Bila tidak setuju, jangan masuk akun. Menu yang tidak membutuhkan akun tetap bisa dipakai."]},
+      {h:"2. Akunmu", l:["Pakai akunmu sendiri dan jaga keamanannya.","Jangan menyamar sebagai orang lain.","Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun."]},
+      {h:"3. Perilaku dan konten yang dilarang", p:["Saat membuat konten (pesan, komentar, nama, atau foto profil), kamu dilarang:"], l:["Melecehkan, merundung, mengancam, atau menakut-nakuti orang lain.","Menyebarkan ujaran kebencian atau merendahkan orang berdasarkan suku, agama, ras, antargolongan, gender, disabilitas, atau orientasi seksual.","Membuat atau membagikan konten seksual, pornografi, atau vulgar, termasuk apa pun yang mengeksploitasi anak.","Mendorong kekerasan, melukai diri sendiri, atau kegiatan yang melanggar hukum.","Melakukan penipuan, spam, atau membagikan tautan berbahaya.","Membagikan data pribadi orang lain tanpa izin.","Mengganggu atau menyalahgunakan cara kerja aplikasi."]},
+      {h:"4. Tanggung jawab atas kontenmu", p:["Kamu bertanggung jawab atas konten yang kamu buat. Kami tidak memantau semua konten secara langsung, jadi kami mengandalkan laporan pengguna."]},
+      {h:"5. Melapor dan memblokir", l:["Di chat pribadi: ketuk pesan temanmu lalu pilih Laporkan. Di menu teman, kamu juga bisa memilih Blokir atau Laporkan pengguna.","Di komentar turnamen: pilih Laporkan di bawah komentar.","Pengguna yang kamu blokir tidak bisa mengirim pesan atau permintaan pertemanan kepadamu. Kamu bisa membuka blokir kapan saja lewat menu teman.","Laporan berisi alasan, ID akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan. Laporan hanya dibaca pengelola."]},
+      {h:"6. Tindakan kami", p:["Kami meninjau laporan dan dapat menghapus konten, membatasi fitur, atau menutup akun yang melanggar syarat ini, termasuk tanpa pemberitahuan lebih dulu untuk pelanggaran berat. Kami dapat menyerahkan data kepada pihak berwenang bila diwajibkan oleh hukum."]},
+      {h:"7. Pesan pribadi", p:["Pesan pribadi hanya antar teman dan disimpan paling lama 30 hari. Jangan memakainya untuk data yang sangat rahasia."]},
+      {h:"8. Hasil menu", p:["Hasil menu primbon dan hiburan bersifat hiburan. Hasil BMI, kalori, dan kehamilan adalah informasi umum, bukan pengganti nasihat tenaga kesehatan."]},
+      {h:"9. Iklan", p:["Versi aplikasi tertentu menampilkan iklan dari pihak ketiga. Rinciannya ada di Kebijakan Privasi."]},
+      {h:"10. Menghapus akun", p:["Kamu bisa menghapus akunmu lewat halaman Profil di Pengaturan. Data akun dan pesan terkait ikut dihapus."]},
+      {h:"11. Perubahan syarat", p:["Syarat ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Bila ada perubahan penting, kamu akan diminta menyetujui lagi."]},
+      {h:"12. Kontak", p:["Pertanyaan tentang syarat ini dapat dikirim lewat Kotak Saran di Pengaturan."]}
+    ]},
+    en:{ t:"Terms of Use", sub:"Satu Titik", upd:"Last updated: 17 November 2026", back:"‹ Back", secs:[
+      {h:"1. Acceptance", p:["By signing in and using Satu Titik’s social features (friends, private messages, tournament comments, and game rooms), you agree to these Terms of Use and the Privacy Policy. If you do not agree, do not sign in. Menus that do not need an account remain available."]},
+      {h:"2. Your account", l:["Use your own account and keep it secure.","Do not impersonate anyone.","This app is not intended for children under 13."]},
+      {h:"3. Prohibited behavior and content", p:["When you create content (messages, comments, names, or profile photos), you must not:"], l:["Harass, bully, threaten, or intimidate others.","Spread hate speech or demean people based on ethnicity, religion, race, group identity, gender, disability, or sexual orientation.","Create or share sexual, pornographic, or vulgar content, including anything that exploits children.","Encourage violence, self-harm, or illegal activity.","Commit fraud, send spam, or share harmful links.","Share other people’s personal data without permission.","Disrupt or abuse how the app works."]},
+      {h:"4. Responsibility for your content", p:["You are responsible for the content you create. We do not watch all content in real time, so we rely on user reports."]},
+      {h:"5. Reporting and blocking", l:["In private chat: tap your friend’s message and choose Report. In the friend menu you can also choose Block or Report user.","In tournament comments: choose Report under the comment.","A user you block cannot send you messages or friend requests. You can unblock at any time from the friend menu.","A report contains the reason, the Account IDs of the reporter and the reported user, the time, and a copy of the reported text. Reports are read only by the maintainer."]},
+      {h:"6. Our actions", p:["We review reports and may remove content, restrict features, or close accounts that break these terms, including without prior notice for serious violations. We may hand over data to the authorities when required by law."]},
+      {h:"7. Private messages", p:["Private messages are only between friends and are kept for at most 30 days. Do not use them for highly confidential data."]},
+      {h:"8. Menu results", p:["Primbon and entertainment menu results are for entertainment. BMI, calorie, and pregnancy results are general information, not a substitute for advice from a health professional."]},
+      {h:"9. Ads", p:["Certain app versions show third-party ads. Details are in the Privacy Policy."]},
+      {h:"10. Deleting your account", p:["You can delete your account from the Profile page in Settings. Account data and related messages are deleted as well."]},
+      {h:"11. Changes to these terms", p:["These terms may be updated. The date of the latest update is shown at the top of this page. For important changes you will be asked to agree again."]},
+      {h:"12. Contact", p:["Questions about these terms can be sent through the Suggestion Box in Settings."]}
+    ]}
+  };
+  let tmFrom = null;
+  function buildTermsPage(){
+    let sec = $("stTerms"); if(sec) return sec;
+    sec = document.createElement("section"); sec.id = "stTerms"; sec.hidden = true; sec.setAttribute("role", "dialog"); sec.setAttribute("aria-modal", "true"); sec.setAttribute("aria-labelledby", "tmTitle");
+    sec.style.zIndex = "99995";
+    sec.innerHTML = '<div class="abbar"><button id="tmBack" type="button"></button></div><div class="abscroll"><div class="abwrap"><header class="abh"><h1 id="tmTitle"></h1><p id="tmSub"></p><p class="pvu" id="tmUpd"></p></header><div id="tmBody"></div></div></div>';
+    document.body.appendChild(sec);
+    $("tmBack").addEventListener("click", closeTerms);
+    document.addEventListener("keydown", e => { if(e.key === "Escape" && !sec.hidden) closeTerms(); });
+    return sec;
+  }
+  function paintTerms(){
+    const d = TM[en() ? "en" : "id"];
+    $("tmBack").textContent = d.back; $("tmTitle").textContent = d.t; $("tmSub").textContent = d.sub; $("tmUpd").textContent = d.upd;
+    const body = $("tmBody"); body.textContent = "";
+    d.secs.forEach(sc => {
+      const s = mk("section", "absec"); if(sc.h) s.appendChild(mk("h2", null, sc.h));
+      (sc.p || []).forEach(x => s.appendChild(mk("p", null, x)));
+      if(sc.l){ const ul = mk("ul", "pvl"); sc.l.forEach(x => ul.appendChild(mk("li", null, x))); s.appendChild(ul); }
+      body.appendChild(s);
+    });
+  }
+  function openTerms(){
+    const sec = buildTermsPage(); tmFrom = document.activeElement; paintTerms();
+    sec.hidden = false; sec.querySelector(".abscroll").scrollTop = 0; $("tmBack").focus({ preventScroll: true });
+  }
+  function closeTerms(){ const sec = $("stTerms"); if(sec) sec.hidden = true; if(tmFrom && tmFrom.focus) try{ tmFrom.focus({ preventScroll: true }); }catch(e){} }
+
+  /* tautan "Syarat Penggunaan" di kaki beranda, di samping Kebijakan Privasi */
+  (function footLink(){
+    const pl = $("privLink"); if(!pl){ setTimeout(footLink, 300); return; }
+    if($("termsLink")) return;
+    const sep = mk("span", "hsep", "·"); sep.setAttribute("aria-hidden", "true");
+    const b = mk("button", "hflink", tr("Syarat Penggunaan", "Terms of Use")); b.type = "button"; b.id = "termsLink";
+    b.addEventListener("click", openTerms);
+    pl.after(sep, b);
+    let lg = en(); setInterval(() => { if(en() !== lg){ lg = en(); b.textContent = tr("Syarat Penggunaan", "Terms of Use"); } }, 1500);
+  })();
+
+  /* ---------- persetujuan setelah login ---------- */
+  const okKey = uid => "stTerms" + TERMS_V + "_" + uid;
+  const accepted = uid => { try{ return localStorage.getItem(okKey(uid)) === "1"; }catch(e){ return false; } };
+  let consentOv = null;
+  function consent(u){
+    if(consentOv || !u || accepted(u.uid)) return;
+    const ov = mk("div", "stov"), card = mk("div", "stcard"); ov.style.zIndex = "99990"; ov.appendChild(card);
+    ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-labelledby", "tmcT");
+    const h = mk("h2", null, tr("Syarat Penggunaan", "Terms of Use")); h.id = "tmcT"; card.appendChild(h);
+    card.appendChild(mk("p", null, tr("Sebelum memakai fitur teman, pesan, dan komentar, mohon setujui aturan singkat ini:", "Before using friends, messages, and comments, please agree to these short rules:")));
+    const ul = mk("ul");
+    [tr("Dilarang melecehkan, mengancam, ujaran kebencian, konten seksual, spam, dan penipuan.", "No harassment, threats, hate speech, sexual content, spam, or scams."),
+     tr("Kamu bisa memblokir dan melaporkan pengguna lain kapan saja.", "You can block and report other users at any time."),
+     tr("Pelanggaran dapat membuat kontenmu dihapus dan akunmu dibatasi atau ditutup.", "Violations can lead to your content being removed and your account restricted or closed.")
+    ].forEach(x => ul.appendChild(mk("li", null, x)));
+    card.appendChild(ul);
+    const rd = mk("button", "stlnk", tr("Baca Syarat Penggunaan lengkap", "Read the full Terms of Use")); rd.type = "button";
+    rd.addEventListener("click", openTerms); card.appendChild(rd);
+    const row = mk("div", "strow"), no = mk("button", "stdng", tr("Tolak dan keluar", "Decline and sign out")), yes = mk("button", "stok", tr("Setuju dan lanjutkan", "Agree and continue"));
+    no.type = yes.type = "button"; row.append(no, yes); card.appendChild(row);
+    yes.addEventListener("click", () => { try{ localStorage.setItem(okKey(u.uid), "1"); }catch(e){} closeOv(ov); consentOv = null; });
+    no.addEventListener("click", async () => { closeOv(ov); consentOv = null; try{ const a = A(); if(a && a.logout) await a.logout(); }catch(e){} });
+    consentOv = ov; document.body.appendChild(ov); yes.focus({ preventScroll: true });
+  }
+
+  /* ---------- sambungkan ke status login ---------- */
+  (function hook(){
+    const a = A();
+    if(a && a.onChange){
+      a.onChange(x => {
+        const u = x && x.user ? x.user : null, id = u ? u.uid : "";
+        if(id !== curUid){ curUid = id; watch(u); }
+        if(u) consent(u); else if(consentOv){ closeOv(consentOv); consentOv = null; }
+      });
+    } else setTimeout(hook, 200);
+  })();
+
+  window.stSafety = {
+    isBlocked: uid => !!uid && blocked.has(String(uid)),
+    list: () => Array.from(blocked),
+    block: uid => setBlock(uid, true),
+    unblock: uid => setBlock(uid, false),
+    onChange: fn => { subs.add(fn); return () => subs.delete(fn); },
+    report, openTerms
+  };
 })();
 </script>
 </body>
