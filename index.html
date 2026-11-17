@@ -223,6 +223,8 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #frpanel .frmsg.gone{cursor:default;opacity:.75}
 #frpanel .frmsg.gone .frmt{font-style:italic;color:var(--muted)}
 #frpanel .frmtm{display:block;margin-top:1px;font-size:9.5px;color:var(--muted);text-align:right}
+#frpanel .frtk{font-size:10.5px;letter-spacing:-1px;color:var(--muted)}
+#frpanel .frtk.rd{color:#4fb4ff;font-weight:700}
 #frpanel .frmdel{display:block;margin:4px 0 0 auto;min-height:24px!important;padding:0 8px!important;font-size:11px!important;border-color:#c0605a!important;color:#f0a0a0!important}
 #frpanel .frcmp{display:flex;gap:6px}
 #frpanel .frcmp input{flex:1;min-width:0;text-transform:none}
@@ -1546,7 +1548,7 @@ async function wipeServer(A, joined){
   /* 2) undangan yang dikirim atau diterima */
   for(const f of ["ownerUid", "toUid"]) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "invites"), m.where(f, "==", uid))); await Promise.all(sn.docs.map(d => soft(() => m.deleteDoc(d.ref)))); });
   /* 2b) pertemanan dan permintaan teman */
-  await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "friendships"), m.where("u", "array-contains", uid))); await Promise.all(sn.docs.map(d => soft(async () => { try{ for(let i = 0; i < 12; i++){ const ms = await m.getDocs(m.query(m.collection(d.ref, "msgs"), m.limit(100))); if(ms.empty) break; await Promise.all(ms.docs.map(x => m.deleteDoc(x.ref))); } }catch(e){} await m.deleteDoc(d.ref); }))); });
+  await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "friendships"), m.where("u", "array-contains", uid))); await Promise.all(sn.docs.map(d => soft(async () => { try{ for(let i = 0; i < 12; i++){ const ms = await m.getDocs(m.query(m.collection(d.ref, "msgs"), m.limit(100))); if(ms.empty) break; await Promise.all(ms.docs.map(x => m.deleteDoc(x.ref))); } }catch(e){} try{ await Promise.all(String(d.id).split("_").map(x => m.deleteDoc(m.doc(d.ref, "reads", x)))); }catch(e){} await m.deleteDoc(d.ref); }))); });
   /* 3) keluar dari turnamen orang lain: moderator, pengikut, suara */
   if(acc) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "tournaments"), m.where("modIds", "array-contains", acc))); await Promise.all(sn.docs.filter(d => d.data().owner !== uid).map(d => soft(() => m.updateDoc(d.ref, { modIds: m.arrayRemove(acc) })))); });
   for(const oid of joined){ await soft(() => m.deleteDoc(m.doc(db, "tournaments", oid, "followers", uid))); await soft(() => m.deleteDoc(m.doc(db, "tournaments", oid, "votes", uid))); }
@@ -12825,12 +12827,22 @@ if(navigator.onLine !== false) init().catch(() => {});
   function btn(label, cls, fn, disabled){ const b = mk("button", cls, label); b.type = "button"; b.disabled = !!disabled || working; b.addEventListener("click", fn); return b; }
   /* ===== PESAN PRIBADI: friendships/{fid}/msgs/{id} = { u: uid pengirim, t: isi (maks. 500), at: jam server, exp: batas simpan 30 hari } ===== */
   const myUid = () => (A() && A().user && A().user.uid) || "";
+  /* tanda dibaca: friendships/{fid}/reads/{uid} = { t: jam server } = kapan orang itu terakhir membuka chat */
+  let frRead = 0, readUnsub = null, lastMarked = 0;
+  async function markRead(){
+    const a = A(), u = a && a.user; if(!u || !chatId || document.hidden) return;
+    const me = u.uid, lo = chatMsgs.filter(x => x.u !== me && !x.g).pop();
+    if(!lo || lo.ms <= lastMarked) return;
+    lastMarked = lo.ms;
+    try{ const { m, db } = await a.getDb(); await m.setDoc(m.doc(db, "friendships", chatId, "reads", me), { t: m.serverTimestamp() }); }catch(e){ lastMarked = 0; }
+  }
+  document.addEventListener("visibilitychange", () => { if(!document.hidden && chatId) markRead(); });
   const getRead = id => { try{ return +localStorage.getItem("st_pm_r_" + id) || 0; }catch(e){ return 0; } };
   const setRead = (id, ms) => { try{ if(ms > getRead(id)) localStorage.setItem("st_pm_r_" + id, String(ms)); }catch(e){} };
   const calcUnread = id => { const l = lastM[id]; if(l && chatId === id) setRead(id, l.ms); unread[id] = !!l && l.u !== myUid() && l.ms > getRead(id); };
   const hhmm = ms => { try{ return new Date(ms).toLocaleTimeString(lang() === "en" ? "en-GB" : "id-ID", { hour: "2-digit", minute: "2-digit" }); }catch(e){ return ""; } };
   const dayLbl = ms => { try{ return new Date(ms).toLocaleDateString(lang() === "en" ? "en-GB" : "id-ID", { day: "numeric", month: "short", year: "numeric" }); }catch(e){ return ""; } };
-  function dropChat(){ if(chatUnsub){ try{ chatUnsub(); }catch(e){} chatUnsub = null; } chatId = ""; chatMsgs = []; chatLoaded = false; chatErr = ""; delId = ""; }
+  function dropChat(){ if(chatUnsub){ try{ chatUnsub(); }catch(e){} chatUnsub = null; } if(readUnsub){ try{ readUnsub(); }catch(e){} readUnsub = null; } frRead = 0; lastMarked = 0; chatId = ""; chatMsgs = []; chatLoaded = false; chatErr = ""; delId = ""; }
   async function openChat(r){
     dropChat(); chatId = r.id; menuId = ""; confirmId = ""; msg = ""; unread[r.id] = false;
     if(lastM[r.id]) setRead(r.id, lastM[r.id].ms);
@@ -12840,11 +12852,20 @@ if(navigator.onLine !== false) init().catch(() => {});
       const { m, db } = await a.getDb(); if(chatId !== r.id) return;
       chatUnsub = m.onSnapshot(m.query(m.collection(db, "friendships", r.id, "msgs"), m.orderBy("at", "desc"), m.limit(60)), sn => {
         if(chatId !== r.id) return;
-        chatMsgs = sn.docs.map(d => { const x = d.data({ serverTimestamps: "estimate" }) || {}; return { id: d.id, u: String(x.u || ""), t: String(x.t || ""), g: x.del === true, ms: x.at && x.at.toMillis ? x.at.toMillis() : Date.now() }; }).reverse();
+        chatMsgs = sn.docs.map(d => { const x = d.data({ serverTimestamps: "estimate" }) || {}; return { id: d.id, u: String(x.u || ""), t: String(x.t || ""), g: x.del === true, p: d.metadata.hasPendingWrites, ms: x.at && x.at.toMillis ? x.at.toMillis() : Date.now() }; }).reverse();
         chatLoaded = true; const last = chatMsgs[chatMsgs.length - 1];
         if(last) setRead(r.id, last.ms); unread[r.id] = false;
         try{ refresh(); }catch(e){}
+        markRead();
       }, e => { chatLoaded = true; chatErr = ferr(e); try{ refresh(); }catch(x){} });
+      /* pantau kapan teman terakhir membuka chat ini (untuk tanda ✓✓) */
+      const other = String(r.id).split("_").find(x => x !== myUid());
+      if(other) readUnsub = m.onSnapshot(m.doc(db, "friendships", r.id, "reads", other), sn => {
+        if(chatId !== r.id) return;
+        const x = sn.exists() ? sn.data({ serverTimestamps: "estimate" }) : null;
+        frRead = x && x.t && x.t.toMillis ? x.t.toMillis() : 0;
+        try{ refresh(); }catch(e){}
+      }, () => {});
     }catch(e){ chatLoaded = true; chatErr = ferr(e); paintChat(); }
   }
   async function sendMsg(raw){
@@ -12863,6 +12884,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   }
   /* hapus semua pesan sebuah pertemanan (dipanggil sebelum teman dihapus) */
   async function purgeMsgs(m, db, fid){
+    try{ await Promise.all(String(fid).split("_").map(x => m.deleteDoc(m.doc(db, "friendships", fid, "reads", x)))); }catch(e){}
     try{ for(let i = 0; i < 12; i++){ const sn = await m.getDocs(m.query(m.collection(db, "friendships", fid, "msgs"), m.limit(100))); if(sn.empty) break; await Promise.all(sn.docs.map(d => m.deleteDoc(d.ref))); } }catch(e){}
   }
   function chatErrPaint(){ const e = $("frMsgErr"); if(!e) return; const t = T[lang()]; e.textContent = chatErr ? (t[chatErr] || t.e_fail) : ""; e.hidden = !chatErr; }
@@ -12895,7 +12917,15 @@ if(navigator.onLine !== false) init().catch(() => {});
     chatMsgs.forEach(x => {
       const dk = new Date(x.ms).toDateString(); if(dk !== pd){ pd = dk; lg.appendChild(mk("p", "frday", dayLbl(x.ms))); }
       const mine = x.u === me, b = mk("div", "frmsg " + (mine ? "me" : "th") + (x.g ? " gone" : ""));
-      b.appendChild(mk("span", "frmt", x.g ? "🚫 " + t.msgGone : x.t)); b.appendChild(mk("span", "frmtm", hhmm(x.ms)));
+      b.appendChild(mk("span", "frmt", x.g ? "🚫 " + t.msgGone : x.t));
+      const tm = mk("span", "frmtm", hhmm(x.ms));
+      if(mine && !x.g){
+        const rd = !x.p && x.ms <= frRead, en = lang() === "en";
+        const tk = mk("span", "frtk" + (rd ? " rd" : ""), x.p ? "🕓" : rd ? "✓✓" : "✓");
+        tk.title = x.p ? (en ? "Sending" : "Mengirim") : rd ? (en ? "Read" : "Sudah dibaca") : (en ? "Sent" : "Terkirim");
+        tk.setAttribute("aria-label", tk.title); tm.appendChild(document.createTextNode(" ")); tm.appendChild(tk);
+      }
+      b.appendChild(tm);
       if(mine && !x.g){
         const tg = () => { delId = delId === x.id ? "" : x.id; paintChat(); };
         b.tabIndex = 0; b.setAttribute("role", "button"); b.addEventListener("click", tg);
