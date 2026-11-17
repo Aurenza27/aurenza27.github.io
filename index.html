@@ -11908,6 +11908,7 @@ function fsOpen(m, ai){
 A.getDb = async () => { const m = await import(BASE + "firebase-firestore.js"); const f = await init(); return { m, db: fsOpen(m, f.ai) }; };
 A.logout = async () => {
   try{ await SY.now(); }catch(e){}   /* kirim perubahan terakhir ke cloud sebelum keluar */
+  try{ if(window.stPushOff) await window.stPushOff(false); }catch(e){}   /* lepas token push perangkat ini selagi masih login */
   try{ const { a, auth } = await init(); await auth.signOut(a); }catch(e){}
   try{ const SL = nativePlug("SocialLogin"); if(SL) await SL.logout({ provider: "google" }); }catch(e){}
   A.error = null; emit();
@@ -11947,6 +11948,8 @@ A.deleteAccount = async () => {
   catch(e){ console.error("[hapus akun] data server gagal:", e); try{ SY.start(uid); }catch(x){} throw new Error("fail"); }
   const soft = async f => { try{ await f(); }catch(e){ console.warn("[hapus akun] sebagian data tidak terhapus:", e && (e.code || e.message)); } };
   const { m, db } = await A.getDb();
+  /* token push: lepas perangkat ini dan semua perangkat lain milik akun (lewat Worker) selagi masih login */
+  await soft(() => window.stPushOff ? window.stPushOff(true) : null);
   if(acc) await soft(() => m.deleteDoc(m.doc(db, "accountIds", acc)));
   await soft(() => m.deleteDoc(m.doc(db, "users", uid)));
   /* 3) hapus akun dari Firebase Authentication */
@@ -13274,12 +13277,34 @@ if(navigator.onLine !== false) init().catch(() => {});
       u.getIdToken().then(t => fetch(PUSH_URL + "/notify", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + t }, body: JSON.stringify(Object.assign({ type: type }, data)), keepalive: true })).catch(() => {});
     }catch(e){}
   };
+  /* minta Worker menghapus SEMUA token milik akun ini (semua perangkat); dipanggil saat Hapus akun */
+  async function unregisterAll(){
+    try{
+      if(!PUSH_URL || PUSH_URL.indexOf("GANTI") === 0) return;
+      const A = AA(); const u = A && A.user; if(!u || !u.getIdToken) return;
+      const t = await u.getIdToken();
+      await fetch(PUSH_URL + "/unregister", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + t }, body: "{}" });
+    }catch(e){}
+  }
+  /* stPushOff(false) = lepas token perangkat ini (Keluar); stPushOff(true) = lepas semua perangkat (Hapus akun). Harus dipanggil selagi masih login. */
+  window.stPushOff = async function(all){ if(all) await unregisterAll(); };
   const C = window.Capacitor; let native = false;
   try{ native = !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){}
   if(!native) return;
   const PN = (C.Plugins && C.Plugins.PushNotifications) || (C.registerPlugin ? C.registerPlugin("PushNotifications") : null);
   if(!PN) return;
   let token = "", wired = false, savedFor = "";
+  window.stPushOff = async function(all){
+    try{
+      const A = AA(); const u = A && A.user;
+      if(u && token){
+        const { m, db } = await A.getDb();
+        await m.deleteDoc(m.doc(db, "pushTokens", token));
+      }
+      savedFor = ""; /* login berikutnya menyimpan token lagi */
+    }catch(e){ console.warn("[push] hapus token gagal:", e && (e.code || e.message)); }
+    if(all) await unregisterAll();
+  };
   async function save(){
     const A = AA(); if(!A) return;
     const u = A.user; if(!u || !token || savedFor === u.uid + token) return;
