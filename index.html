@@ -285,6 +285,9 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 @media (prefers-reduced-motion:reduce){#bellBtn.has,#bellBtn.has svg,#bellBtn .bdg.pop,#bellBtn.ring,#bellBtn.ring svg,#bellBtn.ring .bclap,#bellBtn.tap svg,#bellBtn.settle svg{animation:none!important}#bellBtn.ring::after,#bellBtn.ring::before{animation:none;display:none}}
 #bellPanel{position:absolute;z-index:30;top:52px;left:0;display:flex;flex-direction:column;width:min(350px,calc(100vw - 32px));max-height:min(72vh,540px);padding:0;overflow:hidden;text-align:left;border:1px solid var(--gold);border-radius:16px;background:var(--bg2);box-shadow:0 10px 30px rgba(0,0,0,.6);transform-origin:22px -30px;will-change:transform,opacity;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 #bellPanel[hidden]{display:none}
+#bellPanel .ndev{flex:none}
+#bellPanel .ndev .nmain{padding-right:14px}
+#bellPanel .ndev .nmain:disabled{opacity:.6;cursor:default}
 /* di dalam menu: lonceng pindah ke bilah atas (sebelum tombol Teman dan Pengaturan), panelnya melayang di kanan atas seperti panel Teman */
 #view .bar #bellBtn{position:relative;top:auto;left:auto;margin-left:auto;flex:none}
 #view .bar #bellBtn ~ #frBar,#view .bar #bellBtn ~ #gear{margin-left:0}
@@ -11707,6 +11710,7 @@ window.satuTitikLang = () => (typeof S !== "undefined" && S && S.lang === "en") 
     const hd = mk("div", "nhd"); hd.appendChild(mk("h2", "nht", t.title));
     const mkb = mk("button", "nlnk", t.all); mkb.type = "button"; mkb.disabled = !N.unread(); mkb.addEventListener("click", () => N.markAllRead());
     hd.appendChild(mkb); pan.appendChild(hd);
+    try{ const dv = window.stDeviceNotifRow && window.stDeviceNotifRow(); if(dv) pan.appendChild(dv); }catch(e){}
     if(!list.length){
       const e = mk("div", "nempty"); e.innerHTML = ICON.bell;
       t.empty.split("\n").forEach(l => e.appendChild(mk("span", null, l))); pan.appendChild(e); return;
@@ -13253,32 +13257,40 @@ if(navigator.onLine !== false) init().catch(() => {});
     say("Buka Pengaturan HP → Aplikasi → Satu Titik → Notifikasi, lalu nyalakan.");
     return false;
   }
-  function mountNotifBtn(){
-    const host = document.getElementById("sv0"), anchor = document.getElementById("gSound");
-    if(!host || document.getElementById("stNotifBtn")) return;
-    const b = document.createElement("button");
-    b.className = "sc"; b.id = "stNotifBtn"; b.type = "button";
-    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span id="stNotifTxt">Notifikasi</span>';
-    host.insertBefore(b, anchor || null);
-    const txt = () => document.getElementById("stNotifTxt");
-    async function refresh(){ const s = await notifState(); if(txt()) txt().textContent = s === "on" ? "Notifikasi: aktif ✓" : "Notifikasi: mati. Ketuk untuk menyalakan"; return s; }
-    b.addEventListener("click", async () => {
-      b.disabled = true;
-      try{
-        const s = await notifState();
-        if(s === "on"){ say("Notifikasi sudah aktif."); start(); }
-        else if(s === "prompt"){
-          try{ await PN.requestPermissions(); }catch(e){}
-          start();
-        }else{ await openNotifSettings(); }
-      }catch(e){}
-      b.disabled = false; refresh();
-    });
-    refresh();
-    /* setelah pengguna kembali dari pengaturan HP: perbarui tampilan dan daftarkan token bila sudah aktif */
-    document.addEventListener("visibilitychange", () => { if(!document.hidden) refresh().then(s => { if(s === "on") start(); }); });
-  }
-  mountNotifBtn();
+  /* baris "Notifikasi perangkat" di dalam panel lonceng (dipanggil paintPanel setiap panel digambar ulang) */
+  let devState = "";
+  function bellIcon(){ return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>'; }
+  window.stDeviceNotifRow = function(){
+    try{
+      const row = document.createElement("div"); row.className = "nrow ndev";
+      const main = document.createElement("button"); main.type = "button"; main.className = "nmain";
+      const ic = document.createElement("span"); ic.className = "ni"; ic.innerHTML = bellIcon();
+      const bd = document.createElement("div"); bd.className = "nbody";
+      const tt = document.createElement("p"); tt.className = "ntt"; tt.textContent = "Notifikasi perangkat";
+      const st = document.createElement("p"); st.className = "nbd";
+      bd.append(tt, st); main.append(ic, bd); row.appendChild(main);
+      const paint = s => {
+        devState = s;
+        st.textContent = s === "on" ? "Aktif. Notifikasi muncul walau aplikasi ditutup." : s === "prompt" ? "Belum diizinkan. Ketuk untuk mengizinkan." : s === "off" ? "Mati. Ketuk untuk menyalakan." : "Memeriksa…";
+        row.classList.toggle("un", s === "off" || s === "prompt");
+      };
+      paint(devState);
+      notifState().then(paint);
+      main.addEventListener("click", async e => {
+        e.stopPropagation(); main.disabled = true;
+        try{
+          const s = await notifState();
+          if(s === "on"){ say("Notifikasi sudah aktif."); start(); }
+          else if(s === "prompt"){ try{ await PN.requestPermissions(); }catch(_){} start(); }
+          else await openNotifSettings();
+        }catch(_){}
+        main.disabled = false; notifState().then(paint);
+      });
+      return row;
+    }catch(e){ return null; }
+  };
+  /* setelah pengguna kembali dari pengaturan HP: daftarkan token bila notifikasi sudah aktif */
+  document.addEventListener("visibilitychange", () => { if(!document.hidden) notifState().then(s => { devState = s; if(s === "on") start(); }); });
 })();
 </script>
 </body>
