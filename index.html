@@ -1698,9 +1698,17 @@ window.satuTitikNative = {
     };
     prep();
   }
+  /* Banner disembunyikan saat halaman Syarat Penggunaan terbuka (dipanggil dari #stTerms) */
+  let bnOn = false, bnWantHide = false, bnAd = null;
+  window.satuTitikBannerHide = async function(hide){
+    bnWantHide = !!hide;
+    if(!bnOn || !bnAd) return;
+    try{ if(bnWantHide) await bnAd.hideBanner(); else await bnAd.resumeBanner(); }catch(e){}
+  };
   async function initAds(){
     const AdMob = plug("AdMob"), cfg = window.satuTitikNative;
     if(!AdMob) return;
+    bnAd = AdMob;
     try{
       await AdMob.initialize({});
       try{ const ci = await AdMob.requestConsentInfo(); if(ci && ci.isConsentFormAvailable && ci.status === "REQUIRED") await AdMob.showConsentForm(); }catch(e){}
@@ -1715,6 +1723,7 @@ window.satuTitikNative = {
         try{
           await AdMob.showBanner({ adId: cfg.adBanner, adSize: "ADAPTIVE_BANNER", position: "BOTTOM_CENTER", margin: 0, isTesting: !!cfg.testMode });
           setTimeout(() => { if(!document.documentElement.style.getPropertyValue("--adh")) setH(60); }, 2500);
+          bnOn = true; if(bnWantHide) window.satuTitikBannerHide(true);
         }catch(e){ console.warn("Banner tidak dapat dimuat:", e); }
       }
       if(cfg.interstitial !== false) initInterstitial(AdMob, cfg);
@@ -13554,6 +13563,10 @@ if(navigator.onLine !== false) init().catch(() => {});
     sec.innerHTML = '<div class="abbar"><button id="tmBack" type="button"></button></div><div class="abscroll"><div class="abwrap"><header class="abh"><h1 id="tmTitle"></h1><p id="tmSub"></p><p class="pvu" id="tmUpd"></p></header><div id="tmBody"></div></div></div>';
     document.body.appendChild(sec);
     $("tmBack").addEventListener("click", closeTerms);
+    try{
+      const bh = () => { try{ if(window.satuTitikBannerHide) window.satuTitikBannerHide(!sec.hidden); }catch(e){} };
+      new MutationObserver(bh).observe(sec, { attributes: true, attributeFilter: ["hidden"] });
+    }catch(e){}
     document.addEventListener("keydown", e => { if(e.key === "Escape" && !sec.hidden) closeTerms(); });
     return sec;
   }
