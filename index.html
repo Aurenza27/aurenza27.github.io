@@ -13160,7 +13160,16 @@ if(navigator.onLine !== false) init().catch(() => {});
    Pengiriman dilakukan server push gratis (Cloudflare Worker, lihat push-worker/worker.js). Di web/PWA tidak ada yang berubah. */
 (function(){
   const PUSH_URL = "https://satutitik-push.randiaudiayogeza75.workers.dev"; /* contoh: https://satutitik-push.namamu.workers.dev */
-  const A = window.satuTitikAuth; if(!A) return;
+  /* DIAGNOSIS SEMENTARA (hapus setelah notifikasi beres): tampilkan tahap terakhir di layar */
+  let dbgBox = null;
+  function dbg(t){
+    try{
+      if(!dbgBox){ dbgBox = document.createElement("div"); dbgBox.style.cssText = "position:fixed;left:8px;right:8px;top:8px;z-index:99999;background:#000c;color:#0f0;padding:8px 10px;border-radius:8px;font:12px/1.4 monospace;white-space:pre-wrap;pointer-events:none"; document.body.appendChild(dbgBox); setTimeout(() => { try{ dbgBox.remove(); }catch(_){} }, 15000); }
+      dbgBox.textContent += (dbgBox.textContent ? "\n" : "") + t;
+    }catch(_){}
+  }
+  dbg("push v2 dimuat");
+  const A = window.satuTitikAuth; if(!A){ dbg("STOP: satuTitikAuth belum ada"); return; }
   window.stPush = function(type, data){
     try{
       if(!PUSH_URL || PUSH_URL.indexOf("GANTI") === 0) return;
@@ -13170,8 +13179,10 @@ if(navigator.onLine !== false) init().catch(() => {});
   };
   const C = window.Capacitor; let native = false;
   try{ native = !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){}
+  dbg("aplikasi native: " + native);
   if(!native) return;
   const PN = (C.Plugins && C.Plugins.PushNotifications) || (C.registerPlugin ? C.registerPlugin("PushNotifications") : null);
+  dbg("plugin push: " + !!PN);
   if(!PN) return;
   let token = "", wired = false, savedFor = "";
   async function save(){
@@ -13189,6 +13200,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     starting = true;
     try{
       let p = await PN.checkPermissions();
+      dbg("status izin: " + p.receive);
       /* hanya diminta bila belum pernah ditanya ("prompt"); status sistem sendiri yang mencegah tanya berulang */
       if(p.receive === "prompt"){
         p = await PN.requestPermissions();
@@ -13202,6 +13214,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       await PN.register();
     }catch(e){
       console.warn("[push] gagal mulai:", e && (e.message || e));
+      dbg("ERROR: " + String(e && (e.message || e)));
       /* plugin push tidak ada di APK: beri tahu di layar supaya tidak gagal diam-diam */
       try{
         if(/not implemented|not available|unimplemented/i.test(String(e && (e.message || e)))){
