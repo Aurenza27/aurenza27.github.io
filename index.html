@@ -13222,9 +13222,9 @@ if(navigator.onLine !== false) init().catch(() => {});
 
   /* ===== Tombol "Notifikasi" di Pengaturan: cek status, minta izin (Android 13+), atau buka pengaturan HP bila mati =====
      Android tidak mengizinkan aplikasi menyalakan notifikasi diam-diam, jadi pengguna diarahkan ke sakelarnya.
-     Plugin opsional (bila ada di APK): LocalNotifications (membaca status asli di Android 12 ke bawah) dan NativeSettings (membuka pengaturan). */
+     Memakai plugin native "NotifSettings" buatan sendiri (ditambahkan di workflow build): enabled() membaca status asli, open() membuka pengaturan. */
   const plug = n => { try{ return (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null); }catch(e){ return null; } };
-  const LN = plug("LocalNotifications"), NS = plug("NativeSettings");
+  const NSP = plug("NotifSettings");
   function say(msg){
     try{
       const d = document.createElement("div"); d.textContent = msg;
@@ -13235,16 +13235,20 @@ if(navigator.onLine !== false) init().catch(() => {});
   /* hasil: "on" | "off" | "prompt" */
   async function notifState(){
     try{
-      if(LN && LN.checkPermissions){ const r = await LN.checkPermissions(); if(r.display === "granted") return "on"; if(r.display === "prompt" || r.display === "prompt-with-rationale") return "prompt"; return "off"; }
+      if(NSP && NSP.enabled){
+        const r = await NSP.enabled();
+        if(r && r.enabled) return "on";
+        /* mati: bila Android 13+ dan belum pernah ditanya, masih bisa minta lewat kotak izin */
+        try{ const q = await PN.checkPermissions(); if(q.receive === "prompt") return "prompt"; }catch(e){}
+        return "off";
+      }
     }catch(e){}
     try{ const r = await PN.checkPermissions(); if(r.receive === "granted") return "on"; if(r.receive === "prompt") return "prompt"; return "off"; }catch(e){}
     return "off";
   }
   async function openNotifSettings(){
-    if(NS && NS.openAndroid){
-      for(const opt of ["app_notification_settings", "application_details"]){
-        try{ await NS.openAndroid({ option: opt }); return true; }catch(e){}
-      }
+    if(NSP && NSP.open){
+      try{ await NSP.open(); return true; }catch(e){}
     }
     say("Buka Pengaturan HP → Aplikasi → Satu Titik → Notifikasi, lalu nyalakan.");
     return false;
