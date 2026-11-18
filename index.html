@@ -1414,7 +1414,7 @@ const PV = {
   id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 18 November 2026", back:"‹ Beranda", secs:[
     {h:"1. Pendahuluan", p:["Satu Titik adalah aplikasi yang dikembangkan oleh Aurenza27 (“kami”). Kebijakan ini menjelaskan data apa yang diproses, untuk apa, dan pilihan yang kamu miliki saat memakai aplikasi ini. Dengan memakai aplikasi, kamu menyetujui kebijakan ini."]},
     {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, data turnamen, serta aktivitas olahraga beserta rute GPS yang kamu rekam di menu Olahraga) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google."]},
-    {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, termasuk ketika layar terkunci atau aplikasi berada di latar belakang (notifikasi tampil selama merekam), dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif."]},
+    {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, termasuk ketika layar terkunci atau aplikasi berada di latar belakang (notifikasi tampil selama merekam), dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Jumlah langkah dibaca dari sensor langkah HP (izin Aktivitas Fisik) hanya saat merekam di aplikasi Android, dan hanya dipakai untuk memeriksa kewajaran jarak. Angkanya tidak ditampilkan atau disimpan di riwayat aktivitas.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif."]},
     {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, dan rute GPS olahraga) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, dan dihapus saat pertemanan dihapus."]},
     {p:["Blokir dan laporan:"], l:["Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.","Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan. Laporan hanya dibaca pengelola untuk meninjau pelanggaran."]},
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif."]},
@@ -1432,7 +1432,7 @@ const PV = {
   en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 18 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. By using the app, you agree to this policy."]},
     {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, tournament data, and the sports activities and GPS routes you record in the Sports menu) are stored on your own device.","This data is not sent to our servers unless you sign in with a Google account."]},
-    {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, including while the screen is locked or the app is in the background (a notification shows while recording), and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on."]},
+    {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, including while the screen is locked or the app is in the background (a notification shows while recording), and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","The step count is read from your phone's step sensor (Physical activity permission) only while recording in the Android app, and is used only to check that the distance is plausible. It is not shown or stored in the activity history.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on."]},
     {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, menu results, and sports GPS routes) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, and are deleted when the friendship is removed."]},
     {p:["Blocking and reports:"], l:["The list of users you block is stored in your account so blocking applies on all your devices.","When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, and a copy of the reported text. Reports are read only by the maintainer to review violations."]},
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data."]},
@@ -1887,7 +1887,25 @@ window.stNativeGps = (function(){
       return (C.Plugins && C.Plugins.WorkoutNotif) || (C.registerPlugin ? C.registerPlugin("WorkoutNotif") : null);
     }catch(e){ return null; }
   }
+  function splug(){
+    try{
+      var C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return null;
+      return (C.Plugins && C.Plugins.StepCounter) || (C.registerPlugin ? C.registerPlugin("StepCounter") : null);
+    }catch(e){ return null; }
+  }
+  /* langkah kumulatif sejak rekaman dimulai; -1 = tidak tersedia (bukan Android, sensor tidak ada, atau izin ditolak) */
+  var steps = -1, shandle = null;
   var api = {
+    steps: function(){ return steps; },
+    stepsStart: async function(fresh){
+      var S = splug(); if(!S) return;
+      try{
+        if(fresh){ steps = -1; try{ await S.reset(); }catch(e){} }
+        if(!shandle){ shandle = await S.addListener("step", function(e){ if(e && typeof e.steps === "number" && owner) steps = e.steps; }); }
+        var r = await S.start();
+        if(r && r.available && typeof r.steps === "number") steps = r.steps; else steps = -1;
+      }catch(e){ steps = -1; }
+    },
     available: function(){ return !!plug(); },
     start: async function(win, onLoc, onErr, txt){
       var P = plug(); if(!P) throw new Error("none");
@@ -1904,6 +1922,7 @@ window.stNativeGps = (function(){
     stop: async function(){
       owner = null; clearInterval(timer); timer = 0;
       var N = nplug(); if(N){ try{ await N.hide(); }catch(e){} }
+      var S = splug(); if(S){ try{ await S.stop(); }catch(e){} }
       var P = plug(); if(P){ try{ await P.stop(); }catch(e){} }
     },
     openSettings: async function(){ var P = plug(); if(P){ try{ await P.openSettings(); }catch(e){} } },
@@ -10181,7 +10200,24 @@ function flagFast(pts, sp){
   }
   return fast >= 90;
 }
+/* langkah vs jarak: tiap jendela 60 detik, jarak per langkah (m) yang terlalu panjang, atau langkah hampir nol saat bergerak, menandakan kendaraan. Ditandai bila berlangsung >= 90 detik.
+   Titik tanpa data langkah atau hitungan yang turun (mis. setelah rekaman dipulihkan) dilewati. Sepeda tidak diperiksa. */
+const STRIDE_MAX = {run:3, walk:2, hike:2};
+function flagSteps(pts, sp){
+  const lim = STRIDE_MAX[sp]; if(!lim) return false;
+  let j = 0, bad = 0;
+  for(let i = 1; i < pts.length; i++){
+    while(j + 1 < i && pts[i][2] - pts[j + 1][2] >= 60) j++;
+    const w = pts[i][2] - pts[j][2], a = pts[j][4], b = pts[i][4];
+    if(w < 60 || !(a >= 0) || !(b >= 0) || b < a) continue;
+    const d = pts[i][3] - pts[j][3];
+    if(d >= 100 && d / Math.max(b - a, 1) > lim) bad += pts[i][2] - pts[i - 1][2];
+  }
+  return bad >= 90;
+}
 const flagged = a => !!(a.fl && a.fl.length), okAct = a => !flagged(a) && !a.man;
+/* langkah kumulatif dari sensor HP (-1 bila tidak tersedia); titik tanpa data langkah dilewati saat pemeriksaan */
+function nst(){ try{ const g = window.parent && window.parent.stNativeGps; return nat && g ? g.steps() : -1; }catch(e){ return -1; } }
 function onFix(pos){
   if(rec.st !== "run") return;
   const c = pos.coords, t = pos.timestamp || Date.now(), acc = c.accuracy || 0;
@@ -10196,7 +10232,7 @@ function onFix(pos){
     /* pemanasan: titik awal harus cukup akurat, atau tunggu maksimal 20 detik */
     if(acc > ACC_WARM[rec.sp] && Date.now() - rec.gt0 < 20000){ rec.gps = "warm"; updateLive(); return; }
     rec.gps = "ok"; rec.kf = f;
-    rec.last = {la:f.la, lo:f.lo, t:t}; rec.pts.push([f.la, f.lo, mt, rec.dist]); updateLive(); return;
+    rec.last = {la:f.la, lo:f.lo, t:t}; rec.pts.push([f.la, f.lo, mt, rec.dist, nst()]); updateLive(); return;
   }
   rec.gps = "ok";
   const d = hav(rec.last.la, rec.last.lo, f.la, f.lo), dt = (t - rec.last.t) / 1000, spd = c.speed;
@@ -10205,7 +10241,7 @@ function onFix(pos){
   if(d < Math.min(15, Math.max(3, acc / 2))){ updateLive(); return; }   /* getaran saat diam: abaikan, jarak terkumpul sampai cukup jauh */
   if(typeof spd === "number" && isFinite(spd) && spd >= 0 && spd < 0.4 && d < 15){ updateLive(); return; }   /* kecepatan GPS ~0: diam */
   rec.kf = f; rec.dist += d; rec.last = {la:f.la, lo:f.lo, t:t};
-  rec.pts.push([f.la, f.lo, mt, rec.dist]);
+  rec.pts.push([f.la, f.lo, mt, rec.dist, nst()]);
   updateLive();
   if(Date.now() - lastSave > 10000) saveDraft();
 }
@@ -10230,7 +10266,7 @@ function startGps(){
     loc => { if(nat) onFix({coords:{latitude:loc.latitude, longitude:loc.longitude, accuracy:loc.accuracy || 0, speed:(typeof loc.speed === "number" ? loc.speed : null), simulated:loc.simulated === true}, timestamp:loc.time || Date.now()}); },
     err => { if(nat) onErr({code:(err && err.code === "NOT_AUTHORIZED") ? 1 : 2}); },
     {title:L("GPS olahraga aktif", "Activity GPS on"), msg:L("Detail jarak, waktu, dan kalori ada di notifikasi Rekaman olahraga.", "Distance, time, and calories are in the Activity recording notification.")}
-  ).then(() => pushNotif(true)).catch(() => { if(nat){ nat = false; startWebGps(); updateLive(); } });
+  ).then(() => { pushNotif(true); g.stepsStart(rec.stFresh); rec.stFresh = false; }).catch(() => { if(nat){ nat = false; startWebGps(); updateLive(); } });
 }
 function stopGps(){
   if(nat){ nat = false; try{ window.parent.stNativeGps.stop(); }catch(e){} }
@@ -10243,7 +10279,7 @@ window.addEventListener("pagehide", saveDraft);
 
 function startRec(){
   if(rec.st !== "idle") return;
-  rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; rec.mock = 0; restored = false; resumeRec();
+  rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; rec.mock = 0; rec.stFresh = true; restored = false; resumeRec();
 }
 function resumeRec(){ rec.st = "run"; rec.t0 = Date.now(); rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); lockWake(); renderRec(); saveDraft(); }
 function pauseRec(){ rec.acc += Date.now() - rec.t0; rec.t0 = 0; rec.st = "pause"; stopGps(); unlockWake(); renderRec(); saveDraft(); }
@@ -10257,7 +10293,7 @@ function finishRec(){
   if(dist < 50 && !confirm(L("Jarak dari GPS hampir nol. Simpan tetap tanpa jarak?\n\nBatal = kembali ke rekaman.", "GPS distance is almost zero. Save anyway without distance?\n\nCancel = back to the recording."))) return;
   const a = {id:Date.now().toString(36), sp:rec.sp, ts:rec.start, dist:dist, dur:dur, title:defTitle(rec.sp, rec.start)};
   if(rec.pts.length >= 2){ a.rt = downsample(rec.pts, 250); a.spl = calcSplits(rec.pts, rec.dist, dur); }
-  const fl = []; if(rec.mock > 0) fl.push("mock"); if(flagFast(rec.pts, rec.sp)) fl.push("fast");
+  const fl = []; if(rec.mock > 0) fl.push("mock"); if(flagFast(rec.pts, rec.sp)) fl.push("fast"); if(flagSteps(rec.pts, rec.sp)) fl.push("steps");
   if(fl.length) a.fl = fl;
   const all = acts(); all.push(a); putActs(all);
   discardRec(); toast(L("Aktivitas tersimpan.", "Activity saved.")); openDetail(a.id);
@@ -10417,11 +10453,11 @@ function renderDetail(){
   v.append(ti);
   const d = el("p", "tiny", SP[a.sp].ic + " " + spName(a.sp) + " · " + fmtDate(a.ts) + (a.man ? " · " + L("input manual", "manual entry") : "")); d.style.cssText = "text-align:left;margin:0 0 12px 2px"; v.append(d);
   if(flagged(a)){
-    const nt = el("p", "notice", (a.fl.indexOf("mock") >= 0 ? L("Lokasi palsu (mock location) terdeteksi saat merekam.", "Mock location was detected while recording.") : L("Kecepatan rata-rata terlalu tinggi untuk " + spName(a.sp) + " (kemungkinan memakai kendaraan).", "Average speed is too high for a " + spName(a.sp) + " (a vehicle may have been used).")) + " " + L("Aktivitas ini tidak masuk rekor pribadi dan target mingguan.", "This activity does not count toward personal records or the weekly goal."));
+    const nt = el("p", "notice", (a.fl.indexOf("mock") >= 0 ? L("Lokasi palsu (mock location) terdeteksi saat merekam.", "Mock location was detected while recording.") : [(a.fl.indexOf("fast") >= 0 ? L("Kecepatan rata-rata terlalu tinggi untuk " + spName(a.sp) + " (kemungkinan memakai kendaraan).", "Average speed is too high for a " + spName(a.sp) + " (a vehicle may have been used).") : ""), (a.fl.indexOf("steps") >= 0 ? L("Jumlah langkah tidak sebanding dengan jarak untuk " + spName(a.sp) + " (kemungkinan memakai kendaraan atau alat beroda).", "Step count does not match the distance for a " + spName(a.sp) + " (a vehicle or wheeled device may have been used).") : "")].filter(Boolean).join(" ")) + " " + L("Aktivitas ini tidak masuk rekor pribadi dan target mingguan.", "This activity does not count toward personal records or the weekly goal."));
     v.append(nt);
     if(a.fl.indexOf("mock") < 0){
       const ob = el("button", "btn ghost sm", L("Ini valid, hapus tanda", "This is valid, remove flag")); ob.type = "button"; ob.style.marginBottom = "12px";
-      ob.onclick = () => { const z = acts(), q = z.find(x => x.id === a.id); if(q){ q.fl = (q.fl || []).filter(f => f !== "fast"); if(!q.fl.length) delete q.fl; putActs(z); toast(L("Tanda dihapus.", "Flag removed.")); renderDetail(); } };
+      ob.onclick = () => { const z = acts(), q = z.find(x => x.id === a.id); if(q){ q.fl = (q.fl || []).filter(f => f !== "fast" && f !== "steps"); if(!q.fl.length) delete q.fl; putActs(z); toast(L("Tanda dihapus.", "Flag removed.")); renderDetail(); } };
       v.append(ob);
     }
   }
