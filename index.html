@@ -10618,6 +10618,8 @@ function renderDetail(){
   if(typeof a.eg === "number" && a.eg >= 0){ const t = el("div", "tile"); t.style.gridColumn = "1 / -1"; t.append(el("small", "", L("TANJAKAN (PERKIRAAN)", "ELEVATION GAIN (EST.)")), el("b", "", String(a.eg)), el("em", "", "m")); tiles.append(t); }
   v.append(tiles);
   if(a.pz >= 10){ const zp = el("p", "tiny", L("Waktu diam tidak dihitung (auto-jeda): ", "Idle time not counted (auto-pause): ") + fmtDur(a.pz)); zp.style.cssText = "text-align:left;margin:8px 0 0 2px"; v.append(zp); }
+  { const sb = el("button", "btn", L("Bagikan gambar", "Share image")); sb.type = "button"; sb.style.marginTop = "14px"; sb.onclick = () => shOpen(a); v.append(sb);
+    const sn = el("p", "tiny", L("Latar transparan atau pakai foto dari galerimu, lengkap dengan rute dan statistik.", "Transparent background or your own gallery photo, with route and stats.")); sn.style.marginTop = "8px"; v.append(sn); }
   if(a.spl && a.spl.length){
     const p = el("div", "panel"); p.style.marginTop = "14px"; p.append(el("span", "label", L("Split per km", "Splits per km")));
     const pc = a.spl.map(s => s[1] / s[0]), best = Math.min.apply(null, pc), worst = Math.max.apply(null, pc);
@@ -10637,6 +10639,150 @@ function renderDetail(){
   const del = el("button", "btn danger", L("Hapus aktivitas", "Delete activity")); del.type = "button";
   del.onclick = () => { if(!confirm(L("Hapus aktivitas ini?", "Delete this activity?"))) return; putActs(acts().filter(x => x.id !== a.id)); toast(L("Aktivitas dihapus.", "Activity deleted.")); closeDetail(); };
   bt.append(del); v.append(bt);
+}
+
+/* ===== BAGIKAN GAMBAR =====
+   PNG berlatar transparan (bisa ditempel di foto atau story), atau foto dari galeri sebagai latar. Isinya rute, jarak, waktu, pace/kecepatan,
+   kalori, tanjakan, dan watermark Satu Titik di bagian atas. Digambar langsung di kanvas (tanpa library), lebar 1080 px. */
+const SANS = "system-ui,-apple-system,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif", SERIF = "Georgia,\"Times New Roman\",serif";
+const SHF = {
+  story:{w:1080, h:1920, wm:120, rt:[140, 250, 800, 930], p:{ti:1320, da:1372, di:1590, df:240, ro:1760, rl:1814}, n:{ti:790, da:842, di:1090, df:280, ro:1280, rl:1334}},
+  sq:{w:1080, h:1080, wm:84, rt:[300, 150, 480, 470], p:{ti:700, da:744, di:880, df:150, ro:985, rl:1024}, n:{ti:330, da:374, di:580, df:180, ro:770, rl:809}}
+};
+let shLogoC;
+function shLogo(){
+  if(shLogoC !== undefined) return Promise.resolve(shLogoC);
+  return new Promise(ok => {
+    try{
+      const s = window.parent.document.querySelector("img.logo");
+      if(!s || !s.src){ ok(shLogoC = null); return; }
+      const im = new Image(); im.onload = () => ok(shLogoC = im); im.onerror = () => ok(shLogoC = null); im.src = s.src;
+    }catch(e){ ok(shLogoC = null); }
+  });
+}
+const shDims = im => [im.naturalWidth || im.width, im.naturalHeight || im.height];
+function shFit(g, txt, max){
+  if(g.measureText(txt).width <= max) return txt;
+  let s = txt; while(s.length > 1 && g.measureText(s + "…").width > max) s = s.slice(0, -1);
+  return s.trim() + "…";
+}
+function shRoute(g, pts, b, ink, thick){
+  let la0 = 90, la1 = -90, lo0 = 180, lo1 = -180;
+  pts.forEach(p => { la0 = Math.min(la0, p[0]); la1 = Math.max(la1, p[0]); lo0 = Math.min(lo0, p[1]); lo1 = Math.max(lo1, p[1]); });
+  const kx = Math.cos(rad((la0 + la1) / 2)), RW = Math.max((lo1 - lo0) * kx, 1e-6), RH = Math.max(la1 - la0, 1e-6);
+  const sc = Math.min(b[2] / RW, b[3] / RH), ox = b[0] + (b[2] - RW * sc) / 2, oy = b[1] + (b[3] - RH * sc) / 2;
+  const X = p => ox + (p[1] - lo0) * kx * sc, Y = p => oy + (la1 - p[0]) * sc;
+  g.lineJoin = g.lineCap = "round"; g.strokeStyle = ink; g.lineWidth = thick;
+  g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(X(p), Y(p)) : g.moveTo(X(p), Y(p))); g.stroke();
+  const dot = (p, c) => { g.fillStyle = c; g.strokeStyle = ink; g.lineWidth = thick * .45; g.beginPath(); g.arc(X(p), Y(p), thick * 1.25, 0, 7); g.fill(); g.stroke(); };
+  dot(pts[0], "#4cc38a"); dot(pts[pts.length - 1], "#ff7a3d");
+}
+function shDraw(cv, a, o, logo){
+  const F = SHF[o.fmt], W = F.w, H = F.h, g = cv.getContext("2d"), hasRt = !!(o.rt && a.rt && a.rt.length > 1), P = hasRt ? F.p : F.n;
+  cv.width = W; cv.height = H; g.clearRect(0, 0, W, H);
+  if(o.bg){
+    const d = shDims(o.bg), r = Math.max(W / d[0], H / d[1]), w = d[0] * r, h = d[1] * r;
+    g.drawImage(o.bg, (W - w) / 2, (H - h) / 2, w, h);
+    const c = o.dark ? "255,255,255" : "0,0,0", gr = g.createLinearGradient(0, 0, 0, H);   /* bayangan tipis supaya tulisan tetap terbaca di foto terang/gelap */
+    gr.addColorStop(0, "rgba(" + c + ",.38)"); gr.addColorStop(.3, "rgba(" + c + ",0)"); gr.addColorStop(.55, "rgba(" + c + ",0)"); gr.addColorStop(1, "rgba(" + c + ",.55)");
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  }
+  const ink = o.dark ? "#111111" : "#ffffff";
+  g.fillStyle = ink; g.shadowColor = o.dark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.5)"; g.shadowBlur = 14; g.shadowOffsetY = 2; g.textBaseline = "alphabetic";
+  /* watermark di bagian atas */
+  { const t = "Satu Titik", lh = logo ? 64 : 0, lw = logo ? lh * shDims(logo)[0] / shDims(logo)[1] : 0, gap = logo ? 16 : 0;
+    g.font = "700 46px " + SERIF; const tw = g.measureText(t).width, x0 = (W - lw - gap - tw) / 2;
+    g.globalAlpha = .92; if(logo) g.drawImage(logo, x0, F.wm - lh / 2, lw, lh);
+    g.textAlign = "left"; g.fillText(t, x0 + lw + gap, F.wm + 15); g.globalAlpha = 1; }
+  if(hasRt) shRoute(g, a.rt, F.rt, ink, o.fmt === "story" ? 15 : 11);
+  g.fillStyle = ink; g.textAlign = "center";   /* titik rute mengubah warna isian: kembalikan untuk tulisan */
+  g.font = "700 52px " + SANS; g.fillText(shFit(g, a.title || defTitle(a.sp, a.ts), 900), W / 2, P.ti);
+  g.font = "400 34px " + SANS; g.globalAlpha = .85; g.fillText(spName(a.sp) + " · " + fmtDate(a.ts), W / 2, P.da); g.globalAlpha = 1;
+  { const ds = fmtKm(a.dist); g.font = "800 " + P.df + "px " + SANS; const nw = g.measureText(ds).width;
+    g.font = "700 " + Math.round(P.df * .27) + "px " + SANS; const uw = g.measureText(" km").width, x0 = (W - nw - uw) / 2;
+    g.textAlign = "left"; g.font = "800 " + P.df + "px " + SANS; g.fillText(ds, x0, P.di);
+    g.font = "700 " + Math.round(P.df * .27) + "px " + SANS; g.fillText(" km", x0 + nw, P.di); g.textAlign = "center"; }
+  const pt = paceTile(a.sp, a.dist, a.dur), it = [[L("Waktu", "Time"), fmtDur(a.dur)], [SP[a.sp].pace ? L("Pace /km", "Pace /km") : L("Kecepatan km/jam", "Speed km/h"), pt.v]];
+  if(o.kc) it.push([L("Kalori (kkal)", "Calories (kcal)"), String(kcalAct(a))]);
+  if(o.eg && typeof a.eg === "number" && a.eg >= 0) it.push([L("Tanjakan (m)", "Elevation (m)"), String(a.eg)]);
+  it.forEach((r, i) => {
+    const x = 90 + 900 / it.length * (i + .5);
+    g.font = "800 " + (it.length > 3 ? 58 : 68) + "px " + SANS; g.fillText(r[1], x, P.ro);
+    g.font = "400 30px " + SANS; g.globalAlpha = .85; g.fillText(r[0], x, P.rl); g.globalAlpha = 1;
+  });
+  g.shadowColor = "transparent"; g.shadowBlur = 0; g.shadowOffsetY = 0;
+}
+const shNative = () => { try{ const C = window.parent.Capacitor; return !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){ return false; } };
+async function shOut(a, cv, mode){
+  const b = await new Promise(ok => cv.toBlob(x => ok(x), "image/png"));
+  if(!b){ toast(L("Gagal membuat gambar.", "Could not create the image.")); return; }
+  const name = "satu-titik-" + ((a.title || "aktivitas").replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "aktivitas") + ".png", title = a.title || "Satu Titik";
+  if(mode === "share" || shNative()){
+    try{ const ns = window.parent && window.parent.stNativeShare; if(ns && await ns(b, name, title)) return; }catch(e){}
+    try{ const f = new File([b], name, {type:"image/png"}); if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:title}); return; } }catch(e){ if(e && e.name === "AbortError") return; }
+  }
+  const u = URL.createObjectURL(b), l = document.createElement("a"); l.href = u; l.download = name; document.body.appendChild(l); l.click(); l.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 4000); toast(L("Gambar diunduh.", "Image downloaded."));
+}
+async function shOpen(a){
+  if($("shSheet")) return;
+  const logo = await shLogo(), sv = load("sh", {}) || {};
+  const o = {fmt:sv.fmt === "sq" ? "sq" : "story", dark:sv.dark === true, rt:sv.rt !== false, kc:sv.kc !== false, eg:sv.eg !== false, bg:null};
+  const hasRt = !!(a.rt && a.rt.length > 1), hasEg = typeof a.eg === "number" && a.eg >= 0;
+  const ov = el("div"); ov.id = "shSheet"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
+  const css = el("style", "", "#shSheet{position:fixed;inset:0;z-index:50;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--bg);padding:14px 16px calc(28px + env(safe-area-inset-bottom,0px))}" +
+    "#shSheet .in{max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:12px}" +
+    "#shSheet .pv{padding:10px;border:1px solid var(--line);border-radius:14px;background:conic-gradient(#2a3040 25%,#1b2030 0 50%,#2a3040 0 75%,#1b2030 0) 0 0/22px 22px}" +
+    "#shSheet .pv.lt{background:conic-gradient(#d9dce3 25%,#f2f3f6 0 50%,#d9dce3 0 75%,#f2f3f6 0) 0 0/22px 22px}" +
+    "#shSheet canvas{display:block;margin:0 auto;max-width:100%;max-height:50vh;width:auto;height:auto}" +
+    "#shSheet .grp .label{margin-bottom:8px}.toast{z-index:60}");
+  const inp = el("input"); inp.type = "file"; inp.accept = "image/*"; inp.hidden = true;
+  const pv = el("div", "pv"), cv = el("canvas"); pv.append(cv);
+  const redraw = () => { pv.className = "pv" + (o.dark ? " lt" : ""); try{ shDraw(cv, a, o, logo); }catch(e){ toast(L("Gagal membuat gambar.", "Could not create the image.")); } save("sh", {fmt:o.fmt, dark:o.dark, rt:o.rt, kc:o.kc, eg:o.eg}); };
+  const group = (label, defs) => {
+    const w = el("div", "grp"), ch = el("div", "chips"); w.append(el("span", "label", label), ch);
+    defs.forEach(d => { const b = el("button", "chip", ""); b.type = "button"; ch.append(b); d.b = b; b.onclick = () => { d.tap(); paintAll(); }; });
+    return {w:w, defs:defs};
+  };
+  const pick = () => inp.click();
+  const gBg = group(L("Latar", "Background"), [
+    {t:() => L("Transparan", "Transparent"), on:() => !o.bg, tap:() => { if(o.bg){ o.bg = null; } redraw(); }},
+    {t:() => o.bg ? L("Ganti foto galeri", "Change gallery photo") : L("Foto dari galeri", "Photo from gallery"), on:() => !!o.bg, tap:pick}]);
+  const gFmt = group(L("Ukuran", "Size"), [
+    {t:() => "Story 9:16", on:() => o.fmt === "story", tap:() => { o.fmt = "story"; redraw(); }},
+    {t:() => L("Kotak 1:1", "Square 1:1"), on:() => o.fmt === "sq", tap:() => { o.fmt = "sq"; redraw(); }}]);
+  const gInk = group(L("Warna tulisan", "Text color"), [
+    {t:() => L("Putih", "White"), on:() => !o.dark, tap:() => { o.dark = false; redraw(); }},
+    {t:() => L("Hitam", "Black"), on:() => o.dark, tap:() => { o.dark = true; redraw(); }}]);
+  const gShow = group(L("Tampilkan", "Show"), [
+    {t:() => L("Rute", "Route"), on:() => o.rt && hasRt, off:!hasRt, tap:() => { o.rt = !o.rt; redraw(); }},
+    {t:() => L("Kalori", "Calories"), on:() => o.kc, tap:() => { o.kc = !o.kc; redraw(); }},
+    {t:() => L("Tanjakan", "Elevation"), on:() => o.eg && hasEg, off:!hasEg, tap:() => { o.eg = !o.eg; redraw(); }}]);
+  const groups = [gBg, gFmt, gInk, gShow];
+  function paintAll(){ groups.forEach(gr => gr.defs.forEach(d => { d.b.textContent = d.t(); d.b.classList.toggle("on", !!d.on()); d.b.disabled = !!d.off; d.b.setAttribute("aria-pressed", String(!!d.on())); })); }
+  inp.onchange = () => {
+    const f = inp.files && inp.files[0]; inp.value = ""; if(!f) return;
+    if(!/^image\//.test(f.type)){ toast(L("Pilih file gambar.", "Please choose an image file.")); return; }
+    const u = URL.createObjectURL(f), im = new Image();
+    im.onload = () => {
+      let bg = im; const d = shDims(im), m = Math.max(d[0], d[1]);
+      if(m > 2600){ try{ const k = 2600 / m, c = el("canvas"); c.width = Math.round(d[0] * k); c.height = Math.round(d[1] * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); bg = c; }catch(e){} }   /* foto besar dikecilkan supaya memori HP aman */
+      URL.revokeObjectURL(u); o.bg = bg; redraw(); paintAll();
+    };
+    im.onerror = () => { URL.revokeObjectURL(u); toast(L("Foto tidak bisa dibuka.", "Could not open that photo.")); };
+    im.src = u;
+  };
+  const key = e => { if(e.key === "Escape") close(); };
+  const close = () => { document.removeEventListener("keydown", key); ov.remove(); };
+  document.addEventListener("keydown", key);
+  const back = el("button", "back", "‹ " + L("Kembali", "Back")); back.type = "button"; back.onclick = close;
+  const share = el("button", "btn", L("Bagikan gambar", "Share image")); share.type = "button"; share.onclick = () => shOut(a, cv, "share");
+  const save2 = el("button", "btn ghost", shNative() ? L("Simpan lewat lembar bagikan", "Save via the share sheet") : L("Simpan gambar", "Save image")); save2.type = "button"; save2.onclick = () => shOut(a, cv, "save");
+  const hint = el("p", "hint", L("Latar transparan siap ditempel di foto atau story-mu. Atau pilih foto dari galeri sebagai latar.", "The transparent background is ready to lay over a photo or story. Or pick a gallery photo as the background."));
+  hint.style.margin = "0";
+  const wrap = el("div", "in"); wrap.append(back, pv, hint, gBg.w, gFmt.w, gInk.w, gShow.w, share, save2);
+  ov.append(css, inp, wrap); document.body.appendChild(ov);
+  redraw(); paintAll();
 }
 
 /* ===== tampilan: Statistik ===== */
