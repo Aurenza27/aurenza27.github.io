@@ -2038,7 +2038,7 @@ function openMenu(m){
   window.satuTitikMenuOpenedAt = Date.now();   /* dipakai logika iklan: menu yang ditutup terlalu cepat tidak memicu iklan */
   $("vt").textContent = mTitle(m);
   const f = document.createElement("iframe");
-  f.id = "frame"; f.title = mTitle(m); f.setAttribute("allow", "autoplay");
+  f.id = "frame"; f.title = mTitle(m); f.setAttribute("allow", "autoplay; geolocation");
   curMenu = m.id; try{ paintWarn(); }catch(e){} writeKeys(S); f.addEventListener("load", () => { try{ watchFrame(); }catch(e){} try{ paintMenuTitles(); }catch(e){} try{ medisHookFrame(); }catch(e){} try{ hibHookFrame(); }catch(e){} try{ hapticHook(); }catch(e){} }); f.srcdoc = menuSrc(m);
   $("view").appendChild(f);
   $("home").hidden = true; $("view").hidden = false;
