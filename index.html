@@ -10213,14 +10213,16 @@ function drawRoute(cv, pts){
 function mapCanvas(pts){ const c = el("canvas", "map"); requestAnimationFrame(() => drawRoute(c, pts)); return c; }
 
 /* ===== perekaman ===== */
-const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, jc:0, cand:null, ap:0, apSince:0, stillT:0, pz:0, gt0:0, kf:null, coarse:0, mock:0, eg:0, altN:0, altRef:null, altSm:null};
+const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, jc:0, cand:null, ap:0, apSince:0, stillT:0, pz:0, gt0:0, kf:null, coarse:0, mock:0, eg:0, altN:0, altRef:null, altSm:null, rdy:false};
 if(!SP[rec.sp]) rec.sp = "run";
 let gpsId = null, nat = false, natN = false, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
 /* AUTO-JEDA: saat diam, jam berhenti (waktu bergerak). rec.ap = total ms auto-jeda pada segmen ini, rec.apSince = awal auto-jeda yang sedang berjalan (0 = tidak),
    rec.pz = total ms auto-jeda pada segmen sebelumnya. Jarak, pace, split, dan kalori semuanya memakai waktu bergerak ini. */
 const apOn = () => +load("ap", 1) !== 0;
 const apOpen = () => rec.apSince ? Math.max(0, Date.now() - rec.apSince) : 0;
-const elapsed = () => rec.acc + (rec.st === "run" ? Math.max(0, Date.now() - rec.t0 - rec.ap - apOpen()) : 0);
+/* JAM BARU BERJALAN SETELAH GPS SIAP: rec.rdy = false sejak Mulai / Lanjut sampai titik GPS pertama yang layak diterima; selama itu waktu belum dihitung.
+   (Perangkat tanpa GPS: rdy langsung true, waktu tetap berjalan untuk Input jarak manual.) */
+const elapsed = () => rec.acc + (rec.st === "run" && rec.rdy ? Math.max(0, Date.now() - rec.t0 - rec.ap - apOpen()) : 0);
 const pzMs = () => rec.pz + (rec.st === "run" ? rec.ap + apOpen() : 0);
 const AP_STOP = {run:0.5, walk:0.4, ride:1.0, hike:0.3}, AP_GO = {run:1.0, walk:0.8, ride:1.5, hike:0.6};
 function apStep(spd, t, accepted, gap){
@@ -10308,7 +10310,8 @@ function onFix(pos){
     /* pemanasan: titik awal harus cukup akurat, atau tunggu maksimal 20 detik */
     if(acc > ACC_WARM[rec.sp] && Date.now() - rec.gt0 < 20000){ rec.gps = "warm"; updateLive(); return; }
     rec.gps = "ok"; rec.kf = f; rec.jc = 0; rec.cand = null;
-    rec.last = {la:f.la, lo:f.lo, t:t}; rec.pts.push([f.la, f.lo, mt, rec.dist, nst()]); updateLive(); return;
+    rec.rdy = true; rec.t0 = Math.min(t, Date.now());   /* GPS siap: jam mulai berjalan dari sini */
+    rec.last = {la:f.la, lo:f.lo, t:t}; rec.pts.push([f.la, f.lo, rec.acc / 1000, rec.dist, nst()]); updateLive(); return;
   }
   rec.gps = "ok";
   const d = hav(rec.last.la, rec.last.lo, f.la, f.lo), dt = (t - rec.last.t) / 1000, spd = c.speed;
@@ -10346,9 +10349,9 @@ function onErr(e){
 }
 function nativeGps(){ try{ const g = window.parent && window.parent.stNativeGps; return g && g.available() ? g : null; }catch(e){ return null; } }
 function startWebGps(){
-  if(!navigator.geolocation){ rec.gps = "none"; return; }
+  if(!navigator.geolocation){ rec.gps = "none"; rec.rdy = true; rec.t0 = Date.now(); return; }
   rec.gps = "wait";
-  try{ gpsId = navigator.geolocation.watchPosition(onFix, onErr, {enableHighAccuracy:true, maximumAge:0, timeout:30000}); }catch(e){ rec.gps = "none"; }
+  try{ gpsId = navigator.geolocation.watchPosition(onFix, onErr, {enableHighAccuracy:true, maximumAge:0, timeout:30000}); }catch(e){ rec.gps = "none"; rec.rdy = true; rec.t0 = Date.now(); }
 }
 function startGps(){
   stopGps(false, true);
@@ -10380,10 +10383,10 @@ function startRec(){
   if(rec.st !== "idle") return;
   rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; rec.jc = 0; rec.cand = null; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.mock = 0; rec.eg = 0; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.stFresh = true; restored = false; resumeRec();
 }
-function resumeRec(){ rec.st = "run"; rec.altRef = null; rec.altSm = null; rec.t0 = Date.now(); rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); if(!nativeGps()) lockWake(); renderRec(); saveDraft(); }
-function pauseRec(){ const n = Date.now(), open = apOpen(); rec.acc += Math.max(0, n - rec.t0 - rec.ap - open); rec.pz += rec.ap + open; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.t0 = 0; rec.st = "pause"; stopGps(true); pushNotif(true); unlockWake(); renderRec(); saveDraft(); }
+function resumeRec(){ rec.st = "run"; rec.altRef = null; rec.altSm = null; rec.rdy = false; rec.t0 = Date.now(); rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); if(!nativeGps()) lockWake(); renderRec(); saveDraft(); }
+function pauseRec(){ const n = Date.now(), open = apOpen(); if(rec.rdy) rec.acc += Math.max(0, n - rec.t0 - rec.ap - open); rec.pz += rec.ap + open; rec.rdy = false; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.t0 = 0; rec.st = "pause"; stopGps(true); pushNotif(true); unlockWake(); renderRec(); saveDraft(); }
 function discardRec(){
-  stopGps(); unlockWake(); rec.st = "idle"; rec.acc = 0; rec.t0 = 0; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.eg = 0; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
+  stopGps(); unlockWake(); rec.st = "idle"; rec.rdy = false; rec.acc = 0; rec.t0 = 0; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.eg = 0; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
 }
 function finishRec(){
   if(rec.st === "run") pauseRec();
@@ -10417,11 +10420,11 @@ function gpsText(){
   if(g === "ok") return ["ok", L("GPS baik", "GPS good") + " (±" + Math.round(rec.acc_m) + " m)"];
   if(g === "weak") return ["warn", L("Sinyal GPS lemah" + (rec.acc_m ? " (±" + Math.round(rec.acc_m) + " m)" : "") + ", pindah ke tempat terbuka.", "Weak GPS signal" + (rec.acc_m ? " (±" + Math.round(rec.acc_m) + " m)" : "") + ", move to an open area.")];
   if(g === "mock") return ["bad", L("Lokasi palsu (mock location) terdeteksi. Titik diabaikan dan aktivitas akan ditandai. Matikan aplikasi lokasi palsu.", "Mock location detected. Points are ignored and the activity will be flagged. Turn off the mock location app.")];
-  if(g === "warm") return ["warn", L("Menyiapkan GPS (±" + Math.round(rec.acc_m) + " m). Tunggu sebentar sebelum mulai bergerak.", "Preparing GPS (±" + Math.round(rec.acc_m) + " m). Wait a moment before you start moving.")];
+  if(g === "warm") return ["warn", L("Menyiapkan GPS (±" + Math.round(rec.acc_m) + " m). Jam belum berjalan, tunggu sebentar sebelum mulai bergerak.", "Preparing GPS (±" + Math.round(rec.acc_m) + " m). The clock is not running yet, wait a moment before you start moving.")];
   if(g === "coarse") return ["bad", L("Lokasi kurang tepat (±" + Math.round(rec.acc_m) + " m). Aktifkan izin \"Lokasi tepat\" untuk aplikasi ini di pengaturan HP.", "Location is not precise (±" + Math.round(rec.acc_m) + " m). Turn on \"Precise location\" for this app in phone settings.")];
   if(g === "denied") return ["bad", L("Izin lokasi ditolak. Aktifkan izin lokasi untuk aplikasi, atau pakai Input manual.", "Location permission denied. Allow location for the app, or use Manual entry.")];
   if(g === "none") return ["bad", L("Perangkat ini tidak punya GPS. Waktu tetap berjalan, jarak bisa lewat Input manual.", "No GPS on this device. Time still runs, use Manual entry for distance.")];
-  return ["warn", L("Mencari sinyal GPS…", "Searching for GPS…")];
+  return ["warn", L("Mencari sinyal GPS… Jam mulai berjalan setelah GPS siap.", "Searching for GPS… The clock starts once GPS is ready.")];
 }
 let lastNt = 0;
 /* notifikasi aplikasi dimatikan di HP: plugin native diam saja, jadi beri tahu pengguna sekali di awal rekaman */
@@ -10441,7 +10444,7 @@ function pushNotif(force){
     window.parent.stNativeGps.notify({
       title: SP[rec.sp].ic + " " + spName(rec.sp) + (run ? "" : " · " + L("Dijeda", "Paused")) + " · " + fmtKm(d) + " km",
       text: L("Waktu ", "Time ") + fmtDur(dur) + " · " + L("Kalori ", "Calories ") + kcalOf(rec.sp, d, dur) + " kkal · " + pt.k + " " + pt.v + " " + pt.u,
-      elapsedMs: ms, paused: !run, ticking: run && !rec.apSince,
+      elapsedMs: ms, paused: !run, ticking: run && rec.rdy && !rec.apSince,
       actionLabel: run ? L("Jeda", "Pause") : L("Lanjut", "Resume")
     });
   }catch(e){}
