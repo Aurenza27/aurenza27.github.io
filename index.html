@@ -10152,14 +10152,14 @@ function drawRoute(cv, pts){
 function mapCanvas(pts){ const c = el("canvas", "map"); requestAnimationFrame(() => drawRoute(c, pts)); return c; }
 
 /* ===== perekaman ===== */
-const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, gt0:0, kf:null, coarse:0};
+const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, gt0:0, kf:null, coarse:0, mock:0};
 if(!SP[rec.sp]) rec.sp = "run";
 let gpsId = null, nat = false, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
 const elapsed = () => rec.acc + (rec.st === "run" ? Date.now() - rec.t0 : 0);
 function saveDraft(){
   lastSave = Date.now();
   if(rec.st === "idle") return;
-  save("draft", {sp:rec.sp, acc:Math.round(elapsed()), start:rec.start, pts:rec.pts.slice(-4000), dist:rec.dist});
+  save("draft", {sp:rec.sp, acc:Math.round(elapsed()), start:rec.start, pts:rec.pts.slice(-4000), dist:rec.dist, mock:rec.mock});
 }
 /* ambang akurasi (meter) per jenis olahraga: titik yang lebih buruk dibuang; ACC_WARM = syarat titik awal; KQ = derau proses filter Kalman (m/dtk) */
 const ACC_MAX = {run:25, walk:25, ride:25, hike:35}, ACC_WARM = {run:20, walk:20, ride:20, hike:25}, KQ = {run:4, walk:2.5, ride:8, hike:3};
@@ -10170,11 +10170,24 @@ function kalman(la, lo, acc, t){
   const dt = Math.max(0, (t - k.t) / 1000), q = KQ[rec.sp], v = k.v + dt * q * q, K = v / (v + a * a);
   return {la:k.la + K * (la - k.la), lo:k.lo + K * (lo - k.lo), v:(1 - K) * v, t:t};
 }
+/* rata-rata kecepatan tiap jendela 60 detik (m/dtk) yang dianggap tidak wajar tanpa kendaraan; ditandai bila berlangsung >= 90 detik */
+const AVG_MAX = {run:6.5, walk:3, ride:15, hike:2.5};
+function flagFast(pts, sp){
+  const lim = AVG_MAX[sp]; let j = 0, fast = 0;
+  for(let i = 1; i < pts.length; i++){
+    while(j + 1 < i && pts[i][2] - pts[j + 1][2] >= 60) j++;
+    const w = pts[i][2] - pts[j][2];
+    if(w >= 60 && (pts[i][3] - pts[j][3]) / w > lim) fast += pts[i][2] - pts[i - 1][2];
+  }
+  return fast >= 90;
+}
+const flagged = a => !!(a.fl && a.fl.length), okAct = a => !flagged(a) && !a.man;
 function onFix(pos){
   if(rec.st !== "run") return;
   const c = pos.coords, t = pos.timestamp || Date.now(), acc = c.accuracy || 0;
   rec.acc_m = acc;
   if(t < rec.t0) return;   /* titik lama dari sebelum lanjut */
+  if(c.simulated === true){ rec.mock++; rec.gps = "mock"; updateLive(); return; }   /* lokasi palsu (mock location): titik diabaikan dan aktivitas ditandai */
   if(acc > 100) rec.coarse++; else rec.coarse = 0;
   if(rec.coarse >= 3){ rec.gps = "coarse"; updateLive(); return; }   /* akurasi terus > 100 m: kemungkinan lokasi perkiraan, bukan Lokasi tepat */
   if(acc > ACC_MAX[rec.sp]){ rec.gps = "weak"; updateLive(); return; }
@@ -10214,7 +10227,7 @@ function startGps(){
   /* aplikasi Android: GPS tetap jalan saat layar terkunci / aplikasi di latar belakang */
   rec.gps = "wait"; nat = true;
   g.start(window,
-    loc => { if(nat) onFix({coords:{latitude:loc.latitude, longitude:loc.longitude, accuracy:loc.accuracy || 0, speed:(typeof loc.speed === "number" ? loc.speed : null)}, timestamp:loc.time || Date.now()}); },
+    loc => { if(nat) onFix({coords:{latitude:loc.latitude, longitude:loc.longitude, accuracy:loc.accuracy || 0, speed:(typeof loc.speed === "number" ? loc.speed : null), simulated:loc.simulated === true}, timestamp:loc.time || Date.now()}); },
     err => { if(nat) onErr({code:(err && err.code === "NOT_AUTHORIZED") ? 1 : 2}); },
     {title:L("GPS olahraga aktif", "Activity GPS on"), msg:L("Detail jarak, waktu, dan kalori ada di notifikasi Rekaman olahraga.", "Distance, time, and calories are in the Activity recording notification.")}
   ).then(() => pushNotif(true)).catch(() => { if(nat){ nat = false; startWebGps(); updateLive(); } });
@@ -10230,7 +10243,7 @@ window.addEventListener("pagehide", saveDraft);
 
 function startRec(){
   if(rec.st !== "idle") return;
-  rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; restored = false; resumeRec();
+  rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; rec.mock = 0; restored = false; resumeRec();
 }
 function resumeRec(){ rec.st = "run"; rec.t0 = Date.now(); rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); lockWake(); renderRec(); saveDraft(); }
 function pauseRec(){ rec.acc += Date.now() - rec.t0; rec.t0 = 0; rec.st = "pause"; stopGps(); unlockWake(); renderRec(); saveDraft(); }
@@ -10244,6 +10257,8 @@ function finishRec(){
   if(dist < 50 && !confirm(L("Jarak dari GPS hampir nol. Simpan tetap tanpa jarak?\n\nBatal = kembali ke rekaman.", "GPS distance is almost zero. Save anyway without distance?\n\nCancel = back to the recording."))) return;
   const a = {id:Date.now().toString(36), sp:rec.sp, ts:rec.start, dist:dist, dur:dur, title:defTitle(rec.sp, rec.start)};
   if(rec.pts.length >= 2){ a.rt = downsample(rec.pts, 250); a.spl = calcSplits(rec.pts, rec.dist, dur); }
+  const fl = []; if(rec.mock > 0) fl.push("mock"); if(flagFast(rec.pts, rec.sp)) fl.push("fast");
+  if(fl.length) a.fl = fl;
   const all = acts(); all.push(a); putActs(all);
   discardRec(); toast(L("Aktivitas tersimpan.", "Activity saved.")); openDetail(a.id);
 }
@@ -10256,6 +10271,7 @@ function gpsText(){
   if(rec.st === "pause") return ["warn", L("Dijeda. GPS dimatikan sementara.", "Paused. GPS is off for now.")];
   if(g === "ok") return ["ok", L("GPS baik", "GPS good") + " (±" + Math.round(rec.acc_m) + " m)"];
   if(g === "weak") return ["warn", L("Sinyal GPS lemah" + (rec.acc_m ? " (±" + Math.round(rec.acc_m) + " m)" : "") + ", pindah ke tempat terbuka.", "Weak GPS signal" + (rec.acc_m ? " (±" + Math.round(rec.acc_m) + " m)" : "") + ", move to an open area.")];
+  if(g === "mock") return ["bad", L("Lokasi palsu (mock location) terdeteksi. Titik diabaikan dan aktivitas akan ditandai. Matikan aplikasi lokasi palsu.", "Mock location detected. Points are ignored and the activity will be flagged. Turn off the mock location app.")];
   if(g === "warm") return ["warn", L("Menyiapkan GPS (±" + Math.round(rec.acc_m) + " m). Tunggu sebentar sebelum mulai bergerak.", "Preparing GPS (±" + Math.round(rec.acc_m) + " m). Wait a moment before you start moving.")];
   if(g === "coarse") return ["bad", L("Lokasi kurang tepat (±" + Math.round(rec.acc_m) + " m). Aktifkan izin \"Lokasi tepat\" untuk aplikasi ini di pengaturan HP.", "Location is not precise (±" + Math.round(rec.acc_m) + " m). Turn on \"Precise location\" for this app in phone settings.")];
   if(g === "denied") return ["bad", L("Izin lokasi ditolak. Aktifkan izin lokasi untuk aplikasi, atau pakai Input manual.", "Location permission denied. Allow location for the app, or use Manual entry.")];
@@ -10363,7 +10379,7 @@ function renderHist(){
   list.forEach(a => {
     const b = el("button", "item"); b.type = "button";
     const ic = el("div", "ic", SP[a.sp].ic), tx = el("div", "tx"), kk = el("div", "kk");
-    tx.append(el("b", "", a.title || defTitle(a.sp, a.ts)), el("span", "", fmtDate(a.ts)));
+    tx.append(el("b", "", a.title || defTitle(a.sp, a.ts)), el("span", "", fmtDate(a.ts) + (flagged(a) ? " · ⚠" : "") + (a.man ? " · ✍️" : "")));
     const pt = paceTile(a.sp, a.dist, a.dur);
     kk.append(el("b", "", fmtKm(a.dist) + " km"), el("span", "", fmtDur(a.dur) + " · " + pt.v + " " + pt.u));
     b.append(ic, tx, kk); b.onclick = () => openDetail(a.id); box.append(b);
@@ -10400,6 +10416,15 @@ function renderDetail(){
   ti.onchange = () => { const n = ti.value.replace(/[\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40) || defTitle(a.sp, a.ts); const z = acts(), q = z.find(x => x.id === a.id); if(q){ q.title = n; putActs(z); } ti.value = n; toast(L("Nama diperbarui.", "Name updated.")); };
   v.append(ti);
   const d = el("p", "tiny", SP[a.sp].ic + " " + spName(a.sp) + " · " + fmtDate(a.ts) + (a.man ? " · " + L("input manual", "manual entry") : "")); d.style.cssText = "text-align:left;margin:0 0 12px 2px"; v.append(d);
+  if(flagged(a)){
+    const nt = el("p", "notice", (a.fl.indexOf("mock") >= 0 ? L("Lokasi palsu (mock location) terdeteksi saat merekam.", "Mock location was detected while recording.") : L("Kecepatan rata-rata terlalu tinggi untuk " + spName(a.sp) + " (kemungkinan memakai kendaraan).", "Average speed is too high for a " + spName(a.sp) + " (a vehicle may have been used).")) + " " + L("Aktivitas ini tidak masuk rekor pribadi dan target mingguan.", "This activity does not count toward personal records or the weekly goal."));
+    v.append(nt);
+    if(a.fl.indexOf("mock") < 0){
+      const ob = el("button", "btn ghost sm", L("Ini valid, hapus tanda", "This is valid, remove flag")); ob.type = "button"; ob.style.marginBottom = "12px";
+      ob.onclick = () => { const z = acts(), q = z.find(x => x.id === a.id); if(q){ q.fl = (q.fl || []).filter(f => f !== "fast"); if(!q.fl.length) delete q.fl; putActs(z); toast(L("Tanda dihapus.", "Flag removed.")); renderDetail(); } };
+      v.append(ob);
+    }
+  }
   if(a.rt && a.rt.length > 1) v.append(mapCanvas(a.rt));
   const pt = paceTile(a.sp, a.dist, a.dur), tiles = el("div", "tiles t4");
   [[L("JARAK", "DISTANCE"), fmtKm(a.dist), "km"], [L("WAKTU", "TIME"), fmtDur(a.dur), ""], [pt.k, pt.v, pt.u], [L("KALORI (PERKIRAAN)", "CALORIES (EST.)"), String(kcalOf(a.sp, a.dist, a.dur)), "kkal"]].forEach(r => {
@@ -10455,7 +10480,7 @@ function renderStat(){
   /* target mingguan */
   const goal = +load("goal", 0) || 0;
   if(goal > 0){
-    const wk = all.filter(a => a.ts >= weekStart(Date.now())).reduce((s, a) => s + a.dist, 0) / 1000, pc = Math.min(100, wk / goal * 100);
+    const wk = all.filter(a => a.ts >= weekStart(Date.now()) && !flagged(a)).reduce((s, a) => s + a.dist, 0) / 1000, pc = Math.min(100, wk / goal * 100);
     const p = el("div", "panel"); p.style.marginTop = "14px"; p.append(el("span", "label", L("Target minggu ini", "This week's goal")));
     p.append(el("div", "line", "")); p.lastChild.append(el("span", "", fx(wk, 1) + " / " + fx(goal, 0) + " km"), el("b", "", Math.round(pc) + "%"));
     const bar = el("div", "bar" + (pc >= 100 ? " full" : "")), i = el("i"); i.style.width = pc + "%"; bar.append(i); p.append(bar);
@@ -10485,14 +10510,15 @@ function renderStat(){
   /* rekor pribadi (semua waktu) */
   const rp = el("div", "panel"); rp.style.marginTop = "14px"; rp.append(el("span", "label", L("Rekor pribadi", "Personal records")));
   const best = (arr, f, min) => arr.reduce((b, a) => { const x = f(a); return x === null || !isFinite(x) ? b : (!b || (min ? x < b.x : x > b.x) ? {a:a, x:x} : b); }, null);
-  const recs = [];
-  const far = best(all, a => a.dist, false); if(far) recs.push([L("Jarak terjauh", "Longest distance"), fmtKm(far.x) + " km", far.a]);
-  const lng = best(all, a => a.dur, false); if(lng) recs.push([L("Waktu terlama", "Longest time"), fmtDur(lng.x), lng.a]);
-  const runs = all.filter(a => a.sp === "run");
+  const recs = [], good = all.filter(okAct);
+  const far = best(good, a => a.dist, false); if(far) recs.push([L("Jarak terjauh", "Longest distance"), fmtKm(far.x) + " km", far.a]);
+  const lng = best(good, a => a.dur, false); if(lng) recs.push([L("Waktu terlama", "Longest time"), fmtDur(lng.x), lng.a]);
+  const runs = good.filter(a => a.sp === "run");
   const bp5 = best(runs, a => a.dist >= 1000 ? a.dur / (a.dist / 1000) : null, true); if(bp5) recs.push([L("Pace lari tercepat (≥ 1 km)", "Fastest run pace (≥ 1 km)"), fmtPace(bp5.x) + " /km", bp5.a]);
   const bk = best(runs, a => { const s = (a.spl || []).filter(z => z[0] === 1).map(z => z[1]); return s.length ? Math.min.apply(null, s) : null; }, true); if(bk) recs.push([L("1 km lari tercepat", "Fastest 1 km run"), fmtDur(bk.x), bk.a]);
-  const rs = best(all.filter(a => a.sp === "ride" && a.dist >= 3000), a => a.dist / a.dur * 3.6, false); if(rs) recs.push([L("Kecepatan sepeda tertinggi (≥ 3 km)", "Fastest ride speed (≥ 3 km)"), fx(rs.x, 1) + " km/" + L("jam", "h"), rs.a]);
+  const rs = best(good.filter(a => a.sp === "ride" && a.dist >= 3000), a => a.dist / a.dur * 3.6, false); if(rs) recs.push([L("Kecepatan sepeda tertinggi (≥ 3 km)", "Fastest ride speed (≥ 3 km)"), fx(rs.x, 1) + " km/" + L("jam", "h"), rs.a]);
   recs.forEach(r => { const b = el("button", "rec"); b.type = "button"; const l = el("span", "", r[0]), q = el("b", "", r[1]); q.append(el("small", "", fmtDate(r[2].ts).split(" · ")[0])); b.append(l, q); b.onclick = () => openDetail(r[2].id); rp.append(b); });
+  if(recs.length) rp.append(el("p", "hint", L("Rekor hanya dihitung dari rekaman GPS yang valid (bukan input manual atau aktivitas bertanda ⚠).", "Records only count valid GPS recordings (not manual entries or flagged ⚠ activities).")));
   v.append(rp);
   v.append(settingsPanel());
 }
@@ -10550,7 +10576,7 @@ window.addEventListener("storage", e => { if(!e.key || e.key === "ol_lang"){ con
 (function(){
   const d = load("draft", null);
   if(d && SP[d.sp] && d.acc > 0 && Array.isArray(d.pts)){
-    rec.sp = d.sp; rec.acc = +d.acc; rec.start = +d.start || Date.now(); rec.pts = d.pts.filter(p => Array.isArray(p) && p.length >= 4); rec.dist = +d.dist || 0; rec.st = "pause"; restored = true; tab = "rec"; view = "tab";
+    rec.sp = d.sp; rec.acc = +d.acc; rec.start = +d.start || Date.now(); rec.pts = d.pts.filter(p => Array.isArray(p) && p.length >= 4); rec.dist = +d.dist || 0; rec.mock = +d.mock || 0; rec.st = "pause"; restored = true; tab = "rec"; view = "tab";
   }
 })();
 setInterval(() => { if(rec.st === "run"){ updateLive(); if(Date.now() - lastSave > 10000) saveDraft(); } }, 500);
