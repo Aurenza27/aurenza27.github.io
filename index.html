@@ -10618,7 +10618,7 @@ function renderDetail(){
   if(typeof a.eg === "number" && a.eg >= 0){ const t = el("div", "tile"); t.style.gridColumn = "1 / -1"; t.append(el("small", "", L("TANJAKAN (PERKIRAAN)", "ELEVATION GAIN (EST.)")), el("b", "", String(a.eg)), el("em", "", "m")); tiles.append(t); }
   v.append(tiles);
   if(a.pz >= 10){ const zp = el("p", "tiny", L("Waktu diam tidak dihitung (auto-jeda): ", "Idle time not counted (auto-pause): ") + fmtDur(a.pz)); zp.style.cssText = "text-align:left;margin:8px 0 0 2px"; v.append(zp); }
-  { const sb = el("button", "btn", L("Bagikan gambar", "Share image")); sb.type = "button"; sb.style.marginTop = "14px"; sb.onclick = () => shOpen(a); v.append(sb);
+  { const sb = el("button", "btn", L("Bagikan", "Share")); sb.type = "button"; sb.style.marginTop = "14px"; sb.onclick = () => shOpen(a); v.append(sb);
     const sn = el("p", "tiny", L("Latar transparan atau pakai foto dari galerimu, lengkap dengan rute dan statistik.", "Transparent background or your own gallery photo, with route and stats.")); sn.style.marginTop = "8px"; v.append(sn); }
   if(a.spl && a.spl.length){
     const p = el("div", "panel"); p.style.marginTop = "14px"; p.append(el("span", "label", L("Split per km", "Splits per km")));
@@ -10635,7 +10635,7 @@ function renderDetail(){
     v.append(p);
   }
   const bt = el("div"); bt.style.cssText = "display:flex;flex-direction:column;gap:10px;margin-top:14px";
-  if(a.rt && a.rt.length > 1){ const b = el("button", "btn ghost", L("Ekspor GPX (untuk Strava, Garmin, dll.)", "Export GPX (for Strava, Garmin, etc.)")); b.type = "button"; b.onclick = () => exportGpx(a); bt.append(b); }
+  if(a.rt && a.rt.length > 1){ const b = el("button", "btn ghost", L("Ekspor GPX", "Export GPX")); b.type = "button"; b.onclick = () => exportGpx(a); bt.append(b); }
   const del = el("button", "btn danger", L("Hapus aktivitas", "Delete activity")); del.type = "button";
   del.onclick = () => { if(!confirm(L("Hapus aktivitas ini?", "Delete this activity?"))) return; putActs(acts().filter(x => x.id !== a.id)); toast(L("Aktivitas dihapus.", "Activity deleted.")); closeDetail(); };
   bt.append(del); v.append(bt);
@@ -10776,7 +10776,7 @@ async function shOpen(a){
   const close = () => { document.removeEventListener("keydown", key); ov.remove(); };
   document.addEventListener("keydown", key);
   const back = el("button", "back", "‹ " + L("Kembali", "Back")); back.type = "button"; back.onclick = close;
-  const share = el("button", "btn", L("Bagikan gambar", "Share image")); share.type = "button"; share.onclick = () => shOut(a, cv, "share");
+  const share = el("button", "btn", L("Bagikan", "Share")); share.type = "button"; share.onclick = () => shOut(a, cv, "share");
   const save2 = el("button", "btn ghost", shNative() ? L("Simpan lewat lembar bagikan", "Save via the share sheet") : L("Simpan gambar", "Save image")); save2.type = "button"; save2.onclick = () => shOut(a, cv, "save");
   const hint = el("p", "hint", L("Latar transparan siap ditempel di foto atau story-mu. Atau pilih foto dari galeri sebagai latar.", "The transparent background is ready to lay over a photo or story. Or pick a gallery photo as the background."));
   hint.style.margin = "0";
