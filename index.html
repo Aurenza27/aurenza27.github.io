@@ -763,10 +763,10 @@ function paintMenuTitles(){
   }catch(e){} }
 }
 const CATS = [
-  { id:"hiburan", icon:"🎭", title:"Hiburan", titleEn:"Entertainment", sub:"Uji kemampuan dan seru-seruan.", subEn:"Test your skills and have fun." },
-  { id:"primbon", icon:"🔮", title:"Primbon & Ramalan", titleEn:"Primbon & Fortune", sub:"Weton, shio, numerologi, khodam, dan jodoh.", subEn:"Weton, zodiac, numerology, khodam, and compatibility." },
-  { id:"medis", icon:"🩺", title:"Kesehatan & Medis", titleEn:"Health & Medical", sub:"Informasi kesehatan umum.", subEn:"General health information." },
-  { id:"manajemen", icon:"🗂️", title:"Manajemen", titleEn:"Management", sub:"Atur dan kelola kegiatan.", subEn:"Organize and manage activities." }
+  { id:"hiburan", icon:"🎭", title:"Hiburan & Permainan", titleEn:"Entertainment & Games", sub:"Uji kemampuan dan seru-seruan.", subEn:"Test your skills and have fun." },
+  { id:"primbon", icon:"🔮", title:"Primbon & Numerologi", titleEn:"Primbon & Numerology", sub:"Weton, shio, numerologi, khodam, dan jodoh.", subEn:"Weton, zodiac, numerology, khodam, and compatibility." },
+  { id:"medis", icon:"🩺", title:"Kesehatan & Gaya Hidup", titleEn:"Health & Lifestyle", sub:"Informasi kesehatan umum.", subEn:"General health information." },
+  { id:"manajemen", icon:"🗂️", title:"Produktivitas & Manajemen", titleEn:"Productivity & Management", sub:"Atur dan kelola kegiatan.", subEn:"Organize and manage activities." }
 ];
 const ICONS = {
   "th-analytics":'<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><circle cx="10.5" cy="10.5" r="1.4" fill="currentColor"/></svg>',
@@ -10877,6 +10877,30 @@ const shSc = o => (o.sc === 1 && !o.bg) ? 0 : (o.sc === 2 ? 2 : (o.sc === 1 ? 1 
 function shRR(g, x, y, w, h, r){
   r = Math.min(r, w / 2, h / 2); g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
 }
+/* statistik di kartu aktivitas, disesuaikan jenis aktivitas (sama dengan statistik di hasil rekam) */
+function shItems(a, o){
+  const pt = paceTile(a.sp, a.dist, a.dur), it = [], num = v => typeof v === "number";
+  const eg = o.eg && num(a.eg) && a.eg >= 0, kmh = L("km/jam", "km/h");
+  it.push([L("Waktu", "Time"), fmtDur(a.dur)]);
+  if(a.sp === "ride"){
+    it.push([L("Kecepatan rata-rata (km/jam)", "Avg speed (km/h)"), pt.v]);
+    if(num(a.vm) && a.vm > 0) it.push([L("Kecepatan maks (km/jam)", "Top speed (km/h)"), fx(a.vm, 1)]);
+  } else {
+    it.push([L("Pace rata-rata /km", "Avg pace /km"), pt.v]);
+    if(a.sp === "run"){ const bs = bestSplit(a); if(bs) it.push([L("Pace tercepat /km", "Best pace /km"), fmtPace(bs)]); }
+    if(a.sp === "run" || a.sp === "walk") it.push([L("Kecepatan (km/jam)", "Speed (km/h)"), fmtSpeed(a.dist, a.dur)]);
+  }
+  if(o.kc) it.push([L("Kalori (kkal)", "Calories (kcal)"), String(kcalAct(a))]);
+  if(a.sp === "hike"){
+    if(o.eg){
+      if(num(a.ah)) it.push([L("Tertinggi (mdpl)", "Highest (masl)"), fmtAlt(a.ah)]);
+      if(num(a.al)) it.push([L("Terendah (mdpl)", "Lowest (masl)"), fmtAlt(a.al)]);
+      if(eg) it.push([L("Total naik (m)", "Ascent (m)"), String(a.eg)]);
+      if(num(a.ed)) it.push([L("Total turun (m)", "Descent (m)"), String(a.ed)]);
+    }
+  } else if(eg) it.push([L("Tanjakan (m)", "Elevation gain (m)"), String(a.eg)]);
+  return it;
+}
 function shDraw(cv, a, o, logo, S){
   S = S || 1;
   const F = SHF[o.fmt], W = F.w, H = F.h, g = cv.getContext("2d"), hasRt = !!(o.rt && a.rt && a.rt.length > 1), P = hasRt ? F.p : F.n;
@@ -10890,8 +10914,13 @@ function shDraw(cv, a, o, logo, S){
     g.fillStyle = gr; g.fillRect(0, 0, W, H);
     if(shSc(o) === 1){ g.fillStyle = "rgba(" + c + ",.38)"; g.fillRect(0, 0, W, H); }   /* peredam latar: foto terang/ramai tetap terbaca */
   }
+  /* tata letak statistik: maksimal 4 kolom (3 untuk 16:9 dengan rute), baris tambahan menggeser judul & rute ke atas */
+  const it = shItems(a, o), maxC = (o.fmt === "wide" && hasRt) ? 3 : 4, nRows = Math.max(1, Math.ceil(it.length / maxC)), nCols = Math.ceil(it.length / nRows);
+  const stepY = (P.rl - P.ro) + 78, ex = o.fmt === "wide" ? 0 : (nRows - 1) * stepY;
+  const Pe = {ti:P.ti - ex, da:P.da - ex, di:P.di - ex, df:P.df, ro:P.ro - ex, rl:P.rl + (o.fmt === "wide" ? (nRows - 1) * stepY : 0), cx:P.cx, sw:P.sw, k:P.k};
+  const Fe = {w:F.w, h:F.h, wm:F.wm, rt:[F.rt[0], F.rt[1], F.rt[2], Math.max(160, F.rt[3] - ex)]};
   const sc = shSc(o);
-  const ink = "rgb(" + o.rgb.join(",") + ")", cx = P.cx || W / 2, sw = P.sw || 900, kf = P.k || 1;
+  const ink = "rgb(" + o.rgb.join(",") + ")", cx = Pe.cx || W / 2, sw = Pe.sw || 900, kf = Pe.k || 1;
   g.fillStyle = ink; g.shadowColor = o.dark ? (o.blue ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.6)") : "rgba(0,0,0,.5)"; g.shadowBlur = 14 * S; g.shadowOffsetY = 2 * S; g.textBaseline = "alphabetic";
   const edge = o.dark ? "rgba(255,255,255,.92)" : "rgba(0,0,0,.72)", panel = o.dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.52)";
   /* tulisan diberi garis tepi warna kontras supaya jelas di latar apa pun (terang, gelap, atau ramai) */
@@ -10899,8 +10928,8 @@ function shDraw(cv, a, o, logo, S){
   if(sc === 2){
     const pad = 44, bx = cx - Math.max(sw, 760) / 2 - pad;
     g.save(); g.shadowColor = "transparent"; g.fillStyle = panel;
-    shRR(g, bx, P.ti - 78, Math.max(sw, 760) + pad * 2, P.rl - P.ti + 78 + 46, 34); g.fill();
-    if(hasRt){ const r = F.rt; shRR(g, r[0] - 26, r[1] - 26, r[2] + 52, r[3] + 52, 34); g.fill(); }
+    shRR(g, bx, Pe.ti - 78, Math.max(sw, 760) + pad * 2, Pe.rl - Pe.ti + 78 + 46, 34); g.fill();
+    if(hasRt){ const r = Fe.rt; shRR(g, r[0] - 26, r[1] - 26, r[2] + 52, r[3] + 52, 34); g.fill(); }
     shRR(g, W / 2 - 250, F.wm - 44, 500, 88, 44); g.fill();
     g.restore();
   }
@@ -10909,23 +10938,22 @@ function shDraw(cv, a, o, logo, S){
     g.font = "700 46px " + SERIF; const tw = g.measureText(t).width, x0 = (W - lw - gap - tw) / 2;
     g.globalAlpha = 1; if(logo) g.drawImage(logo, x0, F.wm - lh / 2, lw, lh);
     g.textAlign = "left"; g.globalAlpha = 1; T(t, x0 + lw + gap, F.wm + 15); }
-  if(hasRt) shRoute(g, a.rt, F.rt, ink, o.fmt === "story" ? 15 : 11, edge);
+  if(hasRt) shRoute(g, a.rt, Fe.rt, ink, o.fmt === "story" ? 15 : 11, edge);
   g.fillStyle = ink; g.textAlign = "center";   /* titik rute mengubah warna isian: kembalikan untuk tulisan */
-  g.font = "800 52px " + SANS; T(shFit(g, a.title || defTitle(a.sp, a.ts), Math.min(900, sw + 60)), cx, P.ti);
-  g.font = "600 36px " + SANS; T(spName(a.sp) + " · " + fmtDate(a.ts), cx, P.da);
-  { const ds = fmtKm(a.dist); g.font = "800 " + P.df + "px " + SANS; const nw = g.measureText(ds).width;
-    g.font = "700 " + Math.round(P.df * .27) + "px " + SANS; const uw = g.measureText(" km").width, x0 = cx - (nw + uw) / 2;
-    g.textAlign = "left"; g.font = "800 " + P.df + "px " + SANS; T(ds, x0, P.di);
-    g.font = "700 " + Math.round(P.df * .27) + "px " + SANS; T(" km", x0 + nw, P.di); g.textAlign = "center"; }
-  const pt = paceTile(a.sp, a.dist, a.dur), it = [[L("Waktu", "Time"), fmtDur(a.dur)], [SP[a.sp].pace ? L("Pace /km", "Pace /km") : L("Kecepatan km/jam", "Speed km/h"), pt.v]];
-  if(o.kc) it.push([L("Kalori (kkal)", "Calories (kcal)"), String(kcalAct(a))]);
-  if(o.eg && typeof a.eg === "number" && a.eg >= 0) it.push([L("Tanjakan (m)", "Elevation (m)"), String(a.eg)]);
-  if(o.eg && typeof a.ah === "number") it.push([L("Puncak (mdpl)", "Peak (masl)"), String(a.ah)]);
-  if(a.sp === "ride" && typeof a.vm === "number" && a.vm > 0) it.push([L("Maks (km/jam)", "Top (km/h)"), fx(a.vm, 1)]);
+  g.font = "800 52px " + SANS; T(shFit(g, a.title || defTitle(a.sp, a.ts), Math.min(900, sw + 60)), cx, Pe.ti);
+  g.font = "600 36px " + SANS; T(spName(a.sp) + " · " + fmtDate(a.ts), cx, Pe.da);
+  { const ds = fmtKm(a.dist); g.font = "800 " + Pe.df + "px " + SANS; const nw = g.measureText(ds).width;
+    g.font = "700 " + Math.round(Pe.df * .27) + "px " + SANS; const uw = g.measureText(" km").width, x0 = cx - (nw + uw) / 2;
+    g.textAlign = "left"; g.font = "800 " + Pe.df + "px " + SANS; T(ds, x0, Pe.di);
+    g.font = "700 " + Math.round(Pe.df * .27) + "px " + SANS; T(" km", x0 + nw, Pe.di); g.textAlign = "center"; }
   it.forEach((r, i) => {
-    const x = cx - sw / 2 + sw / it.length * (i + .5);
-    g.font = "800 " + Math.round((it.length > 4 ? 46 : it.length > 3 ? 58 : 68) * kf) + "px " + SANS; T(r[1], x, P.ro);
-    g.font = "600 32px " + SANS; T(r[0], x, P.rl);
+    const ri = Math.floor(i / nCols), inRow = Math.min(nCols, it.length - ri * nCols), ci = i - ri * nCols, colW = Pe.sw ? Pe.sw / nCols : sw / nCols;
+    const x = cx - colW * inRow / 2 + colW * (ci + .5), y = Pe.ro + ri * stepY;
+    let fs = Math.round((nCols >= 4 ? 50 : nCols === 3 ? 58 : 68) * kf);
+    g.font = "800 " + fs + "px " + SANS; while(g.measureText(r[1]).width > colW - 14 && fs > 26){ fs -= 2; g.font = "800 " + fs + "px " + SANS; }
+    T(r[1], x, y);
+    let ls = 28; g.font = "600 " + ls + "px " + SANS; while(g.measureText(r[0]).width > colW - 10 && ls > 18){ ls -= 1; g.font = "600 " + ls + "px " + SANS; }
+    T(r[0], x, y + (P.rl - P.ro));
   });
   g.shadowColor = "transparent"; g.shadowBlur = 0; g.shadowOffsetY = 0;
 }
@@ -10956,7 +10984,7 @@ async function shOpen(a){
   const logo = await shLogo(), sv = load("sh", {}) || {};
   const rgb0 = (Array.isArray(sv.rgb) && sv.rgb.length === 3 && sv.rgb.every(v => typeof v === "number" && v >= 0 && v <= 255)) ? sv.rgb.map(Math.round) : (sv.blue === true ? SH_BLUE.slice() : (sv.dark === true ? [17, 17, 17] : [255, 255, 255]));
   const o = {fmt:(sv.fmt === "sq" || sv.fmt === "wide") ? sv.fmt : "story", rgb:rgb0, dark:shLum(rgb0) < .55, rt:sv.rt !== false, kc:sv.kc !== false, eg:sv.eg !== false, sc:(sv.sc === 0 || sv.sc === 1 || sv.sc === 2) ? sv.sc : 1, bg:null};
-  const hasRt = !!(a.rt && a.rt.length > 1), hasEg = typeof a.eg === "number" && a.eg >= 0;
+  const hasRt = !!(a.rt && a.rt.length > 1), hasEg = (typeof a.eg === "number" && a.eg >= 0) || typeof a.ah === "number";
   const ov = el("div"); ov.id = "shSheet"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
   const css = el("style", "", "#shSheet{position:fixed;inset:0;z-index:50;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--bg);padding:14px 16px calc(28px + env(safe-area-inset-bottom,0px))}" +
     "#shSheet .in{max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:12px}" +
@@ -11041,8 +11069,8 @@ async function shOpen(a){
   const gShow = group(L("Tampilkan", "Show"), [
     {t:() => L("Rute", "Route"), on:() => o.rt && hasRt, off:!hasRt, tap:() => { o.rt = !o.rt; redraw(); }},
     {t:() => L("Kalori", "Calories"), on:() => o.kc, tap:() => { o.kc = !o.kc; redraw(); }},
-    {t:() => L("Tanjakan", "Elevation"), on:() => o.eg && hasEg, off:!hasEg, tap:() => { o.eg = !o.eg; redraw(); }}],
-    () => [(o.rt && hasRt) ? L("Rute", "Route") : "", o.kc ? L("Kalori", "Calories") : "", (o.eg && hasEg) ? L("Tanjakan", "Elevation") : ""].filter(Boolean).join(" · ") || "-");
+    {t:() => L("Ketinggian", "Elevation"), on:() => o.eg && hasEg, off:!hasEg, tap:() => { o.eg = !o.eg; redraw(); }}],
+    () => [(o.rt && hasRt) ? L("Rute", "Route") : "", o.kc ? L("Kalori", "Calories") : "", (o.eg && hasEg) ? L("Ketinggian", "Elevation") : ""].filter(Boolean).join(" · ") || "-");
   const groups = [gBg, gFmt, gInk, gSc, gShow];
   function paintAll(){ groups.forEach(gr => {
     gr.defs.forEach(d => { d.b.textContent = d.t(); d.b.classList.toggle("on", !!d.on()); d.b.disabled = typeof d.off === "function" ? !!d.off() : !!d.off; d.b.setAttribute("aria-pressed", String(!!d.on())); });
