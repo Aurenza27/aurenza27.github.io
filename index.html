@@ -1894,8 +1894,17 @@ window.stNativeGps = (function(){
     }catch(e){ return null; }
   }
   /* langkah kumulatif sejak rekaman dimulai; -1 = tidak tersedia (bukan Android, sensor tidak ada, atau izin ditolak) */
-  var steps = -1, shandle = null;
+  var steps = -1, shandle = null, ahandle = null;
+  /* tombol Jeda / Lanjut di notifikasi: diteruskan ke menu Olahraga lewat api.controls = {pause, resume} */
+  async function ensureAction(){
+    var N = nplug(); if(!N || ahandle) return;
+    try{ ahandle = await N.addListener("action", function(e){
+      var c = api.controls; if(!c || !e) return;
+      try{ if(e.action === "pause" && c.pause) c.pause(); else if(e.action === "resume" && c.resume) c.resume(); }catch(_){}
+    }); }catch(_){}
+  }
   var api = {
+    controls: null,
     steps: function(){ return steps; },
     stepsStart: async function(fresh){
       var S = splug(); if(!S) return;
@@ -1909,7 +1918,7 @@ window.stNativeGps = (function(){
     available: function(){ return !!plug(); },
     start: async function(win, onLoc, onErr, txt){
       var P = plug(); if(!P) throw new Error("none");
-      owner = win; clearInterval(timer);
+      owner = win; clearInterval(timer); ensureAction();
       timer = setInterval(function(){ var f = document.getElementById("frame"); if(!owner || !f || f.contentWindow !== owner) api.stop(); }, 1500);
       try{
         await P.start({backgroundTitle:txt.title, backgroundMessage:txt.msg, requestPermissions:true, stale:false, distanceFilter:0}, function(loc, err){
@@ -1919,9 +1928,12 @@ window.stNativeGps = (function(){
         });
       }catch(e){ api.stop(); throw e; }
     },
-    stop: async function(){
-      owner = null; clearInterval(timer); timer = 0;
-      var N = nplug(); if(N){ try{ await N.hide(); }catch(e){} }
+    /* keep = true: hanya hentikan GPS dan langkah (rekaman dijeda); notifikasi dengan tombol Lanjut tetap tampil selama menu masih terbuka */
+    stop: async function(keep){
+      if(!keep){
+        owner = null; clearInterval(timer); timer = 0; api.controls = null;
+        var N = nplug(); if(N){ try{ await N.hide(); }catch(e){} }
+      }
       var S = splug(); if(S){ try{ await S.stop(); }catch(e){} }
       var P = plug(); if(P){ try{ await P.stop(); }catch(e){} }
     },
@@ -10203,7 +10215,7 @@ function mapCanvas(pts){ const c = el("canvas", "map"); requestAnimationFrame(()
 /* ===== perekaman ===== */
 const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, jc:0, cand:null, ap:0, apSince:0, stillT:0, pz:0, gt0:0, kf:null, coarse:0, mock:0, eg:0, altN:0, altRef:null, altSm:null};
 if(!SP[rec.sp]) rec.sp = "run";
-let gpsId = null, nat = false, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
+let gpsId = null, nat = false, natN = false, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
 /* AUTO-JEDA: saat diam, jam berhenti (waktu bergerak). rec.ap = total ms auto-jeda pada segmen ini, rec.apSince = awal auto-jeda yang sedang berjalan (0 = tidak),
    rec.pz = total ms auto-jeda pada segmen sebelumnya. Jarak, pace, split, dan kalori semuanya memakai waktu bergerak ini. */
 const apOn = () => +load("ap", 1) !== 0;
@@ -10339,19 +10351,24 @@ function startWebGps(){
   try{ gpsId = navigator.geolocation.watchPosition(onFix, onErr, {enableHighAccuracy:true, maximumAge:0, timeout:30000}); }catch(e){ rec.gps = "none"; }
 }
 function startGps(){
-  stopGps();
+  stopGps(false, true);
   const g = nativeGps();
   if(!g){ startWebGps(); return; }
   /* aplikasi Android: GPS tetap jalan saat layar terkunci / aplikasi di latar belakang */
-  rec.gps = "wait"; nat = true;
+  rec.gps = "wait"; nat = true; natN = true;
+  /* tombol Jeda / Lanjut di notifikasi */
+  g.controls = {pause:() => { if(rec.st === "run") pauseRec(); }, resume:() => { if(rec.st === "pause") resumeRec(); }};
   g.start(window,
     loc => { if(nat) onFix({coords:{latitude:loc.latitude, longitude:loc.longitude, accuracy:loc.accuracy || 0, speed:(typeof loc.speed === "number" ? loc.speed : null), altitude:(typeof loc.altitude === "number" ? loc.altitude : null), altitudeAccuracy:(typeof loc.altitudeAccuracy === "number" ? loc.altitudeAccuracy : null), simulated:loc.simulated === true}, timestamp:loc.time || Date.now()}); },
     err => { if(nat) onErr({code:(err && err.code === "NOT_AUTHORIZED") ? 1 : 2}); },
-    {title:L("GPS olahraga aktif", "Activity GPS on"), msg:L("Merekam olahraga. Buka Satu Titik untuk melihat jarak, waktu, dan kalori.", "Recording your activity. Open Satu Titik to see distance, time, and calories.")}
-  ).then(() => { pushNotif(true); if(rec.stFresh) warnNotif(); g.stepsStart(rec.stFresh); rec.stFresh = false; }).catch(() => { if(nat){ nat = false; startWebGps(); lockWake(); updateLive(); } });
+    {title:L("GPS olahraga aktif", "Activity GPS on"), msg:L("Merekam olahraga. Jarak, waktu, dan kalori ada di aplikasi.", "Recording your activity. Distance, time, and calories are in the app.")}
+  ).then(() => { pushNotif(true); if(rec.stFresh) warnNotif(); g.stepsStart(rec.stFresh); rec.stFresh = false; }).catch(() => { if(nat){ nat = false; natN = false; startWebGps(); lockWake(); updateLive(); } });
 }
-function stopGps(){
-  if(nat){ nat = false; try{ window.parent.stNativeGps.stop(); }catch(e){} }
+/* keep: rekaman dijeda, notifikasi (tombol Lanjut) dipertahankan. soft: dipakai startGps, tidak menyentuh notifikasi. */
+function stopGps(keep, soft){
+  if(nat){ nat = false; try{ window.parent.stNativeGps.stop(keep); }catch(e){} }
+  else if(natN && !keep && !soft){ try{ window.parent.stNativeGps.stop(false); }catch(e){} }
+  if(!keep && !soft) natN = false;
   if(gpsId !== null){ try{ navigator.geolocation.clearWatch(gpsId); }catch(e){} gpsId = null; }
 }
 async function lockWake(){ try{ if(navigator.wakeLock && !wake){ wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => { wake = null; }); } }catch(e){ wake = null; } }
@@ -10364,7 +10381,7 @@ function startRec(){
   rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; rec.jc = 0; rec.cand = null; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.mock = 0; rec.eg = 0; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.stFresh = true; restored = false; resumeRec();
 }
 function resumeRec(){ rec.st = "run"; rec.altRef = null; rec.altSm = null; rec.t0 = Date.now(); rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); if(!nativeGps()) lockWake(); renderRec(); saveDraft(); }
-function pauseRec(){ const n = Date.now(), open = apOpen(); rec.acc += Math.max(0, n - rec.t0 - rec.ap - open); rec.pz += rec.ap + open; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.t0 = 0; rec.st = "pause"; stopGps(); unlockWake(); renderRec(); saveDraft(); }
+function pauseRec(){ const n = Date.now(), open = apOpen(); rec.acc += Math.max(0, n - rec.t0 - rec.ap - open); rec.pz += rec.ap + open; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.t0 = 0; rec.st = "pause"; stopGps(true); pushNotif(true); unlockWake(); renderRec(); saveDraft(); }
 function discardRec(){
   stopGps(); unlockWake(); rec.st = "idle"; rec.acc = 0; rec.t0 = 0; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.eg = 0; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
 }
@@ -10414,19 +10431,18 @@ async function warnNotif(){
     if(g && g.notifEnabled && !(await g.notifEnabled())) toast(L("Notifikasi aplikasi mati, jadi penanda rekaman tidak tampil saat layar terkunci dan GPS bisa terhenti di beberapa HP. Hidupkan di Pengaturan HP → Aplikasi → Satu Titik → Notifikasi.", "App notifications are off, so the recording indicator will not show while the screen is locked and GPS may stop on some phones. Turn them on in phone Settings → Apps → Satu Titik → Notifications."), 8000);
   }catch(e){}
 }
-/* notifikasi live di bilah status HP: jarak, waktu (berjalan sendiri), kalori, pace. Diperbarui paling sering tiap 2 detik. */
+/* notifikasi di bilah status HP: jarak, waktu, kalori, pace, dan tombol Jeda / Lanjut. Diperbarui paling sering tiap 2 detik.
+   Saat berjalan, plugin native memperbarui notifikasi milik plugin GPS (tidak ada notifikasi ganda); saat dijeda tampil notifikasi sendiri dengan tombol Lanjut. */
 function pushNotif(force){
-  /* DINONAKTIFKAN: Android wajib menampilkan notifikasi milik plugin GPS selama merekam, jadi notifikasi kedua ini menimbulkan notifikasi ganda.
-     Kode di bawah dibiarkan supaya mudah dihidupkan lagi bila nanti notifikasi plugin bisa diganti. */
-  if(true) return;
-  if(!nat || rec.st !== "run") return;
+  if(!natN || (rec.st !== "run" && rec.st !== "pause")) return;
   const now = Date.now(); if(!force && now - lastNt < 2000) return; lastNt = now;
   try{
-    const ms = Math.round(elapsed()), dur = ms / 1000, d = rec.dist, pt = paceTile(rec.sp, d, dur);
+    const run = rec.st === "run", ms = Math.round(elapsed()), dur = ms / 1000, d = rec.dist, pt = paceTile(rec.sp, d, dur);
     window.parent.stNativeGps.notify({
-      title: SP[rec.sp].ic + " " + spName(rec.sp) + " · " + fmtKm(d) + " km",
+      title: SP[rec.sp].ic + " " + spName(rec.sp) + (run ? "" : " · " + L("Dijeda", "Paused")) + " · " + fmtKm(d) + " km",
       text: L("Waktu ", "Time ") + fmtDur(dur) + " · " + L("Kalori ", "Calories ") + kcalOf(rec.sp, d, dur) + " kkal · " + pt.k + " " + pt.v + " " + pt.u,
-      elapsedMs: ms, running: true
+      elapsedMs: ms, paused: !run, ticking: run && !rec.apSince,
+      actionLabel: run ? L("Jeda", "Pause") : L("Lanjut", "Resume")
     });
   }catch(e){}
 }
