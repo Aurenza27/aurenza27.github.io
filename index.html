@@ -1414,7 +1414,7 @@ const PV = {
   id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 18 November 2026", back:"‹ Beranda", secs:[
     {h:"1. Pendahuluan", p:["Satu Titik adalah aplikasi yang dikembangkan oleh Aurenza27 (“kami”). Kebijakan ini menjelaskan data apa yang diproses, untuk apa, dan pilihan yang kamu miliki saat memakai aplikasi ini. Dengan memakai aplikasi, kamu menyetujui kebijakan ini."]},
     {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, data turnamen, serta aktivitas olahraga beserta rute GPS yang kamu rekam di menu Olahraga) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google."]},
-    {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif."]},
+    {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, termasuk ketika layar terkunci atau aplikasi berada di latar belakang (notifikasi tampil selama merekam), dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif."]},
     {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, dan rute GPS olahraga) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, dan dihapus saat pertemanan dihapus."]},
     {p:["Blokir dan laporan:"], l:["Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.","Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan. Laporan hanya dibaca pengelola untuk meninjau pelanggaran."]},
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif."]},
@@ -1432,7 +1432,7 @@ const PV = {
   en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 18 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. By using the app, you agree to this policy."]},
     {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, tournament data, and the sports activities and GPS routes you record in the Sports menu) are stored on your own device.","This data is not sent to our servers unless you sign in with a Google account."]},
-    {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on."]},
+    {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, including while the screen is locked or the app is in the background (a notification shows while recording), and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on."]},
     {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, menu results, and sports GPS routes) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, and are deleted when the friendship is removed."]},
     {p:["Blocking and reports:"], l:["The list of users you block is stored in your account so blocking applies on all your devices.","When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, and a copy of the reported text. Reports are read only by the maintainer to review violations."]},
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data."]},
@@ -1871,6 +1871,46 @@ window.stNativeShare = async function(blob, name, title){
     return true;
   }catch(e){ return /cancel|dismiss/i.test(String((e && e.message) || e)); }
 };
+/* Rekam GPS latar belakang (menu Olahraga). Di aplikasi Android memakai plugin BackgroundGeolocation (foreground service + notifikasi).
+   Menu olahraga ada di iframe, jadi plugin dipanggil lewat sini. GPS otomatis dihentikan bila menu (iframe) ditutup. */
+window.stNativeGps = (function(){
+  var owner = null, timer = 0;
+  function plug(){
+    try{
+      var C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return null;
+      return (C.Plugins && C.Plugins.BackgroundGeolocation) || (C.registerPlugin ? C.registerPlugin("BackgroundGeolocation") : null);
+    }catch(e){ return null; }
+  }
+  function nplug(){
+    try{
+      var C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return null;
+      return (C.Plugins && C.Plugins.WorkoutNotif) || (C.registerPlugin ? C.registerPlugin("WorkoutNotif") : null);
+    }catch(e){ return null; }
+  }
+  var api = {
+    available: function(){ return !!plug(); },
+    start: async function(win, onLoc, onErr, txt){
+      var P = plug(); if(!P) throw new Error("none");
+      owner = win; clearInterval(timer);
+      timer = setInterval(function(){ var f = document.getElementById("frame"); if(!owner || !f || f.contentWindow !== owner) api.stop(); }, 1500);
+      try{
+        await P.start({backgroundTitle:txt.title, backgroundMessage:txt.msg, requestPermissions:true, stale:false, distanceFilter:0}, function(loc, err){
+          if(owner !== win) return;
+          if(err){ try{ onErr(err); }catch(e){} return; }
+          if(loc){ try{ onLoc(loc); }catch(e){} }
+        });
+      }catch(e){ api.stop(); throw e; }
+    },
+    stop: async function(){
+      owner = null; clearInterval(timer); timer = 0;
+      var N = nplug(); if(N){ try{ await N.hide(); }catch(e){} }
+      var P = plug(); if(P){ try{ await P.stop(); }catch(e){} }
+    },
+    openSettings: async function(){ var P = plug(); if(P){ try{ await P.openSettings(); }catch(e){} } },
+    notify: function(o){ var N = nplug(); if(N){ try{ var r = N.update(o); if(r && r.catch) r.catch(function(){}); }catch(e){} } }
+  };
+  return api;
+})();
 /* Tombol "Bagikan gambar" di semua menu yang punya hasil (primbon, hiburan, kesehatan).
    Hasil yang tampil difoto jadi PNG lewat SVG foreignObject (tanpa library), lalu dibagikan atau diunduh.
    Turnamen tidak ikut karena sudah punya versi sendiri (klasemen). */
@@ -10114,7 +10154,7 @@ function mapCanvas(pts){ const c = el("canvas", "map"); requestAnimationFrame(()
 /* ===== perekaman ===== */
 const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0};
 if(!SP[rec.sp]) rec.sp = "run";
-let gpsId = null, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
+let gpsId = null, nat = false, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
 const elapsed = () => rec.acc + (rec.st === "run" ? Date.now() - rec.t0 : 0);
 function saveDraft(){
   lastSave = Date.now();
@@ -10144,13 +10184,28 @@ function onErr(e){
   else rec.gps = "weak";
   updateLive();
 }
-function startGps(){
-  stopGps();
+function nativeGps(){ try{ const g = window.parent && window.parent.stNativeGps; return g && g.available() ? g : null; }catch(e){ return null; } }
+function startWebGps(){
   if(!navigator.geolocation){ rec.gps = "none"; return; }
   rec.gps = "wait";
   try{ gpsId = navigator.geolocation.watchPosition(onFix, onErr, {enableHighAccuracy:true, maximumAge:0, timeout:30000}); }catch(e){ rec.gps = "none"; }
 }
-function stopGps(){ if(gpsId !== null){ try{ navigator.geolocation.clearWatch(gpsId); }catch(e){} gpsId = null; } }
+function startGps(){
+  stopGps();
+  const g = nativeGps();
+  if(!g){ startWebGps(); return; }
+  /* aplikasi Android: GPS tetap jalan saat layar terkunci / aplikasi di latar belakang */
+  rec.gps = "wait"; nat = true;
+  g.start(window,
+    loc => { if(nat) onFix({coords:{latitude:loc.latitude, longitude:loc.longitude, accuracy:loc.accuracy || 0}, timestamp:loc.time || Date.now()}); },
+    err => { if(nat) onErr({code:(err && err.code === "NOT_AUTHORIZED") ? 1 : 2}); },
+    {title:L("GPS olahraga aktif", "Activity GPS on"), msg:L("Detail jarak, waktu, dan kalori ada di notifikasi Rekaman olahraga.", "Distance, time, and calories are in the Activity recording notification.")}
+  ).then(() => pushNotif(true)).catch(() => { if(nat){ nat = false; startWebGps(); updateLive(); } });
+}
+function stopGps(){
+  if(nat){ nat = false; try{ window.parent.stNativeGps.stop(); }catch(e){} }
+  if(gpsId !== null){ try{ navigator.geolocation.clearWatch(gpsId); }catch(e){} gpsId = null; }
+}
 async function lockWake(){ try{ if(navigator.wakeLock && !wake){ wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => { wake = null; }); } }catch(e){ wake = null; } }
 function unlockWake(){ try{ if(wake) wake.release(); }catch(e){} wake = null; }
 document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible" && rec.st === "run") lockWake(); if(document.visibilityState === "hidden") saveDraft(); });
@@ -10188,7 +10243,22 @@ function gpsText(){
   if(g === "none") return ["bad", L("Perangkat ini tidak punya GPS. Waktu tetap berjalan, jarak bisa lewat Input manual.", "No GPS on this device. Time still runs, use Manual entry for distance.")];
   return ["warn", L("Mencari sinyal GPS…", "Searching for GPS…")];
 }
+let lastNt = 0;
+/* notifikasi live di bilah status HP: jarak, waktu (berjalan sendiri), kalori, pace. Diperbarui paling sering tiap 2 detik. */
+function pushNotif(force){
+  if(!nat || rec.st !== "run") return;
+  const now = Date.now(); if(!force && now - lastNt < 2000) return; lastNt = now;
+  try{
+    const ms = Math.round(elapsed()), dur = ms / 1000, d = rec.dist, pt = paceTile(rec.sp, d, dur);
+    window.parent.stNativeGps.notify({
+      title: SP[rec.sp].ic + " " + spName(rec.sp) + " · " + fmtKm(d) + " km",
+      text: L("Waktu ", "Time ") + fmtDur(dur) + " · " + L("Kalori ", "Calories ") + kcalOf(rec.sp, d, dur) + " kkal · " + pt.k + " " + pt.v + " " + pt.u,
+      elapsedMs: ms, running: true
+    });
+  }catch(e){}
+}
 function updateLive(){
+  pushNotif(false);
   if(!LV.time) return;
   const dur = elapsed() / 1000, dist = rec.dist, pt = paceTile(rec.sp, dist, dur), gt = gpsText();
   LV.time.textContent = fmtDur(dur); LV.dist.textContent = fmtKm(dist); LV.pace.textContent = pt.v;
@@ -10222,7 +10292,7 @@ function renderRec(){
   else { const r = el("div", "row2"); r.append(mkb("go", L("▶  LANJUT", "▶  RESUME"), resumeRec), mkb("", L("■  SELESAI", "■  FINISH"), finishRec)); bt.append(r, mkb("danger", L("Buang rekaman", "Discard recording"), () => { if(confirm(L("Buang rekaman ini?", "Discard this recording?"))) discardRec(); })); }
   v.append(bt);
   if(rec.st === "idle" && manualOpen) v.append(manualForm());
-  const h = el("p", "hint", L("Biarkan layar menyala dan menu ini tetap terbuka selama merekam. GPS berhenti bila menu ditutup atau layar terkunci, tetapi rekaman bisa dilanjutkan saat menu dibuka lagi.", "Keep the screen on and this menu open while recording. GPS stops when the menu is closed or the screen locks, but the recording can be resumed when you reopen the menu."));
+  const h = el("p", "hint", nativeGps() ? L("Rekaman tetap berjalan saat layar terkunci atau kamu membuka aplikasi lain, dan notifikasi tampil selama merekam. GPS berhenti saat kamu menekan Jeda atau Selesai, atau menutup menu.", "Recording keeps running while the screen is locked or you use another app, and a notification shows while recording. GPS stops when you press Pause or Finish, or close the menu.") : L("Biarkan layar menyala dan menu ini tetap terbuka selama merekam. GPS berhenti bila menu ditutup atau layar terkunci, tetapi rekaman bisa dilanjutkan saat menu dibuka lagi.", "Keep the screen on and this menu open while recording. GPS stops when the menu is closed or the screen locks, but the recording can be resumed when you reopen the menu."));
   v.append(h);
   updateLive();
   if(rec.pts.length >= 2){ LV.map.hidden = false; requestAnimationFrame(() => drawRoute(LV.map, rec.pts)); }
