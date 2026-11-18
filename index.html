@@ -10145,17 +10145,17 @@ const HIKE_FLAT_MET = 3.5, HIKE_KCAL_KG_M = 0.0086;
 function kcalOf(sp, dist, dur, wt, eg){
   if(!(dur > 0) || !(dist > 0)) return 0;
   const w = wt > 0 ? wt : weight(), kmh = dist / dur * 3.6;
-  if(sp === "hike" && eg > 0){
+  if(sp === "hike" && typeof eg === "number"){   /* eg tersedia (data altitude cukup, boleh 0): bagian datar + bagian naik. eg tidak ada: rumus lama (MET 6) */
     const wm = SP.walk.met, fm = wm.find(r => kmh <= r[0]) || wm[wm.length - 1];
-    return Math.round(Math.max(fm[1], HIKE_FLAT_MET) * w * dur / 3600 + HIKE_KCAL_KG_M * eg * w);
+    return Math.round(Math.max(fm[1], HIKE_FLAT_MET) * w * dur / 3600 + HIKE_KCAL_KG_M * (eg > 0 ? eg : 0) * w);
   }
   const m = SP[sp].met.find(r => kmh <= r[0]) || SP[sp].met[SP[sp].met.length - 1];
   return Math.round(m[1] * w * dur / 3600);
 }
-const egNow = () => rec.altN >= 10 ? rec.eg : 0;   /* total naik rekaman berjalan; 0 bila data altitude belum cukup */
+const egNow = () => rec.altN >= 10 ? rec.eg : undefined;   /* total naik rekaman berjalan; 0 bila data altitude belum cukup */
 /* kalori aktivitas: memakai nilai yang disimpan saat aktivitas dibuat (tidak ikut berubah bila berat badan diganti);
    aktivitas lama yang belum punya nilai tersimpan dihitung dengan berat badan sekarang */
-const kcalAct = a => (typeof a.kc === "number" && a.kc >= 0) ? a.kc : kcalOf(a.sp, a.dist, a.dur);
+const kcalAct = a => (typeof a.kc === "number" && a.kc >= 0) ? a.kc : kcalOf(a.sp, a.dist, a.dur, 0, typeof a.eg === "number" ? a.eg : undefined);
 /* bekukan kalori aktivitas lama (belum punya nilai tersimpan) dengan berat badan w, supaya tidak berubah lagi saat berat badan diganti */
 function freezeKc(w){
   try{
@@ -10419,12 +10419,13 @@ window.stRecActive = () => rec.st === "run";
 
 function startRec(){
   if(rec.st !== "idle") return;
+  drop("aoff");   /* koreksi kalibrasi hanya berlaku untuk satu rekaman */
   rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; rec.jc = 0; rec.cand = null; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.mock = 0; rec.eg = 0; rec.ed = 0; rec.amax = null; rec.aLast = null; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.stFresh = true; restored = false; resumeRec();
 }
 function resumeRec(){ rec.st = "run"; rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.rdy = false; rec.t0 = Date.now(); rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); if(!nativeGps()) lockWake(); renderRec(); saveDraft(); }
 function pauseRec(){ const n = Date.now(), open = apOpen(); if(rec.rdy) rec.acc += Math.max(0, n - rec.t0 - rec.ap - open); rec.pz += rec.ap + open; rec.rdy = false; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.t0 = 0; rec.st = "pause"; stopGps(true); pushNotif(true); unlockWake(); renderRec(); saveDraft(); }
 function discardRec(){
-  stopGps(); unlockWake(); rec.st = "idle"; rec.rdy = false; rec.acc = 0; rec.t0 = 0; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.eg = 0; rec.ed = 0; rec.amax = null; rec.aLast = null; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
+  drop("aoff"); stopGps(); unlockWake(); rec.st = "idle"; rec.rdy = false; rec.acc = 0; rec.t0 = 0; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.eg = 0; rec.ed = 0; rec.amax = null; rec.aLast = null; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
 }
 function finishRec(){
   if(rec.st === "run") pauseRec();
@@ -10433,7 +10434,7 @@ function finishRec(){
   if(dist < 50 && !confirm(L("Jarak dari GPS hampir nol. Simpan tetap tanpa jarak?\n\nBatal = kembali ke rekaman.", "GPS distance is almost zero. Save anyway without distance?\n\nCancel = back to the recording."))) return;
   const a = {id:Date.now().toString(36), sp:rec.sp, ts:rec.start, dist:dist, dur:dur, title:defTitle(rec.sp, rec.start), kc:kcalOf(rec.sp, dist, dur), wt:weight()};
   { const pz = Math.round(rec.pz / 1000); if(pz >= 10) a.pz = pz; }
-  if(rec.altN >= 10){ a.eg = Math.round(rec.eg); if(a.eg > 0) a.kc = kcalOf(rec.sp, dist, dur, a.wt, a.eg); }   /* hiking: kalori memperhitungkan tanjakan */
+  if(rec.altN >= 10){ a.eg = Math.round(rec.eg); a.kc = kcalOf(rec.sp, dist, dur, a.wt, a.eg); }   /* hiking: kalori memperhitungkan tanjakan */
   const hk = rec.sp === "hike", off = hk ? aoff() : undefined;
   if(hk && rec.altN >= 10){   /* hiking: turunan, titik tertinggi/terendah/awal/akhir (mdpl, sudah dikoreksi kalibrasi) */
     a.ed = Math.round(rec.ed);
@@ -10457,7 +10458,7 @@ function finishRec(){
 /* ===== tampilan: Rekam ===== */
 /* ===== HIKING: ketinggian (mdpl) =====
    Altitude dari GPS HP (perkiraan). Koreksi kalibrasi (aoff) = ketinggian asli - altitude GPS, disimpan di perangkat dan ditambahkan ke seluruh rute. */
-const aoff = () => { const x = +load("aoff", 0); return isFinite(x) && Math.abs(x) <= 3000 ? x : 0; };
+const aoff = () => { const x = +load("aoff", 0); return isFinite(x) && Math.abs(x) <= 9600 ? x : 0; };
 const fmtAlt = n => Math.round(n).toLocaleString(locale());
 function hikeLive(){
   const w = el("div"), t2 = el("div", "tiles t4"), mk = (k, u) => { const t = el("div", "tile"), b = el("b"); t.append(el("small", "", k), b, el("em", "", u)); t2.append(t); return b; };
@@ -10465,7 +10466,7 @@ function hikeLive(){
   w.append(t2);
   if(rec.st === "run"){
     const ci = el("input"); ci.inputMode = "decimal"; ci.placeholder = "mdpl"; ci.autocomplete = "off";
-    const f = el("label", "field"); f.style.margin = "12px 0 0"; f.append(el("span", "", L("Kalibrasi: ketinggian asli di sini (mdpl), mis. dari papan pos atau puncak", "Calibrate: your real altitude here (masl), e.g. from a sign board or summit")), ci);
+    const f = el("label", "field"); f.style.margin = "12px 0 0"; f.append(el("span", "", L("Kalibrasi: ketinggian asli di sini (mdpl), mis. dari papan pos atau puncak. Lakukan saat berhenti beberapa detik agar akurat", "Calibrate: your real altitude here (masl), e.g. from a sign board or summit. Do it while standing still for a few seconds for accuracy")), ci);
     const r = el("div", "row2"); r.style.marginTop = "8px";
     const b1 = el("button", "btn ghost sm", L("Kalibrasi", "Calibrate")), b2 = el("button", "btn ghost sm", L("Reset koreksi", "Reset offset"));
     b1.type = b2.type = "button";
