@@ -12851,7 +12851,7 @@ const SY = (() => {
         merged = true; set("ok");
         if(r.applied || wiped){
           let t = 0; try{ t = wiped ? 0 : (+sessionStorage.getItem("st_sync_rl") || 0); }catch(e){}
-          if(Date.now() - t > 20000){ try{ sessionStorage.setItem("st_sync_rl", String(Date.now())); }catch(e){} location.reload(); }
+          if(Date.now() - t > 20000){ try{ sessionStorage.setItem("st_sync_rl", String(Date.now())); }catch(e){} const go = () => { if(window.stConsentOpen && window.stConsentOpen()) setTimeout(go, 700); else location.reload(); }; go(); }
         }
       } else {
         const local = scan(); mark(local, false);
@@ -14336,6 +14336,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   const okKey = uid => "stTerms" + TERMS_V + "_" + uid;
   const accepted = uid => { try{ return localStorage.getItem(okKey(uid)) === "1"; }catch(e){ return false; } };
   let consentOv = null;
+  window.stConsentOpen = () => !!consentOv;   /* dipakai sinkron data: jangan muat ulang halaman selagi panel ini masih menunggu jawaban */
   function consent(u){
     if(consentOv || !u || accepted(u.uid)) return;
     const ov = mk("div", "stov"), card = mk("div", "stcard"); ov.style.zIndex = "99990"; ov.appendChild(card);
