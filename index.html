@@ -10152,7 +10152,7 @@ function drawRoute(cv, pts){
 function mapCanvas(pts){ const c = el("canvas", "map"); requestAnimationFrame(() => drawRoute(c, pts)); return c; }
 
 /* ===== perekaman ===== */
-const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0};
+const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, gt0:0, kf:null, coarse:0};
 if(!SP[rec.sp]) rec.sp = "run";
 let gpsId = null, nat = false, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
 const elapsed = () => rec.acc + (rec.st === "run" ? Date.now() - rec.t0 : 0);
@@ -10161,21 +10161,38 @@ function saveDraft(){
   if(rec.st === "idle") return;
   save("draft", {sp:rec.sp, acc:Math.round(elapsed()), start:rec.start, pts:rec.pts.slice(-4000), dist:rec.dist});
 }
+/* ambang akurasi (meter) per jenis olahraga: titik yang lebih buruk dibuang; ACC_WARM = syarat titik awal; KQ = derau proses filter Kalman (m/dtk) */
+const ACC_MAX = {run:25, walk:25, ride:25, hike:35}, ACC_WARM = {run:20, walk:20, ride:20, hike:25}, KQ = {run:4, walk:2.5, ride:8, hike:3};
+/* filter Kalman sederhana: menghaluskan jalur tanpa memotong tikungan tajam. Hasilnya baru disimpan (rec.kf) bila titik diterima. */
+function kalman(la, lo, acc, t){
+  const k = rec.kf, a = Math.max(acc, 3);
+  if(!k) return {la:la, lo:lo, v:a * a, t:t};
+  const dt = Math.max(0, (t - k.t) / 1000), q = KQ[rec.sp], v = k.v + dt * q * q, K = v / (v + a * a);
+  return {la:k.la + K * (la - k.la), lo:k.lo + K * (lo - k.lo), v:(1 - K) * v, t:t};
+}
 function onFix(pos){
   if(rec.st !== "run") return;
   const c = pos.coords, t = pos.timestamp || Date.now(), acc = c.accuracy || 0;
   rec.acc_m = acc;
   if(t < rec.t0) return;   /* titik lama dari sebelum lanjut */
-  if(acc > 40){ rec.gps = "weak"; updateLive(); return; }
+  if(acc > 100) rec.coarse++; else rec.coarse = 0;
+  if(rec.coarse >= 3){ rec.gps = "coarse"; updateLive(); return; }   /* akurasi terus > 100 m: kemungkinan lokasi perkiraan, bukan Lokasi tepat */
+  if(acc > ACC_MAX[rec.sp]){ rec.gps = "weak"; updateLive(); return; }
+  const mt = (rec.acc + (t - rec.t0)) / 1000, f = kalman(c.latitude, c.longitude, acc, t);
+  if(!rec.last){
+    /* pemanasan: titik awal harus cukup akurat, atau tunggu maksimal 20 detik */
+    if(acc > ACC_WARM[rec.sp] && Date.now() - rec.gt0 < 20000){ rec.gps = "warm"; updateLive(); return; }
+    rec.gps = "ok"; rec.kf = f;
+    rec.last = {la:f.la, lo:f.lo, t:t}; rec.pts.push([f.la, f.lo, mt, rec.dist]); updateLive(); return;
+  }
   rec.gps = "ok";
-  const mt = (rec.acc + (t - rec.t0)) / 1000;
-  if(!rec.last){ rec.last = {la:c.latitude, lo:c.longitude, t:t}; rec.pts.push([c.latitude, c.longitude, mt, rec.dist]); updateLive(); return; }
-  const d = hav(rec.last.la, rec.last.lo, c.latitude, c.longitude), dt = (t - rec.last.t) / 1000;
+  const d = hav(rec.last.la, rec.last.lo, f.la, f.lo), dt = (t - rec.last.t) / 1000, spd = c.speed;
   if(dt <= 0) return;
   if(d / dt > SP[rec.sp].maxV){ rec.jit++; return; }              /* lompatan GPS yang mustahil: abaikan */
   if(d < Math.min(15, Math.max(3, acc / 2))){ updateLive(); return; }   /* getaran saat diam: abaikan, jarak terkumpul sampai cukup jauh */
-  rec.dist += d; rec.last = {la:c.latitude, lo:c.longitude, t:t};
-  rec.pts.push([c.latitude, c.longitude, mt, rec.dist]);
+  if(typeof spd === "number" && isFinite(spd) && spd >= 0 && spd < 0.4 && d < 15){ updateLive(); return; }   /* kecepatan GPS ~0: diam */
+  rec.kf = f; rec.dist += d; rec.last = {la:f.la, lo:f.lo, t:t};
+  rec.pts.push([f.la, f.lo, mt, rec.dist]);
   updateLive();
   if(Date.now() - lastSave > 10000) saveDraft();
 }
@@ -10197,7 +10214,7 @@ function startGps(){
   /* aplikasi Android: GPS tetap jalan saat layar terkunci / aplikasi di latar belakang */
   rec.gps = "wait"; nat = true;
   g.start(window,
-    loc => { if(nat) onFix({coords:{latitude:loc.latitude, longitude:loc.longitude, accuracy:loc.accuracy || 0}, timestamp:loc.time || Date.now()}); },
+    loc => { if(nat) onFix({coords:{latitude:loc.latitude, longitude:loc.longitude, accuracy:loc.accuracy || 0, speed:(typeof loc.speed === "number" ? loc.speed : null)}, timestamp:loc.time || Date.now()}); },
     err => { if(nat) onErr({code:(err && err.code === "NOT_AUTHORIZED") ? 1 : 2}); },
     {title:L("GPS olahraga aktif", "Activity GPS on"), msg:L("Detail jarak, waktu, dan kalori ada di notifikasi Rekaman olahraga.", "Distance, time, and calories are in the Activity recording notification.")}
   ).then(() => pushNotif(true)).catch(() => { if(nat){ nat = false; startWebGps(); updateLive(); } });
@@ -10215,7 +10232,7 @@ function startRec(){
   if(rec.st !== "idle") return;
   rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; restored = false; resumeRec();
 }
-function resumeRec(){ rec.st = "run"; rec.t0 = Date.now(); rec.last = null; rec.gps = ""; restored = false; startGps(); lockWake(); renderRec(); saveDraft(); }
+function resumeRec(){ rec.st = "run"; rec.t0 = Date.now(); rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); lockWake(); renderRec(); saveDraft(); }
 function pauseRec(){ rec.acc += Date.now() - rec.t0; rec.t0 = 0; rec.st = "pause"; stopGps(); unlockWake(); renderRec(); saveDraft(); }
 function discardRec(){
   stopGps(); unlockWake(); rec.st = "idle"; rec.acc = 0; rec.t0 = 0; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
@@ -10239,6 +10256,8 @@ function gpsText(){
   if(rec.st === "pause") return ["warn", L("Dijeda. GPS dimatikan sementara.", "Paused. GPS is off for now.")];
   if(g === "ok") return ["ok", L("GPS baik", "GPS good") + " (±" + Math.round(rec.acc_m) + " m)"];
   if(g === "weak") return ["warn", L("Sinyal GPS lemah" + (rec.acc_m ? " (±" + Math.round(rec.acc_m) + " m)" : "") + ", pindah ke tempat terbuka.", "Weak GPS signal" + (rec.acc_m ? " (±" + Math.round(rec.acc_m) + " m)" : "") + ", move to an open area.")];
+  if(g === "warm") return ["warn", L("Menyiapkan GPS (±" + Math.round(rec.acc_m) + " m). Tunggu sebentar sebelum mulai bergerak.", "Preparing GPS (±" + Math.round(rec.acc_m) + " m). Wait a moment before you start moving.")];
+  if(g === "coarse") return ["bad", L("Lokasi kurang tepat (±" + Math.round(rec.acc_m) + " m). Aktifkan izin \"Lokasi tepat\" untuk aplikasi ini di pengaturan HP.", "Location is not precise (±" + Math.round(rec.acc_m) + " m). Turn on \"Precise location\" for this app in phone settings.")];
   if(g === "denied") return ["bad", L("Izin lokasi ditolak. Aktifkan izin lokasi untuk aplikasi, atau pakai Input manual.", "Location permission denied. Allow location for the app, or use Manual entry.")];
   if(g === "none") return ["bad", L("Perangkat ini tidak punya GPS. Waktu tetap berjalan, jarak bisa lewat Input manual.", "No GPS on this device. Time still runs, use Manual entry for distance.")];
   return ["warn", L("Mencari sinyal GPS…", "Searching for GPS…")];
