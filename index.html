@@ -178,6 +178,7 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 .frlb.out{animation:frlbOut .18s ease-in both}
 .frlbx{display:flex;flex-direction:column;align-items:center;gap:6px;max-width:100%;animation:frlbPop .26s cubic-bezier(.22,.7,.2,1) both}
 .frlbi{width:min(78vw,320px);height:min(78vw,320px);object-fit:cover;border-radius:50%;border:3px solid var(--gold);background:var(--bg2);box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.favtap{cursor:zoom-in}
 .frlbn{display:flex;align-items:center;justify-content:center;font-size:96px;font-weight:700;color:var(--gold2)}
 .frlbt{margin:10px 0 0;font-size:17px;font-weight:700;color:var(--text);text-align:center;overflow-wrap:anywhere}
 .frlbs{margin:0;font-size:13px;color:var(--muted)}
@@ -10834,10 +10835,12 @@ function renderDetail(){
    kalori, tanjakan, dan watermark Satu Titik di bagian atas. Digambar langsung di kanvas (tanpa library), lebar 1080 px. */
 const SANS = "system-ui,-apple-system,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif", SERIF = "Georgia,\"Times New Roman\",serif";
 const SHF = {
-  story:{w:1080, h:1920, wm:120, rt:[140, 250, 800, 930], p:{ti:1320, da:1372, di:1590, df:240, ro:1760, rl:1814}, n:{ti:790, da:842, di:1090, df:280, ro:1280, rl:1334}},
-  sq:{w:1080, h:1080, wm:84, rt:[300, 150, 480, 470], p:{ti:700, da:744, di:880, df:150, ro:985, rl:1024}, n:{ti:330, da:374, di:580, df:180, ro:770, rl:809}},
+  /* w,h = ukuran; wm = posisi watermark; sw = lebar blok statistik; df = ukuran angka jarak; rh = tinggi satu baris statistik; k = skala huruf;
+     bot = batas bawah blok (dengan rute); rtw/rtmax = lebar & tinggi maksimum gambar rute (sengaja kecil supaya angka tidak bertumpuk) */
+  story:{w:1080, h:1920, wm:120, sw:900, df:230, rh:152, k:1, bot:1800, rtTop:230, rtw:600, rtmax:560, th:12},
+  sq:{w:1080, h:1080, wm:84, sw:900, df:120, rh:124, k:.9, bot:1030, rtTop:160, rtw:520, rtmax:330, th:9},
   /* 16:9 (mendatar, 1920x1080): dengan rute = rute di kiri, angka di kanan; tanpa rute = angka di tengah */
-  wide:{w:1920, h:1080, wm:70, rt:[90, 150, 780, 840], p:{cx:1440, sw:780, k:.85, ti:370, da:420, di:620, df:190, ro:820, rl:864}, n:{cx:960, sw:900, k:1, ti:370, da:420, di:620, df:200, ro:820, rl:864}}
+  wide:{w:1920, h:1080, wm:70, sw:820, df:170, rh:130, k:1, rtbox:640, th:10}
 };
 const SH_BLUE = [45, 125, 255];   /* biru identitas aplikasi (preset warna tulisan) */
 const shLum = c => (.299 * c[0] + .587 * c[1] + .114 * c[2]) / 255;   /* < .55 = tulisan gelap: tepi & bayangan dibuat terang */
@@ -10877,33 +10880,49 @@ const shSc = o => (o.sc === 1 && !o.bg) ? 0 : (o.sc === 2 ? 2 : (o.sc === 1 ? 1 
 function shRR(g, x, y, w, h, r){
   r = Math.min(r, w / 2, h / 2); g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
 }
-/* statistik di kartu aktivitas, disesuaikan jenis aktivitas (sama dengan statistik di hasil rekam) */
+/* statistik di kartu aktivitas, disesuaikan jenis aktivitas (sama dengan statistik di hasil rekam).
+   Tiap butir: [label singkat, nilai, satuan]. Satuan digambar kecil di samping nilai, label pendek supaya tidak saling tumpuk. */
 function shItems(a, o){
   const pt = paceTile(a.sp, a.dist, a.dur), it = [], num = v => typeof v === "number";
   const eg = o.eg && num(a.eg) && a.eg >= 0, kmh = L("km/jam", "km/h");
-  it.push([L("Waktu", "Time"), fmtDur(a.dur)]);
+  it.push([L("Waktu", "Time"), fmtDur(a.dur), ""]);
   if(a.sp === "ride"){
-    it.push([L("Kecepatan rata-rata (km/jam)", "Avg speed (km/h)"), pt.v]);
-    if(num(a.vm) && a.vm > 0) it.push([L("Kecepatan maks (km/jam)", "Top speed (km/h)"), fx(a.vm, 1)]);
+    it.push([L("Kec. rata-rata", "Avg speed"), pt.v, kmh]);
+    if(num(a.vm) && a.vm > 0) it.push([L("Kec. maks", "Top speed"), fx(a.vm, 1), kmh]);
   } else {
-    it.push([L("Pace rata-rata /km", "Avg pace /km"), pt.v]);
-    if(a.sp === "run"){ const bs = bestSplit(a); if(bs) it.push([L("Pace tercepat /km", "Best pace /km"), fmtPace(bs)]); }
-    if(a.sp === "run" || a.sp === "walk") it.push([L("Kecepatan (km/jam)", "Speed (km/h)"), fmtSpeed(a.dist, a.dur)]);
+    it.push([L("Pace rata-rata", "Avg pace"), pt.v, "/km"]);
+    if(a.sp === "run"){ const bs = bestSplit(a); if(bs) it.push([L("Pace tercepat", "Best pace"), fmtPace(bs), "/km"]); }
+    if(a.sp === "run" || a.sp === "walk") it.push([L("Kecepatan", "Speed"), fmtSpeed(a.dist, a.dur), kmh]);
   }
-  if(o.kc) it.push([L("Kalori (kkal)", "Calories (kcal)"), String(kcalAct(a))]);
+  if(o.kc) it.push([L("Kalori", "Calories"), String(kcalAct(a)), L("kkal", "kcal")]);
   if(a.sp === "hike"){
     if(o.eg){
-      if(num(a.ah)) it.push([L("Tertinggi (mdpl)", "Highest (masl)"), fmtAlt(a.ah)]);
-      if(num(a.al)) it.push([L("Terendah (mdpl)", "Lowest (masl)"), fmtAlt(a.al)]);
-      if(eg) it.push([L("Total naik (m)", "Ascent (m)"), String(a.eg)]);
-      if(num(a.ed)) it.push([L("Total turun (m)", "Descent (m)"), String(a.ed)]);
+      if(num(a.ah)) it.push([L("Tertinggi", "Highest"), fmtAlt(a.ah), L("mdpl", "masl")]);
+      if(num(a.al)) it.push([L("Terendah", "Lowest"), fmtAlt(a.al), L("mdpl", "masl")]);
+      if(eg) it.push([L("Total naik", "Ascent"), String(a.eg), "m"]);
+      if(num(a.ed)) it.push([L("Total turun", "Descent"), String(a.ed), "m"]);
     }
-  } else if(eg) it.push([L("Tanjakan (m)", "Elevation gain (m)"), String(a.eg)]);
+  } else if(eg) it.push([L("Tanjakan", "Elev. gain"), String(a.eg), "m"]);
   return it;
+}
+/* label statistik: huruf kapital, maksimal 2 baris; ukuran huruf mengecil bila masih terlalu lebar */
+function shLabel(g, txt, max, fs){
+  txt = txt.toUpperCase();
+  for(;; fs -= 1){
+    g.font = "700 " + fs + "px " + SANS; try{ g.letterSpacing = Math.max(.5, fs * .06) + "px"; }catch(e){}
+    if(g.measureText(txt).width <= max) return {t:[txt], fs:fs};
+    const w = txt.split(" ");
+    if(w.length > 1){
+      let best = null, bw = 1e9;
+      for(let i = 1; i < w.length; i++){ const l = [w.slice(0, i).join(" "), w.slice(i).join(" ")], m = Math.max(g.measureText(l[0]).width, g.measureText(l[1]).width); if(m < bw){ bw = m; best = l; } }
+      if(bw <= max) return {t:best, fs:fs};
+    }
+    if(fs <= 15) return {t:[txt], fs:fs};
+  }
 }
 function shDraw(cv, a, o, logo, S){
   S = S || 1;
-  const F = SHF[o.fmt], W = F.w, H = F.h, g = cv.getContext("2d"), hasRt = !!(o.rt && a.rt && a.rt.length > 1), P = hasRt ? F.p : F.n;
+  const F = SHF[o.fmt], W = F.w, H = F.h, g = cv.getContext("2d"), hasRt = !!(o.rt && a.rt && a.rt.length > 1), wide = o.fmt === "wide", k = F.k;
   cv.width = Math.round(W * S); cv.height = Math.round(H * S); g.setTransform(S, 0, 0, S, 0, 0); g.clearRect(0, 0, W, H);
   g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high"; try{ g.fontKerning = "normal"; g.textRendering = "geometricPrecision"; }catch(e){}
   if(o.bg){
@@ -10914,22 +10933,35 @@ function shDraw(cv, a, o, logo, S){
     g.fillStyle = gr; g.fillRect(0, 0, W, H);
     if(shSc(o) === 1){ g.fillStyle = "rgba(" + c + ",.38)"; g.fillRect(0, 0, W, H); }   /* peredam latar: foto terang/ramai tetap terbaca */
   }
-  /* tata letak statistik: maksimal 4 kolom (3 untuk 16:9 dengan rute), baris tambahan menggeser judul & rute ke atas */
-  const it = shItems(a, o), maxC = (o.fmt === "wide" && hasRt) ? 3 : 4, nRows = Math.max(1, Math.ceil(it.length / maxC)), nCols = Math.ceil(it.length / nRows);
-  const stepY = (P.rl - P.ro) + 78, ex = o.fmt === "wide" ? 0 : (nRows - 1) * stepY;
-  const Pe = {ti:P.ti - ex, da:P.da - ex, di:P.di - ex, df:P.df, ro:P.ro - ex, rl:P.rl + (o.fmt === "wide" ? (nRows - 1) * stepY : 0), cx:P.cx, sw:P.sw, k:P.k};
-  const Fe = {w:F.w, h:F.h, wm:F.wm, rt:[F.rt[0], F.rt[1], F.rt[2], Math.max(160, F.rt[3] - ex)]};
+  /* ===== tata letak: semua posisi dihitung dari tinggi blok, sehingga rute, judul, jarak, dan statistik tidak pernah saling tumpuk =====
+     statistik maksimal 2 baris (<=4 butir: 1 baris); blok: judul > tanggal > jarak > garis > grid statistik */
+  const it = shItems(a, o), n = it.length, nRows = n <= 4 ? 1 : 2, nCols = Math.ceil(n / nRows);
+  const noRtWide = wide && !hasRt;
+  const df = noRtWide ? 200 : F.df, rh = noRtWide ? 140 : F.rh, sw = wide ? (hasRt ? 820 : 1100) : F.sw, cx = wide ? (hasRt ? 1430 : 960) : W / 2;
+  const tF = Math.round(52 * k), dF = Math.round(36 * k), heroAsc = Math.round(df * .72), topPad = Math.round(tF * .9);
+  const offDa = Math.round(tF * 1.1), offDi = offDa + Math.round(36 * k) + heroAsc + Math.round(dF * .4), offRule = offDi + Math.round(58 * k), offEnd = offRule + nRows * rh;
+  let ti, rtb = null;
+  if(wide || !hasRt){
+    const mid = wide ? (H + F.wm) / 2 + 10 : H / 2 + 40;   /* blok di tengah */
+    ti = Math.round(mid + (topPad - offEnd) / 2);
+  } else ti = F.bot - offEnd;   /* blok menempel ke bawah, rute mengisi ruang di atasnya */
+  if(hasRt){
+    if(wide){ const s = F.rtbox; rtb = [510 - s / 2, Math.round((H + F.wm) / 2 + 10 - s / 2), s, s]; }
+    else { const top = F.rtTop, bot = ti - topPad - Math.round(76 * k), ah = Math.max(120, Math.min(F.rtmax, bot - top)); rtb = [(W - F.rtw) / 2, Math.round(bot - ah - Math.max(0, (bot - top - ah) * .25)), F.rtw, ah]; }
+  }
   const sc = shSc(o);
-  const ink = "rgb(" + o.rgb.join(",") + ")", cx = Pe.cx || W / 2, sw = Pe.sw || 900, kf = Pe.k || 1;
+  const ink = "rgb(" + o.rgb.join(",") + ")";
   g.fillStyle = ink; g.shadowColor = o.dark ? (o.blue ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.6)") : "rgba(0,0,0,.5)"; g.shadowBlur = 14 * S; g.shadowOffsetY = 2 * S; g.textBaseline = "alphabetic";
   const edge = o.dark ? "rgba(255,255,255,.92)" : "rgba(0,0,0,.72)", panel = o.dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.52)";
   /* tulisan diberi garis tepi warna kontras supaya jelas di latar apa pun (terang, gelap, atau ramai) */
-  const T = (t, x, y) => { const px = parseFloat((g.font.match(/(\d+(?:\.\d+)?)px/) || [0, 40])[1]); g.save(); g.lineJoin = "round"; g.miterLimit = 2; g.strokeStyle = edge; g.lineWidth = Math.min(20, Math.max(5, px * .15)); g.strokeText(t, x, y); g.restore(); g.fillText(t, x, y); };
+  const T = (t, x, y) => { const px = parseFloat((g.font.match(/(\d+(?:\.\d+)?)px/) || [0, 40])[1]); g.save(); g.lineJoin = "round"; g.miterLimit = 2; g.strokeStyle = edge; g.lineWidth = Math.min(20, Math.max(4, px * .15)); g.strokeText(t, x, y); g.restore(); g.fillText(t, x, y); };
+  /* garis pemisah tipis (diberi tepi kontras di bawahnya) */
+  const ln = (x1, y1, x2, y2) => { g.save(); g.shadowColor = "transparent"; g.lineCap = "round"; g.strokeStyle = edge; g.globalAlpha = .3; g.lineWidth = 5; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.strokeStyle = ink; g.globalAlpha = .75; g.lineWidth = 2; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.restore(); };
   if(sc === 2){
-    const pad = 44, bx = cx - Math.max(sw, 760) / 2 - pad;
+    const pad = 44, bx = cx - sw / 2 - pad, by = ti - topPad - 30;
     g.save(); g.shadowColor = "transparent"; g.fillStyle = panel;
-    shRR(g, bx, Pe.ti - 78, Math.max(sw, 760) + pad * 2, Pe.rl - Pe.ti + 78 + 46, 34); g.fill();
-    if(hasRt){ const r = Fe.rt; shRR(g, r[0] - 26, r[1] - 26, r[2] + 52, r[3] + 52, 34); g.fill(); }
+    shRR(g, bx, by, sw + pad * 2, ti + offEnd + 26 - by, 34); g.fill();
+    if(rtb){ shRR(g, rtb[0] - 20, rtb[1] - 20, rtb[2] + 40, rtb[3] + 40, 34); g.fill(); }
     shRR(g, W / 2 - 250, F.wm - 44, 500, 88, 44); g.fill();
     g.restore();
   }
@@ -10938,22 +10970,39 @@ function shDraw(cv, a, o, logo, S){
     g.font = "700 46px " + SERIF; const tw = g.measureText(t).width, x0 = (W - lw - gap - tw) / 2;
     g.globalAlpha = 1; if(logo) g.drawImage(logo, x0, F.wm - lh / 2, lw, lh);
     g.textAlign = "left"; g.globalAlpha = 1; T(t, x0 + lw + gap, F.wm + 15); }
-  if(hasRt) shRoute(g, a.rt, Fe.rt, ink, o.fmt === "story" ? 15 : 11, edge);
+  if(rtb) shRoute(g, a.rt, rtb, ink, F.th, edge);
   g.fillStyle = ink; g.textAlign = "center";   /* titik rute mengubah warna isian: kembalikan untuk tulisan */
-  g.font = "800 52px " + SANS; T(shFit(g, a.title || defTitle(a.sp, a.ts), Math.min(900, sw + 60)), cx, Pe.ti);
-  g.font = "600 36px " + SANS; T(spName(a.sp) + " · " + fmtDate(a.ts), cx, Pe.da);
-  { const ds = fmtKm(a.dist); g.font = "800 " + Pe.df + "px " + SANS; const nw = g.measureText(ds).width;
-    g.font = "700 " + Math.round(Pe.df * .27) + "px " + SANS; const uw = g.measureText(" km").width, x0 = cx - (nw + uw) / 2;
-    g.textAlign = "left"; g.font = "800 " + Pe.df + "px " + SANS; T(ds, x0, Pe.di);
-    g.font = "700 " + Math.round(Pe.df * .27) + "px " + SANS; T(" km", x0 + nw, Pe.di); g.textAlign = "center"; }
+  g.font = "800 " + tF + "px " + SANS; T(shFit(g, a.title || defTitle(a.sp, a.ts), Math.min(900, sw + 60)), cx, ti);
+  g.font = "600 " + dF + "px " + SANS; T(spName(a.sp) + " · " + fmtDate(a.ts), cx, ti + offDa);
+  { const ds = fmtKm(a.dist), di = ti + offDi; g.font = "800 " + df + "px " + SANS; const nw = g.measureText(ds).width;
+    g.font = "700 " + Math.round(df * .27) + "px " + SANS; const uw = g.measureText(" km").width, x0 = cx - (nw + uw) / 2;
+    g.textAlign = "left"; g.font = "800 " + df + "px " + SANS; T(ds, x0, di);
+    g.font = "700 " + Math.round(df * .27) + "px " + SANS; T(" km", x0 + nw, di); g.textAlign = "center"; }
+  /* grid statistik: garis atas, nilai besar + satuan kecil, label huruf kapital di bawahnya, pemisah tipis antar kolom */
+  const gx0 = cx - sw / 2, gy0 = ti + offRule, colW = sw / nCols;
+  ln(gx0, gy0, gx0 + sw, gy0);
+  const baseFs = Math.round((nCols >= 4 ? 46 : nCols === 3 ? 54 : 62) * k * (noRtWide ? 1.08 : 1)), lblFs = Math.round((nCols >= 4 ? 20 : 22) * k);
+  const vb = Math.round(22 * k + baseFs * .74), l1 = vb + Math.round(36 * k), l2 = l1 + Math.round(27 * k);
   it.forEach((r, i) => {
-    const ri = Math.floor(i / nCols), inRow = Math.min(nCols, it.length - ri * nCols), ci = i - ri * nCols, colW = Pe.sw ? Pe.sw / nCols : sw / nCols;
-    const x = cx - colW * inRow / 2 + colW * (ci + .5), y = Pe.ro + ri * stepY;
-    let fs = Math.round((nCols >= 4 ? 50 : nCols === 3 ? 58 : 68) * kf);
-    g.font = "800 " + fs + "px " + SANS; while(g.measureText(r[1]).width > colW - 14 && fs > 26){ fs -= 2; g.font = "800 " + fs + "px " + SANS; }
-    T(r[1], x, y);
-    let ls = 28; g.font = "600 " + ls + "px " + SANS; while(g.measureText(r[0]).width > colW - 10 && ls > 18){ ls -= 1; g.font = "600 " + ls + "px " + SANS; }
-    T(r[0], x, y + (P.rl - P.ro));
+    const ri = Math.floor(i / nCols), inRow = Math.min(nCols, n - ri * nCols), ci = i - ri * nCols;
+    const x = cx - colW * inRow / 2 + colW * (ci + .5), top = gy0 + ri * rh, base = top + vb;
+    if(ri > 0 && ci === 0) ln(gx0, top, gx0 + sw, top);
+    if(ci > 0) ln(x - colW / 2, top + Math.round(24 * k), x - colW / 2, top + rh - Math.round(18 * k));
+    const inner = colW - 28;
+    let fs = baseFs, vw, uw, gp = r[2] ? Math.round(8 * k) : 0, ufs;
+    for(;; fs -= 2){
+      g.font = "800 " + fs + "px " + SANS; vw = g.measureText(r[1]).width;
+      ufs = Math.max(18, Math.round(fs * .42)); g.font = "700 " + ufs + "px " + SANS; uw = r[2] ? g.measureText(r[2]).width : 0;
+      if(vw + gp + uw <= inner || fs <= 26) break;
+    }
+    const x0 = x - (vw + gp + uw) / 2;
+    g.textAlign = "left"; g.font = "800 " + fs + "px " + SANS; T(r[1], x0, base);
+    if(r[2]){ g.font = "700 " + ufs + "px " + SANS; T(r[2], x0 + vw + gp, base); }
+    g.textAlign = "center";
+    const lb = shLabel(g, r[0], inner, lblFs);
+    g.font = "700 " + lb.fs + "px " + SANS; try{ g.letterSpacing = Math.max(.5, lb.fs * .06) + "px"; }catch(e){}
+    lb.t.forEach((t, j) => T(t, x, top + (j ? l2 : l1)));
+    try{ g.letterSpacing = "0px"; }catch(e){}
   });
   g.shadowColor = "transparent"; g.shadowBlur = 0; g.shadowOffsetY = 0;
 }
@@ -13925,7 +13974,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   const lang = () => (typeof S !== "undefined" && S && S.lang === "en") ? "en" : "id";
   const T = {
     id:{ ttl:"Teman", sub0:"Daftar teman dan permintaan", add:"TAMBAH TEMAN", addS:"Tambah teman", stOn:"Online", stOff:"Offline", lastOn:"Terakhir online {t}", lastUnk:"Terakhir online belum diketahui", agoNow:"baru saja", agoM:"{n} menit lalu", agoH:"{n} jam lalu", agoD:"{n} hari lalu", agoMo:"lebih dari sebulan lalu", addH:"Masukkan ID Akun temanmu, misalnya ST-000004.", mine:"ID Akunmu: ", ph:"ST-000000", send:"Kirim permintaan", busy:"Mohon tunggu…",
-      inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", pm:"💬 Pesan pribadi", back:"Kembali", msgPh:"Tulis pesan…", msgNone:"Belum ada pesan. Sapa temanmu!", msgDel:"Hapus pesan", msgGone:"Pesan telah dihapus", msgSend:"Kirim", blk:"🚫 Blokir pengguna", ublk:"✅ Buka blokir", rpt:"⚠ Laporkan pengguna", rptm:"⚠ Laporkan", blkd:"Kamu memblokir pengguna ini. Dia tidak bisa mengirim pesan kepadamu.", blkOk:"Pengguna diblokir.", ublkOk:"Blokir dibuka.", e_nosend:"Pesan tidak dapat dikirim ke pengguna ini.", e_noreq:"Permintaan tidak dapat dikirim ke pengguna ini.", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
+      inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", pm:"💬 Pesan", back:"Kembali", msgPh:"Tulis pesan…", msgNone:"Belum ada pesan. Sapa temanmu!", msgDel:"Hapus pesan", msgGone:"Pesan telah dihapus", msgSend:"Kirim", blk:"🚫 Blokir pengguna", ublk:"✅ Buka blokir", rpt:"⚠ Laporkan pengguna", rptm:"⚠ Laporkan", blkd:"Kamu memblokir pengguna ini. Dia tidak bisa mengirim pesan kepadamu.", blkOk:"Pengguna diblokir.", ublkOk:"Blokir dibuka.", e_nosend:"Pesan tidak dapat dikirim ke pengguna ini.", e_noreq:"Permintaan tidak dapat dikirim ke pengguna ini.", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
       sent:"Permintaan terkirim.", acd:"Kalian sekarang berteman.", rmd:"Teman dihapus.", decd:"Permintaan ditolak.", cand:"Permintaan dibatalkan.",
       e_fmt:"Format ID Akun: ST-000000.", e_self:"Itu ID Akunmu sendiri.", e_nf:"ID Akun tidak ditemukan.", e_already:"Kalian sudah berteman.", e_pending:"Permintaan sudah terkirim. Tunggu temanmu menerimanya.",
       e_noacc:"ID Akunmu belum siap. Coba lagi sebentar lagi.", e_perm:"Izin ditolak oleh server. Pastikan aturan Firestore sudah diperbarui.", e_off:"Tidak ada koneksi internet.", e_fail:"Gagal. Coba lagi.", login:"Masuk dengan Google untuk memakai fitur teman.",
@@ -13936,7 +13985,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       e_invp:"Undangan masih menunggu jawaban.", e_banned:"Akun ini tidak bisa bergabung kembali ke ruangan ini karena sudah dikeluarkan pemilik ruangan.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
       invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
     en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addS:"Add friend", stOn:"Online", stOff:"Offline", lastOn:"Last online {t}", lastUnk:"Last online unknown", agoNow:"just now", agoM:"{n} min ago", agoH:"{n} h ago", agoD:"{n} d ago", agoMo:"over a month ago", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
-      inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", pm:"💬 Private message", back:"Back", msgPh:"Write a message…", msgNone:"No messages yet. Say hi!", msgDel:"Delete message", msgGone:"This message was deleted", msgSend:"Send", blk:"🚫 Block user", ublk:"✅ Unblock", rpt:"⚠ Report user", rptm:"⚠ Report", blkd:"You blocked this user. They cannot send you messages.", blkOk:"User blocked.", ublkOk:"User unblocked.", e_nosend:"The message could not be sent to this user.", e_noreq:"The request could not be sent to this user.", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
+      inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", pm:"💬 Message", back:"Back", msgPh:"Write a message…", msgNone:"No messages yet. Say hi!", msgDel:"Delete message", msgGone:"This message was deleted", msgSend:"Send", blk:"🚫 Block user", ublk:"✅ Unblock", rpt:"⚠ Report user", rptm:"⚠ Report", blkd:"You blocked this user. They cannot send you messages.", blkOk:"User blocked.", ublkOk:"User unblocked.", e_nosend:"The message could not be sent to this user.", e_noreq:"The request could not be sent to this user.", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
       sent:"Request sent.", acd:"You are now friends.", rmd:"Friend removed.", decd:"Request declined.", cand:"Request cancelled.",
       e_fmt:"Account ID format: ST-000000.", e_self:"That is your own Account ID.", e_nf:"Account ID not found.", e_already:"You are already friends.", e_pending:"The request is already sent. Wait for your friend to accept.",
       e_noacc:"Your Account ID is not ready yet. Try again in a moment.", e_perm:"Permission denied by the server. Make sure the Firestore rules are updated.", e_off:"No internet connection.", e_fail:"Failed. Please try again.", login:"Sign in with Google to use friends.",
@@ -14142,6 +14191,10 @@ if(navigator.onLine !== false) init().catch(() => {});
   function row(r, t, btns, onTap, open){
     const SSb = SAFE(), ouB = r.st === "ok" ? otherUid(r.id) : "", isBlk = !!(SSb && ouB && SSb.isBlocked(ouB));
     const li = mk("div", "frrow" + (onTap ? " frtap" : "") + (isBlk ? " frblk" : "")); li.appendChild(avatar(r.acc));
+    if(r.st === "ok"){   /* ketuk foto profil teman = lihat foto profil (tidak membuka menu baris) */
+      const av = li.lastChild; av.classList.add("favtap"); av.title = lang() === "en" ? "View profile photo" : "Lihat foto profil";
+      av.addEventListener("click", e => { e.stopPropagation(); showPhoto(r.acc); });
+    }
     if(onTap){ li.tabIndex = 0; li.setAttribute("role", "button"); li.setAttribute("aria-expanded", String(!!open)); li.addEventListener("click", onTap); li.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); onTap(); } }); }
     const w = mk("div", "frwho"), nmp = mk("p", "frnm");
     if(r.st === "ok"){ const on = isOn(r.acc), tt = T[lang()], dt = mk("span", "frdot" + (on ? " on" : "")); dt.setAttribute("role", "img"); dt.setAttribute("aria-label", on ? tt.stOn : tt.stOff); dt.title = on ? tt.stOn : tt.stOff; nmp.appendChild(dt); }
@@ -14394,16 +14447,14 @@ if(navigator.onLine !== false) init().catch(() => {});
         const open = menuId === r.id;
         s.appendChild(row(r, t, [], () => { menuId = open ? "" : r.id; paint(); }, open));
         if(open){
-          const mn = mk("div", "frmenu"), hasPh = !!(dir[r.acc] && dir[r.acc].photo);
+          const mn = mk("div", "frmenu");
           mn.appendChild(mk("p", "frh", t.mnuH));
           mn.appendChild(btn(t.pm + (unread[r.id] ? " ●" : ""), "ok", () => openChat(r)));
-          const bp = btn(hasPh ? t.pf : t.nopf, "", () => showPhoto(r.acc)); if(!hasPh) bp.disabled = true;
-          mn.appendChild(bp);
           { const SS = SAFE(), ou = otherUid(r.id);
             if(SS && ou){
               const isB = SS.isBlocked(ou);
-              mn.appendChild(btn(isB ? t.ublk : t.blk, isB ? "" : "dng", () => run(isB ? "ublkOk" : "blkOk", async () => { await (isB ? SS.unblock(ou) : SS.block(ou)); return isB ? "ublkOk" : "blkOk"; })));
               mn.appendChild(btn(t.rpt, "", () => { menuId = ""; paint(); SS.report({ kind: "user", uid: ou, name: nameOf(r.acc), ref: "friendships/" + r.id }); }));
+              mn.appendChild(btn(isB ? t.ublk : t.blk, isB ? "" : "dng", () => run(isB ? "ublkOk" : "blkOk", async () => { await (isB ? SS.unblock(ou) : SS.block(ou)); return isB ? "ublkOk" : "blkOk"; })));
             } }
           mn.appendChild(btn(t.rmf, "dng", () => { confirmId = r.id; menuId = ""; paint(); }));
           mn.appendChild(btn(t.cl, "", () => { menuId = ""; paint(); }));
