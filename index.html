@@ -10093,6 +10093,12 @@ svg.ch{display:block;width:100%;height:auto}.ch .b{fill:var(--gold)}.ch .b.cur{f
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--gold);color:#1a1405;font-weight:700;font-size:14px;padding:10px 18px;border-radius:999px;transition:.25s;z-index:20;max-width:90vw;text-align:center}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .tiny{color:var(--muted);font-size:11.5px;line-height:1.5;margin:0;text-align:center}
+.hero{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);margin:0 0 12px;background:#0d1017}
+.hero svg{display:block;width:100%;height:auto}
+.hero .cap{position:absolute;left:12px;bottom:10px;display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(11,13,18,.62);color:#fff;font-size:13px;font-weight:700;letter-spacing:.08em;backdrop-filter:blur(4px)}
+.hero .cap small{font-weight:400;letter-spacing:.04em;opacity:.85;font-size:12px}
+.sech{display:block;margin:16px 2px 8px;font-size:11px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
+.tile.hl{border-color:var(--gold);background:rgba(212,169,79,.08)}.tile.hl b{color:var(--gold2)}
 </style>
 </head>
 <body>
@@ -10454,6 +10460,7 @@ function finishRec(){
     if(al.length >= 10){ a.ah = Math.round(Math.max.apply(null, al)); a.al = Math.round(Math.min.apply(null, al)); a.a0 = Math.round(al[0]); a.a1 = Math.round(al[al.length - 1]); if(off) a.ao = Math.round(off); }
   }
   if(rec.pts.length >= 2){ a.rt = downsample(rec.pts, 250, off); a.spl = calcSplits(rec.pts, rec.dist, dur); }
+  if(rec.sp === "ride" && rec.pts.length >= 3){ const vm = maxSpeedOf(rec.pts, SP.ride.maxV); if(vm > 0) a.vm = Math.round(vm * 10) / 10; }   /* sepeda: kecepatan tertinggi */
   const fl = []; if(rec.mock > 0) fl.push("mock"); if(flagFast(rec.pts, rec.sp)) fl.push("fast"); if(flagSteps(rec.pts, rec.sp)) fl.push("steps");
   if(fl.length) a.fl = fl;
   const all = acts(); all.push(a); const hadRt = !!a.rt;
@@ -10512,7 +10519,7 @@ function hikeDetail(a){
     tx(8, 129, "0 km", "start"); tx(W - 8, 129, fmtKm(tot) + " km", "end");
     p.append(svg);
   }
-  [[L("Tertinggi", "Highest"), a.ah, "mdpl"], [L("Terendah", "Lowest"), a.al, "mdpl"], [L("Titik awal", "Start"), a.a0, "mdpl"], [L("Titik akhir", "End"), a.a1, "mdpl"], [L("Total naik", "Total ascent"), a.eg, "m"], [L("Total turun", "Total descent"), a.ed, "m"]].forEach(r => {
+  [[L("Titik awal", "Start"), a.a0, "mdpl"], [L("Titik akhir", "End"), a.a1, "mdpl"], [L("Selisih tertinggi - terendah", "Highest - lowest gap"), (typeof a.ah === "number" && typeof a.al === "number") ? a.ah - a.al : undefined, "m"]].forEach(r => {
     if(typeof r[1] === "number"){ const l = el("div", "line"); l.append(el("span", "", r[0]), el("b", "", fmtAlt(r[1]) + " " + r[2])); p.append(l); }
   });
   if(a.eg > 0) p.append(el("p", "hint", L("Kalori hiking sudah memperhitungkan total naik (perkiraan kasar).", "Hiking calories include the total ascent (rough estimate).")));
@@ -10679,10 +10686,79 @@ function renderHist(){
     const ic = el("div", "ic", SP[a.sp].ic), tx = el("div", "tx"), kk = el("div", "kk");
     tx.append(el("b", "", a.title || defTitle(a.sp, a.ts)), el("span", "", fmtDate(a.ts) + (flagged(a) ? " · ⚠" : "") + (a.man ? " · ✍️" : "")));
     const pt = paceTile(a.sp, a.dist, a.dur);
-    kk.append(el("b", "", fmtKm(a.dist) + " km"), el("span", "", fmtDur(a.dur) + " · " + pt.v + " " + pt.u));
+    kk.append(el("b", "", fmtKm(a.dist) + " km"), el("span", "", fmtDur(a.dur) + " · " + pt.v + " " + pt.u + (a.sp === "hike" && typeof a.eg === "number" ? " · ▲" + a.eg + " m" : "") + (a.sp === "ride" && typeof a.vm === "number" ? " · ⚡" + fx(a.vm, 1) : "")));
     b.append(ic, tx, kk); b.onclick = () => openDetail(a.id); box.append(b);
   });
   v.append(box);
+}
+
+
+/* ===== ILUSTRASI per jenis olahraga (banner di hasil rekam) ===== */
+const ART = {
+  run:'<svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" role="img"><defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a63"/><stop offset=".55" stop-color="#e8683f"/><stop offset="1" stop-color="#ffb066"/></linearGradient></defs><rect width="420" height="160" fill="url(#gr)"/><circle cx="90" cy="108" r="34" fill="#ffd9a0" opacity=".9"/><rect y="128" width="420" height="32" fill="#2a1d3d"/><g stroke="#ffffff" stroke-opacity=".35" stroke-width="2"><line x1="0" y1="140" x2="420" y2="140"/><line x1="0" y1="152" x2="420" y2="152"/></g><g stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="298" y1="62" x2="288" y2="92"/><polyline points="297,68 282,80 272,70"/><polyline points="296,68 310,80 322,72"/><polyline points="288,92 306,104 300,126"/><polyline points="288,92 272,108 256,100"/></g><circle cx="302" cy="50" r="10" fill="#fff"/><g stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"><line x1="200" y1="70" x2="238" y2="70"/><line x1="214" y1="84" x2="248" y2="84"/><line x1="206" y1="98" x2="232" y2="98"/></g></svg>',
+  walk:'<svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" role="img"><defs><linearGradient id="gw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fc8e8"/><stop offset="1" stop-color="#dff3e0"/></linearGradient></defs><rect width="420" height="160" fill="url(#gw)"/><circle cx="350" cy="36" r="20" fill="#fff6c8"/><path d="M0 112 Q110 84 220 108 T420 100 V160 H0Z" fill="#6db36d"/><path d="M0 136 Q140 112 260 134 T420 126 V160 H0Z" fill="#4c9a56"/><path d="M150 160 Q200 128 250 118 T330 104" stroke="#e9d9a8" stroke-width="16" fill="none" stroke-linecap="round" opacity=".9"/><g fill="#2f7a3f"><rect x="52" y="84" width="6" height="26" fill="#6b4a2b"/><circle cx="55" cy="76" r="20"/><rect x="104" y="92" width="5" height="20" fill="#6b4a2b"/><circle cx="106" cy="86" r="15"/><rect x="372" y="86" width="6" height="22" fill="#6b4a2b"/><circle cx="375" cy="78" r="17"/></g><g stroke="#2b3a55" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="236" y1="58" x2="236" y2="92"/><polyline points="236,66 226,84"/><polyline points="236,66 249,82"/><polyline points="236,92 228,128"/><polyline points="236,92 247,128"/></g><circle cx="236" cy="48" r="10" fill="#2b3a55"/></svg>',
+  ride:'<svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" role="img"><defs><linearGradient id="gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a6fd6"/><stop offset="1" stop-color="#9fd0ff"/></linearGradient></defs><rect width="420" height="160" fill="url(#gd)"/><path d="M0 104 L60 70 L120 100 L190 56 L260 100 L330 66 L420 104 V160 H0Z" fill="#3a5a86" opacity=".55"/><rect y="124" width="420" height="36" fill="#3b3f4a"/><g stroke="#ffd34d" stroke-width="3" stroke-dasharray="22 16"><line x1="0" y1="142" x2="420" y2="142"/></g><g stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"><line x1="70" y1="82" x2="130" y2="82"/><line x1="96" y1="96" x2="150" y2="96"/><line x1="60" y1="110" x2="108" y2="110"/></g><g stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="252" cy="110" r="22"/><circle cx="332" cy="110" r="22"/><polyline points="252,110 284,110 302,84 270,84 252,110"/><polyline points="302,84 332,110"/><polyline points="302,84 310,74 322,74"/><line x1="270" y1="84" x2="268" y2="76"/></g><g stroke="#ffd0b0" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"><polyline points="274,74 296,56"/><polyline points="298,58 320,74"/><polyline points="274,74 292,96 286,110"/></g><circle cx="304" cy="46" r="9" fill="#ffd0b0"/><path d="M296 42 Q304 32 313 42Z" fill="#ff5a3d"/></svg>',
+  hike:'<svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" role="img"><defs><linearGradient id="gh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#27467a"/><stop offset=".7" stop-color="#f2a56b"/><stop offset="1" stop-color="#ffd9a0"/></linearGradient></defs><rect width="420" height="160" fill="url(#gh)"/><circle cx="340" cy="52" r="18" fill="#fff1c9"/><polygon points="0,160 0,98 70,56 120,96 190,30 270,112 330,74 420,120 420,160" fill="#4d5f86"/><polygon points="190,30 172,52 182,48 190,58 198,48 208,54" fill="#fff"/><polygon points="0,160 0,126 60,92 130,128 200,84 290,134 360,104 420,138 420,160" fill="#2e3c5a"/><polyline points="60,152 110,136 84,124 150,112 128,102 190,90" stroke="#f0cf86" stroke-width="3" stroke-dasharray="6 5" fill="none" stroke-linecap="round"/><line x1="190" y1="30" x2="190" y2="10" stroke="#fff" stroke-width="3" stroke-linecap="round"/><polygon points="190,10 208,15 190,21" fill="#ff7a3d"/><g stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"><line x1="262" y1="94" x2="262" y2="116"/><polyline points="262,100 254,112"/><polyline points="262,100 272,110"/><polyline points="262,116 256,134"/><polyline points="262,116 270,134"/><line x1="276" y1="100" x2="280" y2="134"/></g><circle cx="262" cy="87" r="7" fill="#fff"/><rect x="256" y="96" width="9" height="16" rx="3" fill="#ff7a3d" transform="translate(-9 0)"/></svg>'
+};
+const HERO_SUB = {
+  run:["Lari tuntas!", "Run complete!"], walk:["Jalan santai tercatat", "Walk logged"],
+  ride:["Gowes selesai!", "Ride complete!"], hike:["Pendakian tercatat", "Hike logged"]
+};
+function heroBanner(a){
+  const h = el("div", "hero"); h.innerHTML = ART[a.sp] || "";
+  const c = el("div", "cap"); c.append(document.createTextNode(SP[a.sp].ic + " " + spName(a.sp).toUpperCase()), el("small", "", L(HERO_SUB[a.sp][0], HERO_SUB[a.sp][1])));
+  h.append(c); return h;
+}
+/* kecepatan tertinggi (km/jam): jendela 10 detik waktu bergerak supaya lonjakan GPS tidak ikut */
+function maxSpeedOf(pts, cap){
+  let best = 0;
+  for(let i = 0, j = 0; i < pts.length; i++){
+    if(j < i) j = i;
+    while(j < pts.length && pts[j][2] - pts[i][2] < 10) j++;
+    if(j >= pts.length) break;
+    const dt = pts[j][2] - pts[i][2], dd = pts[j][3] - pts[i][3];
+    if(dt > 0){ const v = dd / dt * 3.6; if(v > best) best = v; }
+  }
+  return Math.min(best, cap * 3.6);
+}
+/* pace tercepat dari split (menit per km), memilih potongan >= 1 km penuh bila ada */
+function bestSplit(a){
+  if(!a.spl || !a.spl.length) return 0;
+  const full = a.spl.filter(s => s[0] >= 1), pool = full.length ? full : a.spl.filter(s => s[0] >= .5);
+  return pool.length ? Math.min.apply(null, pool.map(s => s[1] / s[0])) : 0;
+}
+/* kartu statistik hasil rekam, disesuaikan dengan jenis aktivitas */
+function detailTiles(a){
+  const pt = paceTile(a.sp, a.dist, a.dur), kcal = String(kcalAct(a)), T = [];
+  const dist = [L("JARAK", "DISTANCE"), fmtKm(a.dist), "km"], time = [L("WAKTU", "TIME"), fmtDur(a.dur), ""];
+  const kc = [L("KALORI (PERKIRAAN)", "CALORIES (EST.)"), kcal, "kkal"];
+  const kmh = [L("KECEPATAN RATA-RATA", "AVG SPEED"), fmtSpeed(a.dist, a.dur), "km/" + L("jam", "h")];
+  const num = typeof a.eg === "number" && a.eg >= 0;
+  if(a.sp === "run"){
+    const bs = bestSplit(a);
+    T.push(dist, time, [L("PACE RATA-RATA", "AVG PACE"), pt.v, pt.u]);
+    if(bs) T.push([L("PACE TERCEPAT", "BEST PACE"), fmtPace(bs), "/km", 1]);
+    T.push(kmh, kc);
+    if(num) T.push([L("TANJAKAN", "ELEVATION GAIN"), String(a.eg), "m"]);
+  } else if(a.sp === "walk"){
+    T.push(dist, time, [L("PACE RATA-RATA", "AVG PACE"), pt.v, pt.u], kmh, kc);
+    if(num) T.push([L("TANJAKAN", "ELEVATION GAIN"), String(a.eg), "m"]);
+  } else if(a.sp === "ride"){
+    T.push(dist, time, [L("KECEPATAN RATA-RATA", "AVG SPEED"), pt.v, pt.u]);
+    if(typeof a.vm === "number" && a.vm > 0) T.push([L("KECEPATAN TERTINGGI", "TOP SPEED"), fx(a.vm, 1), "km/" + L("jam", "h"), 1]);
+    T.push(kc);
+    if(num) T.push([L("TANJAKAN", "ELEVATION GAIN"), String(a.eg), "m"]);
+  } else {
+    T.push(dist, time, [L("PACE RATA-RATA", "AVG PACE"), pt.v, pt.u], kc);
+    if(typeof a.ah === "number") T.push([L("KETINGGIAN TERTINGGI", "HIGHEST POINT"), fmtAlt(a.ah), "mdpl", 1]);
+    if(typeof a.al === "number") T.push([L("KETINGGIAN TERENDAH", "LOWEST POINT"), fmtAlt(a.al), "mdpl"]);
+    if(num) T.push([L("TOTAL NAIK", "TOTAL ASCENT"), String(a.eg), "m", 1]);
+    if(typeof a.ed === "number") T.push([L("TOTAL TURUN", "TOTAL DESCENT"), String(a.ed), "m"]);
+  }
+  const g = el("div", "tiles t4");
+  T.forEach(r => { const t = el("div", "tile" + (r[3] ? " hl" : "")); t.append(el("small", "", r[0]), el("b", "", r[1]), el("em", "", r[2])); g.append(t); });
+  if(T.length % 2) g.lastChild.style.gridColumn = "1 / -1";
+  return g;
 }
 
 /* ===== tampilan: detail aktivitas ===== */
@@ -10723,30 +10799,27 @@ function renderDetail(){
       v.append(ob);
     }
   }
+  v.append(heroBanner(a));
   if(a.rt && a.rt.length > 1) v.append(mapCanvas(a.rt));
   else if(!a.man && all.indexOf(a) >= MAXRT){ const h = el("p", "tiny", L("Rute tidak ada lagi: rute hanya disimpan untuk " + MAXRT + " aktivitas terbaru agar penyimpanan dan sinkronisasi akun tetap ringan.", "The route is no longer stored: routes are kept only for the " + MAXRT + " newest activities to keep storage and account sync light.")); h.style.cssText = "text-align:left;margin:0 0 12px 2px"; v.append(h); }
-  const pt = paceTile(a.sp, a.dist, a.dur), tiles = el("div", "tiles t4");
-  [[L("JARAK", "DISTANCE"), fmtKm(a.dist), "km"], [L("WAKTU", "TIME"), fmtDur(a.dur), ""], [pt.k, pt.v, pt.u], [L("KALORI (PERKIRAAN)", "CALORIES (EST.)"), String(kcalAct(a)), "kkal"]].forEach(r => {
-    const t = el("div", "tile"); t.append(el("small", "", r[0]), el("b", "", r[1]), el("em", "", r[2])); tiles.append(t);
-  });
-  if(typeof a.eg === "number" && a.eg >= 0){ const t = el("div", "tile"); t.style.gridColumn = "1 / -1"; t.append(el("small", "", L("TANJAKAN (PERKIRAAN)", "ELEVATION GAIN (EST.)")), el("b", "", String(a.eg)), el("em", "", "m")); tiles.append(t); }
-  v.append(tiles);
+  { const sh = el("span", "sech", L("Ringkasan " + spName(a.sp), spName(a.sp) + " summary")); sh.style.marginTop = "14px"; v.append(sh); }
+  v.append(detailTiles(a));
   if(a.sp === "hike" && (typeof a.ah === "number" || typeof a.ed === "number")) v.append(hikeDetail(a));
   if(a.pz >= 10){ const zp = el("p", "tiny", L("Waktu diam tidak dihitung (auto-jeda): ", "Idle time not counted (auto-pause): ") + fmtDur(a.pz)); zp.style.cssText = "text-align:left;margin:8px 0 0 2px"; v.append(zp); }
-  { const sb = el("button", "btn", L("Bagikan", "Share")); sb.type = "button"; sb.style.marginTop = "14px"; sb.onclick = () => shOpen(a); v.append(sb);
+  { const sb = el("button", "btn", L("Kartu Aktivitas", "Activity Card")); sb.type = "button"; sb.style.marginTop = "14px"; sb.onclick = () => shOpen(a); v.append(sb);
     const sn = el("p", "tiny", L("Latar transparan atau pakai foto dari galerimu, lengkap dengan rute dan statistik.", "Transparent background or your own gallery photo, with route and stats.")); sn.style.marginTop = "8px"; v.append(sn); }
   if(a.spl && a.spl.length){
-    const p = el("div", "panel"); p.style.marginTop = "14px"; p.append(el("span", "label", L("Split per km", "Splits per km")));
+    const p = el("div", "panel"); p.style.marginTop = "14px"; p.append(el("span", "label", a.sp === "ride" ? L("Kecepatan per km", "Speed per km") : L("Split per km", "Splits per km")));
     const pc = a.spl.map(s => s[1] / s[0]), best = Math.min.apply(null, pc), worst = Math.max.apply(null, pc);
     a.spl.forEach((s, i) => {
       const r = el("div", "spl"), w = el("div"), bar = el("i"), pace = pc[i];
       bar.style.width = (worst === best ? 100 : 35 + 65 * (worst - pace) / (worst - best)) + "%";
       w.append(bar);
       const lab = el("span", "", s[0] === 1 ? String(i + 1) : fx(i + s[0], 2));
-      r.append(lab, w, el("b", "", fmtPace(pace)));
+      r.append(lab, w, el("b", "", a.sp === "ride" ? fx(3600 / pace, 1) : fmtPace(pace)));
       p.append(r);
     });
-    p.append(el("p", "hint", L("Pace dalam menit per km. Batang lebih panjang = lebih cepat.", "Pace in minutes per km. Longer bar = faster.")));
+    p.append(el("p", "hint", a.sp === "ride" ? L("Kecepatan dalam km/jam. Batang lebih panjang = lebih cepat.", "Speed in km/h. Longer bar = faster.") : L("Pace dalam menit per km. Batang lebih panjang = lebih cepat.", "Pace in minutes per km. Longer bar = faster.")));
     v.append(p);
   }
   const bt = el("div"); bt.style.cssText = "display:flex;flex-direction:column;gap:10px;margin-top:14px";
@@ -10766,7 +10839,9 @@ const SHF = {
   /* 16:9 (mendatar, 1920x1080): dengan rute = rute di kiri, angka di kanan; tanpa rute = angka di tengah */
   wide:{w:1920, h:1080, wm:70, rt:[90, 150, 780, 840], p:{cx:1440, sw:780, k:.85, ti:370, da:420, di:620, df:190, ro:820, rl:864}, n:{cx:960, sw:900, k:1, ti:370, da:420, di:620, df:200, ro:820, rl:864}}
 };
-const SH_BLUE = "#2d7dff";   /* biru identitas aplikasi untuk warna tulisan */
+const SH_BLUE = [45, 125, 255];   /* biru identitas aplikasi (preset warna tulisan) */
+const shLum = c => (.299 * c[0] + .587 * c[1] + .114 * c[2]) / 255;   /* < .55 = tulisan gelap: tepi & bayangan dibuat terang */
+const shHex = c => "#" + c.map(v => v.toString(16).padStart(2, "0")).join("").toUpperCase();
 let shLogoC;
 function shLogo(){
   if(shLogoC !== undefined) return Promise.resolve(shLogoC);
@@ -10784,61 +10859,91 @@ function shFit(g, txt, max){
   let s = txt; while(s.length > 1 && g.measureText(s + "…").width > max) s = s.slice(0, -1);
   return s.trim() + "…";
 }
-function shRoute(g, pts, b, ink, thick){
+function shRoute(g, pts, b, ink, thick, edge){
   let la0 = 90, la1 = -90, lo0 = 180, lo1 = -180;
   pts.forEach(p => { la0 = Math.min(la0, p[0]); la1 = Math.max(la1, p[0]); lo0 = Math.min(lo0, p[1]); lo1 = Math.max(lo1, p[1]); });
   const kx = Math.cos(rad((la0 + la1) / 2)), RW = Math.max((lo1 - lo0) * kx, 1e-6), RH = Math.max(la1 - la0, 1e-6);
   const sc = Math.min(b[2] / RW, b[3] / RH), ox = b[0] + (b[2] - RW * sc) / 2, oy = b[1] + (b[3] - RH * sc) / 2;
   const X = p => ox + (p[1] - lo0) * kx * sc, Y = p => oy + (la1 - p[0]) * sc;
-  g.lineJoin = g.lineCap = "round"; g.strokeStyle = ink; g.lineWidth = thick;
-  g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(X(p), Y(p)) : g.moveTo(X(p), Y(p))); g.stroke();
+  g.lineJoin = g.lineCap = "round";
+  const path = () => { g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(X(p), Y(p)) : g.moveTo(X(p), Y(p))); };
+  g.strokeStyle = edge; g.lineWidth = thick + Math.max(6, thick * .7); path(); g.stroke();   /* kontur kontras di bawah garis rute */
+  g.strokeStyle = ink; g.lineWidth = thick; path(); g.stroke();
   const dot = (p, c) => { g.fillStyle = c; g.strokeStyle = ink; g.lineWidth = thick * .45; g.beginPath(); g.arc(X(p), Y(p), thick * 1.25, 0, 7); g.fill(); g.stroke(); };
   dot(pts[0], "#4cc38a"); dot(pts[pts.length - 1], "#ff7a3d");
 }
-function shDraw(cv, a, o, logo){
+/* keterbacaan: 0 = standar, 1 = latar foto diredupkan, 2 = panel semi-transparan di balik tulisan */
+const shSc = o => (o.sc === 1 && !o.bg) ? 0 : (o.sc === 2 ? 2 : (o.sc === 1 ? 1 : 0));
+function shRR(g, x, y, w, h, r){
+  r = Math.min(r, w / 2, h / 2); g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+}
+function shDraw(cv, a, o, logo, S){
+  S = S || 1;
   const F = SHF[o.fmt], W = F.w, H = F.h, g = cv.getContext("2d"), hasRt = !!(o.rt && a.rt && a.rt.length > 1), P = hasRt ? F.p : F.n;
-  cv.width = W; cv.height = H; g.clearRect(0, 0, W, H);
+  cv.width = Math.round(W * S); cv.height = Math.round(H * S); g.setTransform(S, 0, 0, S, 0, 0); g.clearRect(0, 0, W, H);
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high"; try{ g.fontKerning = "normal"; g.textRendering = "geometricPrecision"; }catch(e){}
   if(o.bg){
     const d = shDims(o.bg), r = Math.max(W / d[0], H / d[1]), w = d[0] * r, h = d[1] * r;
     g.drawImage(o.bg, (W - w) / 2, (H - h) / 2, w, h);
     const c = o.dark ? "255,255,255" : "0,0,0", gr = g.createLinearGradient(0, 0, 0, H);   /* bayangan tipis supaya tulisan tetap terbaca di foto terang/gelap */
     gr.addColorStop(0, "rgba(" + c + ",.38)"); gr.addColorStop(.3, "rgba(" + c + ",0)"); gr.addColorStop(.55, "rgba(" + c + ",0)"); gr.addColorStop(1, "rgba(" + c + ",.55)");
     g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    if(shSc(o) === 1){ g.fillStyle = "rgba(" + c + ",.38)"; g.fillRect(0, 0, W, H); }   /* peredam latar: foto terang/ramai tetap terbaca */
   }
-  const ink = o.blue ? SH_BLUE : (o.dark ? "#111111" : "#ffffff"), cx = P.cx || W / 2, sw = P.sw || 900, kf = P.k || 1;
-  g.fillStyle = ink; g.shadowColor = o.dark ? (o.blue ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.6)") : "rgba(0,0,0,.5)"; g.shadowBlur = 14; g.shadowOffsetY = 2; g.textBaseline = "alphabetic";
+  const sc = shSc(o);
+  const ink = "rgb(" + o.rgb.join(",") + ")", cx = P.cx || W / 2, sw = P.sw || 900, kf = P.k || 1;
+  g.fillStyle = ink; g.shadowColor = o.dark ? (o.blue ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.6)") : "rgba(0,0,0,.5)"; g.shadowBlur = 14 * S; g.shadowOffsetY = 2 * S; g.textBaseline = "alphabetic";
+  const edge = o.dark ? "rgba(255,255,255,.92)" : "rgba(0,0,0,.72)", panel = o.dark ? "rgba(255,255,255,.7)" : "rgba(0,0,0,.52)";
+  /* tulisan diberi garis tepi warna kontras supaya jelas di latar apa pun (terang, gelap, atau ramai) */
+  const T = (t, x, y) => { const px = parseFloat((g.font.match(/(\d+(?:\.\d+)?)px/) || [0, 40])[1]); g.save(); g.lineJoin = "round"; g.miterLimit = 2; g.strokeStyle = edge; g.lineWidth = Math.min(20, Math.max(5, px * .15)); g.strokeText(t, x, y); g.restore(); g.fillText(t, x, y); };
+  if(sc === 2){
+    const pad = 44, bx = cx - Math.max(sw, 760) / 2 - pad;
+    g.save(); g.shadowColor = "transparent"; g.fillStyle = panel;
+    shRR(g, bx, P.ti - 78, Math.max(sw, 760) + pad * 2, P.rl - P.ti + 78 + 46, 34); g.fill();
+    if(hasRt){ const r = F.rt; shRR(g, r[0] - 26, r[1] - 26, r[2] + 52, r[3] + 52, 34); g.fill(); }
+    shRR(g, W / 2 - 250, F.wm - 44, 500, 88, 44); g.fill();
+    g.restore();
+  }
   /* watermark di bagian atas */
   { const t = "Satu Titik", lh = logo ? 64 : 0, lw = logo ? lh * shDims(logo)[0] / shDims(logo)[1] : 0, gap = logo ? 16 : 0;
     g.font = "700 46px " + SERIF; const tw = g.measureText(t).width, x0 = (W - lw - gap - tw) / 2;
-    g.globalAlpha = .92; if(logo) g.drawImage(logo, x0, F.wm - lh / 2, lw, lh);
-    g.textAlign = "left"; g.fillText(t, x0 + lw + gap, F.wm + 15); g.globalAlpha = 1; }
-  if(hasRt) shRoute(g, a.rt, F.rt, ink, o.fmt === "story" ? 15 : 11);
+    g.globalAlpha = 1; if(logo) g.drawImage(logo, x0, F.wm - lh / 2, lw, lh);
+    g.textAlign = "left"; g.globalAlpha = 1; T(t, x0 + lw + gap, F.wm + 15); }
+  if(hasRt) shRoute(g, a.rt, F.rt, ink, o.fmt === "story" ? 15 : 11, edge);
   g.fillStyle = ink; g.textAlign = "center";   /* titik rute mengubah warna isian: kembalikan untuk tulisan */
-  g.font = "700 52px " + SANS; g.fillText(shFit(g, a.title || defTitle(a.sp, a.ts), Math.min(900, sw + 60)), cx, P.ti);
-  g.font = "400 34px " + SANS; g.globalAlpha = .85; g.fillText(spName(a.sp) + " · " + fmtDate(a.ts), cx, P.da); g.globalAlpha = 1;
+  g.font = "800 52px " + SANS; T(shFit(g, a.title || defTitle(a.sp, a.ts), Math.min(900, sw + 60)), cx, P.ti);
+  g.font = "600 36px " + SANS; T(spName(a.sp) + " · " + fmtDate(a.ts), cx, P.da);
   { const ds = fmtKm(a.dist); g.font = "800 " + P.df + "px " + SANS; const nw = g.measureText(ds).width;
     g.font = "700 " + Math.round(P.df * .27) + "px " + SANS; const uw = g.measureText(" km").width, x0 = cx - (nw + uw) / 2;
-    g.textAlign = "left"; g.font = "800 " + P.df + "px " + SANS; g.fillText(ds, x0, P.di);
-    g.font = "700 " + Math.round(P.df * .27) + "px " + SANS; g.fillText(" km", x0 + nw, P.di); g.textAlign = "center"; }
+    g.textAlign = "left"; g.font = "800 " + P.df + "px " + SANS; T(ds, x0, P.di);
+    g.font = "700 " + Math.round(P.df * .27) + "px " + SANS; T(" km", x0 + nw, P.di); g.textAlign = "center"; }
   const pt = paceTile(a.sp, a.dist, a.dur), it = [[L("Waktu", "Time"), fmtDur(a.dur)], [SP[a.sp].pace ? L("Pace /km", "Pace /km") : L("Kecepatan km/jam", "Speed km/h"), pt.v]];
   if(o.kc) it.push([L("Kalori (kkal)", "Calories (kcal)"), String(kcalAct(a))]);
   if(o.eg && typeof a.eg === "number" && a.eg >= 0) it.push([L("Tanjakan (m)", "Elevation (m)"), String(a.eg)]);
   if(o.eg && typeof a.ah === "number") it.push([L("Puncak (mdpl)", "Peak (masl)"), String(a.ah)]);
+  if(a.sp === "ride" && typeof a.vm === "number" && a.vm > 0) it.push([L("Maks (km/jam)", "Top (km/h)"), fx(a.vm, 1)]);
   it.forEach((r, i) => {
     const x = cx - sw / 2 + sw / it.length * (i + .5);
-    g.font = "800 " + Math.round((it.length > 4 ? 46 : it.length > 3 ? 58 : 68) * kf) + "px " + SANS; g.fillText(r[1], x, P.ro);
-    g.font = "400 30px " + SANS; g.globalAlpha = .85; g.fillText(r[0], x, P.rl); g.globalAlpha = 1;
+    g.font = "800 " + Math.round((it.length > 4 ? 46 : it.length > 3 ? 58 : 68) * kf) + "px " + SANS; T(r[1], x, P.ro);
+    g.font = "600 32px " + SANS; T(r[0], x, P.rl);
   });
   g.shadowColor = "transparent"; g.shadowBlur = 0; g.shadowOffsetY = 0;
 }
 const shNative = () => { try{ const C = window.parent.Capacitor; return !!(C && C.isNativePlatform && C.isNativePlatform()); }catch(e){ return false; } };
-async function shOut(a, cv, mode){
-  const b = await new Promise(ok => cv.toBlob(x => ok(x), "image/png"));
+async function shOut(a, cv, mode, o, logo){
+  /* hasil akhir dirender ulang 2x (mis. story 2160x3840) supaya tajam; pratinjau tetap 1x agar ringan */
+  let mime = "image/png";
+  if(o){
+    try{ const hc = el("canvas"); shDraw(hc, a, o, logo, 2); cv = hc; }catch(e){}
+    if(o.bg) mime = "image/jpeg";   /* foto latar: JPEG kualitas tinggi supaya berkas tidak raksasa; latar transparan tetap PNG */
+  }
+  const ext = mime === "image/jpeg" ? ".jpg" : ".png";
+  const b = await new Promise(ok => cv.toBlob(x => ok(x), mime, .95));
   if(!b){ toast(L("Gagal membuat gambar.", "Could not create the image.")); return; }
-  const name = "satu-titik-" + ((a.title || "aktivitas").replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "aktivitas") + "-" + Date.now().toString(36) + ".png", title = a.title || "Satu Titik";
+  const name = "satu-titik-" + ((a.title || "aktivitas").replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "aktivitas") + "-" + Date.now().toString(36) + ext, title = a.title || "Satu Titik";
   if(mode === "share"){
     try{ const ns = window.parent && window.parent.stNativeShare; if(ns && await ns(b, name, title)) return; }catch(e){}
-    try{ const f = new File([b], name, {type:"image/png"}); if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:title}); return; } }catch(e){ if(e && e.name === "AbortError") return; }
+    try{ const f = new File([b], name, {type:mime}); if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:title}); return; } }catch(e){ if(e && e.name === "AbortError") return; }
   } else {
     /* simpan: langsung ke galeri (aplikasi Android), bukan lewat lembar bagikan */
     try{ const sg = window.parent && window.parent.stNativeSaveGallery; if(sg && await sg(b, name)){ toast(L("Gambar disimpan ke galeri.", "Image saved to gallery.")); return; } }catch(e){}
@@ -10849,7 +10954,8 @@ async function shOut(a, cv, mode){
 async function shOpen(a){
   if($("shSheet")) return;
   const logo = await shLogo(), sv = load("sh", {}) || {};
-  const o = {fmt:(sv.fmt === "sq" || sv.fmt === "wide") ? sv.fmt : "story", blue:sv.blue === true, dark:sv.dark === true || sv.blue === true, rt:sv.rt !== false, kc:sv.kc !== false, eg:sv.eg !== false, bg:null};
+  const rgb0 = (Array.isArray(sv.rgb) && sv.rgb.length === 3 && sv.rgb.every(v => typeof v === "number" && v >= 0 && v <= 255)) ? sv.rgb.map(Math.round) : (sv.blue === true ? SH_BLUE.slice() : (sv.dark === true ? [17, 17, 17] : [255, 255, 255]));
+  const o = {fmt:(sv.fmt === "sq" || sv.fmt === "wide") ? sv.fmt : "story", rgb:rgb0, dark:shLum(rgb0) < .55, rt:sv.rt !== false, kc:sv.kc !== false, eg:sv.eg !== false, sc:(sv.sc === 0 || sv.sc === 1 || sv.sc === 2) ? sv.sc : 1, bg:null};
   const hasRt = !!(a.rt && a.rt.length > 1), hasEg = typeof a.eg === "number" && a.eg >= 0;
   const ov = el("div"); ov.id = "shSheet"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
   const css = el("style", "", "#shSheet{position:fixed;inset:0;z-index:50;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--bg);padding:14px 16px calc(28px + env(safe-area-inset-bottom,0px))}" +
@@ -10857,40 +10963,98 @@ async function shOpen(a){
     "#shSheet .pv{padding:10px;border:1px solid var(--line);border-radius:14px;background:conic-gradient(#2a3040 25%,#1b2030 0 50%,#2a3040 0 75%,#1b2030 0) 0 0/22px 22px}" +
     "#shSheet .pv.lt{background:conic-gradient(#d9dce3 25%,#f2f3f6 0 50%,#d9dce3 0 75%,#f2f3f6 0) 0 0/22px 22px}" +
     "#shSheet canvas{display:block;margin:0 auto;max-width:100%;max-height:50vh;width:auto;height:auto}" +
-    "#shSheet .grp .label{margin-bottom:8px}.toast{z-index:60}");
+    "#shSheet .acc{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--bg2),var(--card));overflow:hidden}" +
+    "#shSheet .grp{border-top:1px solid var(--line)}#shSheet .grp:first-child{border-top:0}" +
+    "#shSheet .gh{width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;min-height:52px;background:transparent;border:0;color:var(--text);text-align:left}" +
+    "#shSheet .gh .gl{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);flex:none}" +
+    "#shSheet .gh .gs{margin-left:auto;min-width:0;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+    "#shSheet .gh .gs i{flex:none;width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,.35)}" +
+    "#shSheet .gh .cv{flex:none;width:8px;height:8px;margin:0 3px 3px 2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s}" +
+    "#shSheet .gh[aria-expanded=true] .cv{transform:rotate(225deg);margin:3px 3px 0 2px}" +
+    "#shSheet .gb{padding:0 16px 16px}" +
+    "#shSheet .rgb{display:flex;flex-direction:column;gap:14px;margin-top:16px;padding-top:16px;border-top:1px dashed var(--line)}" +
+    "#shSheet .rr{display:grid;grid-template-columns:16px 1fr 56px;gap:12px;align-items:center}" +
+    "#shSheet .rr b{font-size:13px;color:var(--muted);font-weight:600}" +
+    "#shSheet .rr input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;margin:0;border-radius:999px;outline:0;border:1px solid rgba(255,255,255,.12)}" +
+    "#shSheet .rr input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid #0b0d12;box-shadow:0 0 0 1px rgba(255,255,255,.5),0 2px 6px rgba(0,0,0,.5)}" +
+    "#shSheet .rr input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0b0d12;box-shadow:0 0 0 1px rgba(255,255,255,.5),0 2px 6px rgba(0,0,0,.5)}" +
+    "#shSheet input.num,#shSheet input.hex{font:inherit;font-size:14px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;min-height:38px;padding:0 6px;text-align:center;-moz-appearance:textfield}" +
+    "#shSheet input.num{width:56px}#shSheet input.hex{flex:1;min-width:0;letter-spacing:.08em;text-transform:uppercase}" +
+    "#shSheet input.num:focus,#shSheet input.hex:focus{outline:0;border-color:var(--gold)}" +
+    "#shSheet .hx{display:flex;align-items:center;gap:12px}#shSheet .hx i{flex:none;width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.35)}" +
+    "#shSheet .sbar{position:sticky;bottom:0;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 0 2px;background:linear-gradient(180deg,rgba(11,13,18,0),var(--bg) 28%)}" +
+    "#shSheet .sbar .btn{margin:0;font-size:14px;letter-spacing:.04em;padding:0 8px}.toast{z-index:60}");
   const inp = el("input"); inp.type = "file"; inp.accept = "image/*"; inp.hidden = true;
   const pv = el("div", "pv"), cv = el("canvas"); pv.append(cv);
-  const redraw = () => { pv.className = "pv" + (o.dark ? " lt" : ""); try{ shDraw(cv, a, o, logo); }catch(e){ toast(L("Gagal membuat gambar.", "Could not create the image.")); } save("sh", {fmt:o.fmt, dark:o.dark, blue:o.blue, rt:o.rt, kc:o.kc, eg:o.eg}); };
-  const group = (label, defs) => {
-    const w = el("div", "grp"), ch = el("div", "chips"); w.append(el("span", "label", label), ch);
+  const redraw = () => { o.dark = shLum(o.rgb) < .55; pv.className = "pv" + (o.dark ? " lt" : ""); try{ shDraw(cv, a, o, logo); }catch(e){ toast(L("Gagal membuat gambar.", "Could not create the image.")); } save("sh", {fmt:o.fmt, rgb:o.rgb, rt:o.rt, kc:o.kc, eg:o.eg, sc:o.sc}); };
+  const group = (label, defs, sum, extra, swatch) => {
+    const w = el("div", "grp"), h = el("button", "gh", ""), body = el("div", "gb"), ch = el("div", "chips");
+    h.type = "button"; h.setAttribute("aria-expanded", "false"); body.hidden = true;
+    const gs = el("span", "gs", ""); h.append(el("span", "gl", label), gs, el("span", "cv"));
+    const gr = {w:w, defs:defs, gs:gs, sum:sum, swatch:!!swatch, close:() => { body.hidden = true; h.setAttribute("aria-expanded", "false"); }};
+    h.onclick = () => { const open = body.hidden; groups.forEach(x => x.close()); if(open){ body.hidden = false; h.setAttribute("aria-expanded", "true"); } };   /* satu bagian terbuka sekaligus; semua diminimalkan secara awal */
+    body.append(ch); if(extra) body.append(extra); w.append(h, body);
     defs.forEach(d => { const b = el("button", "chip", ""); b.type = "button"; ch.append(b); d.b = b; b.onclick = () => { d.tap(); paintAll(); }; });
-    return {w:w, defs:defs};
+    return gr;
   };
   const pick = () => inp.click();
+  const clamp8 = v => Math.max(0, Math.min(255, Math.round(+v || 0)));
+  let raf = 0;
+  const setRgb = (c, now) => { o.rgb = c.map(clamp8); syncRgb(); paintAll(); if(now){ redraw(); return; } if(!raf) raf = requestAnimationFrame(() => { raf = 0; redraw(); }); };
+  const rgbBox = el("div", "rgb"), sl = [], nm = [], CH = ["R", "G", "B"];
+  CH.forEach((n, i) => {
+    const r = el("div", "rr"), rg = el("input"), nu = el("input", "num");
+    rg.type = "range"; rg.min = 0; rg.max = 255; rg.step = 1; rg.setAttribute("aria-label", L("Warna tulisan ", "Text color ") + n);
+    nu.type = "number"; nu.min = 0; nu.max = 255; nu.inputMode = "numeric"; nu.setAttribute("aria-label", n);
+    rg.oninput = () => { const c = o.rgb.slice(); c[i] = +rg.value; setRgb(c); };
+    nu.onchange = () => { const c = o.rgb.slice(); c[i] = clamp8(nu.value); setRgb(c, true); };
+    r.append(el("b", "", n), rg, nu); rgbBox.append(r); sl.push(rg); nm.push(nu);
+  });
+  const hx = el("div", "hx"), hsw = el("i"), hin = el("input", "hex"); hin.type = "text"; hin.maxLength = 7; hin.spellcheck = false; hin.setAttribute("aria-label", "Hex");
+  hin.onchange = () => { const m = /^#?([0-9a-f]{6})$/i.exec(hin.value.trim()); if(m) setRgb([0, 2, 4].map(k => parseInt(m[1].substr(k, 2), 16)), true); else syncRgb(); };
+  hx.append(hsw, hin); rgbBox.append(hx);
+  function syncRgb(){
+    const c = o.rgb;
+    sl.forEach((rg, i) => { rg.value = c[i]; nm[i].value = c[i]; const a0 = c.slice(), a1 = c.slice(); a0[i] = 0; a1[i] = 255; rg.style.background = "linear-gradient(to right,rgb(" + a0.join(",") + "),rgb(" + a1.join(",") + "))"; });
+    hsw.style.background = shHex(c); hin.value = shHex(c);
+  }
+  const eqc = c => o.rgb[0] === c[0] && o.rgb[1] === c[1] && o.rgb[2] === c[2];
   const gBg = group(L("Latar", "Background"), [
     {t:() => L("Transparan", "Transparent"), on:() => !o.bg, tap:() => { if(o.bg){ o.bg = null; } redraw(); }},
-    {t:() => o.bg ? L("Ganti foto galeri", "Change gallery photo") : L("Foto dari galeri", "Photo from gallery"), on:() => !!o.bg, tap:pick}]);
+    {t:() => o.bg ? L("Ganti foto galeri", "Change gallery photo") : L("Foto dari galeri", "Photo from gallery"), on:() => !!o.bg, tap:pick}],
+    () => o.bg ? L("Foto galeri", "Gallery photo") : L("Transparan", "Transparent"));
   const gFmt = group(L("Ukuran", "Size"), [
     {t:() => "Story 9:16", on:() => o.fmt === "story", tap:() => { o.fmt = "story"; redraw(); }},
     {t:() => L("Kotak 1:1", "Square 1:1"), on:() => o.fmt === "sq", tap:() => { o.fmt = "sq"; redraw(); }},
-    {t:() => L("Lebar 16:9", "Wide 16:9"), on:() => o.fmt === "wide", tap:() => { o.fmt = "wide"; redraw(); }}]);
+    {t:() => L("Lebar 16:9", "Wide 16:9"), on:() => o.fmt === "wide", tap:() => { o.fmt = "wide"; redraw(); }}],
+    () => o.fmt === "story" ? "Story 9:16" : (o.fmt === "sq" ? L("Kotak 1:1", "Square 1:1") : L("Lebar 16:9", "Wide 16:9")));
   const gInk = group(L("Warna tulisan", "Text color"), [
-    {t:() => L("Putih", "White"), on:() => !o.dark, tap:() => { o.dark = false; o.blue = false; redraw(); }},
-    {t:() => L("Hitam", "Black"), on:() => o.dark && !o.blue, tap:() => { o.dark = true; o.blue = false; redraw(); }},
-    {t:() => L("Biru", "Blue"), on:() => o.blue, tap:() => { o.dark = true; o.blue = true; redraw(); }}]);
+    {t:() => L("Putih", "White"), on:() => eqc([255, 255, 255]), tap:() => setRgb([255, 255, 255], true)},
+    {t:() => L("Hitam", "Black"), on:() => eqc([17, 17, 17]), tap:() => setRgb([17, 17, 17], true)},
+    {t:() => L("Biru", "Blue"), on:() => eqc(SH_BLUE), tap:() => setRgb(SH_BLUE, true)}],
+    () => shHex(o.rgb), rgbBox, true);
+  const gSc = group(L("Perjelas tulisan", "Text clarity"), [
+    {t:() => L("Standar", "Standard"), on:() => shSc(o) === 0, tap:() => { o.sc = 0; redraw(); }},
+    {t:() => L("Redupkan foto", "Dim photo"), on:() => shSc(o) === 1, off:() => !o.bg, tap:() => { o.sc = 1; redraw(); }},
+    {t:() => L("Panel", "Panel"), on:() => shSc(o) === 2, tap:() => { o.sc = 2; redraw(); }}],
+    () => shSc(o) === 0 ? L("Standar", "Standard") : (shSc(o) === 1 ? L("Redupkan foto", "Dim photo") : "Panel"));
   const gShow = group(L("Tampilkan", "Show"), [
     {t:() => L("Rute", "Route"), on:() => o.rt && hasRt, off:!hasRt, tap:() => { o.rt = !o.rt; redraw(); }},
     {t:() => L("Kalori", "Calories"), on:() => o.kc, tap:() => { o.kc = !o.kc; redraw(); }},
-    {t:() => L("Tanjakan", "Elevation"), on:() => o.eg && hasEg, off:!hasEg, tap:() => { o.eg = !o.eg; redraw(); }}]);
-  const groups = [gBg, gFmt, gInk, gShow];
-  function paintAll(){ groups.forEach(gr => gr.defs.forEach(d => { d.b.textContent = d.t(); d.b.classList.toggle("on", !!d.on()); d.b.disabled = !!d.off; d.b.setAttribute("aria-pressed", String(!!d.on())); })); }
+    {t:() => L("Tanjakan", "Elevation"), on:() => o.eg && hasEg, off:!hasEg, tap:() => { o.eg = !o.eg; redraw(); }}],
+    () => [(o.rt && hasRt) ? L("Rute", "Route") : "", o.kc ? L("Kalori", "Calories") : "", (o.eg && hasEg) ? L("Tanjakan", "Elevation") : ""].filter(Boolean).join(" · ") || "-");
+  const groups = [gBg, gFmt, gInk, gSc, gShow];
+  function paintAll(){ groups.forEach(gr => {
+    gr.defs.forEach(d => { d.b.textContent = d.t(); d.b.classList.toggle("on", !!d.on()); d.b.disabled = typeof d.off === "function" ? !!d.off() : !!d.off; d.b.setAttribute("aria-pressed", String(!!d.on())); });
+    gr.gs.textContent = gr.sum(); if(gr.swatch){ const i = el("i"); i.style.background = shHex(o.rgb); gr.gs.prepend(i); }
+  }); }
   inp.onchange = () => {
     const f = inp.files && inp.files[0]; inp.value = ""; if(!f) return;
     if(!/^image\//.test(f.type)){ toast(L("Pilih file gambar.", "Please choose an image file.")); return; }
     const u = URL.createObjectURL(f), im = new Image();
     im.onload = () => {
       let bg = im; const d = shDims(im), m = Math.max(d[0], d[1]);
-      if(m > 2600){ try{ const k = 2600 / m, c = el("canvas"); c.width = Math.round(d[0] * k); c.height = Math.round(d[1] * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); bg = c; }catch(e){} }   /* foto besar dikecilkan supaya memori HP aman */
+      if(m > 4096){ try{ const k = 4096 / m, c = el("canvas"); c.width = Math.round(d[0] * k); c.height = Math.round(d[1] * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); bg = c; }catch(e){} }   /* foto besar dikecilkan supaya memori HP aman */
       URL.revokeObjectURL(u); o.bg = bg; redraw(); paintAll();
     };
     im.onerror = () => { URL.revokeObjectURL(u); toast(L("Foto tidak bisa dibuka.", "Could not open that photo.")); };
@@ -10900,13 +11064,15 @@ async function shOpen(a){
   const close = () => { document.removeEventListener("keydown", key); ov.remove(); };
   document.addEventListener("keydown", key);
   const back = el("button", "back", "‹ " + L("Kembali", "Back")); back.type = "button"; back.onclick = close;
-  const share = el("button", "btn", L("Bagikan", "Share")); share.type = "button"; share.onclick = () => shOut(a, cv, "share");
-  const save2 = el("button", "btn ghost", L("Simpan gambar ke galeri", "Save image to gallery")); save2.type = "button"; save2.onclick = () => shOut(a, cv, "save");
+  const share = el("button", "btn", L("Bagikan Aktivitas", "Share Activity")); share.type = "button"; share.onclick = () => shOut(a, cv, "share", o, logo);
+  const save2 = el("button", "btn ghost", L("Simpan ke Galeri", "Save to Gallery")); save2.type = "button"; save2.onclick = () => shOut(a, cv, "save", o, logo);
   const hint = el("p", "hint", L("Latar transparan siap ditempel di foto atau story-mu. Atau pilih foto dari galeri sebagai latar.", "The transparent background is ready to lay over a photo or story. Or pick a gallery photo as the background."));
   hint.style.margin = "0";
-  const wrap = el("div", "in"); wrap.append(back, pv, hint, gBg.w, gFmt.w, gInk.w, gShow.w, share, save2);
+  const acc = el("div", "acc"); acc.append(gBg.w, gFmt.w, gInk.w, gSc.w, gShow.w);
+  const bar = el("div", "sbar"); bar.append(share, save2);
+  const wrap = el("div", "in"); wrap.append(back, pv, hint, acc, bar);
   ov.append(css, inp, wrap); document.body.appendChild(ov);
-  redraw(); paintAll();
+  syncRgb(); redraw(); paintAll();
 }
 
 /* ===== tampilan: Statistik ===== */
