@@ -729,6 +729,7 @@ const MENUS = [
   { id:"cek-jodoh", cat:"primbon", icon:"💞", title:"JODOH", desc:"Cocokkah kalian berdua?", descEn:"Are the two of you a match?", src:"src-cek-jodoh" },
   { id:"cek-bmi", cat:"medis", icon:"⚖️", title:"BMI & KALORI", desc:"IMT (standar Kemenkes dan WHO), target berat, dan kebutuhan kalori harian (FAO/WHO/UNU)", descEn:"BMI (Indonesian MoH and WHO standards), weight target, and daily calorie needs (FAO/WHO/UNU)", src:"src-cek-bmi" },
   { id:"cek-hamil", cat:"medis", icon:"🤰", title:"KEHAMILAN", desc:"Usia kehamilan, perkiraan lahir (HPL), jadwal periksa, dan kenaikan berat badan", descEn:"Gestational age, due date (EDD), checkup schedule, and weight gain", src:"src-cek-hamil" },
+  { id:"olahraga", cat:"medis", icon:"🏃", title:"OLAHRAGA", desc:"Catat lari, jalan, sepeda, dan hiking dengan GPS: rute, pace, split, riwayat, dan statistik", descEn:"Record runs, walks, rides, and hikes with GPS: route, pace, splits, history, and stats", src:"src-olahraga" },
   { id:"turnamen", cat:"manajemen", icon:"🏆", title:"TURNAMEN", desc:"Atur turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor", descEn:"Run a sports or eSports tournament: fixtures, scores, standings, knockout bracket, and top scorers", src:"src-turnamen" },
   { id:"tebak-inisial", cat:"hiburan", icon:"🔤", title:"TEBAK INISIAL", desc:"Acak huruf A–Z dan kategori untuk tebak-tebakan seru anak-anak", descEn:"Random letter A–Z and category for fun kids' guessing games", src:"src-tebak-inisial" }
 ];
@@ -742,6 +743,7 @@ const MTITLE = {
   "cek-bmi":["BMI & KALORI","BMI & CALORIES","CEK BMI & KALORI","BMI & CALORIE CHECK"],
   "cek-hamil":["KEHAMILAN","PREGNANCY","CEK KEHAMILAN","PREGNANCY CHECK"],
   "turnamen":["TURNAMEN","TOURNAMENT","TURNAMEN","TOURNAMENT"],
+  "olahraga":["OLAHRAGA","SPORTS","CATAT OLAHRAGA","ACTIVITY LOG"],
   "tebak-inisial":["TEBAK INISIAL","GUESS THE INITIAL","TEBAK INISIAL","GUESS THE INITIAL"]
 };
 const mTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 1 : 0] : m.title; };
@@ -774,6 +776,7 @@ const ICONS = {
   "cek-jodoh":'<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
   "cek-bmi":'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.5 10a4.5 4.5 0 0 1 7 0"/><path d="M12 13.5l2.2-3"/></svg>',
   "cek-hamil":'<svg viewBox="0 0 24 24"><circle cx="9.5" cy="4.5" r="2"/><path d="M9 8.5c-1.6.4-2.4 1.8-2.4 3.5V20M9 8.5c3 0 6 2 6 6a5 5 0 0 1-3.2 4.6V20"/></svg>',
+  "olahraga":'<svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>',
   "turnamen":'<svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7M10 17h4"/></svg>',
   "tebak-inisial":'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M9 16l3-8 3 8M10.2 13.4h3.6"/></svg>'
 };
@@ -1022,6 +1025,8 @@ function writeKeys(s){
   w("tt_fx", j(s.sound)); w("tt_music", j(s.music)); w("tt_read", j(s.read)); w("tt_auto", j(s.auto));
   /* Tebak Inisial (awalan ti_; ikut Mode suara, bahasa, dan animasi) */
   w("ti_fx", j(s.sound)); w("ti_lang", s.lang); w("ti_anim", j(s.anim));
+  /* Olahraga (awalan ol_; hanya mengikuti bahasa) */
+  w("ol_lang", s.lang);
   w("tt_gap", j(gi)); w("tt_lang", j(s.lang)); w("tt_follow", j(s.scroll)); w("tt_anim", j(s.anim)); w("tt_vol", j(s.aivol / 100)); w("tt_mvol", j(s.mvol / 100));
 }
 const TOG = {
@@ -1033,9 +1038,10 @@ const TOG = {
   "cek-bmi": {soundBtn:s => s.sound && s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
   "cek-hamil": {soundBtn:s => s.sound && s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
   "turnamen": {fxBtn:s => s.sound, readBtn:s => s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
+  "olahraga": {},
   "tebak-inisial": {}
 };
-const RNG = {"th-analytics":{mvol:"volRange", aivol:"aiVolRange"}, "cek-khodam":{mvol:"mvol", aivol:"vol"}, "hari-hoki":{mvol:"mvol", aivol:"vol"}, "cek-watak":{mvol:"mvol", aivol:"vol"}, "cek-jodoh":{mvol:"mvol", aivol:"vol"}, "cek-bmi":{mvol:"mvol", aivol:"vol"}, "cek-hamil":{mvol:"mvol", aivol:"vol"}, "turnamen":{mvol:"mvol", aivol:"vol"}, "tebak-inisial":{}};
+const RNG = {"th-analytics":{mvol:"volRange", aivol:"aiVolRange"}, "cek-khodam":{mvol:"mvol", aivol:"vol"}, "hari-hoki":{mvol:"mvol", aivol:"vol"}, "cek-watak":{mvol:"mvol", aivol:"vol"}, "cek-jodoh":{mvol:"mvol", aivol:"vol"}, "cek-bmi":{mvol:"mvol", aivol:"vol"}, "cek-hamil":{mvol:"mvol", aivol:"vol"}, "turnamen":{mvol:"mvol", aivol:"vol"}, "olahraga":{}, "tebak-inisial":{}};
 /* Keadaan ASLI menu dibaca langsung dari bingkainya (bukan ditebak dari pengaturan sebelumnya),
    sehingga tombol panel tidak terbalik bila menu mengubah pengaturannya sendiri (mis. tombol Stop auto-next di Cek Khodam). */
 function frameDoc(){
@@ -1336,8 +1342,8 @@ function paintPanel(){
 }
 /* teks beranda ikut bahasa pengaturan */
 const HT = {
-  id:{sub:"Pilih menu untuk mulai.", back:"‹ Beranda", gear:"Pengaturan", close:"Tutup", lang:"id", priv:"Kebijakan Privasi", about:"Tentang", abt:"Satu Titik adalah kumpulan menu primbon dan kesehatan.\n\n👻 Cek Khodam: khodam yang menemanimu.\n🍀 Tri Hoki: hari baik, angka hoki, dan warna hoki (Jawa, Tionghoa, Numerologi).\n🔮 Cek Watak: watak dari numerologi dan wuku.\n💞 Cek Jodoh: kecocokan dua orang.\n⚖️ Cek BMI & Kalori: indeks massa tubuh dan kebutuhan kalori (standar Kemenkes dan WHO).\n🤰 Cek Kehamilan: usia kehamilan, perkiraan lahir (HPL), jadwal periksa, dan kenaikan berat badan.\n🏆 Turnamen: atur turnamen olahraga atau eSports (jadwal, skor, klasemen, bagan gugur).", ver:"Versi 1.0", fol:"Ikuti kami: Titik Hilangs", ab:{title:"Satu Titik", sub:"Sebuah produk digital dari Aurenza27", h1:"Tentang Aplikasi", p1:"Satu Titik merupakan aplikasi digital yang dikembangkan sebagai bagian dari proyek Aurenza27. Aplikasi ini hadir untuk memberikan pengalaman dan kemudahan bagi penggunanya melalui teknologi digital.", brand:"AURENZA27", tag:"Independent Digital Creator", desc:"Aurenza27 merupakan identitas pengembang independen yang menaungi berbagai proyek digital, termasuk pengembangan aplikasi dan media kreatif.", h2:"Proyek Kami", n1:"Titik Hilangs", b1:"Media Project", d1:"Misteri, tragedi, sejarah dan dokumenter", n2:"Satu Titik", b2:"App Project", d2:"Produk aplikasi digital", ft:"© 2026 Aurenza27. All Rights Reserved."}},
-  en:{sub:"Pick a menu to start.", back:"‹ Home", gear:"Settings", close:"Close", lang:"en", priv:"Privacy Policy", about:"About", abt:"Satu Titik is a collection of primbon and health menus.\n\n👻 Cek Khodam: the khodam (spirit guardian) that walks with you.\n🍀 Tri Hoki: lucky days, numbers and colors (Javanese, Chinese, Numerology).\n🔮 Cek Watak: character from numerology and wuku.\n💞 Cek Jodoh: compatibility of two people.\n⚖️ Cek BMI & Kalori: body mass index and calorie needs (Indonesian MoH and WHO standards).\n🤰 Cek Kehamilan: gestational age, due date (EDD), checkup schedule, and weight gain.\n🏆 Turnamen: run a sports or eSports tournament (fixtures, scores, standings, knockout bracket).", ver:"Version 1.0", fol:"Follow us: Titik Hilangs", ab:{title:"Satu Titik", sub:"A digital product by Aurenza27", h1:"About the App", p1:"Satu Titik is a digital app developed as part of the Aurenza27 project. It is made to give its users experience and convenience through digital technology.", brand:"AURENZA27", tag:"Independent Digital Creator", desc:"Aurenza27 is the identity of an independent developer that houses various digital projects, including app development and creative media.", h2:"Our Projects", n1:"Titik Hilangs", b1:"Media Project", d1:"Mystery, tragedy, history and documentaries", n2:"Satu Titik", b2:"App Project", d2:"Digital app product", ft:"© 2026 Aurenza27. All Rights Reserved."}}
+  id:{sub:"Pilih menu untuk mulai.", back:"‹ Beranda", gear:"Pengaturan", close:"Tutup", lang:"id", priv:"Kebijakan Privasi", about:"Tentang", abt:"Satu Titik adalah kumpulan menu primbon dan kesehatan.\n\n👻 Cek Khodam: khodam yang menemanimu.\n🍀 Tri Hoki: hari baik, angka hoki, dan warna hoki (Jawa, Tionghoa, Numerologi).\n🔮 Cek Watak: watak dari numerologi dan wuku.\n💞 Cek Jodoh: kecocokan dua orang.\n⚖️ Cek BMI & Kalori: indeks massa tubuh dan kebutuhan kalori (standar Kemenkes dan WHO).\n🤰 Cek Kehamilan: usia kehamilan, perkiraan lahir (HPL), jadwal periksa, dan kenaikan berat badan.\n🏆 Turnamen: atur turnamen olahraga atau eSports (jadwal, skor, klasemen, bagan gugur).\n🏃 Olahraga: catat lari, jalan, sepeda, dan hiking dengan GPS (rute, pace, split, statistik).", ver:"Versi 1.0", fol:"Ikuti kami: Titik Hilangs", ab:{title:"Satu Titik", sub:"Sebuah produk digital dari Aurenza27", h1:"Tentang Aplikasi", p1:"Satu Titik merupakan aplikasi digital yang dikembangkan sebagai bagian dari proyek Aurenza27. Aplikasi ini hadir untuk memberikan pengalaman dan kemudahan bagi penggunanya melalui teknologi digital.", brand:"AURENZA27", tag:"Independent Digital Creator", desc:"Aurenza27 merupakan identitas pengembang independen yang menaungi berbagai proyek digital, termasuk pengembangan aplikasi dan media kreatif.", h2:"Proyek Kami", n1:"Titik Hilangs", b1:"Media Project", d1:"Misteri, tragedi, sejarah dan dokumenter", n2:"Satu Titik", b2:"App Project", d2:"Produk aplikasi digital", ft:"© 2026 Aurenza27. All Rights Reserved."}},
+  en:{sub:"Pick a menu to start.", back:"‹ Home", gear:"Settings", close:"Close", lang:"en", priv:"Privacy Policy", about:"About", abt:"Satu Titik is a collection of primbon and health menus.\n\n👻 Cek Khodam: the khodam (spirit guardian) that walks with you.\n🍀 Tri Hoki: lucky days, numbers and colors (Javanese, Chinese, Numerology).\n🔮 Cek Watak: character from numerology and wuku.\n💞 Cek Jodoh: compatibility of two people.\n⚖️ Cek BMI & Kalori: body mass index and calorie needs (Indonesian MoH and WHO standards).\n🤰 Cek Kehamilan: gestational age, due date (EDD), checkup schedule, and weight gain.\n🏆 Turnamen: run a sports or eSports tournament (fixtures, scores, standings, knockout bracket).\n🏃 Olahraga: record runs, walks, rides, and hikes with GPS (route, pace, splits, stats).", ver:"Version 1.0", fol:"Follow us: Titik Hilangs", ab:{title:"Satu Titik", sub:"A digital product by Aurenza27", h1:"About the App", p1:"Satu Titik is a digital app developed as part of the Aurenza27 project. It is made to give its users experience and convenience through digital technology.", brand:"AURENZA27", tag:"Independent Digital Creator", desc:"Aurenza27 is the identity of an independent developer that houses various digital projects, including app development and creative media.", h2:"Our Projects", n1:"Titik Hilangs", b1:"Media Project", d1:"Mystery, tragedy, history and documentaries", n2:"Satu Titik", b2:"App Project", d2:"Digital app product", ft:"© 2026 Aurenza27. All Rights Reserved."}}
 };
 function paintHome(){
   const h = HT[S.lang];
@@ -1405,10 +1411,11 @@ $("abBack").addEventListener("click", closeAbout);
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("about").hidden) closeAbout(); });
 /* ===== Kebijakan Privasi: halaman penuh seperti Tentang, dibuka dari tulisan di kaki beranda ===== */
 const PV = {
-  id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 17 November 2026", back:"‹ Beranda", secs:[
+  id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 18 November 2026", back:"‹ Beranda", secs:[
     {h:"1. Pendahuluan", p:["Satu Titik adalah aplikasi yang dikembangkan oleh Aurenza27 (“kami”). Kebijakan ini menjelaskan data apa yang diproses, untuk apa, dan pilihan yang kamu miliki saat memakai aplikasi ini. Dengan memakai aplikasi, kamu menyetujui kebijakan ini."]},
-    {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, serta data turnamen) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google."]},
-    {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, dan hasil menu) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, dan dihapus saat pertemanan dihapus."]},
+    {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, data turnamen, serta aktivitas olahraga beserta rute GPS yang kamu rekam di menu Olahraga) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google."]},
+    {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif."]},
+    {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, dan rute GPS olahraga) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, dan dihapus saat pertemanan dihapus."]},
     {p:["Blokir dan laporan:"], l:["Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.","Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan. Laporan hanya dibaca pengelola untuk meninjau pelanggaran."]},
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif."]},
     {p:["Pengecekan koneksi dan waktu:"], l:["Aplikasi mengirim permintaan sederhana ke server publik (Google, Cloudflare, dan WorldTimeAPI) untuk mengecek koneksi internet dan jam. Permintaan ini tidak berisi data pribadimu, tetapi seperti permintaan internet lainnya, alamat IP perangkat terlihat oleh server tersebut."]},
@@ -1422,10 +1429,11 @@ const PV = {
     {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini."]},
     {h:"10. Kontak", p:["Pertanyaan tentang privasi dapat dikirim lewat Kotak Saran di Pengaturan."]}
   ]},
-  en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 17 November 2026", back:"‹ Home", secs:[
+  en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 18 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. By using the app, you agree to this policy."]},
-    {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, and tournament data) are stored on your own device.","This data is not sent to our servers unless you sign in with a Google account."]},
-    {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, and menu results) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, and are deleted when the friendship is removed."]},
+    {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, tournament data, and the sports activities and GPS routes you record in the Sports menu) are stored on your own device.","This data is not sent to our servers unless you sign in with a Google account."]},
+    {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on."]},
+    {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, menu results, and sports GPS routes) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, and are deleted when the friendship is removed."]},
     {p:["Blocking and reports:"], l:["The list of users you block is stored in your account so blocking applies on all your devices.","When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, and a copy of the reported text. Reports are read only by the maintainer to review violations."]},
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data."]},
     {p:["Connection and time checks:"], l:["The app sends simple requests to public servers (Google, Cloudflare, and WorldTimeAPI) to check your internet connection and the time. These requests do not contain your personal data, but as with any internet request, your device’s IP address is visible to those servers."]},
@@ -1525,7 +1533,7 @@ $("srSend").addEventListener("click", async () => {
 });
 /* ===== RESET & HAPUS CACHE ===== */
 /* kunci pengaturan (tiap menu menyimpan salinannya sendiri), kunci akun/sinkron yang tidak boleh dihapus, dan posisi panel */
-const SETRE = /^(titikhilangs_settings|asd_(follow|sound|music|voice|auto|gap|lang|vol|aivol|side|sidepos|livepos|livemini)|kh_(follow|fx|music|read|auto|gap|lang|vol|mvol|side|sideopen)|(th|tw|tj|tb|tk|tt)_(follow|sound|fx|music|read|auto|gap|lang|vol|mvol|anim|side|sidepos|sideopen|livepos|livemini))$/;
+const SETRE = /^(titikhilangs_settings|asd_(follow|sound|music|voice|auto|gap|lang|vol|aivol|side|sidepos|livepos|livemini)|kh_(follow|fx|music|read|auto|gap|lang|vol|mvol|side|sideopen)|(th|tw|tj|tb|tk|tt|ol)_(follow|sound|fx|music|read|auto|gap|lang|vol|mvol|anim|side|sidepos|sideopen|livepos|livemini))$/;
 const POSRE = /(side|sidepos|sideopen|livepos|livemini)$/;
 const KEEPRE = /^(firebase:|st_sync_|sp_saran_queue$|sp_rel$)/;
 const lsDel = f => { const a = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && f(k)) a.push(k); } }catch(e){} a.forEach(k => { try{ localStorage.removeItem(k); }catch(e){} }); };
@@ -9910,6 +9918,554 @@ $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id
 musicSync();
 paint();
 try{ startOnline(); }catch(e){}
+</scr@@ipt>
+</body>
+</html>
+</script>
+<script type="text/plain" id="src-olahraga"><!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CATAT OLAHRAGA</title>
+<style>
+:root{--bg:#0b0d12;--bg2:#141821;--card:#161a23;--line:#2a3040;--text:#ece7da;--muted:#8d93a3;--gold:#d4a94f;--gold2:#f0cf86;--route:#ff7a3d;--ok:#4cc38a;--bad:#e2644f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#1c2230 0%,var(--bg) 60%) fixed,var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif;display:flex;justify-content:center}
+.app{width:100%;max-width:420px;padding:18px 16px calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.brand{text-align:center;margin-top:4px}.brand .icon{font-size:42px;filter:drop-shadow(0 0 18px rgba(212,169,79,.35))}.brand h1{margin:4px 0 0;font-size:24px;letter-spacing:.1em}
+.sub{color:var(--muted);font-style:italic;text-align:center;font-size:14px;line-height:1.45;margin:0}
+.panel{background:linear-gradient(180deg,var(--bg2),var(--card));border:1px solid var(--line);border-radius:16px;padding:16px}
+.label{display:block;font-size:12px;letter-spacing:.2em;color:var(--gold);margin:0 0 10px;text-transform:uppercase}
+.hint{font-size:12.5px;line-height:1.5;color:var(--muted);margin:10px 0 0}
+.err{font-size:13px;line-height:1.45;color:var(--bad);margin:8px 0 0}.err:empty{display:none}
+button{font:inherit;cursor:pointer}
+.btn{width:100%;min-height:50px;font-weight:700;letter-spacing:.12em;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0;border-radius:12px}
+.btn.ghost{background:transparent;color:var(--gold2);border:1px solid var(--line);font-weight:600;letter-spacing:.06em}
+.btn.ghost:active{background:rgba(255,255,255,.06)}
+.btn.go{background:linear-gradient(180deg,#ff9a66,var(--route));color:#1f0d03;min-height:60px;font-size:17px}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid var(--line);font-weight:600;letter-spacing:.06em}
+.btn.sm{width:auto;min-height:34px;padding:0 14px;font-size:12px;border-radius:10px}
+.row2{display:flex;gap:10px}.row2>*{flex:1;min-width:0}
+.tabs{display:flex;gap:6px;padding:4px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03)}
+.tab{flex:1;min-height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:13px;letter-spacing:.06em}
+.tab.on{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{flex:1 1 auto;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--text);font-size:13px;white-space:nowrap}
+.chip.on{border-color:var(--gold);color:var(--gold2);background:rgba(212,169,79,.12)}
+.chip:disabled{opacity:.45}
+.clock{text-align:center;font-size:56px;font-weight:700;line-height:1.05;color:var(--gold2);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.clock small{display:block;margin-top:6px;font-size:11px;letter-spacing:.22em;color:var(--muted);font-weight:400}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.tiles.t2{grid-template-columns:repeat(2,1fr)}.tiles.t4{grid-template-columns:repeat(2,1fr)}
+.tile{padding:11px 4px;text-align:center;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);min-width:0}
+.tile small{display:block;font-size:10px;letter-spacing:.1em;color:var(--muted);line-height:1.3;min-height:13px}
+.tile b{display:block;font-size:20px;margin-top:3px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.tile em{font-style:normal;font-size:11px;color:var(--muted)}
+.gps{margin:12px 0 0;text-align:center;font-size:12px;color:var(--muted)}
+.gps i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--muted);vertical-align:0}
+.gps.ok i{background:var(--ok)}.gps.warn i{background:#e8b04a}.gps.bad i{background:var(--bad)}
+canvas.map{display:block;width:100%;height:210px;border-radius:12px;background:#0d1017;border:1px solid var(--line)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;font-size:12px;color:var(--muted)}
+.field input,.field select{width:100%;min-height:44px;padding:0 12px;font:inherit;font-size:16px;color:var(--text);background:#0d1017;border:1px solid var(--line);border-radius:12px;min-width:0}
+.field input:focus,.field select:focus{outline:0;border-color:var(--gold)}
+.field select option{background:#161a23;color:var(--text)}
+.item{display:flex;align-items:center;gap:12px;width:100%;padding:12px;margin:0 0 8px;text-align:left;color:var(--text);background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px}
+.item .ic{flex:none;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:21px;border-radius:12px;background:rgba(255,255,255,.06)}
+.item .tx{flex:1;min-width:0}.item .tx b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .tx span{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
+.item .kk{flex:none;text-align:right;font-variant-numeric:tabular-nums}.item .kk b{display:block;font-size:17px;color:var(--gold2)}.item .kk span{font-size:11px;color:var(--muted)}
+.empty{color:var(--muted);font-style:italic;font-size:13px;text-align:center;padding:18px 6px;line-height:1.5}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:99px}
+.bar.full i{background:linear-gradient(90deg,#3aa876,var(--ok))}
+.line{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}.line:last-child{border-bottom:0}.line span{color:var(--muted)}.line b{text-align:right;font-weight:600}
+.rec{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--text);text-align:left;font-size:14px}.rec:last-child{border-bottom:0}
+.rec span{color:var(--muted);font-size:13px}.rec b{text-align:right;font-weight:600;color:var(--gold2)}.rec small{display:block;color:var(--muted);font-size:11px;font-weight:400}
+.spl{display:grid;grid-template-columns:44px 1fr 64px;align-items:center;gap:8px;padding:5px 0;font-size:13px;font-variant-numeric:tabular-nums}
+.spl i{display:block;height:9px;border-radius:99px;background:linear-gradient(90deg,var(--route),#ffb07a)}
+.spl b{text-align:right;font-weight:600}
+.back{align-self:flex-start;min-height:36px;padding:0 4px;border:0;background:transparent;color:var(--gold2);font-size:14px}
+.title-in{width:100%;min-height:44px;padding:0 12px;font:inherit;font-size:18px;font-weight:700;color:var(--text);background:transparent;border:1px solid transparent;border-radius:12px}
+.title-in:focus{outline:0;border-color:var(--gold);background:#0d1017}
+svg.ch{display:block;width:100%;height:auto}.ch .b{fill:var(--gold)}.ch .b.cur{fill:var(--route)}.ch text{fill:var(--muted);font-size:9.5px;font-family:inherit;text-anchor:middle}.ch .v{fill:var(--text);font-size:9px}.ch line{stroke:var(--line);stroke-width:1}
+.notice{margin:0 0 12px;padding:10px 12px;border-radius:12px;border:1px solid #e8b04a;background:rgba(232,176,74,.10);font-size:12.5px;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--gold);color:#1a1405;font-weight:700;font-size:14px;padding:10px 18px;border-radius:999px;transition:.25s;z-index:20;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.tiny{color:var(--muted);font-size:11.5px;line-height:1.5;margin:0;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="brand"><div class="icon">🏃</div><h1 id="t">CATAT OLAHRAGA</h1></div>
+<p class="sub" id="sub"></p>
+<nav class="tabs" id="tabs"></nav>
+<section id="vRec"></section>
+<section id="vHist" hidden></section>
+<section id="vStat" hidden></section>
+<section id="vDet" hidden></section>
+<p class="tiny" id="note"></p>
+<div class="toast" id="toast" role="status"></div>
+</div>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const LS = k => "ol_" + k;
+function load(k, d){ try{ const v = localStorage.getItem(LS(k)); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }
+function save(k, v){ try{ localStorage.setItem(LS(k), JSON.stringify(v)); }catch(e){} }
+function drop(k){ try{ localStorage.removeItem(LS(k)); }catch(e){} }
+const readLang = () => { try{ return String(localStorage.getItem("ol_lang") || "id").replace(/"/g, "") === "en" ? "en" : "id"; }catch(e){ return "id"; } };
+let lang = readLang();
+const L = (i, e) => lang === "en" ? e : i;
+const el = (t, c, x) => { const e = document.createElement(t); if(c) e.className = c; if(x !== undefined) e.textContent = x; return e; };
+const fx = (n, d) => { const t = (+n).toFixed(d); return lang === "en" ? t : t.replace(".", ","); };
+const pad2 = n => String(n).padStart(2, "0");
+let tt = 0;
+function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), 2400); }
+
+/* ===== data olahraga =====
+   Kalori = MET x berat badan (kg) x jam. Nilai MET dari Compendium of Physical Activities (Ainsworth dkk. 2011), dipilih menurut kecepatan rata-rata.
+   Ini PERKIRAAN kasar, bukan hasil ukur. */
+const SPORTS = ["run", "walk", "ride", "hike"];
+const SP = {
+  run:{ic:"🏃", id:"Lari", en:"Run", maxV:8.5, pace:true, met:[[6.5,6],[8,8.3],[9.7,9.8],[11.3,11],[12.9,11.8],[14.5,12.8],[1e9,14.5]], gpx:"running"},
+  walk:{ic:"🚶", id:"Jalan", en:"Walk", maxV:4, pace:true, met:[[3.2,2.8],[4.8,3.5],[6.4,4.3],[1e9,5.5]], gpx:"walking"},
+  ride:{ic:"🚴", id:"Sepeda", en:"Ride", maxV:25, pace:false, met:[[16,4],[19.2,6.8],[22.4,8],[25.6,10],[32,12],[1e9,15.8]], gpx:"cycling"},
+  hike:{ic:"🥾", id:"Hiking", en:"Hike", maxV:4.5, pace:true, met:[[1e9,6]], gpx:"hiking"}
+};
+const spName = k => SP[k][lang === "en" ? "en" : "id"];
+const WT_DEF = 60;
+const weight = () => { const w = +load("wt", WT_DEF); return w >= 30 && w <= 250 ? w : WT_DEF; };
+function kcalOf(sp, dist, dur){
+  if(!(dur > 0) || !(dist > 0)) return 0;
+  const kmh = dist / dur * 3.6, m = SP[sp].met.find(r => kmh <= r[0]) || SP[sp].met[SP[sp].met.length - 1];
+  return Math.round(m[1] * weight() * dur / 3600);
+}
+const fmtDur = s => { s = Math.max(0, Math.round(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return h ? h + ":" + pad2(m) + ":" + pad2(x) : m + ":" + pad2(x); };
+const fmtPace = spk => (isFinite(spk) && spk > 0 && spk < 3600) ? fmtDur(spk) : "--";
+const fmtKm = m => fx(m / 1000, 2);
+const fmtSpeed = (m, s) => s > 0 && m > 0 ? fx(m / s * 3.6, 1) : "--";
+const locale = () => lang === "en" ? "en-GB" : "id-ID";
+const fmtDate = ts => new Date(ts).toLocaleDateString(locale(), {weekday:"short", day:"numeric", month:"short", year:"numeric"}) + " · " + pad2(new Date(ts).getHours()) + ":" + pad2(new Date(ts).getMinutes());
+function defTitle(sp, ts){
+  const h = new Date(ts).getHours();
+  const p = h < 11 ? ["Pagi", "Morning"] : h < 15 ? ["Siang", "Midday"] : h < 18 ? ["Sore", "Afternoon"] : ["Malam", "Evening"];
+  return lang === "en" ? p[1] + " " + SP[sp].en : SP[sp].id + " " + p[0];
+}
+/* pace (menit per km) untuk lari, jalan, dan hiking; kecepatan (km/jam) untuk sepeda */
+function paceTile(sp, dist, dur){
+  return SP[sp].pace ? {k:L("PACE", "PACE"), v:fmtPace(dist > 0 ? dur / (dist / 1000) : 0), u:"/km"} : {k:L("KECEPATAN", "SPEED"), v:fmtSpeed(dist, dur), u:"km/" + L("jam", "h")};
+}
+
+/* ===== penyimpanan aktivitas ===== */
+const MAXACT = 300, MAXRT = 40;
+function acts(){ const a = load("acts", []); return Array.isArray(a) ? a.filter(x => x && typeof x === "object" && SP[x.sp] && x.dist >= 0 && x.dur > 0) : []; }
+function putActs(a){
+  a.sort((x, y) => y.ts - x.ts); a = a.slice(0, MAXACT);
+  a.forEach((x, i) => { if(i >= MAXRT && x.rt) delete x.rt; });   /* rute hanya disimpan untuk 40 aktivitas terbaru supaya penyimpanan tetap ringan */
+  save("acts", a);
+}
+
+/* ===== geometri ===== */
+const R = 6371000, rad = x => x * Math.PI / 180;
+function hav(a, b, c, d){
+  const p = rad(c - a), q = rad(d - b), h = Math.sin(p / 2) ** 2 + Math.cos(rad(a)) * Math.cos(rad(c)) * Math.sin(q / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+const r5 = x => Math.round(x * 1e5) / 1e5;
+function downsample(pts, max){
+  if(pts.length <= max) return pts.map(p => [r5(p[0]), r5(p[1]), Math.round(p[2])]);
+  const o = [], st = (pts.length - 1) / (max - 1);
+  for(let i = 0; i < max; i++){ const p = pts[Math.round(i * st)]; o.push([r5(p[0]), r5(p[1]), Math.round(p[2])]); }
+  return o;
+}
+/* waktu tiap kilometer (diinterpolasi antar titik GPS); sisa jarak >= 100 m jadi potongan terakhir */
+function calcSplits(pts, dist, dur){
+  const out = []; let k = 1, pc = 0, pm = 0, lastM = 0;
+  for(const p of pts){
+    while(p[3] >= k * 1000 && p[3] > pc){
+      const f = (k * 1000 - pc) / (p[3] - pc), mk = pm + f * (p[2] - pm);
+      out.push([1, Math.max(1, Math.round(mk - lastM))]); lastM = mk; k++;
+    }
+    pc = p[3]; pm = p[2];
+  }
+  const rem = dist - (k - 1) * 1000;
+  if(rem >= 100 && dur - lastM > 0) out.push([Math.round(rem) / 1000, Math.max(1, Math.round(dur - lastM))]);
+  return out;
+}
+function drawRoute(cv, pts){
+  const w = cv.clientWidth || 300, h = cv.clientHeight || 210, dpr = Math.min(3, window.devicePixelRatio || 1);
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const g = cv.getContext("2d"); g.scale(dpr, dpr); g.clearRect(0, 0, w, h);
+  if(!pts || pts.length < 1) return;
+  let la0 = 90, la1 = -90, lo0 = 180, lo1 = -180;
+  pts.forEach(p => { la0 = Math.min(la0, p[0]); la1 = Math.max(la1, p[0]); lo0 = Math.min(lo0, p[1]); lo1 = Math.max(lo1, p[1]); });
+  const kx = Math.cos(rad((la0 + la1) / 2)), W = Math.max((lo1 - lo0) * kx, 1e-6), H = Math.max(la1 - la0, 1e-6), P = 18;
+  const sc = Math.min((w - 2 * P) / W, (h - 2 * P) / H), ox = (w - W * sc) / 2, oy = (h - H * sc) / 2;
+  const X = p => ox + (p[1] - lo0) * kx * sc, Y = p => oy + (la1 - p[0]) * sc;
+  g.lineJoin = g.lineCap = "round";
+  g.strokeStyle = "rgba(255,122,61,.25)"; g.lineWidth = 9; g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(X(p), Y(p)) : g.moveTo(X(p), Y(p))); g.stroke();
+  g.strokeStyle = "#ff7a3d"; g.lineWidth = 3.5; g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(X(p), Y(p)) : g.moveTo(X(p), Y(p))); g.stroke();
+  const dot = (p, c) => { g.fillStyle = c; g.strokeStyle = "#0b0d12"; g.lineWidth = 2; g.beginPath(); g.arc(X(p), Y(p), 5.5, 0, 7); g.fill(); g.stroke(); };
+  dot(pts[0], "#4cc38a"); if(pts.length > 1) dot(pts[pts.length - 1], "#ffffff");
+}
+function mapCanvas(pts){ const c = el("canvas", "map"); requestAnimationFrame(() => drawRoute(c, pts)); return c; }
+
+/* ===== perekaman ===== */
+const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0};
+if(!SP[rec.sp]) rec.sp = "run";
+let gpsId = null, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
+const elapsed = () => rec.acc + (rec.st === "run" ? Date.now() - rec.t0 : 0);
+function saveDraft(){
+  lastSave = Date.now();
+  if(rec.st === "idle") return;
+  save("draft", {sp:rec.sp, acc:Math.round(elapsed()), start:rec.start, pts:rec.pts.slice(-4000), dist:rec.dist});
+}
+function onFix(pos){
+  if(rec.st !== "run") return;
+  const c = pos.coords, t = pos.timestamp || Date.now(), acc = c.accuracy || 0;
+  rec.acc_m = acc;
+  if(t < rec.t0) return;   /* titik lama dari sebelum lanjut */
+  if(acc > 40){ rec.gps = "weak"; updateLive(); return; }
+  rec.gps = "ok";
+  const mt = (rec.acc + (t - rec.t0)) / 1000;
+  if(!rec.last){ rec.last = {la:c.latitude, lo:c.longitude, t:t}; rec.pts.push([c.latitude, c.longitude, mt, rec.dist]); updateLive(); return; }
+  const d = hav(rec.last.la, rec.last.lo, c.latitude, c.longitude), dt = (t - rec.last.t) / 1000;
+  if(dt <= 0) return;
+  if(d / dt > SP[rec.sp].maxV){ rec.jit++; return; }              /* lompatan GPS yang mustahil: abaikan */
+  if(d < Math.min(15, Math.max(3, acc / 2))){ updateLive(); return; }   /* getaran saat diam: abaikan, jarak terkumpul sampai cukup jauh */
+  rec.dist += d; rec.last = {la:c.latitude, lo:c.longitude, t:t};
+  rec.pts.push([c.latitude, c.longitude, mt, rec.dist]);
+  updateLive();
+  if(Date.now() - lastSave > 10000) saveDraft();
+}
+function onErr(e){
+  if(e && e.code === 1){ rec.gps = "denied"; stopGps(); }
+  else rec.gps = "weak";
+  updateLive();
+}
+function startGps(){
+  stopGps();
+  if(!navigator.geolocation){ rec.gps = "none"; return; }
+  rec.gps = "wait";
+  try{ gpsId = navigator.geolocation.watchPosition(onFix, onErr, {enableHighAccuracy:true, maximumAge:0, timeout:30000}); }catch(e){ rec.gps = "none"; }
+}
+function stopGps(){ if(gpsId !== null){ try{ navigator.geolocation.clearWatch(gpsId); }catch(e){} gpsId = null; } }
+async function lockWake(){ try{ if(navigator.wakeLock && !wake){ wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => { wake = null; }); } }catch(e){ wake = null; } }
+function unlockWake(){ try{ if(wake) wake.release(); }catch(e){} wake = null; }
+document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible" && rec.st === "run") lockWake(); if(document.visibilityState === "hidden") saveDraft(); });
+window.addEventListener("pagehide", saveDraft);
+
+function startRec(){
+  if(rec.st !== "idle") return;
+  rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; restored = false; resumeRec();
+}
+function resumeRec(){ rec.st = "run"; rec.t0 = Date.now(); rec.last = null; rec.gps = ""; restored = false; startGps(); lockWake(); renderRec(); saveDraft(); }
+function pauseRec(){ rec.acc += Date.now() - rec.t0; rec.t0 = 0; rec.st = "pause"; stopGps(); unlockWake(); renderRec(); saveDraft(); }
+function discardRec(){
+  stopGps(); unlockWake(); rec.st = "idle"; rec.acc = 0; rec.t0 = 0; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
+}
+function finishRec(){
+  if(rec.st === "run") pauseRec();
+  const dur = Math.round(rec.acc / 1000), dist = Math.round(rec.dist);
+  if(dur < 10){ toast(L("Terlalu singkat, rekaman dibuang.", "Too short, recording discarded.")); discardRec(); return; }
+  if(dist < 50 && !confirm(L("Jarak dari GPS hampir nol. Simpan tetap tanpa jarak?\n\nBatal = kembali ke rekaman.", "GPS distance is almost zero. Save anyway without distance?\n\nCancel = back to the recording."))) return;
+  const a = {id:Date.now().toString(36), sp:rec.sp, ts:rec.start, dist:dist, dur:dur, title:defTitle(rec.sp, rec.start)};
+  if(rec.pts.length >= 2){ a.rt = downsample(rec.pts, 250); a.spl = calcSplits(rec.pts, rec.dist, dur); }
+  const all = acts(); all.push(a); putActs(all);
+  discardRec(); toast(L("Aktivitas tersimpan.", "Activity saved.")); openDetail(a.id);
+}
+
+/* ===== tampilan: Rekam ===== */
+let LV = {};
+function gpsText(){
+  const g = rec.gps;
+  if(rec.st === "idle") return ["", L("GPS menyala saat kamu menekan Mulai.", "GPS turns on when you press Start.")];
+  if(rec.st === "pause") return ["warn", L("Dijeda. GPS dimatikan sementara.", "Paused. GPS is off for now.")];
+  if(g === "ok") return ["ok", L("GPS baik", "GPS good") + " (±" + Math.round(rec.acc_m) + " m)"];
+  if(g === "weak") return ["warn", L("Sinyal GPS lemah" + (rec.acc_m ? " (±" + Math.round(rec.acc_m) + " m)" : "") + ", pindah ke tempat terbuka.", "Weak GPS signal" + (rec.acc_m ? " (±" + Math.round(rec.acc_m) + " m)" : "") + ", move to an open area.")];
+  if(g === "denied") return ["bad", L("Izin lokasi ditolak. Aktifkan izin lokasi untuk aplikasi, atau pakai Input manual.", "Location permission denied. Allow location for the app, or use Manual entry.")];
+  if(g === "none") return ["bad", L("Perangkat ini tidak punya GPS. Waktu tetap berjalan, jarak bisa lewat Input manual.", "No GPS on this device. Time still runs, use Manual entry for distance.")];
+  return ["warn", L("Mencari sinyal GPS…", "Searching for GPS…")];
+}
+function updateLive(){
+  if(!LV.time) return;
+  const dur = elapsed() / 1000, dist = rec.dist, pt = paceTile(rec.sp, dist, dur), gt = gpsText();
+  LV.time.textContent = fmtDur(dur); LV.dist.textContent = fmtKm(dist); LV.pace.textContent = pt.v;
+  LV.kcal.textContent = String(kcalOf(rec.sp, dist, dur));
+  LV.gps.className = "gps " + gt[0]; LV.gps.lastChild.textContent = gt[1];
+  if(LV.map && rec.pts.length >= 2 && Date.now() - (LV.mt || 0) > 1500){ LV.mt = Date.now(); LV.map.hidden = false; drawRoute(LV.map, rec.pts); }
+}
+function renderRec(){
+  const v = $("vRec"); v.textContent = ""; LV = {};
+  const chips = el("div", "chips");
+  SPORTS.forEach(k => {
+    const b = el("button", "chip" + (rec.sp === k ? " on" : ""), SP[k].ic + " " + spName(k)); b.type = "button"; b.disabled = rec.st !== "idle";
+    b.onclick = () => { rec.sp = k; save("sport", k); renderRec(); }; chips.append(b);
+  });
+  v.append(chips);
+  const p = el("div", "panel"); p.style.marginTop = "14px";
+  if(restored){ const n = el("p", "notice", L("Ada rekaman yang belum selesai (tadi menu tertutup). Lanjutkan, selesaikan, atau buang.", "There is an unfinished recording (the menu was closed). Resume, finish, or discard it.")); p.append(n); }
+  const clk = el("div", "clock"), tm = el("span"); clk.append(tm, el("small", "", L("WAKTU", "TIME"))); LV.time = tm;
+  p.append(clk);
+  const tiles = el("div", "tiles"), mk = (key, unit) => { const t = el("div", "tile"), k = el("small", "", key), b = el("b"), u = el("em", "", unit); t.append(k, b, u); tiles.append(t); return b; };
+  const pt = paceTile(rec.sp, 0, 0);
+  LV.dist = mk(L("JARAK", "DISTANCE"), "km"); LV.pace = mk(pt.k, pt.u); LV.kcal = mk(L("KALORI", "CALORIES"), "kkal");
+  p.append(tiles);
+  const g = el("p", "gps"); g.append(el("i"), document.createTextNode("")); LV.gps = g; p.append(g);
+  LV.map = el("canvas", "map"); LV.map.hidden = true; LV.map.style.marginTop = "12px"; p.append(LV.map);
+  v.append(p);
+  const bt = el("div"); bt.style.cssText = "display:flex;flex-direction:column;gap:10px;margin-top:14px";
+  const mkb = (cls, txt, fn) => { const b = el("button", "btn " + cls, txt); b.type = "button"; b.onclick = fn; return b; };
+  if(rec.st === "idle"){ bt.append(mkb("go", L("▶  MULAI", "▶  START"), startRec), mkb("ghost", manualOpen ? L("Tutup input manual", "Close manual entry") : L("＋ Input manual", "＋ Manual entry"), () => { manualOpen = !manualOpen; renderRec(); })); }
+  else if(rec.st === "run"){ const r = el("div", "row2"); r.append(mkb("ghost", L("⏸  JEDA", "⏸  PAUSE"), pauseRec), mkb("", L("■  SELESAI", "■  FINISH"), finishRec)); bt.append(r); }
+  else { const r = el("div", "row2"); r.append(mkb("go", L("▶  LANJUT", "▶  RESUME"), resumeRec), mkb("", L("■  SELESAI", "■  FINISH"), finishRec)); bt.append(r, mkb("danger", L("Buang rekaman", "Discard recording"), () => { if(confirm(L("Buang rekaman ini?", "Discard this recording?"))) discardRec(); })); }
+  v.append(bt);
+  if(rec.st === "idle" && manualOpen) v.append(manualForm());
+  const h = el("p", "hint", L("Biarkan layar menyala dan menu ini tetap terbuka selama merekam. GPS berhenti bila menu ditutup atau layar terkunci, tetapi rekaman bisa dilanjutkan saat menu dibuka lagi.", "Keep the screen on and this menu open while recording. GPS stops when the menu is closed or the screen locks, but the recording can be resumed when you reopen the menu."));
+  v.append(h);
+  updateLive();
+  if(rec.pts.length >= 2){ LV.map.hidden = false; requestAnimationFrame(() => drawRoute(LV.map, rec.pts)); }
+}
+function parseDur(s){
+  s = String(s).trim().replace(",", "."); if(!s) return NaN;
+  if(/^\d+(\.\d+)?$/.test(s)) return Math.round(parseFloat(s) * 60);   /* angka saja = menit */
+  const m = s.match(/^(\d+):(\d{1,2})(?::(\d{1,2}))?$/); if(!m) return NaN;
+  return m[3] !== undefined ? +m[1] * 3600 + +m[2] * 60 + +m[3] : +m[1] * 60 + +m[2];
+}
+function manualForm(){
+  const p = el("div", "panel"); p.style.marginTop = "14px";
+  p.append(el("span", "label", L("Input manual", "Manual entry")));
+  const now = new Date(), f = (lab, inp) => { const w = el("label", "field"); w.append(el("span", "", lab), inp); return w; };
+  const di = el("input"); di.type = "date"; di.value = now.getFullYear() + "-" + pad2(now.getMonth() + 1) + "-" + pad2(now.getDate()); di.max = di.value;
+  const ti = el("input"); ti.type = "time"; ti.value = pad2(now.getHours()) + ":" + pad2(now.getMinutes());
+  const ki = el("input"); ki.inputMode = "decimal"; ki.placeholder = "5,0"; ki.autocomplete = "off";
+  const ui = el("input"); ui.placeholder = "32:15"; ui.autocomplete = "off"; ui.inputMode = "text";
+  const ni = el("input"); ni.maxLength = 40; ni.autocomplete = "off"; ni.placeholder = defTitle(rec.sp, Date.now());
+  const r1 = el("div", "row2"); r1.append(f(L("Tanggal", "Date"), di), f(L("Jam mulai", "Start time"), ti));
+  const r2 = el("div", "row2"); r2.append(f(L("Jarak (km)", "Distance (km)"), ki), f(L("Durasi (mm:ss atau j:mm:ss)", "Duration (mm:ss or h:mm:ss)"), ui));
+  const er = el("p", "err"); er.setAttribute("role", "alert");
+  const ok = el("button", "btn", L("SIMPAN AKTIVITAS", "SAVE ACTIVITY")); ok.type = "button";
+  ok.onclick = () => {
+    const km = parseFloat(String(ki.value).replace(",", ".")), dur = parseDur(ui.value), dt = new Date(di.value + "T" + (ti.value || "00:00"));
+    if(!(km >= 0.05 && km <= 1000)) { er.textContent = L("Jarak harus 0,05 sampai 1.000 km.", "Distance must be 0.05 to 1,000 km."); return; }
+    if(!(dur >= 10 && dur <= 172800)) { er.textContent = L("Isi durasi dengan format mm:ss atau j:mm:ss (maksimal 48 jam).", "Enter duration as mm:ss or h:mm:ss (max 48 hours)."); return; }
+    if(isNaN(+dt) || +dt > Date.now() + 60000) { er.textContent = L("Tanggal dan jam tidak valid atau di masa depan.", "Date and time are invalid or in the future."); return; }
+    if(km * 1000 / dur > SP[rec.sp].maxV * 1.15) { er.textContent = L("Kecepatannya tidak masuk akal untuk " + spName(rec.sp) + ". Periksa jarak dan durasi.", "That speed is not realistic for " + spName(rec.sp) + ". Check distance and duration."); return; }
+    const a = {id:Date.now().toString(36), sp:rec.sp, ts:+dt, dist:Math.round(km * 1000), dur:dur, title:(ni.value.replace(/[\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40)) || defTitle(rec.sp, +dt), man:1};
+    const all = acts(); all.push(a); putActs(all); manualOpen = false; toast(L("Aktivitas tersimpan.", "Activity saved.")); openDetail(a.id);
+  };
+  p.append(r1, r2, f(L("Nama (opsional)", "Name (optional)"), ni), ok, er);
+  return p;
+}
+
+/* ===== tampilan: Riwayat ===== */
+function renderHist(){
+  const v = $("vHist"); v.textContent = "";
+  const chips = el("div", "chips");
+  ["all"].concat(SPORTS).forEach(k => {
+    const b = el("button", "chip" + (histF === k ? " on" : ""), k === "all" ? L("Semua", "All") : SP[k].ic + " " + spName(k)); b.type = "button";
+    b.onclick = () => { histF = k; renderHist(); }; chips.append(b);
+  });
+  v.append(chips);
+  const list = acts().filter(a => histF === "all" || a.sp === histF);
+  const box = el("div"); box.style.marginTop = "14px";
+  if(!list.length) box.append(el("p", "empty", acts().length ? L("Belum ada aktivitas untuk jenis ini.", "No activities of this type yet.") : L("Belum ada aktivitas. Mulai rekaman pertamamu di tab Rekam.", "No activities yet. Start your first recording in the Record tab.")));
+  list.forEach(a => {
+    const b = el("button", "item"); b.type = "button";
+    const ic = el("div", "ic", SP[a.sp].ic), tx = el("div", "tx"), kk = el("div", "kk");
+    tx.append(el("b", "", a.title || defTitle(a.sp, a.ts)), el("span", "", fmtDate(a.ts)));
+    const pt = paceTile(a.sp, a.dist, a.dur);
+    kk.append(el("b", "", fmtKm(a.dist) + " km"), el("span", "", fmtDur(a.dur) + " · " + pt.v + " " + pt.u));
+    b.append(ic, tx, kk); b.onclick = () => openDetail(a.id); box.append(b);
+  });
+  v.append(box);
+}
+
+/* ===== tampilan: detail aktivitas ===== */
+function openDetail(id){ detId = id; view = "detail"; paint(); window.scrollTo(0, 0); }
+function closeDetail(){ view = "tab"; detId = null; if(tab === "rec") tab = "hist"; paint(); window.scrollTo(0, 0); }
+const xmlEsc = s => String(s).replace(/[<>&"']/g, c => ({"<":"&lt;", ">":"&gt;", "&":"&amp;", "\"":"&quot;", "'":"&apos;"}[c]));
+function gpxOf(a){
+  const t0 = a.ts, iso = s => new Date(t0 + s * 1000).toISOString();
+  let x = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Satu Titik" xmlns="http://www.topografix.com/GPX/1/1">\n<metadata><time>' + new Date(t0).toISOString() + '</time></metadata>\n<trk><name>' + xmlEsc(a.title || "") + '</name><type>' + SP[a.sp].gpx + '</type><trkseg>\n';
+  (a.rt || []).forEach(p => { x += '<trkpt lat="' + p[0] + '" lon="' + p[1] + '"><time>' + iso(p[2]) + '</time></trkpt>\n'; });
+  return x + '</trkseg></trk>\n</gpx>\n';
+}
+async function exportGpx(a){
+  try{
+    const name = ((a.title || "aktivitas").replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "aktivitas") + ".gpx";
+    const blob = new Blob([gpxOf(a)], {type:"application/gpx+xml"});
+    try{ const ns = window.parent && window.parent.stNativeShare; if(ns && await ns(blob, name, a.title || "GPX")) return; }catch(e){}
+    try{ const f = new File([blob], name, {type:"application/gpx+xml"}); if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:a.title || "GPX"}); return; } }catch(e){ if(e && e.name === "AbortError") return; }
+    const u = URL.createObjectURL(blob), l = document.createElement("a"); l.href = u; l.download = name; document.body.appendChild(l); l.click(); l.remove();
+    setTimeout(() => URL.revokeObjectURL(u), 4000); toast(L("File GPX diunduh.", "GPX file downloaded."));
+  }catch(e){ toast(L("Gagal membuat file GPX.", "Could not create the GPX file.")); }
+}
+function renderDetail(){
+  const v = $("vDet"); v.textContent = "";
+  const all = acts(), a = all.find(x => x.id === detId);
+  if(!a){ closeDetail(); return; }
+  const back = el("button", "back", "‹ " + L("Riwayat", "History")); back.type = "button"; back.onclick = closeDetail; v.append(back);
+  const ti = el("input", "title-in"); ti.value = a.title || ""; ti.maxLength = 40; ti.setAttribute("aria-label", L("Nama aktivitas", "Activity name"));
+  ti.onchange = () => { const n = ti.value.replace(/[\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40) || defTitle(a.sp, a.ts); const z = acts(), q = z.find(x => x.id === a.id); if(q){ q.title = n; putActs(z); } ti.value = n; toast(L("Nama diperbarui.", "Name updated.")); };
+  v.append(ti);
+  const d = el("p", "tiny", SP[a.sp].ic + " " + spName(a.sp) + " · " + fmtDate(a.ts) + (a.man ? " · " + L("input manual", "manual entry") : "")); d.style.cssText = "text-align:left;margin:0 0 12px 2px"; v.append(d);
+  if(a.rt && a.rt.length > 1) v.append(mapCanvas(a.rt));
+  const pt = paceTile(a.sp, a.dist, a.dur), tiles = el("div", "tiles t4");
+  [[L("JARAK", "DISTANCE"), fmtKm(a.dist), "km"], [L("WAKTU", "TIME"), fmtDur(a.dur), ""], [pt.k, pt.v, pt.u], [L("KALORI (PERKIRAAN)", "CALORIES (EST.)"), String(kcalOf(a.sp, a.dist, a.dur)), "kkal"]].forEach(r => {
+    const t = el("div", "tile"); t.append(el("small", "", r[0]), el("b", "", r[1]), el("em", "", r[2])); tiles.append(t);
+  });
+  v.append(tiles);
+  if(a.spl && a.spl.length){
+    const p = el("div", "panel"); p.style.marginTop = "14px"; p.append(el("span", "label", L("Split per km", "Splits per km")));
+    const pc = a.spl.map(s => s[1] / s[0]), best = Math.min.apply(null, pc), worst = Math.max.apply(null, pc);
+    a.spl.forEach((s, i) => {
+      const r = el("div", "spl"), w = el("div"), bar = el("i"), pace = pc[i];
+      bar.style.width = (worst === best ? 100 : 35 + 65 * (worst - pace) / (worst - best)) + "%";
+      w.append(bar);
+      const lab = el("span", "", s[0] === 1 ? String(i + 1) : fx(i + s[0], 2));
+      r.append(lab, w, el("b", "", fmtPace(pace)));
+      p.append(r);
+    });
+    p.append(el("p", "hint", L("Pace dalam menit per km. Batang lebih panjang = lebih cepat.", "Pace in minutes per km. Longer bar = faster.")));
+    v.append(p);
+  }
+  const bt = el("div"); bt.style.cssText = "display:flex;flex-direction:column;gap:10px;margin-top:14px";
+  if(a.rt && a.rt.length > 1){ const b = el("button", "btn ghost", L("Ekspor GPX (untuk Strava, Garmin, dll.)", "Export GPX (for Strava, Garmin, etc.)")); b.type = "button"; b.onclick = () => exportGpx(a); bt.append(b); }
+  const del = el("button", "btn danger", L("Hapus aktivitas", "Delete activity")); del.type = "button";
+  del.onclick = () => { if(!confirm(L("Hapus aktivitas ini?", "Delete this activity?"))) return; putActs(acts().filter(x => x.id !== a.id)); toast(L("Aktivitas dihapus.", "Activity deleted.")); closeDetail(); };
+  bt.append(del); v.append(bt);
+}
+
+/* ===== tampilan: Statistik ===== */
+const weekStart = ts => { const d = new Date(ts), k = (d.getDay() + 6) % 7; d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - k); return d.getTime(); };
+function periodStart(p){
+  const n = new Date();
+  if(p === "week") return weekStart(Date.now());
+  if(p === "month") return new Date(n.getFullYear(), n.getMonth(), 1).getTime();
+  if(p === "year") return new Date(n.getFullYear(), 0, 1).getTime();
+  return 0;
+}
+function renderStat(){
+  const v = $("vStat"); v.textContent = "";
+  const all = acts();
+  if(!all.length){ v.append(el("p", "empty", L("Statistik muncul setelah kamu punya aktivitas.", "Stats appear once you have some activities."))); v.append(settingsPanel()); return; }
+  const chips = el("div", "chips");
+  [["week", L("Minggu ini", "This week")], ["month", L("Bulan ini", "This month")], ["year", L("Tahun ini", "This year")], ["all", L("Semua", "All time")]].forEach(r => {
+    const b = el("button", "chip" + (statP === r[0] ? " on" : ""), r[1]); b.type = "button"; b.onclick = () => { statP = r[0]; renderStat(); }; chips.append(b);
+  });
+  v.append(chips);
+  const from = periodStart(statP), set = all.filter(a => a.ts >= from);
+  const dist = set.reduce((s, a) => s + a.dist, 0), dur = set.reduce((s, a) => s + a.dur, 0), kc = set.reduce((s, a) => s + kcalOf(a.sp, a.dist, a.dur), 0);
+  const tiles = el("div", "tiles t4"); tiles.style.marginTop = "14px";
+  [[L("AKTIVITAS", "ACTIVITIES"), String(set.length), ""], [L("JARAK", "DISTANCE"), fmtKm(dist), "km"], [L("WAKTU", "TIME"), fmtDur(dur), ""], [L("KALORI (PERKIRAAN)", "CALORIES (EST.)"), kc.toLocaleString(locale()), "kkal"]].forEach(r => {
+    const t = el("div", "tile"); t.append(el("small", "", r[0]), el("b", "", r[1]), el("em", "", r[2])); tiles.append(t);
+  });
+  v.append(tiles);
+  /* target mingguan */
+  const goal = +load("goal", 0) || 0;
+  if(goal > 0){
+    const wk = all.filter(a => a.ts >= weekStart(Date.now())).reduce((s, a) => s + a.dist, 0) / 1000, pc = Math.min(100, wk / goal * 100);
+    const p = el("div", "panel"); p.style.marginTop = "14px"; p.append(el("span", "label", L("Target minggu ini", "This week's goal")));
+    p.append(el("div", "line", "")); p.lastChild.append(el("span", "", fx(wk, 1) + " / " + fx(goal, 0) + " km"), el("b", "", Math.round(pc) + "%"));
+    const bar = el("div", "bar" + (pc >= 100 ? " full" : "")), i = el("i"); i.style.width = pc + "%"; bar.append(i); p.append(bar);
+    if(pc >= 100) p.append(el("p", "hint", L("Target tercapai. Mantap!", "Goal reached. Nice work!")));
+    v.append(p);
+  }
+  /* grafik 8 minggu */
+  const ws = weekStart(Date.now()), wk = [];
+  for(let i = 7; i >= 0; i--){ const d = new Date(ws); d.setDate(d.getDate() - 7 * i); wk.push({s:d.getTime(), m:0}); }
+  all.forEach(a => { const s = weekStart(a.ts), w = wk.find(x => x.s === s); if(w) w.m += a.dist; });
+  const mx = Math.max(1000, ...wk.map(w => w.m)), NS = "http://www.w3.org/2000/svg", W = 320, H = 130, bw = 26, gap = (W - 8 * bw) / 9;
+  const svg = document.createElementNS(NS, "svg"); svg.setAttribute("viewBox", "0 0 " + W + " " + H); svg.setAttribute("class", "ch"); svg.setAttribute("role", "img"); svg.setAttribute("aria-label", L("Jarak per minggu, 8 minggu terakhir", "Distance per week, last 8 weeks"));
+  const ln = document.createElementNS(NS, "line"); ln.setAttribute("x1", 0); ln.setAttribute("x2", W); ln.setAttribute("y1", 104); ln.setAttribute("y2", 104); svg.append(ln);
+  wk.forEach((w, i) => {
+    const x = gap + i * (bw + gap), h = Math.round(w.m / mx * 78), r = document.createElementNS(NS, "rect");
+    r.setAttribute("x", x); r.setAttribute("y", 104 - h); r.setAttribute("width", bw); r.setAttribute("height", Math.max(w.m > 0 ? 2 : 0, h)); r.setAttribute("rx", 4); r.setAttribute("class", "b" + (i === 7 ? " cur" : "")); svg.append(r);
+    const d = new Date(w.s), t = document.createElementNS(NS, "text"); t.setAttribute("x", x + bw / 2); t.setAttribute("y", 118); t.textContent = d.getDate() + "/" + (d.getMonth() + 1); svg.append(t);
+    if(w.m > 0){ const q = document.createElementNS(NS, "text"); q.setAttribute("x", x + bw / 2); q.setAttribute("y", 100 - h); q.setAttribute("class", "v"); q.textContent = fx(w.m / 1000, w.m >= 100000 ? 0 : 1); svg.append(q); }
+  });
+  const cp = el("div", "panel"); cp.style.marginTop = "14px"; cp.append(el("span", "label", L("Jarak per minggu (km)", "Distance per week (km)")), svg); v.append(cp);
+  /* per jenis olahraga */
+  const bp = el("div", "panel"); bp.style.marginTop = "14px"; bp.append(el("span", "label", L("Menurut jenis", "By type")));
+  let n = 0;
+  SPORTS.forEach(k => { const s = set.filter(a => a.sp === k); if(!s.length) return; n++; const l = el("div", "line"); l.append(el("span", "", SP[k].ic + " " + spName(k) + " · " + s.length + "×"), el("b", "", fmtKm(s.reduce((q, a) => q + a.dist, 0)) + " km")); bp.append(l); });
+  if(!n) bp.append(el("p", "empty", L("Belum ada aktivitas pada periode ini.", "No activities in this period.")));
+  v.append(bp);
+  /* rekor pribadi (semua waktu) */
+  const rp = el("div", "panel"); rp.style.marginTop = "14px"; rp.append(el("span", "label", L("Rekor pribadi", "Personal records")));
+  const best = (arr, f, min) => arr.reduce((b, a) => { const x = f(a); return x === null || !isFinite(x) ? b : (!b || (min ? x < b.x : x > b.x) ? {a:a, x:x} : b); }, null);
+  const recs = [];
+  const far = best(all, a => a.dist, false); if(far) recs.push([L("Jarak terjauh", "Longest distance"), fmtKm(far.x) + " km", far.a]);
+  const lng = best(all, a => a.dur, false); if(lng) recs.push([L("Waktu terlama", "Longest time"), fmtDur(lng.x), lng.a]);
+  const runs = all.filter(a => a.sp === "run");
+  const bp5 = best(runs, a => a.dist >= 1000 ? a.dur / (a.dist / 1000) : null, true); if(bp5) recs.push([L("Pace lari tercepat (≥ 1 km)", "Fastest run pace (≥ 1 km)"), fmtPace(bp5.x) + " /km", bp5.a]);
+  const bk = best(runs, a => { const s = (a.spl || []).filter(z => z[0] === 1).map(z => z[1]); return s.length ? Math.min.apply(null, s) : null; }, true); if(bk) recs.push([L("1 km lari tercepat", "Fastest 1 km run"), fmtDur(bk.x), bk.a]);
+  const rs = best(all.filter(a => a.sp === "ride" && a.dist >= 3000), a => a.dist / a.dur * 3.6, false); if(rs) recs.push([L("Kecepatan sepeda tertinggi (≥ 3 km)", "Fastest ride speed (≥ 3 km)"), fx(rs.x, 1) + " km/" + L("jam", "h"), rs.a]);
+  recs.forEach(r => { const b = el("button", "rec"); b.type = "button"; const l = el("span", "", r[0]), q = el("b", "", r[1]); q.append(el("small", "", fmtDate(r[2].ts).split(" · ")[0])); b.append(l, q); b.onclick = () => openDetail(r[2].id); rp.append(b); });
+  v.append(rp);
+  v.append(settingsPanel());
+}
+function settingsPanel(){
+  const p = el("div", "panel"); p.style.marginTop = "14px"; p.append(el("span", "label", L("Pengaturan", "Settings")));
+  const f = (lab, inp) => { const w = el("label", "field"); w.append(el("span", "", lab), inp); return w; };
+  const gi = el("input"); gi.inputMode = "decimal"; gi.placeholder = "0"; gi.value = (+load("goal", 0) || "") + ""; gi.autocomplete = "off";
+  const wi = el("input"); wi.inputMode = "decimal"; wi.value = String(weight()); wi.autocomplete = "off";
+  const er = el("p", "err"); er.setAttribute("role", "alert");
+  const ok = el("button", "btn ghost", L("Simpan pengaturan", "Save settings")); ok.type = "button"; ok.style.marginTop = "0";
+  ok.onclick = () => {
+    const g = gi.value.trim() === "" ? 0 : parseFloat(gi.value.replace(",", ".")), w = parseFloat(wi.value.replace(",", "."));
+    if(!(g >= 0 && g <= 1000)){ er.textContent = L("Target mingguan 0 sampai 1.000 km (0 = tanpa target).", "Weekly goal 0 to 1,000 km (0 = no goal)."); return; }
+    if(!(w >= 30 && w <= 250)){ er.textContent = L("Berat badan 30 sampai 250 kg.", "Body weight 30 to 250 kg."); return; }
+    er.textContent = ""; save("goal", g); save("wt", w); toast(L("Pengaturan disimpan.", "Settings saved.")); paint();
+  };
+  p.append(f(L("Target mingguan (km, 0 = tanpa target)", "Weekly goal (km, 0 = no goal)"), gi), f(L("Berat badan (kg) untuk perkiraan kalori", "Body weight (kg) for calorie estimate"), wi), ok, er);
+  return p;
+}
+
+/* ===== kerangka ===== */
+function renderTabs(){
+  const n = $("tabs"); n.textContent = "";
+  [["rec", L("Rekam", "Record")], ["hist", L("Riwayat", "History")], ["stat", L("Statistik", "Stats")]].forEach(r => {
+    const b = el("button", "tab" + (tab === r[0] && view === "tab" ? " on" : ""), r[1]); b.type = "button";
+    b.onclick = () => { tab = r[0]; view = "tab"; detId = null; save("tab", tab); paint(); }; n.append(b);
+  });
+}
+function paint(){
+  document.documentElement.lang = lang;
+  $("t").textContent = L("CATAT OLAHRAGA", "ACTIVITY LOG");
+  $("sub").textContent = L("Rekam lari, jalan, sepeda, dan hiking dengan GPS.", "Record runs, walks, rides, and hikes with GPS.");
+  $("note").textContent = L("Data tersimpan di perangkatmu dan tetap bisa dipakai tanpa internet. Kalori hanya perkiraan.", "Data is stored on your device and works without internet. Calories are only an estimate.");
+  document.title = L("CATAT OLAHRAGA", "ACTIVITY LOG");
+  renderTabs();
+  $("tabs").hidden = view === "detail";
+  $("vRec").hidden = !(view === "tab" && tab === "rec"); $("vHist").hidden = !(view === "tab" && tab === "hist");
+  $("vStat").hidden = !(view === "tab" && tab === "stat"); $("vDet").hidden = view !== "detail";
+  if(view === "detail") renderDetail();
+  else if(tab === "rec") renderRec();
+  else if(tab === "hist") renderHist();
+  else renderStat();
+}
+/* tombol back HP: tutup detail atau form manual dulu sebelum keluar menu */
+window.__stLayers = function(){
+  const o = [];
+  if(view === "detail") o.push(() => closeDetail());
+  else if(manualOpen && tab === "rec" && rec.st === "idle") o.push(() => { manualOpen = false; renderRec(); });
+  return o;
+};
+window.__setFollow = () => {}; window.__setAnim = () => {};
+/* bahasa mengikuti Pengaturan beranda (kunci ol_lang) */
+window.addEventListener("storage", e => { if(!e.key || e.key === "ol_lang"){ const l = readLang(); if(l !== lang){ lang = l; paint(); } } });
+/* ada rekaman yang belum selesai (menu sempat tertutup): pulihkan dalam keadaan jeda */
+(function(){
+  const d = load("draft", null);
+  if(d && SP[d.sp] && d.acc > 0 && Array.isArray(d.pts)){
+    rec.sp = d.sp; rec.acc = +d.acc; rec.start = +d.start || Date.now(); rec.pts = d.pts.filter(p => Array.isArray(p) && p.length >= 4); rec.dist = +d.dist || 0; rec.st = "pause"; restored = true; tab = "rec"; view = "tab";
+  }
+})();
+setInterval(() => { if(rec.st === "run"){ updateLive(); if(Date.now() - lastSave > 10000) saveDraft(); } }, 500);
+paint();
 </scr@@ipt>
 </body>
 </html>
