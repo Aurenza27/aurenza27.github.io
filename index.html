@@ -1925,6 +1925,14 @@ window.stNativeGps = (function(){
       var S = splug(); if(S){ try{ await S.stop(); }catch(e){} }
       var P = plug(); if(P){ try{ await P.stop(); }catch(e){} }
     },
+    notifEnabled: async function(){
+      try{
+        var C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return true;
+        var N = (C.Plugins && C.Plugins.NotifSettings) || (C.registerPlugin ? C.registerPlugin("NotifSettings") : null);
+        if(!N || !N.enabled) return true;
+        var r = await N.enabled(); return !(r && r.enabled === false);
+      }catch(e){ return true; }
+    },
     openSettings: async function(){ var P = plug(); if(P){ try{ await P.openSettings(); }catch(e){} } },
     notify: function(o){ var N = nplug(); if(N){ try{ var r = N.update(o); if(r && r.catch) r.catch(function(){}); }catch(e){} } }
   };
@@ -10071,7 +10079,7 @@ svg.ch{display:block;width:100%;height:auto}.ch .b{fill:var(--gold)}.ch .b.cur{f
 const $ = id => document.getElementById(id);
 const LS = k => "ol_" + k;
 function load(k, d){ try{ const v = localStorage.getItem(LS(k)); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }
-function save(k, v){ try{ localStorage.setItem(LS(k), JSON.stringify(v)); }catch(e){} }
+function save(k, v){ try{ localStorage.setItem(LS(k), JSON.stringify(v)); return true; }catch(e){ return false; } }
 function drop(k){ try{ localStorage.removeItem(LS(k)); }catch(e){} }
 const readLang = () => { try{ return String(localStorage.getItem("ol_lang") || "id").replace(/"/g, "") === "en" ? "en" : "id"; }catch(e){ return "id"; } };
 let lang = readLang();
@@ -10080,7 +10088,8 @@ const el = (t, c, x) => { const e = document.createElement(t); if(c) e.className
 const fx = (n, d) => { const t = (+n).toFixed(d); return lang === "en" ? t : t.replace(".", ","); };
 const pad2 = n => String(n).padStart(2, "0");
 let tt = 0;
-function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), 2400); }
+function toast(m, ms){ const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), ms || 2400); }
+const fullMsg = () => L("Penyimpanan penuh, perubahan tidak tersimpan.", "Storage is full, the change was not saved.");
 
 /* ===== data olahraga =====
    Kalori = MET x berat badan (kg) x jam. Nilai MET dari Compendium of Physical Activities (Ainsworth dkk. 2011), dipilih menurut kecepatan rata-rata.
@@ -10095,10 +10104,22 @@ const SP = {
 const spName = k => SP[k][lang === "en" ? "en" : "id"];
 const WT_DEF = 60;
 const weight = () => { const w = +load("wt", WT_DEF); return w >= 30 && w <= 250 ? w : WT_DEF; };
-function kcalOf(sp, dist, dur){
+const wtSet = () => { try{ return localStorage.getItem(LS("wt")) !== null; }catch(e){ return true; } };
+function kcalOf(sp, dist, dur, wt){
   if(!(dur > 0) || !(dist > 0)) return 0;
   const kmh = dist / dur * 3.6, m = SP[sp].met.find(r => kmh <= r[0]) || SP[sp].met[SP[sp].met.length - 1];
-  return Math.round(m[1] * weight() * dur / 3600);
+  return Math.round(m[1] * (wt > 0 ? wt : weight()) * dur / 3600);
+}
+/* kalori aktivitas: memakai nilai yang disimpan saat aktivitas dibuat (tidak ikut berubah bila berat badan diganti);
+   aktivitas lama yang belum punya nilai tersimpan dihitung dengan berat badan sekarang */
+const kcalAct = a => (typeof a.kc === "number" && a.kc >= 0) ? a.kc : kcalOf(a.sp, a.dist, a.dur);
+/* bekukan kalori aktivitas lama (belum punya nilai tersimpan) dengan berat badan w, supaya tidak berubah lagi saat berat badan diganti */
+function freezeKc(w){
+  try{
+    const all = acts(); let n = 0;
+    all.forEach(a => { if(!(typeof a.kc === "number" && a.kc >= 0)){ a.kc = kcalOf(a.sp, a.dist, a.dur, w); a.wt = w; n++; } });
+    if(n) putActs(all);
+  }catch(e){}
 }
 const fmtDur = s => { s = Math.max(0, Math.round(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return h ? h + ":" + pad2(m) + ":" + pad2(x) : m + ":" + pad2(x); };
 const fmtPace = spk => (isFinite(spk) && spk > 0 && spk < 3600) ? fmtDur(spk) : "--";
@@ -10119,10 +10140,19 @@ function paceTile(sp, dist, dur){
 /* ===== penyimpanan aktivitas ===== */
 const MAXACT = 300, MAXRT = 40;
 function acts(){ const a = load("acts", []); return Array.isArray(a) ? a.filter(x => x && typeof x === "object" && SP[x.sp] && x.dist >= 0 && x.dur > 0) : []; }
+/* mengembalikan true bila tersimpan. Penyimpanan penuh: rute lama dibuang bertahap (40 -> 10 -> 1 -> 0) lalu dicoba lagi.
+   putActs.dropped = jumlah aktivitas terlama yang terhapus karena melewati batas MAXACT. */
 function putActs(a){
-  a.sort((x, y) => y.ts - x.ts); a = a.slice(0, MAXACT);
-  a.forEach((x, i) => { if(i >= MAXRT && x.rt) delete x.rt; });   /* rute hanya disimpan untuk 40 aktivitas terbaru supaya penyimpanan tetap ringan */
-  save("acts", a);
+  a.sort((x, y) => y.ts - x.ts);
+  putActs.dropped = Math.max(0, a.length - MAXACT); a = a.slice(0, MAXACT);
+  let keep = MAXRT, ok = false;
+  for(;;){
+    a.forEach((x, i) => { if(i >= keep && x.rt) delete x.rt; });   /* rute hanya disimpan untuk 40 aktivitas terbaru supaya penyimpanan dan sinkronisasi akun tetap ringan */
+    ok = save("acts", a);
+    if(ok || keep === 0) break;
+    keep = keep > 10 ? 10 : keep > 1 ? 1 : 0;
+  }
+  return ok;
 }
 
 /* ===== geometri ===== */
@@ -10171,14 +10201,48 @@ function drawRoute(cv, pts){
 function mapCanvas(pts){ const c = el("canvas", "map"); requestAnimationFrame(() => drawRoute(c, pts)); return c; }
 
 /* ===== perekaman ===== */
-const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, gt0:0, kf:null, coarse:0, mock:0};
+const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, jc:0, cand:null, ap:0, apSince:0, stillT:0, pz:0, gt0:0, kf:null, coarse:0, mock:0, eg:0, altN:0, altRef:null, altSm:null};
 if(!SP[rec.sp]) rec.sp = "run";
 let gpsId = null, nat = false, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
-const elapsed = () => rec.acc + (rec.st === "run" ? Date.now() - rec.t0 : 0);
+/* AUTO-JEDA: saat diam, jam berhenti (waktu bergerak). rec.ap = total ms auto-jeda pada segmen ini, rec.apSince = awal auto-jeda yang sedang berjalan (0 = tidak),
+   rec.pz = total ms auto-jeda pada segmen sebelumnya. Jarak, pace, split, dan kalori semuanya memakai waktu bergerak ini. */
+const apOn = () => +load("ap", 1) !== 0;
+const apOpen = () => rec.apSince ? Math.max(0, Date.now() - rec.apSince) : 0;
+const elapsed = () => rec.acc + (rec.st === "run" ? Math.max(0, Date.now() - rec.t0 - rec.ap - apOpen()) : 0);
+const pzMs = () => rec.pz + (rec.st === "run" ? rec.ap + apOpen() : 0);
+const AP_STOP = {run:0.5, walk:0.4, ride:1.0, hike:0.3}, AP_GO = {run:1.0, walk:0.8, ride:1.5, hike:0.6};
+function apStep(spd, t, accepted, gap){
+  if(!apOn()) return;
+  const known = typeof spd === "number" && isFinite(spd) && spd >= 0;
+  if(rec.apSince){
+    /* lanjut otomatis: titik gerak yang diterima, dengan kecepatan GPS cukup (atau dua titik gerak berdekatan bila kecepatan tidak tersedia) */
+    if(accepted && (known ? spd >= AP_GO[rec.sp] : gap <= 8)){ rec.ap += Math.max(0, t - rec.apSince); rec.apSince = 0; rec.stillT = 0; }
+    return;
+  }
+  const still = !accepted && (known ? (spd < AP_STOP[rec.sp] && gap >= 5) : gap >= 15);
+  if(!still){ rec.stillT = 0; return; }
+  if(!rec.stillT){ rec.stillT = t; return; }
+  if(t - rec.stillT >= 4000){ rec.apSince = Math.max(rec.t0, t - gap * 1000); rec.stillT = 0; }   /* mulai dihitung dari titik gerak terakhir */
+}
+/* TANJAKAN: total naik (m) dari altitude GPS. Altitude GPS HP kasar (sering meleset belasan meter), jadi dihaluskan lalu hanya dihitung bila naik >= 5 m
+   dari titik acuan terakhir. Hasilnya PERKIRAAN. altN = jumlah titik beraltitude; tanjakan baru disimpan bila cukup titik (>= 10). */
+function altStep(alt, altAcc){
+  if(typeof alt !== "number" || !isFinite(alt) || alt < -500 || alt > 9000) return;
+  if(typeof altAcc === "number" && isFinite(altAcc) && altAcc > 30) return;
+  rec.altN++;
+  rec.altSm = rec.altSm === null ? alt : rec.altSm + 0.1 * (alt - rec.altSm);
+  if(rec.altRef === null){ rec.altRef = rec.altSm; return; }
+  const df = rec.altSm - rec.altRef;
+  if(df >= 5){ rec.eg += df; rec.altRef = rec.altSm; }
+  else if(df <= -5){ rec.altRef = rec.altSm; }
+}
+let draftWarned = false;
 function saveDraft(){
   lastSave = Date.now();
   if(rec.st === "idle") return;
-  save("draft", {sp:rec.sp, acc:Math.round(elapsed()), start:rec.start, pts:rec.pts.slice(-4000), dist:rec.dist, mock:rec.mock});
+  if(!save("draft", {sp:rec.sp, acc:Math.round(elapsed()), start:rec.start, pts:rec.pts.slice(-4000), dist:rec.dist, mock:rec.mock, pz:Math.round(pzMs()), eg:Math.round(rec.eg), an:rec.altN}) && !draftWarned){
+    draftWarned = true; toast(L("Penyimpanan penuh: rekaman tidak bisa dicadangkan otomatis. Hapus aktivitas lama.", "Storage is full: the recording cannot be backed up automatically. Delete old activities."), 7000);
+  }
 }
 /* ambang akurasi (meter) per jenis olahraga: titik yang lebih buruk dibuang; ACC_WARM = syarat titik awal; KQ = derau proses filter Kalman (m/dtk) */
 const ACC_MAX = {run:25, walk:25, ride:25, hike:35}, ACC_WARM = {run:20, walk:20, ride:20, hike:25}, KQ = {run:4, walk:2.5, ride:8, hike:3};
@@ -10227,19 +10291,37 @@ function onFix(pos){
   if(acc > 100) rec.coarse++; else rec.coarse = 0;
   if(rec.coarse >= 3){ rec.gps = "coarse"; updateLive(); return; }   /* akurasi terus > 100 m: kemungkinan lokasi perkiraan, bukan Lokasi tepat */
   if(acc > ACC_MAX[rec.sp]){ rec.gps = "weak"; updateLive(); return; }
-  const mt = (rec.acc + (t - rec.t0)) / 1000, f = kalman(c.latitude, c.longitude, acc, t);
+  const mt = (rec.acc + (t - rec.t0) - rec.ap - (rec.apSince ? Math.max(0, t - rec.apSince) : 0)) / 1000, f = kalman(c.latitude, c.longitude, acc, t);
   if(!rec.last){
     /* pemanasan: titik awal harus cukup akurat, atau tunggu maksimal 20 detik */
     if(acc > ACC_WARM[rec.sp] && Date.now() - rec.gt0 < 20000){ rec.gps = "warm"; updateLive(); return; }
-    rec.gps = "ok"; rec.kf = f;
+    rec.gps = "ok"; rec.kf = f; rec.jc = 0; rec.cand = null;
     rec.last = {la:f.la, lo:f.lo, t:t}; rec.pts.push([f.la, f.lo, mt, rec.dist, nst()]); updateLive(); return;
   }
   rec.gps = "ok";
   const d = hav(rec.last.la, rec.last.lo, f.la, f.lo), dt = (t - rec.last.t) / 1000, spd = c.speed;
   if(dt <= 0) return;
-  if(d / dt > SP[rec.sp].maxV){ rec.jit++; return; }              /* lompatan GPS yang mustahil: abaikan */
-  if(d < Math.min(15, Math.max(3, acc / 2))){ updateLive(); return; }   /* getaran saat diam: abaikan, jarak terkumpul sampai cukup jauh */
-  if(typeof spd === "number" && isFinite(spd) && spd >= 0 && spd < 0.4 && d < 15){ updateLive(); return; }   /* kecepatan GPS ~0: diam */
+  if(d / dt > SP[rec.sp].maxV){                                      /* lompatan GPS yang mustahil: abaikan */
+    rec.jit++;
+    /* titik-titik baru yang berturut-turut saling konsisten (kecepatan antar-titik wajar) tapi semuanya "melompat" dari titik acuan:
+       berarti titik acuan-lah yang meleset. Setelah 5 titik, pindahkan acuan ke posisi baru tanpa menambah jarak. */
+    const cd = rec.cand ? (t - rec.cand.t) / 1000 : 0;
+    if(cd > 0 && hav(rec.cand.la, rec.cand.lo, c.latitude, c.longitude) / cd <= SP[rec.sp].maxV) rec.jc++; else rec.jc = 1;
+    rec.cand = {la:c.latitude, lo:c.longitude, t:t};
+    if(rec.jc >= 5){
+      rec.jc = 0; rec.cand = null;
+      rec.kf = {la:c.latitude, lo:c.longitude, v:Math.max(acc, 3) * Math.max(acc, 3), t:t};
+      rec.last = {la:c.latitude, lo:c.longitude, t:t};
+      if(rec.pts.length <= 2){ rec.dist = 0; rec.pts = [[c.latitude, c.longitude, mt, 0, nst()]]; }   /* titik awal ternyata salah: mulai ulang dari sini */
+      updateLive();
+    }
+    return;
+  }
+  rec.jc = 0; rec.cand = null;
+  if(d < Math.min(15, Math.max(3, acc / 2))){ apStep(spd, t, false, dt); updateLive(); return; }   /* getaran saat diam: abaikan, jarak terkumpul sampai cukup jauh */
+  if(typeof spd === "number" && isFinite(spd) && spd >= 0 && spd < 0.4 && d < 15){ apStep(spd, t, false, dt); updateLive(); return; }   /* kecepatan GPS ~0: diam */
+  apStep(spd, t, true, dt);
+  altStep(c.altitude, c.altitudeAccuracy);
   rec.kf = f; rec.dist += d; rec.last = {la:f.la, lo:f.lo, t:t};
   rec.pts.push([f.la, f.lo, mt, rec.dist, nst()]);
   updateLive();
@@ -10263,10 +10345,10 @@ function startGps(){
   /* aplikasi Android: GPS tetap jalan saat layar terkunci / aplikasi di latar belakang */
   rec.gps = "wait"; nat = true;
   g.start(window,
-    loc => { if(nat) onFix({coords:{latitude:loc.latitude, longitude:loc.longitude, accuracy:loc.accuracy || 0, speed:(typeof loc.speed === "number" ? loc.speed : null), simulated:loc.simulated === true}, timestamp:loc.time || Date.now()}); },
+    loc => { if(nat) onFix({coords:{latitude:loc.latitude, longitude:loc.longitude, accuracy:loc.accuracy || 0, speed:(typeof loc.speed === "number" ? loc.speed : null), altitude:(typeof loc.altitude === "number" ? loc.altitude : null), altitudeAccuracy:(typeof loc.altitudeAccuracy === "number" ? loc.altitudeAccuracy : null), simulated:loc.simulated === true}, timestamp:loc.time || Date.now()}); },
     err => { if(nat) onErr({code:(err && err.code === "NOT_AUTHORIZED") ? 1 : 2}); },
-    {title:L("GPS olahraga aktif", "Activity GPS on"), msg:L("Detail jarak, waktu, dan kalori ada di notifikasi Rekaman olahraga.", "Distance, time, and calories are in the Activity recording notification.")}
-  ).then(() => { pushNotif(true); g.stepsStart(rec.stFresh); rec.stFresh = false; }).catch(() => { if(nat){ nat = false; startWebGps(); updateLive(); } });
+    {title:L("GPS olahraga aktif", "Activity GPS on"), msg:L("Merekam olahraga. Buka Satu Titik untuk melihat jarak, waktu, dan kalori.", "Recording your activity. Open Satu Titik to see distance, time, and calories.")}
+  ).then(() => { pushNotif(true); if(rec.stFresh) warnNotif(); g.stepsStart(rec.stFresh); rec.stFresh = false; }).catch(() => { if(nat){ nat = false; startWebGps(); lockWake(); updateLive(); } });
 }
 function stopGps(){
   if(nat){ nat = false; try{ window.parent.stNativeGps.stop(); }catch(e){} }
@@ -10274,29 +10356,38 @@ function stopGps(){
 }
 async function lockWake(){ try{ if(navigator.wakeLock && !wake){ wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => { wake = null; }); } }catch(e){ wake = null; } }
 function unlockWake(){ try{ if(wake) wake.release(); }catch(e){} wake = null; }
-document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible" && rec.st === "run") lockWake(); if(document.visibilityState === "hidden") saveDraft(); });
+document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible" && rec.st === "run" && !nat) lockWake(); if(document.visibilityState === "hidden") saveDraft(); });
 window.addEventListener("pagehide", saveDraft);
 
 function startRec(){
   if(rec.st !== "idle") return;
-  rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; rec.mock = 0; rec.stFresh = true; restored = false; resumeRec();
+  rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; rec.jc = 0; rec.cand = null; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.mock = 0; rec.eg = 0; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.stFresh = true; restored = false; resumeRec();
 }
-function resumeRec(){ rec.st = "run"; rec.t0 = Date.now(); rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); lockWake(); renderRec(); saveDraft(); }
-function pauseRec(){ rec.acc += Date.now() - rec.t0; rec.t0 = 0; rec.st = "pause"; stopGps(); unlockWake(); renderRec(); saveDraft(); }
+function resumeRec(){ rec.st = "run"; rec.altRef = null; rec.altSm = null; rec.t0 = Date.now(); rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); if(!nativeGps()) lockWake(); renderRec(); saveDraft(); }
+function pauseRec(){ const n = Date.now(), open = apOpen(); rec.acc += Math.max(0, n - rec.t0 - rec.ap - open); rec.pz += rec.ap + open; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.t0 = 0; rec.st = "pause"; stopGps(); unlockWake(); renderRec(); saveDraft(); }
 function discardRec(){
-  stopGps(); unlockWake(); rec.st = "idle"; rec.acc = 0; rec.t0 = 0; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
+  stopGps(); unlockWake(); rec.st = "idle"; rec.acc = 0; rec.t0 = 0; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.eg = 0; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
 }
 function finishRec(){
   if(rec.st === "run") pauseRec();
   const dur = Math.round(rec.acc / 1000), dist = Math.round(rec.dist);
   if(dur < 10){ toast(L("Terlalu singkat, rekaman dibuang.", "Too short, recording discarded.")); discardRec(); return; }
   if(dist < 50 && !confirm(L("Jarak dari GPS hampir nol. Simpan tetap tanpa jarak?\n\nBatal = kembali ke rekaman.", "GPS distance is almost zero. Save anyway without distance?\n\nCancel = back to the recording."))) return;
-  const a = {id:Date.now().toString(36), sp:rec.sp, ts:rec.start, dist:dist, dur:dur, title:defTitle(rec.sp, rec.start)};
+  const a = {id:Date.now().toString(36), sp:rec.sp, ts:rec.start, dist:dist, dur:dur, title:defTitle(rec.sp, rec.start), kc:kcalOf(rec.sp, dist, dur), wt:weight()};
+  { const pz = Math.round(rec.pz / 1000); if(pz >= 10) a.pz = pz; }
+  if(rec.altN >= 10) a.eg = Math.round(rec.eg);
   if(rec.pts.length >= 2){ a.rt = downsample(rec.pts, 250); a.spl = calcSplits(rec.pts, rec.dist, dur); }
   const fl = []; if(rec.mock > 0) fl.push("mock"); if(flagFast(rec.pts, rec.sp)) fl.push("fast"); if(flagSteps(rec.pts, rec.sp)) fl.push("steps");
   if(fl.length) a.fl = fl;
-  const all = acts(); all.push(a); putActs(all);
-  discardRec(); toast(L("Aktivitas tersimpan.", "Activity saved.")); openDetail(a.id);
+  const all = acts(); all.push(a); const hadRt = !!a.rt;
+  if(!putActs(all)){
+    /* penyimpanan penuh: rekaman TIDAK dibuang, tetap ada sebagai draf jeda */
+    toast(L("Penyimpanan penuh, aktivitas belum tersimpan. Hapus aktivitas lama lalu tekan Selesai lagi.", "Storage is full, the activity was not saved. Delete old activities, then press Finish again."), 7000);
+    if(a.rt && confirm(L("Penyimpanan penuh. Simpan rekaman ini sebagai file GPX supaya tidak hilang?", "Storage is full. Save this recording as a GPX file so it is not lost?"))) exportGpx(a);
+    return;
+  }
+  const dropped = putActs.dropped, lostRt = hadRt && !a.rt;
+  discardRec(); toast(lostRt ? L("Aktivitas tersimpan, tapi rutenya tidak ikut karena penyimpanan hampir penuh. Hapus aktivitas lama.", "Activity saved, but its route was not kept because storage is nearly full. Delete old activities.") : dropped > 0 ? L("Aktivitas tersimpan. " + dropped + " aktivitas terlama dihapus (batas " + MAXACT + ").", "Activity saved. " + dropped + " oldest activity removed (limit " + MAXACT + ").") : L("Aktivitas tersimpan.", "Activity saved."), (lostRt || dropped > 0) ? 7000 : 0); openDetail(a.id);
 }
 
 /* ===== tampilan: Rekam ===== */
@@ -10305,6 +10396,7 @@ function gpsText(){
   const g = rec.gps;
   if(rec.st === "idle") return ["", L("GPS menyala saat kamu menekan Mulai.", "GPS turns on when you press Start.")];
   if(rec.st === "pause") return ["warn", L("Dijeda. GPS dimatikan sementara.", "Paused. GPS is off for now.")];
+  if(rec.apSince) return ["warn", L("Auto-jeda: kamu berhenti, jam ikut berhenti. Lanjut otomatis saat kamu bergerak.", "Auto-pause: you stopped, so the clock stopped. It resumes when you move.")];
   if(g === "ok") return ["ok", L("GPS baik", "GPS good") + " (±" + Math.round(rec.acc_m) + " m)"];
   if(g === "weak") return ["warn", L("Sinyal GPS lemah" + (rec.acc_m ? " (±" + Math.round(rec.acc_m) + " m)" : "") + ", pindah ke tempat terbuka.", "Weak GPS signal" + (rec.acc_m ? " (±" + Math.round(rec.acc_m) + " m)" : "") + ", move to an open area.")];
   if(g === "mock") return ["bad", L("Lokasi palsu (mock location) terdeteksi. Titik diabaikan dan aktivitas akan ditandai. Matikan aplikasi lokasi palsu.", "Mock location detected. Points are ignored and the activity will be flagged. Turn off the mock location app.")];
@@ -10315,8 +10407,18 @@ function gpsText(){
   return ["warn", L("Mencari sinyal GPS…", "Searching for GPS…")];
 }
 let lastNt = 0;
+/* notifikasi aplikasi dimatikan di HP: plugin native diam saja, jadi beri tahu pengguna sekali di awal rekaman */
+async function warnNotif(){
+  try{
+    const g = window.parent && window.parent.stNativeGps;
+    if(g && g.notifEnabled && !(await g.notifEnabled())) toast(L("Notifikasi aplikasi mati, jadi penanda rekaman tidak tampil saat layar terkunci dan GPS bisa terhenti di beberapa HP. Hidupkan di Pengaturan HP → Aplikasi → Satu Titik → Notifikasi.", "App notifications are off, so the recording indicator will not show while the screen is locked and GPS may stop on some phones. Turn them on in phone Settings → Apps → Satu Titik → Notifications."), 8000);
+  }catch(e){}
+}
 /* notifikasi live di bilah status HP: jarak, waktu (berjalan sendiri), kalori, pace. Diperbarui paling sering tiap 2 detik. */
 function pushNotif(force){
+  /* DINONAKTIFKAN: Android wajib menampilkan notifikasi milik plugin GPS selama merekam, jadi notifikasi kedua ini menimbulkan notifikasi ganda.
+     Kode di bawah dibiarkan supaya mudah dihidupkan lagi bila nanti notifikasi plugin bisa diganti. */
+  if(true) return;
   if(!nat || rec.st !== "run") return;
   const now = Date.now(); if(!force && now - lastNt < 2000) return; lastNt = now;
   try{
@@ -10363,10 +10465,29 @@ function renderRec(){
   else { const r = el("div", "row2"); r.append(mkb("go", L("▶  LANJUT", "▶  RESUME"), resumeRec), mkb("", L("■  SELESAI", "■  FINISH"), finishRec)); bt.append(r, mkb("danger", L("Buang rekaman", "Discard recording"), () => { if(confirm(L("Buang rekaman ini?", "Discard this recording?"))) discardRec(); })); }
   v.append(bt);
   if(rec.st === "idle" && manualOpen) v.append(manualForm());
+  if(rec.st === "idle" && !wtSet()) v.append(weightPrompt());
   const h = el("p", "hint", nativeGps() ? L("Rekaman tetap berjalan saat layar terkunci atau kamu membuka aplikasi lain, dan notifikasi tampil selama merekam. GPS berhenti saat kamu menekan Jeda atau Selesai, atau menutup menu.", "Recording keeps running while the screen is locked or you use another app, and a notification shows while recording. GPS stops when you press Pause or Finish, or close the menu.") : L("Biarkan layar menyala dan menu ini tetap terbuka selama merekam. GPS berhenti bila menu ditutup atau layar terkunci, tetapi rekaman bisa dilanjutkan saat menu dibuka lagi.", "Keep the screen on and this menu open while recording. GPS stops when the menu is closed or the screen locks, but the recording can be resumed when you reopen the menu."));
   v.append(h);
   updateLive();
   if(rec.pts.length >= 2){ LV.map.hidden = false; requestAnimationFrame(() => drawRoute(LV.map, rec.pts)); }
+}
+/* berat badan belum pernah diisi: kalori memakai 60 kg. Minta diisi di sini supaya perkiraan kalori tidak meleset. */
+function weightPrompt(){
+  const p = el("div", "panel"); p.style.marginTop = "14px";
+  p.append(el("p", "notice", L("Berat badan belum diisi, jadi kalori dihitung dengan 60 kg. Isi di sini supaya perkiraan kalori lebih tepat.", "Body weight is not set, so calories use 60 kg. Enter it here for a better calorie estimate.")));
+  const wi = el("input"); wi.inputMode = "decimal"; wi.placeholder = "60"; wi.autocomplete = "off";
+  const fl = el("label", "field"); fl.append(el("span", "", L("Berat badan (kg)", "Body weight (kg)")), wi);
+  const er = el("p", "err"); er.setAttribute("role", "alert");
+  const ok = el("button", "btn ghost", L("Simpan berat badan", "Save weight")); ok.type = "button"; ok.style.marginTop = "0";
+  ok.onclick = () => {
+    const x = parseFloat(String(wi.value).replace(",", "."));
+    if(!(x >= 30 && x <= 250)){ er.textContent = L("Berat badan 30 sampai 250 kg.", "Body weight 30 to 250 kg."); return; }
+    if(!save("wt", x)){ toast(fullMsg()); return; }
+    freezeKc(x);
+    toast(L("Berat badan disimpan.", "Weight saved.")); renderRec();
+  };
+  p.append(fl, ok, er);
+  return p;
 }
 function parseDur(s){
   s = String(s).trim().replace(",", "."); if(!s) return NaN;
@@ -10393,8 +10514,10 @@ function manualForm(){
     if(!(dur >= 10 && dur <= 172800)) { er.textContent = L("Isi durasi dengan format mm:ss atau j:mm:ss (maksimal 48 jam).", "Enter duration as mm:ss or h:mm:ss (max 48 hours)."); return; }
     if(isNaN(+dt) || +dt > Date.now() + 60000) { er.textContent = L("Tanggal dan jam tidak valid atau di masa depan.", "Date and time are invalid or in the future."); return; }
     if(km * 1000 / dur > SP[rec.sp].maxV * 1.15) { er.textContent = L("Kecepatannya tidak masuk akal untuk " + spName(rec.sp) + ". Periksa jarak dan durasi.", "That speed is not realistic for " + spName(rec.sp) + ". Check distance and duration."); return; }
-    const a = {id:Date.now().toString(36), sp:rec.sp, ts:+dt, dist:Math.round(km * 1000), dur:dur, title:(ni.value.replace(/[\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40)) || defTitle(rec.sp, +dt), man:1};
-    const all = acts(); all.push(a); putActs(all); manualOpen = false; toast(L("Aktivitas tersimpan.", "Activity saved.")); openDetail(a.id);
+    const a = {id:Date.now().toString(36), sp:rec.sp, ts:+dt, dist:Math.round(km * 1000), dur:dur, kc:kcalOf(rec.sp, Math.round(km * 1000), dur), wt:weight(), title:(ni.value.replace(/[\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40)) || defTitle(rec.sp, +dt), man:1};
+    const all = acts(); all.push(a);
+    if(!putActs(all)){ er.textContent = L("Penyimpanan penuh. Hapus aktivitas lama dulu.", "Storage is full. Delete old activities first."); return; }
+    manualOpen = false; toast(putActs.dropped > 0 ? L("Aktivitas tersimpan. " + putActs.dropped + " aktivitas terlama dihapus (batas " + MAXACT + ").", "Activity saved. " + putActs.dropped + " oldest activity removed (limit " + MAXACT + ").") : L("Aktivitas tersimpan.", "Activity saved."), putActs.dropped > 0 ? 6000 : 0); openDetail(a.id);
   };
   p.append(r1, r2, f(L("Nama (opsional)", "Name (optional)"), ni), ok, er);
   return p;
@@ -10409,6 +10532,10 @@ function renderHist(){
     b.onclick = () => { histF = k; renderHist(); }; chips.append(b);
   });
   v.append(chips);
+  if(acts().length >= MAXACT - 30){
+    const nt = el("p", "notice", L("Riwayat hampir penuh (" + acts().length + " dari " + MAXACT + "). Saat penuh, aktivitas terlama dihapus otomatis. Rute hanya disimpan untuk " + MAXRT + " aktivitas terbaru. Ekspor GPX dari halaman detail bila ingin menyimpannya.", "History is almost full (" + acts().length + " of " + MAXACT + "). When full, the oldest activities are removed automatically. Routes are kept only for the " + MAXRT + " newest activities. Export GPX from the detail page to keep them."));
+    nt.style.marginTop = "12px"; v.append(nt);
+  }
   const list = acts().filter(a => histF === "all" || a.sp === histF);
   const box = el("div"); box.style.marginTop = "14px";
   if(!list.length) box.append(el("p", "empty", acts().length ? L("Belum ada aktivitas untuk jenis ini.", "No activities of this type yet.") : L("Belum ada aktivitas. Mulai rekaman pertamamu di tab Rekam.", "No activities yet. Start your first recording in the Record tab.")));
@@ -10449,7 +10576,7 @@ function renderDetail(){
   if(!a){ closeDetail(); return; }
   const back = el("button", "back", "‹ " + L("Riwayat", "History")); back.type = "button"; back.onclick = closeDetail; v.append(back);
   const ti = el("input", "title-in"); ti.value = a.title || ""; ti.maxLength = 40; ti.setAttribute("aria-label", L("Nama aktivitas", "Activity name"));
-  ti.onchange = () => { const n = ti.value.replace(/[\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40) || defTitle(a.sp, a.ts); const z = acts(), q = z.find(x => x.id === a.id); if(q){ q.title = n; putActs(z); } ti.value = n; toast(L("Nama diperbarui.", "Name updated.")); };
+  ti.onchange = () => { const n = ti.value.replace(/[\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40) || defTitle(a.sp, a.ts); const z = acts(), q = z.find(x => x.id === a.id); if(q){ q.title = n; if(!putActs(z)){ toast(fullMsg()); return; } } ti.value = n; toast(L("Nama diperbarui.", "Name updated.")); };
   v.append(ti);
   const d = el("p", "tiny", SP[a.sp].ic + " " + spName(a.sp) + " · " + fmtDate(a.ts) + (a.man ? " · " + L("input manual", "manual entry") : "")); d.style.cssText = "text-align:left;margin:0 0 12px 2px"; v.append(d);
   if(flagged(a)){
@@ -10457,16 +10584,19 @@ function renderDetail(){
     v.append(nt);
     if(a.fl.indexOf("mock") < 0){
       const ob = el("button", "btn ghost sm", L("Ini valid, hapus tanda", "This is valid, remove flag")); ob.type = "button"; ob.style.marginBottom = "12px";
-      ob.onclick = () => { const z = acts(), q = z.find(x => x.id === a.id); if(q){ q.fl = (q.fl || []).filter(f => f !== "fast" && f !== "steps"); if(!q.fl.length) delete q.fl; putActs(z); toast(L("Tanda dihapus.", "Flag removed.")); renderDetail(); } };
+      ob.onclick = () => { const z = acts(), q = z.find(x => x.id === a.id); if(q){ q.fl = (q.fl || []).filter(f => f !== "fast" && f !== "steps"); if(!q.fl.length) delete q.fl; if(!putActs(z)){ toast(fullMsg()); return; } toast(L("Tanda dihapus.", "Flag removed.")); renderDetail(); } };
       v.append(ob);
     }
   }
   if(a.rt && a.rt.length > 1) v.append(mapCanvas(a.rt));
+  else if(!a.man && all.indexOf(a) >= MAXRT){ const h = el("p", "tiny", L("Rute tidak ada lagi: rute hanya disimpan untuk " + MAXRT + " aktivitas terbaru agar penyimpanan dan sinkronisasi akun tetap ringan.", "The route is no longer stored: routes are kept only for the " + MAXRT + " newest activities to keep storage and account sync light.")); h.style.cssText = "text-align:left;margin:0 0 12px 2px"; v.append(h); }
   const pt = paceTile(a.sp, a.dist, a.dur), tiles = el("div", "tiles t4");
-  [[L("JARAK", "DISTANCE"), fmtKm(a.dist), "km"], [L("WAKTU", "TIME"), fmtDur(a.dur), ""], [pt.k, pt.v, pt.u], [L("KALORI (PERKIRAAN)", "CALORIES (EST.)"), String(kcalOf(a.sp, a.dist, a.dur)), "kkal"]].forEach(r => {
+  [[L("JARAK", "DISTANCE"), fmtKm(a.dist), "km"], [L("WAKTU", "TIME"), fmtDur(a.dur), ""], [pt.k, pt.v, pt.u], [L("KALORI (PERKIRAAN)", "CALORIES (EST.)"), String(kcalAct(a)), "kkal"]].forEach(r => {
     const t = el("div", "tile"); t.append(el("small", "", r[0]), el("b", "", r[1]), el("em", "", r[2])); tiles.append(t);
   });
+  if(typeof a.eg === "number" && a.eg >= 0){ const t = el("div", "tile"); t.style.gridColumn = "1 / -1"; t.append(el("small", "", L("TANJAKAN (PERKIRAAN)", "ELEVATION GAIN (EST.)")), el("b", "", String(a.eg)), el("em", "", "m")); tiles.append(t); }
   v.append(tiles);
+  if(a.pz >= 10){ const zp = el("p", "tiny", L("Waktu diam tidak dihitung (auto-jeda): ", "Idle time not counted (auto-pause): ") + fmtDur(a.pz)); zp.style.cssText = "text-align:left;margin:8px 0 0 2px"; v.append(zp); }
   if(a.spl && a.spl.length){
     const p = el("div", "panel"); p.style.marginTop = "14px"; p.append(el("span", "label", L("Split per km", "Splits per km")));
     const pc = a.spl.map(s => s[1] / s[0]), best = Math.min.apply(null, pc), worst = Math.max.apply(null, pc);
@@ -10507,7 +10637,7 @@ function renderStat(){
   });
   v.append(chips);
   const from = periodStart(statP), set = all.filter(a => a.ts >= from);
-  const dist = set.reduce((s, a) => s + a.dist, 0), dur = set.reduce((s, a) => s + a.dur, 0), kc = set.reduce((s, a) => s + kcalOf(a.sp, a.dist, a.dur), 0);
+  const dist = set.reduce((s, a) => s + a.dist, 0), dur = set.reduce((s, a) => s + a.dur, 0), kc = set.reduce((s, a) => s + kcalAct(a), 0);
   const tiles = el("div", "tiles t4"); tiles.style.marginTop = "14px";
   [[L("AKTIVITAS", "ACTIVITIES"), String(set.length), ""], [L("JARAK", "DISTANCE"), fmtKm(dist), "km"], [L("WAKTU", "TIME"), fmtDur(dur), ""], [L("KALORI (PERKIRAAN)", "CALORIES (EST.)"), kc.toLocaleString(locale()), "kkal"]].forEach(r => {
     const t = el("div", "tile"); t.append(el("small", "", r[0]), el("b", "", r[1]), el("em", "", r[2])); tiles.append(t);
@@ -10563,15 +10693,17 @@ function settingsPanel(){
   const f = (lab, inp) => { const w = el("label", "field"); w.append(el("span", "", lab), inp); return w; };
   const gi = el("input"); gi.inputMode = "decimal"; gi.placeholder = "0"; gi.value = (+load("goal", 0) || "") + ""; gi.autocomplete = "off";
   const wi = el("input"); wi.inputMode = "decimal"; wi.value = String(weight()); wi.autocomplete = "off";
+  const ai = el("input"); ai.type = "checkbox"; ai.checked = apOn(); ai.style.cssText = "width:22px;height:22px;flex:none";
+  const arow = el("label", ""); arow.style.cssText = "display:flex;align-items:center;gap:10px;margin:4px 0 12px;font-size:14px"; arow.append(ai, el("span", "", L("Auto-jeda: jam berhenti saat kamu diam (lampu merah, istirahat)", "Auto-pause: stop the clock when you stand still (traffic lights, breaks)")));
   const er = el("p", "err"); er.setAttribute("role", "alert");
   const ok = el("button", "btn ghost", L("Simpan pengaturan", "Save settings")); ok.type = "button"; ok.style.marginTop = "0";
   ok.onclick = () => {
     const g = gi.value.trim() === "" ? 0 : parseFloat(gi.value.replace(",", ".")), w = parseFloat(wi.value.replace(",", "."));
     if(!(g >= 0 && g <= 1000)){ er.textContent = L("Target mingguan 0 sampai 1.000 km (0 = tanpa target).", "Weekly goal 0 to 1,000 km (0 = no goal)."); return; }
     if(!(w >= 30 && w <= 250)){ er.textContent = L("Berat badan 30 sampai 250 kg.", "Body weight 30 to 250 kg."); return; }
-    er.textContent = ""; save("goal", g); save("wt", w); toast(L("Pengaturan disimpan.", "Settings saved.")); paint();
+    er.textContent = ""; freezeKc(wtSet() ? weight() : w); save("goal", g); save("wt", w); save("ap", ai.checked ? 1 : 0); toast(L("Pengaturan disimpan.", "Settings saved.")); paint();
   };
-  p.append(f(L("Target mingguan (km, 0 = tanpa target)", "Weekly goal (km, 0 = no goal)"), gi), f(L("Berat badan (kg) untuk perkiraan kalori", "Body weight (kg) for calorie estimate"), wi), ok, er);
+  p.append(f(L("Target mingguan (km, 0 = tanpa target)", "Weekly goal (km, 0 = no goal)"), gi), f(L("Berat badan (kg) untuk perkiraan kalori", "Body weight (kg) for calorie estimate"), wi), arow, ok, er);
   return p;
 }
 
@@ -10599,8 +10731,21 @@ function paint(){
   else renderStat();
 }
 /* tombol back HP: tutup detail atau form manual dulu sebelum keluar menu */
+/* Sedang merekam: tombol ‹ Beranda atau back HP TIDAK langsung menutup menu (GPS ikut mati). Tekan pertama menjeda rekaman dan memberi tahu,
+   tekan kedua baru keluar (rekaman tetap aman sebagai draf jeda dan bisa dilanjutkan). */
+let pausedByBack = 0;
+function holdRec(){
+  if(rec.st !== "run") return;
+  pauseRec(); pausedByBack = Date.now();
+  toast(L("Rekaman dijeda. Tekan kembali sekali lagi untuk keluar.", "Recording paused. Press back once more to leave."), 4000);
+}
+window.satuTitikLeaveGuard = function(){
+  if(rec.st === "run"){ holdRec(); return true; }
+  return Date.now() - pausedByBack < 1500;
+};
 window.__stLayers = function(){
   const o = [];
+  if(rec.st === "run") o.push(() => holdRec());
   if(view === "detail") o.push(() => closeDetail());
   else if(manualOpen && tab === "rec" && rec.st === "idle") o.push(() => { manualOpen = false; renderRec(); });
   return o;
@@ -10612,9 +10757,10 @@ window.addEventListener("storage", e => { if(!e.key || e.key === "ol_lang"){ con
 (function(){
   const d = load("draft", null);
   if(d && SP[d.sp] && d.acc > 0 && Array.isArray(d.pts)){
-    rec.sp = d.sp; rec.acc = +d.acc; rec.start = +d.start || Date.now(); rec.pts = d.pts.filter(p => Array.isArray(p) && p.length >= 4); rec.dist = +d.dist || 0; rec.mock = +d.mock || 0; rec.st = "pause"; restored = true; tab = "rec"; view = "tab";
+    rec.sp = d.sp; rec.acc = +d.acc; rec.start = +d.start || Date.now(); rec.pts = d.pts.filter(p => Array.isArray(p) && p.length >= 4); rec.dist = +d.dist || 0; rec.mock = +d.mock || 0; rec.pz = +d.pz || 0; rec.eg = +d.eg || 0; rec.altN = +d.an || 0; rec.altRef = null; rec.altSm = null; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.st = "pause"; restored = true; tab = "rec"; view = "tab";
   }
 })();
+if(wtSet()) freezeKc(weight());   /* aktivitas lama: kalori dibekukan dengan berat badan yang sudah diisi */
 setInterval(() => { if(rec.st === "run"){ updateLive(); if(Date.now() - lastSave > 10000) saveDraft(); } }, 500);
 paint();
 </scr@@ipt>
