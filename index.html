@@ -1871,6 +1871,27 @@ window.stNativeShare = async function(blob, name, title){
     return true;
   }catch(e){ return /cancel|dismiss/i.test(String((e && e.message) || e)); }
 };
+/* Simpan gambar langsung ke galeri (Android/Capacitor). Urutan: plugin Media (@capacitor-community/media) bila ada; bila tidak,
+   tulis ke Pictures/Satu Titik lewat Filesystem. Mengembalikan true hanya bila benar-benar tersimpan; false = pemanggil memakai unduhan biasa. */
+window.stNativeSaveGallery = async function(blob, name){
+  try{
+    const C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return false;
+    const pl = n => { try{ return (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null); }catch(e){ return null; } };
+    const FS = pl("Filesystem"); if(!FS) return false;
+    const b64 = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = no; r.readAsDataURL(blob); });
+    const MD = pl("Media");
+    if(MD && MD.savePhoto){
+      try{
+        const w = await FS.writeFile({path:name, data:b64, directory:"CACHE"});
+        await MD.savePhoto({path:w.uri});
+        return true;
+      }catch(e){}
+    }
+    try{ await FS.requestPermissions(); }catch(e){}
+    await FS.writeFile({path:"Pictures/Satu Titik/" + name, data:b64, directory:"EXTERNAL_STORAGE", recursive:true});
+    return true;
+  }catch(e){ return false; }
+};
 /* Rekam GPS latar belakang (menu Olahraga). Di aplikasi Android memakai plugin BackgroundGeolocation (foreground service + notifikasi).
    Menu olahraga ada di iframe, jadi plugin dipanggil lewat sini. GPS otomatis dihentikan bila menu (iframe) ditutup. */
 window.stNativeGps = (function(){
@@ -10647,8 +10668,11 @@ function renderDetail(){
 const SANS = "system-ui,-apple-system,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif", SERIF = "Georgia,\"Times New Roman\",serif";
 const SHF = {
   story:{w:1080, h:1920, wm:120, rt:[140, 250, 800, 930], p:{ti:1320, da:1372, di:1590, df:240, ro:1760, rl:1814}, n:{ti:790, da:842, di:1090, df:280, ro:1280, rl:1334}},
-  sq:{w:1080, h:1080, wm:84, rt:[300, 150, 480, 470], p:{ti:700, da:744, di:880, df:150, ro:985, rl:1024}, n:{ti:330, da:374, di:580, df:180, ro:770, rl:809}}
+  sq:{w:1080, h:1080, wm:84, rt:[300, 150, 480, 470], p:{ti:700, da:744, di:880, df:150, ro:985, rl:1024}, n:{ti:330, da:374, di:580, df:180, ro:770, rl:809}},
+  /* 16:9 (mendatar, 1920x1080): dengan rute = rute di kiri, angka di kanan; tanpa rute = angka di tengah */
+  wide:{w:1920, h:1080, wm:70, rt:[90, 150, 780, 840], p:{cx:1440, sw:780, k:.85, ti:370, da:420, di:620, df:190, ro:820, rl:864}, n:{cx:960, sw:900, k:1, ti:370, da:420, di:620, df:200, ro:820, rl:864}}
 };
+const SH_BLUE = "#2d7dff";   /* biru identitas aplikasi untuk warna tulisan */
 let shLogoC;
 function shLogo(){
   if(shLogoC !== undefined) return Promise.resolve(shLogoC);
@@ -10687,8 +10711,8 @@ function shDraw(cv, a, o, logo){
     gr.addColorStop(0, "rgba(" + c + ",.38)"); gr.addColorStop(.3, "rgba(" + c + ",0)"); gr.addColorStop(.55, "rgba(" + c + ",0)"); gr.addColorStop(1, "rgba(" + c + ",.55)");
     g.fillStyle = gr; g.fillRect(0, 0, W, H);
   }
-  const ink = o.dark ? "#111111" : "#ffffff";
-  g.fillStyle = ink; g.shadowColor = o.dark ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.5)"; g.shadowBlur = 14; g.shadowOffsetY = 2; g.textBaseline = "alphabetic";
+  const ink = o.blue ? SH_BLUE : (o.dark ? "#111111" : "#ffffff"), cx = P.cx || W / 2, sw = P.sw || 900, kf = P.k || 1;
+  g.fillStyle = ink; g.shadowColor = o.dark ? (o.blue ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.6)") : "rgba(0,0,0,.5)"; g.shadowBlur = 14; g.shadowOffsetY = 2; g.textBaseline = "alphabetic";
   /* watermark di bagian atas */
   { const t = "Satu Titik", lh = logo ? 64 : 0, lw = logo ? lh * shDims(logo)[0] / shDims(logo)[1] : 0, gap = logo ? 16 : 0;
     g.font = "700 46px " + SERIF; const tw = g.measureText(t).width, x0 = (W - lw - gap - tw) / 2;
@@ -10696,18 +10720,18 @@ function shDraw(cv, a, o, logo){
     g.textAlign = "left"; g.fillText(t, x0 + lw + gap, F.wm + 15); g.globalAlpha = 1; }
   if(hasRt) shRoute(g, a.rt, F.rt, ink, o.fmt === "story" ? 15 : 11);
   g.fillStyle = ink; g.textAlign = "center";   /* titik rute mengubah warna isian: kembalikan untuk tulisan */
-  g.font = "700 52px " + SANS; g.fillText(shFit(g, a.title || defTitle(a.sp, a.ts), 900), W / 2, P.ti);
-  g.font = "400 34px " + SANS; g.globalAlpha = .85; g.fillText(spName(a.sp) + " · " + fmtDate(a.ts), W / 2, P.da); g.globalAlpha = 1;
+  g.font = "700 52px " + SANS; g.fillText(shFit(g, a.title || defTitle(a.sp, a.ts), Math.min(900, sw + 60)), cx, P.ti);
+  g.font = "400 34px " + SANS; g.globalAlpha = .85; g.fillText(spName(a.sp) + " · " + fmtDate(a.ts), cx, P.da); g.globalAlpha = 1;
   { const ds = fmtKm(a.dist); g.font = "800 " + P.df + "px " + SANS; const nw = g.measureText(ds).width;
-    g.font = "700 " + Math.round(P.df * .27) + "px " + SANS; const uw = g.measureText(" km").width, x0 = (W - nw - uw) / 2;
+    g.font = "700 " + Math.round(P.df * .27) + "px " + SANS; const uw = g.measureText(" km").width, x0 = cx - (nw + uw) / 2;
     g.textAlign = "left"; g.font = "800 " + P.df + "px " + SANS; g.fillText(ds, x0, P.di);
     g.font = "700 " + Math.round(P.df * .27) + "px " + SANS; g.fillText(" km", x0 + nw, P.di); g.textAlign = "center"; }
   const pt = paceTile(a.sp, a.dist, a.dur), it = [[L("Waktu", "Time"), fmtDur(a.dur)], [SP[a.sp].pace ? L("Pace /km", "Pace /km") : L("Kecepatan km/jam", "Speed km/h"), pt.v]];
   if(o.kc) it.push([L("Kalori (kkal)", "Calories (kcal)"), String(kcalAct(a))]);
   if(o.eg && typeof a.eg === "number" && a.eg >= 0) it.push([L("Tanjakan (m)", "Elevation (m)"), String(a.eg)]);
   it.forEach((r, i) => {
-    const x = 90 + 900 / it.length * (i + .5);
-    g.font = "800 " + (it.length > 3 ? 58 : 68) + "px " + SANS; g.fillText(r[1], x, P.ro);
+    const x = cx - sw / 2 + sw / it.length * (i + .5);
+    g.font = "800 " + Math.round((it.length > 3 ? 58 : 68) * kf) + "px " + SANS; g.fillText(r[1], x, P.ro);
     g.font = "400 30px " + SANS; g.globalAlpha = .85; g.fillText(r[0], x, P.rl); g.globalAlpha = 1;
   });
   g.shadowColor = "transparent"; g.shadowBlur = 0; g.shadowOffsetY = 0;
@@ -10716,18 +10740,21 @@ const shNative = () => { try{ const C = window.parent.Capacitor; return !!(C && 
 async function shOut(a, cv, mode){
   const b = await new Promise(ok => cv.toBlob(x => ok(x), "image/png"));
   if(!b){ toast(L("Gagal membuat gambar.", "Could not create the image.")); return; }
-  const name = "satu-titik-" + ((a.title || "aktivitas").replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "aktivitas") + ".png", title = a.title || "Satu Titik";
-  if(mode === "share" || shNative()){
+  const name = "satu-titik-" + ((a.title || "aktivitas").replace(/[^\w-]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 30) || "aktivitas") + "-" + Date.now().toString(36) + ".png", title = a.title || "Satu Titik";
+  if(mode === "share"){
     try{ const ns = window.parent && window.parent.stNativeShare; if(ns && await ns(b, name, title)) return; }catch(e){}
     try{ const f = new File([b], name, {type:"image/png"}); if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:title}); return; } }catch(e){ if(e && e.name === "AbortError") return; }
+  } else {
+    /* simpan: langsung ke galeri (aplikasi Android), bukan lewat lembar bagikan */
+    try{ const sg = window.parent && window.parent.stNativeSaveGallery; if(sg && await sg(b, name)){ toast(L("Gambar disimpan ke galeri.", "Image saved to gallery.")); return; } }catch(e){}
   }
   const u = URL.createObjectURL(b), l = document.createElement("a"); l.href = u; l.download = name; document.body.appendChild(l); l.click(); l.remove();
-  setTimeout(() => URL.revokeObjectURL(u), 4000); toast(L("Gambar diunduh.", "Image downloaded."));
+  setTimeout(() => URL.revokeObjectURL(u), 4000); toast(shNative() ? L("Gagal menyimpan ke galeri. Gambar diunduh.", "Could not save to gallery. Image downloaded.") : L("Gambar diunduh.", "Image downloaded."));
 }
 async function shOpen(a){
   if($("shSheet")) return;
   const logo = await shLogo(), sv = load("sh", {}) || {};
-  const o = {fmt:sv.fmt === "sq" ? "sq" : "story", dark:sv.dark === true, rt:sv.rt !== false, kc:sv.kc !== false, eg:sv.eg !== false, bg:null};
+  const o = {fmt:(sv.fmt === "sq" || sv.fmt === "wide") ? sv.fmt : "story", blue:sv.blue === true, dark:sv.dark === true || sv.blue === true, rt:sv.rt !== false, kc:sv.kc !== false, eg:sv.eg !== false, bg:null};
   const hasRt = !!(a.rt && a.rt.length > 1), hasEg = typeof a.eg === "number" && a.eg >= 0;
   const ov = el("div"); ov.id = "shSheet"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
   const css = el("style", "", "#shSheet{position:fixed;inset:0;z-index:50;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--bg);padding:14px 16px calc(28px + env(safe-area-inset-bottom,0px))}" +
@@ -10738,7 +10765,7 @@ async function shOpen(a){
     "#shSheet .grp .label{margin-bottom:8px}.toast{z-index:60}");
   const inp = el("input"); inp.type = "file"; inp.accept = "image/*"; inp.hidden = true;
   const pv = el("div", "pv"), cv = el("canvas"); pv.append(cv);
-  const redraw = () => { pv.className = "pv" + (o.dark ? " lt" : ""); try{ shDraw(cv, a, o, logo); }catch(e){ toast(L("Gagal membuat gambar.", "Could not create the image.")); } save("sh", {fmt:o.fmt, dark:o.dark, rt:o.rt, kc:o.kc, eg:o.eg}); };
+  const redraw = () => { pv.className = "pv" + (o.dark ? " lt" : ""); try{ shDraw(cv, a, o, logo); }catch(e){ toast(L("Gagal membuat gambar.", "Could not create the image.")); } save("sh", {fmt:o.fmt, dark:o.dark, blue:o.blue, rt:o.rt, kc:o.kc, eg:o.eg}); };
   const group = (label, defs) => {
     const w = el("div", "grp"), ch = el("div", "chips"); w.append(el("span", "label", label), ch);
     defs.forEach(d => { const b = el("button", "chip", ""); b.type = "button"; ch.append(b); d.b = b; b.onclick = () => { d.tap(); paintAll(); }; });
@@ -10750,10 +10777,12 @@ async function shOpen(a){
     {t:() => o.bg ? L("Ganti foto galeri", "Change gallery photo") : L("Foto dari galeri", "Photo from gallery"), on:() => !!o.bg, tap:pick}]);
   const gFmt = group(L("Ukuran", "Size"), [
     {t:() => "Story 9:16", on:() => o.fmt === "story", tap:() => { o.fmt = "story"; redraw(); }},
-    {t:() => L("Kotak 1:1", "Square 1:1"), on:() => o.fmt === "sq", tap:() => { o.fmt = "sq"; redraw(); }}]);
+    {t:() => L("Kotak 1:1", "Square 1:1"), on:() => o.fmt === "sq", tap:() => { o.fmt = "sq"; redraw(); }},
+    {t:() => L("Lebar 16:9", "Wide 16:9"), on:() => o.fmt === "wide", tap:() => { o.fmt = "wide"; redraw(); }}]);
   const gInk = group(L("Warna tulisan", "Text color"), [
-    {t:() => L("Putih", "White"), on:() => !o.dark, tap:() => { o.dark = false; redraw(); }},
-    {t:() => L("Hitam", "Black"), on:() => o.dark, tap:() => { o.dark = true; redraw(); }}]);
+    {t:() => L("Putih", "White"), on:() => !o.dark, tap:() => { o.dark = false; o.blue = false; redraw(); }},
+    {t:() => L("Hitam", "Black"), on:() => o.dark && !o.blue, tap:() => { o.dark = true; o.blue = false; redraw(); }},
+    {t:() => L("Biru", "Blue"), on:() => o.blue, tap:() => { o.dark = true; o.blue = true; redraw(); }}]);
   const gShow = group(L("Tampilkan", "Show"), [
     {t:() => L("Rute", "Route"), on:() => o.rt && hasRt, off:!hasRt, tap:() => { o.rt = !o.rt; redraw(); }},
     {t:() => L("Kalori", "Calories"), on:() => o.kc, tap:() => { o.kc = !o.kc; redraw(); }},
@@ -10777,7 +10806,7 @@ async function shOpen(a){
   document.addEventListener("keydown", key);
   const back = el("button", "back", "‹ " + L("Kembali", "Back")); back.type = "button"; back.onclick = close;
   const share = el("button", "btn", L("Bagikan", "Share")); share.type = "button"; share.onclick = () => shOut(a, cv, "share");
-  const save2 = el("button", "btn ghost", shNative() ? L("Simpan lewat lembar bagikan", "Save via the share sheet") : L("Simpan gambar", "Save image")); save2.type = "button"; save2.onclick = () => shOut(a, cv, "save");
+  const save2 = el("button", "btn ghost", L("Simpan gambar ke galeri", "Save image to gallery")); save2.type = "button"; save2.onclick = () => shOut(a, cv, "save");
   const hint = el("p", "hint", L("Latar transparan siap ditempel di foto atau story-mu. Atau pilih foto dari galeri sebagai latar.", "The transparent background is ready to lay over a photo or story. Or pick a gallery photo as the background."));
   hint.style.margin = "0";
   const wrap = el("div", "in"); wrap.append(back, pv, hint, gBg.w, gFmt.w, gInk.w, gShow.w, share, save2);
