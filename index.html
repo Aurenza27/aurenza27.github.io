@@ -10444,7 +10444,7 @@ function pushNotif(force){
     window.parent.stNativeGps.notify({
       title: SP[rec.sp].ic + " " + spName(rec.sp) + (run ? "" : " · " + L("Dijeda", "Paused")) + " · " + fmtKm(d) + " km",
       text: L("Waktu ", "Time ") + fmtDur(dur) + " · " + L("Kalori ", "Calories ") + kcalOf(rec.sp, d, dur) + " kkal · " + pt.k + " " + pt.v + " " + pt.u,
-      elapsedMs: ms, paused: !run, ticking: run && rec.rdy && !rec.apSince,
+      elapsedMs: ms, paused: !run, ticking: run && rec.rdy && !rec.apSince, ongoing: true,   /* permanen: tidak bisa digeser hilang selama menu Olahraga merekam */
       actionLabel: run ? L("Jeda", "Pause") : L("Lanjut", "Resume")
     });
   }catch(e){}
@@ -10780,7 +10780,7 @@ window.addEventListener("storage", e => { if(!e.key || e.key === "ol_lang"){ con
   }
 })();
 if(wtSet()) freezeKc(weight());   /* aktivitas lama: kalori dibekukan dengan berat badan yang sudah diisi */
-setInterval(() => { if(rec.st === "run"){ updateLive(); if(Date.now() - lastSave > 10000) saveDraft(); } }, 500);
+setInterval(() => { if(rec.st === "run"){ updateLive(); if(Date.now() - lastSave > 10000) saveDraft(); } else if(rec.st === "pause") pushNotif(false); }, 500);   /* saat dijeda, notifikasi dipasang ulang tiap 2 dtk bila terhapus */
 paint();
 </scr@@ipt>
 </body>
