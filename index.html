@@ -13231,7 +13231,7 @@ const bio = (() => {
   }
   async function ask(reason, fallback){
     init();
-    if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason, cancelTitle: L("Pakai PIN", "Use PIN"), allowDeviceCredential: !!fallback, androidTitle: "KEUANGAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
+    if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason, cancelTitle: fallback ? L("Batal", "Cancel") : L("Pakai PIN", "Use PIN"), allowDeviceCredential: !!fallback, androidTitle: "KEUANGAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
     if(N){ try{ await N.verifyIdentity({ reason, title: "KEUANGAN", subtitle: reason, useFallback: !!fallback, maxAttempts: 3 }); return true; }catch(e){} }
     return false;
   }
@@ -13388,10 +13388,10 @@ async function lkRecGate(){
   if(asking) return;
   let ok = true;
   if(await bio.ok()){
-    ok = false; asking = true;
+    ok = false; asking = true; window.__bioErr = "";
     try{ ok = await bio.ask(L("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code"), true); }catch(e){ ok = false; } finally{ asking = false; }
   }
-  if(!ok) return toast(L("Verifikasi dibatalkan.", "Verification cancelled."));
+  if(!ok) return toast(L("Verifikasi dibatalkan.", "Verification cancelled.") + (window.__bioErr ? " [" + window.__bioErr + "]" : ""), 5000);
   recMode = true; paint();
 }
 async function lkRecNew(){
@@ -14244,7 +14244,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     }
     async function ask(reason, fallback){
       init();
-      if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason: reason, cancelTitle: LL("Pakai PIN", "Use PIN"), allowDeviceCredential: !!fallback, androidTitle: "ARISAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
+      if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason: reason, cancelTitle: fallback ? LL("Batal", "Cancel") : LL("Pakai PIN", "Use PIN"), allowDeviceCredential: !!fallback, androidTitle: "ARISAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
       if(N){ try{ await N.verifyIdentity({ reason: reason, title: "ARISAN", subtitle: reason, useFallback: !!fallback, maxAttempts: 3 }); return true; }catch(e){} }
       return false;
     }
@@ -14425,10 +14425,10 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     if(lkAsking) return;
     var ok = true;
     if(await lkbio.ok()){
-      ok = false; lkAsking = true;
+      ok = false; lkAsking = true; window.__bioErr = "";
       try{ ok = await lkbio.ask(LL("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code"), true); }catch(e){ ok = false; } finally{ lkAsking = false; }
     }
-    if(!ok) return flash(LL("Verifikasi dibatalkan.", "Verification cancelled."));
+    if(!ok) return flash(LL("Verifikasi dibatalkan.", "Verification cancelled.") + (window.__bioErr ? " [" + window.__bioErr + "]" : ""));
     lkRecMode = true; lkRedraw();
   }
   async function lkRecNew(){
