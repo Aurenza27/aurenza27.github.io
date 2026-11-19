@@ -14181,7 +14181,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
   function lkCfgView(){
     if(lkRec) return lkRecView();
     var c = lkcfg(), back = '<button class="ghost" type="button" data-lk="back" style="align-self:flex-start">‹ ' + LL("Kembali", "Back") + '</button>';
-    if(!c) return back + '<div class="panel"><p class="label">🔒 ' + LL("Kunci tab Keuangan", "Lock the Finance tab") + '</p><p class="hint" style="margin:0 0 12px">' +
+    if(!c) return back + '<div class="panel"><p class="label">🔒 ' + LL("Kunci Arisan", "Lock Arisan") + '</p><p class="hint" style="margin:0 0 12px">' +
       LL("Pasang PIN supaya tab Keuangan Arisan hanya bisa dibuka olehmu. Kunci hanya berlaku di perangkat ini. Tab Kocok tetap bisa dipakai tanpa PIN.", "Set a PIN so only you can open the Arisan Finance tab. The lock only applies on this device. The Draw tab stays open without a PIN.") + '</p>' +
       lkPinFld("lk1", LL("PIN baru (4-8 angka)", "New PIN (4-8 digits)")) + lkPinFld("lk2", LL("Ulangi PIN", "Repeat PIN")) +
       '<button class="go" type="button" data-lk="set">' + LL("Aktifkan kunci", "Turn on lock") + '</button></div>';
@@ -14209,7 +14209,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       if(c && c.b && !lkAuto){ lkAuto = true; setTimeout(lkAskBio, 350); }
     }
   }
-  function lkLabel(){ var b = $("bLkCfg"); if(b) b.textContent = "🔒 " + (lkOn() ? LL("Kunci Keuangan: aktif", "Finance lock: on") : LL("Kunci Keuangan", "Lock Finance")); }
+  function lkLabel(){ var b = $("bLkCfg"); if(b) b.textContent = "🔒 " + (lkOn() ? LL("Kunci Arisan: aktif", "Arisan lock: on") : LL("Kunci Arisan", "Lock Arisan")); }
   function lkPinCheck(p1, p2){
     if(!(window.crypto && crypto.subtle)) return LL("Perangkat ini tidak mendukung kunci PIN.", "This device doesn't support PIN lock.");
     if(!/^\d{4,8}$/.test(p1)) return LL("PIN harus 4 sampai 8 angka.", "PIN must be 4 to 8 digits.");
@@ -14257,7 +14257,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       if(await lkhash(code, c.rs) === c.rh){
         try{ localStorage.removeItem(LKEY); }catch(e){}
         lkd = false; lkMode = ""; lkRecMode = false; lkRedraw();
-        flash(LL("PIN dihapus, data aman. Pasang PIN baru lewat tombol Kunci Keuangan.", "PIN removed, data is safe. Set a new PIN with the Lock Finance button."), true);
+        flash(LL("PIN dihapus, data aman. Pasang PIN baru lewat tombol Kunci Arisan.", "PIN removed, data is safe. Set a new PIN with the Lock Arisan button."), true);
         return;
       }
       c.f = (+c.f || 0) + 1;
@@ -14283,7 +14283,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       if(dv === "fail") return flash(LL("Verifikasi dibatalkan. PIN tidak dihapus.", "Verification cancelled. The PIN was not removed."));
       flash(LL("Masuk dengan akun Google yang sama untuk menghapus PIN.", "Sign in with the same Google account to remove the PIN."), true);
       try{ if(au.user && au.logout) await au.logout(); await au.login(); for(var i = 0; i < 20 && !au.user; i++) await new Promise(function(r){ setTimeout(r, 250); }); }catch(e){}
-      if(au.user && au.user.uid === c.o){ try{ localStorage.removeItem(LKEY); }catch(e){} lkd = false; lkMode = ""; lkRedraw(); flash(LL("Kunci dihapus. Pasang PIN baru lewat tombol Kunci Keuangan.", "Lock removed. Set a new PIN with the Lock Finance button."), true); }
+      if(au.user && au.user.uid === c.o){ try{ localStorage.removeItem(LKEY); }catch(e){} lkd = false; lkMode = ""; lkRedraw(); flash(LL("Kunci dihapus. Pasang PIN baru lewat tombol Kunci Arisan.", "Lock removed. Set a new PIN with the Lock Arisan button."), true); }
       else flash(LL("Akun Google tidak cocok atau masuk dibatalkan.", "Google account doesn't match, or sign-in was cancelled."));
       return;
     }
@@ -14561,10 +14561,18 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
 
   var delArm = "";
   function emptyA(){ A = { names:[], out:[], fix:0, pay:{}, ul:{} }; }
-  function deleteArisan(id){
+  async function deleteArisan(id){
     if(busy || ON.role) return;
     if(delArm !== id){ delArm = id; paintM(); setTimeout(function(){ if(delArm === id){ delArm = 0; if(scr === "M") paintM(); } }, 3500); return; }
     delArm = 0;
+    /* bila sidik jari aktif di kunci Arisan, hapus arisan harus diverifikasi dengan sidik jari */
+    var lc = lkcfg();
+    if(lc && lc.b){
+      var vok = false; lkAsking = true;
+      try{ vok = await lkbio.ask(LL("Verifikasi sidik jari untuk menghapus arisan", "Verify your fingerprint to delete the arisan")); }catch(e){} finally{ lkAsking = false; }
+      if(!vok){ if(scr === "M") paintM(); flash(LL("Verifikasi dibatalkan. Arisan tidak dihapus.", "Verification cancelled. The arisan was not deleted.")); return; }
+      if(busy || ON.role) return;
+    }
     try{ localStorage.removeItem("an_data_" + id); }catch(e){}
     AL.items = AL.items.filter(function(x){ return x.id !== id; }); saveList();
     paint(); flash(T().deld, true);
