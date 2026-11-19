@@ -734,7 +734,8 @@ const MENUS = [
   { id:"turnamen", cat:"manajemen", icon:"🏆", title:"TURNAMEN", desc:"Atur turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor", descEn:"Run a sports or eSports tournament: fixtures, scores, standings, knockout bracket, and top scorers", src:"src-turnamen" },
   { id:"tebak-inisial", cat:"hiburan", icon:"🔤", title:"TEBAK INISIAL", desc:"Acak huruf A–Z dan kategori untuk tebak-tebakan seru anak-anak", descEn:"Random letter A–Z and category for fun kids' guessing games", src:"src-tebak-inisial" },
   { id:"versus", cat:"hiburan", icon:"⚔️", title:"VERSUS", desc:"Tulis dua nama apa saja, lalu adu: menang, kalah, atau draw", descEn:"Type any two names and fight: win, lose, or draw", src:"src-versus" },
-  { id:"acak-nama", cat:"manajemen", icon:"🎲", title:"ARISAN", desc:"Kocok arisan: nama yang keluar tidak muncul lagi, bisa offline atau online (ditonton realtime), plus catatan keuangan arisan", descEn:"Arisan-style name draw: a drawn name never returns, play offline or online (watched live), plus arisan finance tracking", src:"src-acak-nama" }
+  { id:"acak-nama", cat:"manajemen", icon:"🎲", title:"ARISAN", desc:"Kocok arisan: nama yang keluar tidak muncul lagi, bisa offline atau online (ditonton realtime), plus catatan keuangan arisan", descEn:"Arisan-style name draw: a drawn name never returns, play offline or online (watched live), plus arisan finance tracking", src:"src-acak-nama" },
+  { id:"keuangan", cat:"manajemen", icon:"💰", title:"KEUANGAN", desc:"Catat uang masuk dan uang keluar, atur jatah belanja, dan kumpulkan tabungan", descEn:"Record money in and out, set spending limits, and build your savings", src:"src-keuangan" }
 ];
 /* judul menu per bahasa: [beranda ID, beranda EN, judul di dalam menu ID, judul di dalam menu EN]. Nama aplikasi "Satu Titik" tidak diterjemahkan. */
 const MTITLE = {
@@ -749,7 +750,8 @@ const MTITLE = {
   "olahraga":["OLAHRAGA","SPORTS","CATAT OLAHRAGA","ACTIVITY LOG"],
   "tebak-inisial":["TEBAK INISIAL","GUESS THE INITIAL","TEBAK INISIAL","GUESS THE INITIAL"],
   "versus":["VERSUS","VERSUS","VERSUS","VERSUS"],
-  "acak-nama":["ARISAN","ARISAN","ARISAN","ARISAN"]
+  "acak-nama":["ARISAN","ARISAN","ARISAN","ARISAN"],
+  "keuangan":["KEUANGAN","FINANCE","KEUANGAN","FINANCE"]
 };
 const mTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 1 : 0] : m.title; };
 const fTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 3 : 2] : m.title; };
@@ -785,9 +787,10 @@ const ICONS = {
   "turnamen":'<svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7M10 17h4"/></svg>',
   "tebak-inisial":'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M9 16l3-8 3 8M10.2 13.4h3.6"/></svg>',
   "versus":'<svg viewBox="0 0 24 24"><path d="M5 19 15 9M15 9l1-4 4-1-1 4-4 1zM19 19 9 9M9 9 8 5 4 4l1 4 4 1z"/></svg>',
-  "acak-nama":'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>'
+  "acak-nama":'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>',
+  "keuangan":'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.3" fill="currentColor"/></svg>'
 };
-const BADGE = {"cek-watak":{id:"Baru", en:"New"}, "cek-jodoh":{id:"Baru", en:"New"}, "cek-bmi":{id:"Baru", en:"New"}, "cek-hamil":{id:"Baru", en:"New"}, "versus":{id:"Baru", en:"New"}, "acak-nama":{id:"Baru", en:"New"}};
+const BADGE = {"cek-watak":{id:"Baru", en:"New"}, "cek-jodoh":{id:"Baru", en:"New"}, "cek-bmi":{id:"Baru", en:"New"}, "cek-hamil":{id:"Baru", en:"New"}, "versus":{id:"Baru", en:"New"}, "acak-nama":{id:"Baru", en:"New"}, "keuangan":{id:"Baru", en:"New"}};
 /* Label "Baru" hilang otomatis 14 hari.
    - 4 menu awal: dihitung dari tanggal rilis 10 November 2026 (hilang 24 November 2026).
    - Menu yang ditambahkan kemudian: otomatis berlabel "Baru" selama 14 hari sejak pertama kali muncul di perangkat ini
@@ -1038,6 +1041,8 @@ function writeKeys(s){
   w("an_fx", j(s.sound)); w("an_lang", s.lang); w("an_anim", j(s.anim));
   /* Olahraga (awalan ol_; hanya mengikuti bahasa) */
   w("ol_lang", s.lang);
+  /* Keuangan (awalan kg_; hanya mengikuti bahasa) */
+  w("kg_lang", s.lang);
   w("tt_gap", j(gi)); w("tt_lang", j(s.lang)); w("tt_follow", j(s.scroll)); w("tt_anim", j(s.anim)); w("tt_vol", j(s.aivol / 100)); w("tt_mvol", j(s.mvol / 100));
 }
 const TOG = {
@@ -1052,7 +1057,8 @@ const TOG = {
   "olahraga": {},
   "tebak-inisial": {},
   "versus": {},
-  "acak-nama": {}
+  "acak-nama": {},
+  "keuangan": {}
 };
 const RNG = {"th-analytics":{mvol:"volRange", aivol:"aiVolRange"}, "cek-khodam":{mvol:"mvol", aivol:"vol"}, "hari-hoki":{mvol:"mvol", aivol:"vol"}, "cek-watak":{mvol:"mvol", aivol:"vol"}, "cek-jodoh":{mvol:"mvol", aivol:"vol"}, "cek-bmi":{mvol:"mvol", aivol:"vol"}, "cek-hamil":{mvol:"mvol", aivol:"vol"}, "turnamen":{mvol:"mvol", aivol:"vol"}, "olahraga":{}, "tebak-inisial":{}};
 /* Keadaan ASLI menu dibaca langsung dari bingkainya (bukan ditebak dari pengaturan sebelumnya),
@@ -1585,6 +1591,7 @@ function rStatus(id, msg){ const e = $(id); e.hidden = !msg; e.textContent = msg
 async function wipeKv(A){
   const u = A.user, { m, db } = await A.getDb();
   await m.setDoc(m.doc(db, "users", u.uid), { kv: m.deleteField(), u: m.deleteField() }, { merge: true });
+  await m.deleteDoc(m.doc(db, "users", u.uid, "data", "keuangan"));   /* data keuangan (dokumen terpisah) */
 }
 async function wipeServer(A, joined){
   const u = A.user, { m, db } = await A.getDb(), uid = u.uid, acc = A.accountId ? String(A.accountId).toUpperCase() : "";
@@ -13052,6 +13059,313 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 </html>
 </script>
 
+<script type="text/plain" id="src-keuangan"><!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KEUANGAN</title>
+<style>
+:root{--bg:#0d1017;--card:#171c27;--field:#0f131b;--line:#262d3b;--text:#eef0f4;--muted:#8b93a5;--gold:#d4a94f;--gold2:#f0cf86;--ok:#4cc38a;--warn:#e8a838;--bad:#e5534b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-variant-numeric:tabular-nums;display:flex;justify-content:center}
+.app{width:100%;max-width:420px;padding:18px 16px calc(34px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.brand{text-align:center}.brand .icon{font-size:34px}.brand h1{margin:4px 0 0;font-size:20px;letter-spacing:.14em}
+.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:14px}
+.tab{flex:1;min-height:40px;padding:0 4px;border:0;border-radius:10px;background:transparent;color:var(--muted);font:inherit;font-size:13px;cursor:pointer}
+.tab.on{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font-weight:700}
+main{display:flex;flex-direction:column;gap:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.label{display:block;font-size:14px;font-weight:600;color:var(--gold);margin:0 0 10px}
+.hint,small{font-size:13px;line-height:1.5;color:var(--muted)}
+.hint{margin:8px 0 0}
+.big{font-size:32px;font-weight:700;color:var(--gold2);line-height:1.15;margin-bottom:6px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--field);min-width:0}
+.tile small{display:block}.tile b{display:block;margin-top:3px;font-size:15px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .l{min-width:0;flex:1}.row .l b{display:block;font-size:14px;font-weight:600}
+.row .r{text-align:right;white-space:nowrap;font-weight:600;font-size:14px}
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}.fld>span{font-size:13.5px;color:var(--muted)}
+input,select{width:100%;min-height:48px;padding:0 12px;font:inherit;font-size:16px;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:12px}
+input:focus,select:focus{outline:0;border-color:var(--gold)}
+#fa{font-size:22px;font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cat{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:62px;padding:8px 2px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--text);font:inherit;font-size:12px;cursor:pointer}
+.cat i{font-style:normal;font-size:20px}
+.cat.on{border-color:var(--gold);background:rgba(212,169,79,.12);color:var(--gold2)}
+.btn{width:100%;min-height:52px;font:inherit;font-size:15px;font-weight:700;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0;border-radius:12px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--gold2);border:1px solid var(--line);font-weight:600}
+.btn.in{background:var(--ok);color:#06210f;min-height:64px;font-size:16px}
+.btn.out{background:var(--bad);color:#1f0705;min-height:64px;font-size:16px}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid var(--bad);font-weight:600}
+.btn.sure{background:var(--bad);color:#1f0705}
+.ovl{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.65)}
+.dlg{width:100%;max-width:360px;padding:20px;background:var(--card);border:1px solid var(--bad);border-radius:16px}
+.dlg h2{margin:0 0 10px;font-size:17px;line-height:1.35}.dlg p{margin:0 0 16px;font-size:14px;line-height:1.6;color:var(--muted)}.dlg p b{color:var(--text)}
+.dlg .two{margin-top:0}
+.x{min-width:40px;min-height:38px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--muted);font:inherit;font-size:13px;cursor:pointer}
+.mnav{display:flex;align-items:center;justify-content:space-between;gap:10px}.mnav b{font-size:15px}
+.bar{height:8px;border-radius:99px;background:var(--field);overflow:hidden;margin:7px 0 5px}
+.bar i{display:block;height:100%;background:var(--ok)}.bar i.warn{background:var(--warn)}.bar i.bad{background:var(--bad)}
+.brow{padding:10px 0;border-top:1px solid var(--line)}.brow:first-of-type{border-top:0}
+.rowh{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
+.rowh input{width:140px;min-height:40px;text-align:right;font-size:15px}
+.empty{color:var(--muted);font-size:14px;line-height:1.6;margin:0;text-align:center;padding:6px 0}
+details{margin-bottom:14px}summary{cursor:pointer;color:var(--gold2);font-size:14px;padding:6px 0}details[open] summary{margin-bottom:10px}
+.tip ol{margin:6px 0 0;padding-left:20px;font-size:14px;line-height:1.7;color:var(--text)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--gold);color:#1a1405;font-weight:700;font-size:14px;padding:10px 18px;border-radius:999px;transition:.2s;max-width:90%;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="brand"><div class="icon">💰</div><h1 id="t">KEUANGAN</h1></div>
+<nav class="tabs" id="tabs"></nav>
+<main id="v"></main>
+<div class="toast" id="toast" role="status"></div>
+<div class="ovl" id="ovl" role="alertdialog" aria-modal="true" aria-labelledby="ovT" aria-describedby="ovP" hidden><div class="dlg"><h2 id="ovT"></h2><p id="ovP"></p><div class="two"><button class="btn ghost" id="ovNo" data-a="cancelreset"></button><button class="btn sure" data-a="doreset"></button></div></div></div>
+</div>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const K = "kg_db";
+const readLang = () => { try{ return String(localStorage.getItem("kg_lang") || "id").replace(/"/g, "") === "en" ? "en" : "id"; }catch(e){ return "id"; } };
+let lang = readLang();
+const L = (i, e) => lang === "en" ? e : i;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const num = s => +String(s).replace(/[^\d]/g, "") || 0;
+const fmtN = n => Math.round(n).toLocaleString(lang === "en" ? "en-US" : "id-ID");
+const rp = n => (n < 0 ? "−" : "") + "Rp " + fmtN(Math.abs(n));
+const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
+const thisM = () => today().slice(0, 7);
+const MN = {id:["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"], en:["January","February","March","April","May","June","July","August","September","October","November","December"]};
+const mLab = m => MN[lang][+m.slice(5) - 1] + " " + m.slice(0, 4);
+const mShift = (m, n) => { const d = new Date(+m.slice(0, 4), +m.slice(5) - 1 + n, 1); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); };
+let tt = 0;
+function toast(m, ms){ const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), ms || 2400); }
+
+/* ===== data: satu kunci kg_db (ikut tersinkron ke akun Google oleh beranda) ===== */
+function load(){ try{ const d = JSON.parse(localStorage.getItem(K) || "null"); if(d && d.v === 1){ if(!d.cc) d.cc = []; if(!d.ci) d.ci = []; return d; } }catch(e){} return {v:1, w:[{id:"w1", n:"Tunai", t:"cash", b:0}], t:[], bu:{}, g:[], cc:[], ci:[]}; }
+let db = load();
+/* sinkron ke dokumen keuangan di akun (lewat beranda); kg_ts = waktu perubahan terakhir, dipakai untuk menentukan data mana yang lebih baru */
+let syT = 0;
+function syncSoon(){ clearTimeout(syT); syT = setTimeout(() => { try{ const A = window.parent !== window ? window.parent.satuTitikAuth : null; if(A && A.kgSync) Promise.resolve(A.kgSync()).then(r => { if(r === "big") toast(L("Data keuangan terlalu besar untuk disinkronkan ke akun. Simpan salinan lewat CSV.", "Finance data is too large to sync to your account. Save a copy as CSV."), 5000); }).catch(() => {}); }catch(e){} }, 800); }
+function save(){ try{ localStorage.setItem(K, JSON.stringify(db)); try{ localStorage.setItem("kg_ts", String(Date.now())); }catch(e){} syncSoon(); return true; }catch(e){ toast(L("Penyimpanan penuh, perubahan tidak tersimpan.", "Storage is full, the change was not saved.")); return false; } }
+
+const CO = [["food","🍚","Makan","Food"],["trans","🚌","Transport","Transport"],["shop","🛒","Belanja","Shopping"],["bill","🧾","Tagihan","Bills"],["fun","🎮","Hiburan","Fun"],["health","💊","Kesehatan","Health"],["edu","📚","Sekolah","School"]];
+const OTH = ["oth","➕","Lainnya","Other"];
+const CI = [["sal","💼","Gaji","Salary"],["biz","🏪","Usaha","Business"],["gift","🎁","Hadiah","Gift"]];
+const cr = c => c[4] ? c[2] : L(c[2], c[3]);
+const cn = c => esc(cr(c));
+/* jatah belanja = kategori uang keluar: 7 bawaan + buatan sendiri (db.cc); "Lainnya" hanya tampil bila ada catatan lama */
+const expCats = () => CO.concat(db.cc.map(c => [c.id, "🏷️", c.n, c.n, 1]));
+const allCats = () => expCats().concat(db.t.some(x => x.k === "out" && x.c === "oth") ? [OTH] : []);
+/* kategori uang masuk: 3 bawaan + buatan sendiri (db.ci) + "Lainnya" (tombol untuk membuat kategori baru) */
+const incCats = () => CI.concat(db.ci.map(c => [c.id, "🏷️", c.n, c.n, 1]), [OTH]);
+const catName = (c, k) => { const x = (k === "in" ? incCats() : expCats().concat([OTH])).find(y => y[0] === c); return x ? cn(x) : "-"; };
+const wn = id => { const w = db.w.find(x => x.id === id); return w ? esc(w.n) : "?"; };
+const inM = m => db.t.filter(x => x.d.slice(0, 7) === m);
+const sum = (a, k) => a.filter(x => x.k === k).reduce((s, x) => s + x.a, 0);
+const bal = w => db.t.reduce((s, x) => s + (x.k === "in" && x.w === w.id ? x.a : x.k === "out" && x.w === w.id ? -x.a : x.k === "tf" ? (x.w === w.id ? -x.a : 0) + (x.w2 === w.id ? x.a : 0) : 0), +w.b || 0);
+const spentBy = m => { const o = {}; inM(m).filter(x => x.k === "out").forEach(x => { o[x.c] = (o[x.c] || 0) + x.a; }); return o; };
+const byDate = (a, b) => b.d.localeCompare(a.d) || b.id.localeCompare(a.id);
+
+/* ===== tampilan ===== */
+const S = {tab:"home", m:thisM(), f:null};
+const newF = k => ({k:k || "out", c:k === "in" ? "sal" : "food", w:db.w[0] ? db.w[0].id : "", d:today(), n:"", a:""});
+S.f = newF();
+const TABS = [["home","Beranda","Home"],["hist","Riwayat","History"],["bu","Jatah belanja","Limits"],["go","Tabungan","Savings"]];
+const mnav = () => '<div class="mnav"><button class="x" data-a="mm" data-v="-1" aria-label="' + L("Bulan sebelumnya", "Previous month") + '">‹</button><b>' + mLab(S.m) + '</b><button class="x" data-a="mm" data-v="1" aria-label="' + L("Bulan berikutnya", "Next month") + '">›</button></div>';
+const back = () => '<button class="x" style="align-self:flex-start" data-a="tab" data-v="home">‹ ' + L("Beranda", "Home") + '</button>';
+const wopts = (sel, skip) => db.w.filter(w => w.id !== skip).map(w => '<option value="' + w.id + '"' + (sel === w.id ? " selected" : "") + '>' + esc(w.n) + '</option>').join("");
+const delBtn = (a, v) => '<button class="x" data-a="' + a + '" data-v="' + v + '" aria-label="' + L("Hapus", "Delete") + '">✕</button>';
+
+function txRow(x, del){
+  const sign = x.k === "in" ? "+" : x.k === "out" ? "−" : "", cl = x.k === "in" ? "ok" : x.k === "out" ? "bad" : "";
+  const title = x.k === "tf" ? L("Pindah uang", "Moved money") : catName(x.c, x.k);
+  const meta = x.d + (x.k === "tf" ? " – " + wn(x.w) + " → " + wn(x.w2) : db.w.length > 1 ? " – " + wn(x.w) : "") + (x.n ? " – " + esc(x.n) : "");
+  return '<div class="row"><div class="l"><b>' + title + '</b><small>' + meta + '</small></div><div class="r ' + cl + '">' + sign + "Rp " + fmtN(x.a) + '</div>' + (del ? delBtn("deltx", x.id) : "") + '</div>';
+}
+
+const VIEWS = {
+  home(){
+    const m = thisM(), a = inM(m), tot = db.w.reduce((s, w) => s + bal(w), 0);
+    const bu = Object.keys(db.bu).filter(k => db.bu[k] > 0), sp = spentBy(m), left = bu.reduce((s, k) => s + db.bu[k] - (sp[k] || 0), 0);
+    const rec = db.t.slice().sort(byDate).slice(0, 5), ws = warns();
+    const wbox = ws.length ? '<section class="panel" style="border-color:' + (ws.some(x => x.s > x.lim) ? "var(--bad)" : "var(--warn)") + '"><span class="label">⚠️ ' + L("Perhatian jatah belanja", "Spending limit alert") + '</span>' + ws.map(x => '<p class="hint" style="margin:6px 0 0;color:var(--text)"><b class="' + (x.s > x.lim ? "bad" : "warn") + '">' + x.c[1] + " " + cn(x.c) + '</b>: ' + (x.s > x.lim ? L("sudah lewat ", "over by ") + rp(x.s - x.lim) : L("hampir habis, sisa ", "almost used up, ") + rp(x.lim - x.s) + L("", " left")) + '</p>').join("") + '</section>' : "";
+    return '<section class="panel"><span class="label">' + L("Uang kamu sekarang", "Your money now") + '</span><div class="big' + (tot < 0 ? " bad" : "") + '">' + rp(tot) + '</div>' +
+      '<small>' + L("Bulan ini: masuk ", "This month: in ") + '<b class="ok">' + rp(sum(a, "in")) + '</b>' + L(", keluar ", ", out ") + '<b class="bad">' + rp(sum(a, "out")) + '</b></small>' +
+      (bu.length ? '<br><small>' + L("Sisa jatah belanja bulan ini: ", "Spending limit left this month: ") + '<b class="' + (left < 0 ? "bad" : "ok") + '">' + rp(left) + '</b></small>' : "") + '</section>' + wbox +
+      '<div class="two"><button class="btn in" data-a="new" data-v="in">＋ ' + L("Uang masuk", "Money in") + '</button><button class="btn out" data-a="new" data-v="out">－ ' + L("Uang keluar", "Money out") + '</button></div>' +
+      (db.t.length ? '<section class="panel"><span class="label">' + L("Terakhir dicatat", "Latest") + '</span>' + rec.map(x => txRow(x)).join("") + '<button class="btn ghost" style="margin-top:10px" data-a="tab" data-v="hist">' + L("Lihat semua", "See all") + '</button></section>' :
+        '<section class="panel tip"><span class="label">' + L("Cara pakai", "How to use") + '</span><ol><li>' + L("Tekan <b>Uang masuk</b> saat dapat uang.", "Tap <b>Money in</b> when you receive money.") + '</li><li>' + L("Tekan <b>Uang keluar</b> saat memakai uang.", "Tap <b>Money out</b> when you spend.") + '</li><li>' + L("Saldo dihitung otomatis.", "Your balance updates by itself.") + '</li></ol><p class="hint">' + L("Sudah punya uang sebelum mulai mencatat? Isi di <b>Dompet saya</b> bagian Saldo awal.", "Already have money before you start? Enter it under Starting balance in <b>My wallets</b>.") + '</p></section>') +
+      '<button class="btn ghost" data-a="tab" data-v="wa">' + L("Dompet saya", "My wallets") + '</button>' +
+      '<button class="btn danger" data-a="askreset">' + L("Reset semua catatan keuangan", "Reset all financial records") + '</button>' +
+      '<p class="hint" style="text-align:center">' + L("Data tersimpan di HP dan ikut tersinkron ke akun Google saat kamu masuk.", "Data is saved on this phone and syncs to your Google account when you sign in.") + '</p>';
+  },
+  add(){
+    const f = S.f, out = f.k === "out", cats = out ? expCats() : incCats();
+    return '<section class="panel"><span class="label">' + (out ? L("Uang keluar", "Money out") : L("Uang masuk", "Money in")) + '</span>' +
+      '<label class="fld"><span>' + L("Berapa? (Rp)", "How much? (Rp)") + '</span><input id="fa" data-money inputmode="numeric" autocomplete="off" placeholder="0" value="' + (f.a ? fmtN(num(f.a)) : "") + '"></label>' +
+      '<div class="fld"><span>' + (out ? L("Untuk apa?", "What for?") : L("Dari mana?", "From where?")) + '</span><div class="cats">' + cats.map(c => { const o = !out && c[0] === "oth"; return '<button class="cat' + ((o ? f.nc : f.c === c[0]) ? " on" : "") + '" data-a="' + (o ? "newcat" : "cat") + '" data-v="' + c[0] + '"><i>' + c[1] + '</i>' + cn(c) + '</button>'; }).join("") + (out ? '<button class="cat' + (f.nc ? " on" : "") + '" data-a="newcat"><i>＋</i>' + L("Tambah", "Add") + '</button>' : "") + '</div>' +
+      (f.nc ? '<div style="display:flex;gap:8px;margin-top:10px"><input id="fnc" maxlength="30" autocomplete="off" placeholder="' + (out ? L("Nama jatah belanja baru", "New spending limit name") : L("Nama kategori baru, contoh: Bonus", "New category name, e.g. Bonus")) + '"><button class="btn ghost" style="width:auto;padding:0 16px" data-a="mkcat">' + L("Buat", "Create") + '</button></div>' : "") + (!out && f.c.indexOf("c_") === 0 ? '<div style="text-align:right;margin-top:8px"><button class="x" data-a="delci" data-v="' + f.c + '">' + L("Hapus kategori ini", "Delete this category") + '</button></div>' : "") + '</div>' +
+      '<label class="fld"><span>' + L("Catatan (boleh kosong)", "Note (optional)") + '</span><input id="fn" maxlength="80" autocomplete="off" value="' + esc(f.n) + '"></label>' +
+      '<details><summary>' + (db.w.length > 1 ? L("Ubah tanggal atau dompet", "Change date or wallet") : L("Ubah tanggal", "Change date")) + '</summary><label class="fld"><span>' + L("Tanggal", "Date") + '</span><input id="fd" type="date" value="' + esc(f.d) + '"></label>' +
+      (db.w.length > 1 ? '<label class="fld"><span>' + L("Dompet", "Wallet") + '</span><select id="fw">' + wopts(f.w) + '</select></label>' : "") + '</details>' +
+      '<button class="btn" data-a="addtx">' + L("Simpan", "Save") + '</button><button class="btn ghost" style="margin-top:8px" data-a="tab" data-v="home">' + L("Batal", "Cancel") + '</button></section>';
+  },
+  hist(){
+    const a = inM(S.m), inc = sum(a, "in"), out = sum(a, "out"), sp = spentBy(S.m), list = a.slice().sort(byDate);
+    const cats = allCats().filter(c => sp[c[0]]).sort((x, y) => sp[y[0]] - sp[x[0]]);
+    return '<section class="panel">' + mnav() + '<div class="tiles" style="margin-top:12px"><div class="tile"><small>' + L("Uang masuk", "Money in") + '</small><b class="ok">' + rp(inc) + '</b></div><div class="tile"><small>' + L("Uang keluar", "Money out") + '</small><b class="bad">' + rp(out) + '</b></div></div><p class="hint">' + L("Sisa bulan ini: ", "Left this month: ") + '<b>' + rp(inc - out) + '</b></p></section>' +
+      (cats.length ? '<section class="panel"><span class="label">' + L("Uang keluar untuk apa saja", "Where the money went") + '</span>' + cats.map(c => '<div class="brow"><div class="rowh"><span>' + c[1] + " " + cn(c) + '</span><b>' + rp(sp[c[0]]) + '</b></div><div class="bar"><i style="width:' + (sp[c[0]] / out * 100) + '%"></i></div></div>').join("") + '</section>' : "") +
+      '<section class="panel">' + (list.length ? list.map(x => txRow(x, true)).join("") : '<p class="empty">' + L("Belum ada catatan di bulan ini.", "Nothing recorded this month.") + '</p>') + '</section>' +
+      (db.t.length ? '<button class="btn ghost" data-a="csv">' + L("Simpan semua catatan sebagai file (CSV)", "Save all records as a file (CSV)") + '</button>' : "");
+  },
+  bu(){
+    const sp = spentBy(S.m);
+    const rows = allCats().map(c => {
+      const lim = +db.bu[c[0]] || 0, s = sp[c[0]] || 0, cl = !lim ? "" : s > lim ? "bad" : s >= lim * .8 ? "warn" : "ok";
+      return '<div class="brow"><div class="rowh"><span>' + c[1] + " " + cn(c) + '</span><input data-bu="' + c[0] + '" data-money inputmode="numeric" placeholder="' + L("Batas", "Limit") + '" aria-label="' + L("Batas ", "Limit for ") + cn(c) + '" value="' + (lim ? fmtN(lim) : "") + '"></div>' +
+        (lim ? '<div class="bar"><i class="' + cl + '" style="width:' + Math.min(100, s / lim * 100) + '%"></i></div><small class="' + (cl === "bad" ? "bad" : "") + '">' + L("Terpakai ", "Used ") + rp(s) + L(" dari ", " of ") + rp(lim) + (s > lim ? L(". Sudah lewat!", ". Over the limit!") : cl === "warn" ? L(". Hampir habis!", ". Almost used up!") : "") + '</small>' : (s ? '<small>' + L("Terpakai ", "Used ") + rp(s) + '</small>' : "")) + (c[4] ? '<div style="text-align:right;margin-top:6px">' + delBtn("delcc", c[0]) + '</div>' : "") + '</div>';
+    }).join("");
+    return '<section class="panel">' + mnav() + '<p class="hint">' + L("Tentukan batas uang keluar tiap bulan untuk hal yang ingin kamu jaga. Kosongkan kalau tidak perlu.", "Set a monthly limit for what you want to keep in check. Leave empty if not needed.") + '</p></section><section class="panel">' + rows + '</section>' +
+      '<section class="panel"><span class="label">' + L("Tambah jatah belanja", "Add a spending limit") + '</span><label class="fld"><span>' + L("Judul jatah belanja", "Title") + '</span><input id="ccn" maxlength="30" autocomplete="off" placeholder="' + L("Contoh: Jajan anak, Kopi", "Example: Coffee, Kids' snacks") + '"></label><label class="fld"><span>' + L("Batas tiap bulan (Rp, boleh kosong)", "Monthly limit (Rp, optional)") + '</span><input id="ccl" data-money inputmode="numeric" autocomplete="off"></label><button class="btn" data-a="addcc">' + L("Tambah jatah belanja", "Add spending limit") + '</button></section>';
+  },
+  go(){
+    const rows = db.g.map(g => { const p = Math.min(100, g.s / g.a * 100); return '<div class="brow"><div class="rowh"><b>' + esc(g.n) + '</b>' + delBtn("delg", g.id) + '</div><div class="bar"><i style="width:' + p + '%"></i></div><small>' + rp(g.s) + L(" dari ", " of ") + rp(g.a) + (g.s >= g.a ? L(". Tercapai! 🎉", ". Reached! 🎉") : " (" + Math.floor(p) + "%)") + '</small>' +
+      '<div class="two" style="margin-top:8px"><input id="gs_' + g.id + '" data-money inputmode="numeric" placeholder="' + L("Berapa?", "How much?") + '" aria-label="' + L("Jumlah ditabung", "Amount saved") + '"><button class="btn ghost" data-a="sav" data-v="' + g.id + '">' + L("Tambah", "Add") + '</button></div></div>'; }).join("");
+    return '<section class="panel"><span class="label">' + L("Tabunganmu", "Your savings") + '</span>' + (rows || '<p class="empty">' + L("Belum ada tabungan. Buat satu di bawah, misalnya dana darurat.", "No savings yet. Create one below, like an emergency fund.") + '</p>') + '</section>' +
+      '<section class="panel"><span class="label">' + L("Buat tabungan baru", "New savings") + '</span><label class="fld"><span>' + L("Untuk apa?", "What for?") + '</span><input id="gn" maxlength="40" autocomplete="off" placeholder="' + L("Contoh: Dana darurat", "Example: Emergency fund") + '"></label><label class="fld"><span>' + L("Mau terkumpul berapa? (Rp)", "How much to save? (Rp)") + '</span><input id="ga" data-money inputmode="numeric" autocomplete="off"></label><button class="btn" data-a="addg">' + L("Buat tabungan", "Create") + '</button></section>';
+  },
+  wa(){
+    const rows = db.w.map(w => '<div class="brow"><div class="rowh"><b>' + esc(w.n) + '</b><b class="' + (bal(w) < 0 ? "bad" : "") + '">' + rp(bal(w)) + '</b></div><div class="rowh" style="margin-top:8px"><small>' + L("Saldo awal", "Starting balance") + '</small><input data-wb="' + w.id + '" data-money inputmode="numeric" value="' + (+w.b ? fmtN(w.b) : "") + '" placeholder="0" aria-label="' + L("Saldo awal ", "Starting balance ") + esc(w.n) + '"></div><div style="text-align:right;margin-top:8px">' + delBtn("delw", w.id) + '</div></div>').join("");
+    return back() + '<section class="panel"><span class="label">' + L("Dompet saya", "My wallets") + '</span>' + rows + '<p class="hint">' + L("Pakai satu dompet saja sudah cukup. Tambah dompet kalau uangmu terpisah, misalnya tunai dan rekening bank.", "One wallet is enough. Add more if your money is split, like cash and a bank account.") + '</p></section>' +
+      '<section class="panel"><span class="label">' + L("Tambah dompet", "Add a wallet") + '</span><label class="fld"><span>' + L("Nama dompet", "Wallet name") + '</span><input id="wn" maxlength="30" autocomplete="off" placeholder="' + L("Contoh: Rekening BCA", "Example: Bank account") + '"></label><label class="fld"><span>' + L("Uang di dalamnya (Rp)", "Money in it (Rp)") + '</span><input id="wb" data-money inputmode="numeric" autocomplete="off"></label><button class="btn" data-a="addw">' + L("Tambah dompet", "Add wallet") + '</button></section>' +
+      (db.w.length > 1 ? '<section class="panel"><span class="label">' + L("Pindahkan uang", "Move money") + '</span><div class="two"><label class="fld"><span>' + L("Dari", "From") + '</span><select id="mf">' + wopts(db.w[0].id) + '</select></label><label class="fld"><span>' + L("Ke", "To") + '</span><select id="mt">' + wopts(db.w[1].id) + '</select></label></div><label class="fld"><span>' + L("Berapa? (Rp)", "How much? (Rp)") + '</span><input id="ma" data-money inputmode="numeric" autocomplete="off"></label><button class="btn" data-a="mv">' + L("Pindahkan", "Move") + '</button></section>' : "");
+  }
+};
+
+function warns(){ const sp = spentBy(thisM()); return allCats().map(c => { const lim = +db.bu[c[0]] || 0, s = sp[c[0]] || 0; return lim && s >= lim * .8 ? {c, lim, s, p:s / lim} : null; }).filter(Boolean).sort((a, b) => b.p - a.p); }
+function warnMsg(f){
+  let m = L("Tersimpan ✓", "Saved ✓"), ms = 0;
+  if(f.k === "out"){ const lim = +db.bu[f.c] || 0, c = allCats().find(x => x[0] === f.c);
+    if(lim && c){ const s = spentBy(f.d.slice(0, 7))[f.c] || 0, n = cr(c);
+      if(s > lim){ m = "⚠️ " + L("Jatah " + n + " sudah lewat batas!", "The " + n + " limit is over!"); ms = 4500; }
+      else if(s >= lim * .8){ m = "⚠️ " + L("Jatah " + n + " hampir habis (" + Math.floor(s / lim * 100) + "%)", "The " + n + " limit is almost used up (" + Math.floor(s / lim * 100) + "%)"); ms = 4500; } } }
+  return [m, ms];
+}
+function paint(){
+  $("t").textContent = L("KEUANGAN", "FINANCE");
+  $("tabs").innerHTML = TABS.map(t => '<button class="tab' + (S.tab === t[0] ? " on" : "") + '" data-a="tab" data-v="' + t[0] + '">' + L(t[1], t[2]) + '</button>').join("");
+  $("v").innerHTML = VIEWS[S.tab]();
+}
+function grab(){
+  if(S.tab !== "add" || !$("fa")) return;
+  const f = S.f; f.a = $("fa").value; f.n = $("fn").value; f.d = $("fd").value || f.d; if($("fw")) f.w = $("fw").value;
+}
+function arm(b, fn){ if(b.dataset.arm){ fn(); return; } b.dataset.arm = "1"; b.dataset.o = b.textContent; b.textContent = L("Hapus?", "Delete?"); setTimeout(() => { if(b.isConnected){ delete b.dataset.arm; b.textContent = b.dataset.o; } }, 3000); }
+function csv(){
+  const q = s => '"' + String(s).replace(/"/g, '""') + '"', nm = id => { const w = db.w.find(x => x.id === id); return w ? w.n : ""; };
+  const rows = [["date","type","category","wallet","to_wallet","amount","note"].map(q).join(",")].concat(db.t.slice().sort(byDate).map(x => [x.d, x.k, x.k === "tf" ? "" : catName(x.c, x.k), nm(x.w), nm(x.w2), x.a, x.n].map(q).join(",")));
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + rows.join("\n")], {type:"text/csv"})); a.download = "keuangan.csv"; document.body.appendChild(a); a.click(); a.remove();
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-a]"); if(!b) return;
+  const a = b.dataset.a, v = b.dataset.v;
+  if(a === "tab"){ grab(); S.tab = v; paint(); window.scrollTo(0, 0); }
+  else if(a === "mm"){ S.m = mShift(S.m, +v); paint(); }
+  else if(a === "new"){ S.f = newF(v); S.tab = "add"; paint(); window.scrollTo(0, 0); }
+  else if(a === "cat"){ grab(); S.f.c = v; paint(); }
+  else if(a === "addtx"){
+    grab(); const f = S.f, amt = num(f.a);
+    if(!amt) return toast(L("Isi jumlah uangnya dulu.", "Enter the amount first."));
+    if(!/^\d{4}-\d\d-\d\d$/.test(f.d)) return toast(L("Isi tanggalnya dulu.", "Enter the date first."));
+    db.t.push({id:uid(), d:f.d, k:f.k, a:amt, c:f.c, w:f.w, w2:"", n:f.n.trim().slice(0, 80)});
+    if(save()){ const wm = warnMsg(f); S.m = f.d.slice(0, 7); S.f = newF(); S.tab = "home"; toast(wm[0], wm[1]); paint(); window.scrollTo(0, 0); } else db.t.pop();
+  }
+  else if(a === "deltx") arm(b, () => { db.t = db.t.filter(x => x.id !== v); save(); paint(); });
+  else if(a === "addw"){
+    const n = $("wn").value.trim(); if(!n) return toast(L("Isi nama dompetnya dulu.", "Enter a wallet name first."));
+    db.w.push({id:uid(), n:n.slice(0, 30), t:"cash", b:num($("wb").value)}); if(save()){ toast(L("Dompet ditambahkan ✓", "Wallet added ✓")); paint(); }
+  }
+  else if(a === "delw") arm(b, () => {
+    if(db.t.some(x => x.w === v || x.w2 === v)) return toast(L("Dompet ini sudah punya catatan, jadi tidak bisa dihapus.", "This wallet has records, so it can't be deleted."));
+    if(db.w.length < 2) return toast(L("Harus ada minimal satu dompet.", "You need at least one wallet."));
+    db.w = db.w.filter(x => x.id !== v); S.f = newF(); save(); paint();
+  });
+  else if(a === "mv"){
+    const f = $("mf").value, t = $("mt").value, amt = num($("ma").value);
+    if(!amt) return toast(L("Isi jumlah uangnya dulu.", "Enter the amount first."));
+    if(f === t) return toast(L("Pilih dua dompet yang berbeda.", "Pick two different wallets."));
+    db.t.push({id:uid(), d:today(), k:"tf", a:amt, c:"", w:f, w2:t, n:""}); if(save()){ toast(L("Uang dipindahkan ✓", "Money moved ✓")); paint(); } else db.t.pop();
+  }
+  else if(a === "addg"){
+    const n = $("gn").value.trim(), amt = num($("ga").value); if(!n || !amt) return toast(L("Isi tujuan dan jumlahnya dulu.", "Enter what it's for and the amount."));
+    db.g.push({id:uid(), n:n.slice(0, 40), a:amt, s:0, d:""}); if(save()){ toast(L("Tabungan dibuat ✓", "Savings created ✓")); paint(); }
+  }
+  else if(a === "sav"){
+    const x = num($("gs_" + v).value), g = db.g.find(y => y.id === v); if(!g || !x) return toast(L("Isi jumlahnya dulu.", "Enter the amount first."));
+    g.s += x; if(save()){ toast(g.s >= g.a ? L("Tabungan tercapai! 🎉", "Goal reached! 🎉") : L("Tabungan bertambah ✓", "Savings added ✓")); paint(); } else g.s -= x;
+  }
+  else if(a === "delg") arm(b, () => { db.g = db.g.filter(x => x.id !== v); save(); paint(); });
+  else if(a === "newcat"){ grab(); S.f.nc = !S.f.nc; paint(); }
+  else if(a === "mkcat"){
+    const n = $("fnc").value.trim(), inc = S.f.k === "in"; if(!n) return toast(inc ? L("Isi nama kategorinya dulu.", "Enter a category name first.") : L("Isi nama jatah belanjanya dulu.", "Enter a name first."));
+    grab(); const id = "c_" + uid(), arr = inc ? db.ci : db.cc; arr.push({id, n:n.slice(0, 30)});
+    if(save()){ S.f.c = id; S.f.nc = false; toast(inc ? L("Kategori dibuat ✓", "Category created ✓") : L("Jatah belanja dibuat ✓", "Spending limit created ✓")); paint(); } else arr.pop();
+  }
+  else if(a === "addcc"){
+    const n = $("ccn").value.trim(); if(!n) return toast(L("Isi judul jatah belanjanya dulu.", "Enter a title first."));
+    const id = "c_" + uid(), lim = num($("ccl").value); db.cc.push({id, n:n.slice(0, 30)}); if(lim) db.bu[id] = lim;
+    if(save()){ toast(L("Jatah belanja ditambahkan ✓", "Spending limit added ✓")); paint(); } else { db.cc.pop(); delete db.bu[id]; }
+  }
+  else if(a === "delcc") arm(b, () => {
+    if(db.t.some(x => x.c === v)) return toast(L("Jatah ini sudah dipakai di catatan, jadi tidak bisa dihapus.", "This one is used in records, so it can't be deleted."));
+    db.cc = db.cc.filter(x => x.id !== v); delete db.bu[v]; if(S.f.c === v) S.f.c = "food"; save(); paint();
+  });
+  else if(a === "askreset"){
+    $("ovT").textContent = L("Yakin ingin menghapus semua data keuangan kamu?", "Are you sure you want to delete all your financial data?");
+    $("ovP").innerHTML = L("Semua catatan, dompet, jatah belanja, dan tabungan akan dihapus. <b>Setelah dihapus, data keuangan kamu hilang permanen</b> dan tidak bisa dikembalikan. Jika sudah masuk dengan Google, salinan di akun juga ikut terhapus.", "All records, wallets, spending limits, and savings will be deleted. <b>Once deleted, your financial data is gone permanently</b> and can't be restored. If you're signed in with Google, the copy in your account is deleted too.");
+    $("ovNo").textContent = L("Batal", "Cancel"); document.querySelector(".btn.sure").textContent = L("Ya, hapus semua", "Yes, delete all");
+    $("ovl").hidden = false; $("ovNo").focus();
+  }
+  else if(a === "cancelreset") $("ovl").hidden = true;
+  else if(a === "doreset"){
+    const old = db; db = {v:1, w:[{id:uid(), n:"Tunai", t:"cash", b:0}], t:[], bu:{}, g:[], cc:[], ci:[]};
+    if(save()){ S.f = newF(); S.m = thisM(); S.tab = "home"; $("ovl").hidden = true; toast(L("Semua data keuangan sudah dihapus.", "All financial data was deleted.")); paint(); window.scrollTo(0, 0); } else db = old;
+  }
+  else if(a === "delci") arm(b, () => {
+    if(db.t.some(x => x.c === v)) return toast(L("Kategori ini sudah dipakai di catatan, jadi tidak bisa dihapus.", "This category is used in records, so it can't be deleted."));
+    grab(); db.ci = db.ci.filter(x => x.id !== v); S.f.c = "sal"; save(); paint();
+  });
+  else if(a === "csv") csv();
+});
+document.addEventListener("keydown", e => { if(e.key === "Escape") $("ovl").hidden = true; });
+document.addEventListener("input", e => { const t = e.target; if(t.hasAttribute && t.hasAttribute("data-money")){ const n = num(t.value); t.value = n ? fmtN(n) : ""; } });
+document.addEventListener("change", e => {
+  const t = e.target; if(!t.dataset) return;
+  if(t.dataset.bu){ const n = num(t.value); if(n) db.bu[t.dataset.bu] = n; else delete db.bu[t.dataset.bu]; save(); paint(); }
+  else if(t.dataset.wb){ const w = db.w.find(x => x.id === t.dataset.wb); if(w){ w.b = num(t.value); save(); paint(); } }
+});
+window.addEventListener("storage", e => {
+  if(!e.key || e.key === "kg_lang"){ const l = readLang(); if(l !== lang){ grab(); lang = l; paint(); } }
+  if(!e.key || e.key === K){ grab(); db = load(); if(!db.w.some(w => w.id === S.f.w)) S.f = newF(S.f.k); paint(); }
+});
+paint();
+</scr@@ipt>
+</body>
+</html>
+</script>
+
 <script type="text/plain" id="src-versus"><!DOCTYPE html>
 <html lang="id">
 <head>
@@ -14637,9 +14951,9 @@ A.deleteAccount = async () => {
   }
   /* 2) hapus data server; sinkron dihentikan dulu supaya tidak mengunggah ulang */
   let joined = []; try{ const j = JSON.parse(localStorage.getItem("tt_joined") || "[]"); if(Array.isArray(j)) joined = j.filter(x => typeof x === "string"); }catch(e){}
-  try{ SY.stop(); }catch(e){}
+  try{ SY.stop(); }catch(e){} try{ KGS.stop(); }catch(e){}
   try{ await window.wipeServer(A, joined); }
-  catch(e){ console.error("[hapus akun] data server gagal:", e); try{ SY.start(uid); }catch(x){} throw new Error("fail"); }
+  catch(e){ console.error("[hapus akun] data server gagal:", e); try{ SY.start(uid); }catch(x){} try{ KGS.start(uid); }catch(x){} throw new Error("fail"); }
   const soft = async f => { try{ await f(); }catch(e){ console.warn("[hapus akun] sebagian data tidak terhapus:", e && (e.code || e.message)); } };
   const { m, db } = await A.getDb();
   /* token push: lepas perangkat ini dan semua perangkat lain milik akun (lewat Worker) selagi masih login */
@@ -14648,8 +14962,8 @@ A.deleteAccount = async () => {
   await soft(() => m.deleteDoc(m.doc(db, "users", uid)));
   /* 3) hapus akun dari Firebase Authentication */
   try{ await auth.deleteUser(u); }
-  catch(e){ console.error("[hapus akun] deleteUser gagal:", e); try{ SY.start(uid); }catch(x){} throw new Error("fail"); }
-  ["st_sync_acc_" + uid, "st_sync_un_" + uid, "st_sync_ph_" + uid, "st_sync_h", "st_sync_ts", "st_sync_uid"].forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
+  catch(e){ console.error("[hapus akun] deleteUser gagal:", e); try{ SY.start(uid); }catch(x){} try{ KGS.start(uid); }catch(x){} throw new Error("fail"); }
+  ["st_sync_acc_" + uid, "st_sync_un_" + uid, "st_sync_ph_" + uid, "st_sync_h", "st_sync_ts", "st_sync_uid", "st_sync_kg"].forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
   try{ await auth.signOut(a); }catch(e){}
   try{ if(SL) await SL.logout({ provider: "google" }); }catch(e){}
   A.error = null; emit();
@@ -14752,13 +15066,13 @@ A.clearPhoto = async () => {
    Seluruh data aplikasi di localStorage (pengaturan, riwayat, hasil semua menu) disimpan di satu dokumen: users/{uid}.
    Cuma jalan saat sudah masuk dan online. Tanpa masuk, aplikasi memakai localStorage seperti biasa. */
 const SY = (() => {
-  const EX = /^(firebase:|st_sync_|sp_saran_queue$|asd_livepos$|asd_livemini$|asd_sidepos$|asd_side$|kh_side$|kh_sideopen$)/;
+  const EX = /^(firebase:|st_sync_|kg_db$|kg_ts$|sp_saran_queue$|asd_livepos$|asd_livemini$|asd_sidepos$|asd_side$|kh_side$|kh_sideopen$)/;
   const M_H = "st_sync_h", M_TS = "st_sync_ts", M_UID = "st_sync_uid", MAXTOT = 880000, EVERY = 20000;
   const rd = k => { try{ return JSON.parse(localStorage.getItem(k) || "{}") || {}; }catch(e){ return {}; } };
   const wr = (k, o) => { try{ localStorage.setItem(k, JSON.stringify(o)); }catch(e){} };
   const hs = s => { let h = 5381; for(let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return s.length + ":" + (h >>> 0).toString(36); };
   const ek = k => encodeURIComponent(k).replace(/\./g, "%2E");
-  let fs = null, db = null, uid = null, merged = false, busy = false, timer = 0, seen = {};
+  let fs = null, db = null, uid = null, merged = false, busy = false, again = false, timer = 0, seen = {};
   const set = v => { if(A.sync !== v){ A.sync = v; emit(); } };
   async function lib(){
     if(fs) return;
@@ -14817,7 +15131,8 @@ const SY = (() => {
     return { applied, force };
   }
   async function run(){
-    if(busy || !uid) return; busy = true;
+    if(busy){ again = true; return; }
+    if(!uid) return; busy = true;
     try{
       if(navigator.onLine === false){ set("off"); return; }
       await lib();
@@ -14842,7 +15157,7 @@ const SY = (() => {
         if(n){ set("sync"); set("ok"); } else set("ok");
       }
     }catch(e){ console.warn("sync gagal:", e && (e.code || e.message)); set(navigator.onLine === false ? "off" : "err"); }
-    finally{ busy = false; }
+    finally{ busy = false; if(again){ again = false; setTimeout(() => { if(uid) run(); }, 300); } }
   }
   const tick = () => { if(uid) run(); };
   function start(u){
@@ -14855,8 +15170,78 @@ const SY = (() => {
   addEventListener("pagehide", tick);
   return { start, stop, now: async () => { if(uid && merged && navigator.onLine !== false) await Promise.race([run(), new Promise(r => setTimeout(r, 5000))]); } };
 })();
+/* ===== SINKRON KEUANGAN: dokumen terpisah users/{uid}/data/keuangan =====
+   Menu Keuangan (kg_db) tidak ikut sinkron umum di atas (dikecualikan lewat EX) supaya punya jatah ukuran dokumen sendiri.
+   Isi dokumen: { v: teks JSON kg_db, t: waktu perubahan terakhir (ms), u: waktu unggah }. Yang lebih baru menang (sama seperti sinkron umum).
+   Waktu perubahan lokal ada di localStorage "kg_ts" (ditulis menu Keuangan setiap menyimpan). Menu memanggil window.parent.satuTitikAuth.kgSync().
+   Migrasi: bila dokumen baru belum ada, salinan lama di users/{uid}.kv["kg_db"] dipindahkan lalu dihapus dari sana. */
+const KGS = (() => {
+  const M = "st_sync_kg", KV = encodeURIComponent("kg_db"), MAXB = 900000, EVERY = 20000;
+  const rd = k => { try{ return JSON.parse(localStorage.getItem(k) || "{}") || {}; }catch(e){ return {}; } };
+  const wr = (k, o) => { try{ localStorage.setItem(k, JSON.stringify(o)); }catch(e){} };
+  const sv = (k, v) => { try{ localStorage.setItem(k, v); }catch(e){} };
+  const bytes = s => { try{ return new TextEncoder().encode(s).length; }catch(e){ return s.length * 3; } };
+  let uid = null, merged = false, busy = false, again = false, timer = 0;
+  const lt = () => +localStorage.getItem("kg_ts") || +(rd("st_sync_ts").kg_db) || 0;
+  const synced = () => { const x = rd(M); return x.uid === uid ? (+x.t || 0) : 0; };
+  const dirty = () => localStorage.getItem("kg_db") !== null && lt() > synced();
+  async function run(){
+    if(!uid) return "nologin";
+    if(busy){ again = true; return "busy"; }
+    busy = true;
+    try{
+      if(navigator.onLine === false) return "off";
+      const { m, db } = await A.getDb();
+      const ref = m.doc(db, "users", uid, "data", "keuangan");
+      let need = false, legacy = false;
+      if(!merged){
+        const local = localStorage.getItem("kg_db"), l = lt();
+        let cv = null, ct = 0;
+        const snap = await m.getDoc(ref);
+        if(snap.exists()){ const d = snap.data(); if(typeof d.v === "string"){ cv = d.v; ct = +d.t || 0; } }
+        else {
+          const us = await m.getDoc(m.doc(db, "users", uid)), e = us.exists() ? ((us.data().kv || {})[KV]) : null;
+          if(e && !e.d && typeof e.v === "string"){ cv = e.v; ct = +e.t || 0; legacy = true; }
+        }
+        if(cv !== null){
+          if(local === null || (cv !== local && ct > l)){ sv("kg_db", cv); sv("kg_ts", String(ct)); wr(M, { uid, t: ct }); need = legacy; }
+          else if(cv === local){ const t = Math.max(l, ct); sv("kg_ts", String(t)); wr(M, { uid, t }); need = legacy; }
+          else need = true;
+        } else need = local !== null;
+      } else need = dirty();
+      if(need){
+        const v = localStorage.getItem("kg_db");
+        if(v !== null){
+          if(bytes(v) > MAXB){ merged = true; return "big"; }
+          let t = lt(); if(!t){ t = Date.now(); sv("kg_ts", String(t)); }
+          await m.setDoc(ref, { v, t, u: Date.now() });
+          wr(M, { uid, t });
+          if(legacy){ try{ await m.setDoc(m.doc(db, "users", uid), { kv: { [KV]: m.deleteField() } }, { merge: true }); }catch(e){} }
+        }
+      }
+      merged = true; return "ok";
+    }catch(e){ console.warn("sync keuangan gagal:", e && (e.code || e.message)); return navigator.onLine === false ? "off" : "err"; }
+    finally{ busy = false; if(again){ again = false; setTimeout(() => { if(uid) run(); }, 300); } }
+  }
+  const tick = () => { if(uid && (!merged || dirty())) run(); };
+  function start(u){
+    if(uid === u) return; stop();
+    /* pindah ke akun Google LAIN di perangkat yang sama: buang data keuangan lokal milik akun sebelumnya (masih aman di cloud-nya) */
+    const owner = rd(M).uid || localStorage.getItem("st_sync_uid");
+    if(owner && owner !== u){ try{ localStorage.removeItem("kg_db"); localStorage.removeItem("kg_ts"); }catch(e){} wr(M, {}); }
+    uid = u; merged = false; run(); timer = setInterval(tick, EVERY);
+  }
+  function stop(){ if(timer) clearInterval(timer); timer = 0; uid = null; merged = false; }
+  addEventListener("online", tick);
+  document.addEventListener("visibilitychange", () => { if(document.hidden) tick(); });
+  addEventListener("pagehide", tick);
+  return { start, stop, now: () => run() };
+})();
+A.kgSync = () => KGS.now();   /* dipanggil menu Keuangan (iframe): window.parent.satuTitikAuth.kgSync() -> "ok" | "off" | "big" | "err" | "nologin" | "busy" */
+A.syncNow = () => SY.now();   /* dipanggil menu (iframe) lewat window.parent.satuTitikAuth.syncNow() setelah menyimpan data */
 let lastUid = null;
 A.onChange(x => {
+  try{ if(x.user) KGS.start(x.user.uid); else if(A.ready) KGS.stop(); }catch(e){}
   try{ if(x.user) SY.start(x.user.uid); else if(A.ready) SY.stop(); }catch(e){}
   try{
     const id = x.user ? x.user.uid : null;
