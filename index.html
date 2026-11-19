@@ -734,7 +734,7 @@ const MENUS = [
   { id:"turnamen", cat:"manajemen", icon:"🏆", title:"TURNAMEN", desc:"Atur turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor", descEn:"Run a sports or eSports tournament: fixtures, scores, standings, knockout bracket, and top scorers", src:"src-turnamen" },
   { id:"tebak-inisial", cat:"hiburan", icon:"🔤", title:"TEBAK INISIAL", desc:"Acak huruf A–Z dan kategori untuk tebak-tebakan seru anak-anak", descEn:"Random letter A–Z and category for fun kids' guessing games", src:"src-tebak-inisial" },
   { id:"versus", cat:"hiburan", icon:"⚔️", title:"VERSUS", desc:"Tulis dua nama apa saja, lalu adu: menang, kalah, atau draw", descEn:"Type any two names and fight: win, lose, or draw", src:"src-versus" },
-  { id:"acak-nama", cat:"hiburan", icon:"🎲", title:"ACAK NAMA", desc:"Kocok arisan: nama yang keluar tidak muncul lagi, bisa offline atau online (ditonton realtime), plus catatan keuangan arisan", descEn:"Arisan-style name draw: a drawn name never returns, play offline or online (watched live), plus arisan finance tracking", src:"src-acak-nama" }
+  { id:"acak-nama", cat:"manajemen", icon:"🎲", title:"ARISAN", desc:"Kocok arisan: nama yang keluar tidak muncul lagi, bisa offline atau online (ditonton realtime), plus catatan keuangan arisan", descEn:"Arisan-style name draw: a drawn name never returns, play offline or online (watched live), plus arisan finance tracking", src:"src-acak-nama" }
 ];
 /* judul menu per bahasa: [beranda ID, beranda EN, judul di dalam menu ID, judul di dalam menu EN]. Nama aplikasi "Satu Titik" tidak diterjemahkan. */
 const MTITLE = {
@@ -749,7 +749,7 @@ const MTITLE = {
   "olahraga":["OLAHRAGA","SPORTS","CATAT OLAHRAGA","ACTIVITY LOG"],
   "tebak-inisial":["TEBAK INISIAL","GUESS THE INITIAL","TEBAK INISIAL","GUESS THE INITIAL"],
   "versus":["VERSUS","VERSUS","VERSUS","VERSUS"],
-  "acak-nama":["ACAK NAMA","NAME DRAW","ACAK NAMA","NAME DRAW"]
+  "acak-nama":["ARISAN","ARISAN","ARISAN","ARISAN"]
 };
 const mTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 1 : 0] : m.title; };
 const fTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 3 : 2] : m.title; };
@@ -1034,7 +1034,7 @@ function writeKeys(s){
   w("ti_fx", j(s.sound)); w("ti_lang", s.lang); w("ti_anim", j(s.anim));
   /* Versus (awalan vs_; ikut Mode suara, bahasa, dan animasi) */
   w("vs_fx", j(s.sound)); w("vs_lang", s.lang); w("vs_anim", j(s.anim));
-  /* Acak Nama (awalan an_; ikut Mode suara, bahasa, dan animasi) */
+  /* Arisan (awalan an_; ikut Mode suara, bahasa, dan animasi) */
   w("an_fx", j(s.sound)); w("an_lang", s.lang); w("an_anim", j(s.anim));
   /* Olahraga (awalan ol_; hanya mengikuti bahasa) */
   w("ol_lang", s.lang);
@@ -13295,7 +13295,7 @@ body.noanim .reel.run .emo,body.noanim .rres.run .big,body.noanim .reel.land,bod
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ACAK NAMA</title>
+<title>ARISAN</title>
 <style>
 :root{--bg:#0d1017;--bg2:#131822;--card:#171c27;--field:#0f131b;--line:#262d3b;--text:#eef0f4;--muted:#8b93a5;--gold:#d4a94f;--gold2:#f0cf86;--ok:#4cc38a;--warn:#e8a838;--bad:#e5534b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -13320,6 +13320,9 @@ input:focus,textarea:focus{outline:0;border-color:var(--gold)}
 .ghost{min-height:38px;padding:0 12px;font:inherit;font-size:13px;font-weight:600;color:var(--gold2);background:transparent;border:1px solid var(--line);border-radius:10px;cursor:pointer}
 button:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
 .row{display:flex;gap:8px;margin-top:10px}.row input{text-transform:uppercase;letter-spacing:.2em;text-align:center}
+#nmRow input{text-transform:none;letter-spacing:0;text-align:left}
+#aBar{display:flex;align-items:center;gap:10px}#aBar b{flex:1;min-width:0;font-size:15px;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.arl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}.arl li{display:flex;gap:8px}.arl li .adel{width:auto;flex:none;padding:0 12px;font-size:14px;color:var(--muted)}.arl li .adel.arm{color:var(--bad);border-color:rgba(229,83,75,.55);font-size:12px;white-space:normal;max-width:46%}.arl li .aop{flex:1;min-width:0}.arl button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:48px;padding:0 14px;font:inherit;font-size:15px;font-weight:600;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:12px;cursor:pointer;text-align:left}.arl button small{color:var(--muted);font-weight:500;font-size:12px;white-space:nowrap}.arl button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .code{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}.code b{font-size:26px;letter-spacing:.3em;color:var(--gold2)}
 .stage{text-align:center}
 .reel{position:relative;display:flex;align-items:center;justify-content:center;min-height:120px;padding:26px 8px 12px;border:1px solid var(--line);border-radius:14px;background:var(--field)}
@@ -13404,10 +13407,20 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
 </head>
 <body>
 <div class="app">
-<div class="brand"><div class="icon">🎲</div><h1 id="t">ACAK NAMA</h1></div>
+<div class="brand"><div class="icon">🎲</div><h1 id="t">ARISAN</h1></div>
 <p class="sub" id="sub"></p>
-<div class="tabs"><button id="tK" type="button"></button><button id="tF" type="button"></button></div>
+<div id="aBar" hidden><button class="ghost" id="bBack" type="button"></button><b id="aNm"></b></div>
+<div class="tabs" id="tabs"><button id="tK" type="button"></button><button id="tF" type="button"></button></div>
 <p class="err" id="err" role="alert"></p>
+
+<section id="pM" class="app" style="padding:0;gap:14px" hidden>
+  <div class="panel">
+    <label class="label" id="mNL" for="mNm"></label>
+    <div class="row" id="nmRow"><input id="mNm" maxlength="30" autocomplete="off" enterkeyhint="done"><button class="ghost" id="bNew" type="button"></button></div>
+  </div>
+  <div class="panel" id="mLP"><p class="label" id="mLL"></p><ul class="arl" id="arl"></ul><p class="empty" id="mNo"></p></div>
+  <div class="panel"><button class="ghost" id="bView" type="button" style="width:100%"></button></div>
+</section>
 
 <section id="pK" class="app" style="padding:0;gap:14px">
   <div class="panel">
@@ -13443,6 +13456,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     <div class="hd"><span class="label" id="lbO"></span><button class="ghost" id="bRs" type="button"></button></div>
     <ol id="outl"></ol><p class="empty" id="noO"></p>
   </div>
+
 </section>
 
 <section id="pF" hidden>
@@ -13480,7 +13494,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       cp:"Salin", cpd:"Tersalin ✓", lv:"Berhenti mengikuti", cl:"Tutup ruang", hostI:"{n} pengikut di ruang ini. Bagikan kode ke anggota.", guestI:"Kamu mengikuti ruang milik {h} dan menonton langsung.",
       lbN:"Input anggota", ph:"Satu nama per baris atau pisahkan dengan koma", add:"Tambah anggota", dup:"Tidak ada nama baru (kosong atau sudah ada).",
       lbQ:"Antrian ({n})", noQ:"Tidak ada nama dalam antrian.", go:"🎲 KOCOK", run:"MENGOCOK…", need:"Tambahkan anggota di tab Keuangan dulu.", done:"Semua nama sudah keluar.", nopay:"Belum semua anggota lunas di periode {p} (masih {x} yang belum). Tandai pembayaran di tab Keuangan dulu.", cap:"KELUAR",
-      lbO:"Sudah keluar", noO:"Belum ada yang keluar.", rs:"Ulang", rsC:"Ketuk lagi: hapus hasil & catatan bayar", got:"🎉 {n} keluar di periode {p}!",
+      lbO:"Sudah keluar", noO:"Belum ada yang keluar.", del:"🗑 Hapus arisan", delC:"Ketuk lagi untuk hapus", deld:"Arisan dihapus.", subM:"Buat arisan baru atau pilih arisan yang sudah ada.", mNL:"Nama arisan baru", mNP:"Contoh: Arisan Keluarga", mNew:"Buat", mLL:"Arisan saya ({n})", mNo:"Belum ada arisan. Buat dulu dengan memberi nama di atas.", mMem:"{n} anggota", bk:"‹ Daftar arisan", inRm:"Tutup ruang online dulu sebelum pindah arisan.", mView:"🌐 Ikuti ruang online (penonton)", nmDup:"Nama arisan itu sudah ada.", nmEmpty:"Isi nama arisan dulu.", rs:"Ulang", rsC:"Ketuk lagi: hapus hasil & catatan bayar", got:"🎉 {n} keluar di periode {p}!",
       nf:"Kode ruang tidak ditemukan.", closed:"Ruang sudah ditutup pemilik.", denied:"Aturan Firestore untuk an_rooms belum dipasang.", off:"Tidak ada internet.", fail:"Gagal",
       fix:"Ketetapan angsuran per anggota", fixH:"Nominal wajib tiap anggota per periode, misalnya 50.000.", col:"Iuran periode ini (otomatis)", lbF:"Angsuran anggota", per:"Periode {p} dari {n}", rcv:"Penerima: {n}", rcv0:"Penerima: belum dikocok", sum:"{a} dari {n} anggota lunas", tg:"Target {b}", paid:"Lunas", short:"Kurang {x}", unpaid:"Belum bayar", tot:"Total dibayar: {x}", fill:"Isi penuh", nofix:"Atur ketetapan angsuran per anggota di tab Keuangan dulu.", noN:"Belum ada anggota. Tambahkan nama di atas.", noM:"Belum ada anggota. Tambahkan di tab Keuangan.", lock:"🔒 Periode ini sudah lunas & dikocok, angsurannya dikunci.", lockO:"Pemilik ruang bisa membuka kunci angsuran tiap anggota.", lockG:"Hanya pemilik ruang yang bisa membuka kunci.", ulk:"🔓 Buka kunci", rlk:"🔒 Kunci lagi", ulOn:"Kunci dibuka oleh pemilik ruang.", roleO:"PEMILIK RUANG", roleF:"PENGIKUT", fLb:"Pengikut ({n})", noF:"Belum ada pengikut. Bagikan kode ruang.", kick:"Keluarkan", kickC:"Ketuk lagi", kicked:"Kamu dikeluarkan dari ruang oleh pemilik.", banned:"Kamu dikeluarkan dari ruang ini oleh pemilik.", resume:"Lanjut mengikuti ruang {c}", fixLk:"Dikunci sejak periode 1 dikocok.", lbR:"Laporan", exp:"⬇ Export PDF", shr:"↗ Bagikan", rbusy:"Membuat PDF…", saved:"PDF tersimpan di Dokumen/Satu Titik.", dl:"PDF diunduh.", rfail:"Gagal membuat PDF." },
     en:{ sub:"Draw names like an arisan. A name that has come out never comes out again.", tK:"🎲 Draw", tF:"💰 Finance", mOff:"Offline", mOn:"Online",
@@ -13488,7 +13502,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       cp:"Copy", cpd:"Copied ✓", lv:"Unfollow", cl:"Close room", hostI:"{n} following this room. Share the code with members.", guestI:"You are following {h}'s room and watching live.",
       lbN:"Add members", ph:"One name per line or separate with commas", add:"Add members", dup:"No new names (empty or already added).",
       lbQ:"Queue ({n})", noQ:"No names in the queue.", go:"🎲 DRAW", run:"DRAWING…", need:"Add members in the Finance tab first.", done:"All names have been drawn.", nopay:"Not everyone has paid for period {p} yet ({x} still unpaid). Mark payments in the Finance tab first.", cap:"DRAWN",
-      lbO:"Already drawn", noO:"Nobody drawn yet.", rs:"Reset", rsC:"Tap again: clears results & payments", got:"🎉 {n} drawn in period {p}!",
+      lbO:"Already drawn", noO:"Nobody drawn yet.", del:"🗑 Delete arisan", delC:"Tap again to delete", deld:"Arisan deleted.", subM:"Create a new arisan or pick an existing one.", mNL:"New arisan name", mNP:"e.g. Family Arisan", mNew:"Create", mLL:"My arisans ({n})", mNo:"No arisan yet. Create one by giving it a name above.", mMem:"{n} members", bk:"‹ Arisan list", inRm:"Close the online room before switching arisan.", mView:"🌐 Follow an online room (viewer)", nmDup:"That arisan name already exists.", nmEmpty:"Enter an arisan name first.", rs:"Reset", rsC:"Tap again: clears results & payments", got:"🎉 {n} drawn in period {p}!",
       nf:"Room code not found.", closed:"The room was closed by the owner.", denied:"Firestore rules for an_rooms are not installed yet.", off:"No internet.", fail:"Failed",
       fix:"Fixed installment per member", fixH:"Amount each member must pay per period, e.g. 50,000.", col:"Collected this period (auto)", lbF:"Member installments", per:"Period {p} of {n}", rcv:"Recipient: {n}", rcv0:"Recipient: not drawn yet", sum:"{a} of {n} members paid", tg:"Target {b}", paid:"Paid", short:"Short {x}", unpaid:"Unpaid", tot:"Total paid: {x}", fill:"Fill full", nofix:"Set the fixed installment per member in the Finance tab first.", noN:"No members yet. Add names above.", noM:"No members yet. Add them in the Finance tab.", lock:"🔒 This period is fully paid & drawn; its installments are locked.", lockO:"The room owner can unlock each member's installment.", lockG:"Only the room owner can unlock.", ulk:"🔓 Unlock", rlk:"🔒 Lock again", ulOn:"Unlocked by the room owner.", roleO:"ROOM OWNER", roleF:"FOLLOWER", fLb:"Followers ({n})", noF:"No followers yet. Share the room code.", kick:"Remove", kickC:"Tap again", kicked:"The owner removed you from the room.", banned:"The owner removed you from this room.", resume:"Resume following room {c}", fixLk:"Locked since period 1 was drawn.", lbR:"Report", exp:"⬇ Export PDF", shr:"↗ Share", rbusy:"Creating PDF…", saved:"PDF saved to Documents/Satu Titik.", dl:"PDF downloaded.", rfail:"Could not create the PDF." }
   };
@@ -13529,7 +13543,24 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
   function flash(m, ok){ var e = $("err"); e.className = "err" + (ok ? " ok" : ""); e.textContent = m; clearTimeout(msgT); if(m) msgT = setTimeout(function(){ e.textContent = ""; }, 4000); }
 
   /* data arisan (disimpan di perangkat, ikut tersinkron ke akun lewat localStorage) */
-  var a0 = lsj("an_data", null);
+  var aid = "", scr = "M", AL = { items:[] };
+  function loadList(){
+    var l = lsj("an_list", null);
+    if(l && Array.isArray(l.items)) AL.items = l.items.filter(function(x){ return x && typeof x.id === "string" && typeof x.name === "string" && x.id; }).slice(0, 50);
+    else {   /* migrasi: arisan tunggal lama jadi "Arisan 1" */
+      var old = lsj("an_data", null);
+      if(old && Array.isArray(old.names) && (old.names.length || old.fix || (old.out && old.out.length) || old.due)){
+        sv("an_data_a1", old); AL.items = [{ id:"a1", name:"Arisan 1" }];
+      }
+      try{ localStorage.removeItem("an_data"); }catch(e){}
+      saveList();
+    }
+  }
+  function saveList(){ sv("an_list", { items:AL.items }); }
+  function aName(){ var x = AL.items.filter(function(i){ return i.id === aid; })[0]; return x ? x.name : ""; }
+  function loadA(id){
+    aid = id; A = { names:[], out:[], fix:0, pay:{}, ul:{} };
+    var a0 = lsj("an_data_" + id, null);
   if(a0 && Array.isArray(a0.names)){
     A.names = a0.names.filter(function(s){ return typeof s === "string" && s; }).slice(0, 60);
     A.out = (Array.isArray(a0.out) ? a0.out : []).filter(function(n){ return A.names.indexOf(n) >= 0; });
@@ -13546,6 +13577,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       if(Object.keys(o).length) A.pay[n] = o;
     });
   }
+  }
   function amt(n, p){ return (A.pay[n] && A.pay[n][p]) || 0; }
   function isPaid(n, p){ return A.fix > 0 && amt(n, p) >= A.fix; }
   function locked(p){ return p <= A.out.length; }   /* periode yang sudah dikocok dikunci */
@@ -13559,7 +13591,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     save(); paintF();
   }
   function totalOf(n){ var o = A.pay[n] || {}; return Object.keys(o).reduce(function(s, k){ return s + o[k]; }, 0); }
-  function save(){ sv("an_data", A); }
+  function save(){ if(aid) sv("an_data_" + aid, A); }
   function spec(){ return ON.role === "guest"; }
   function qList(){ return spec() ? ((ON.data && ON.data.q) || []) : A.names.filter(function(n){ return A.out.indexOf(n) < 0; }); }
   function oList(){ return spec() ? ((ON.data && ON.data.o) || []) : A.out; }
@@ -13731,13 +13763,58 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     rsArm = 0; A.out = []; A.pay = {}; A.ul = {}; LAST = ""; save(); syncLists(); paint();
   }
 
+  var delArm = "";
+  function emptyA(){ A = { names:[], out:[], fix:0, pay:{}, ul:{} }; }
+  function deleteArisan(id){
+    if(busy || ON.role) return;
+    if(delArm !== id){ delArm = id; paintM(); setTimeout(function(){ if(delArm === id){ delArm = 0; if(scr === "M") paintM(); } }, 3500); return; }
+    delArm = 0;
+    try{ localStorage.removeItem("an_data_" + id); }catch(e){}
+    AL.items = AL.items.filter(function(x){ return x.id !== id; }); saveList();
+    paint(); flash(T().deld, true);
+  }
+  function openArisan(id){
+    if(busy) return;
+    loadA(id); scr = "A"; tab = "F"; mode = "off"; fper = 0; rsArm = 0; delArm = ""; LAST = ""; flash(""); paint();
+  }
+  function newArisan(){
+    var t = T(), nm = clean($("mNm").value);
+    if(!nm){ flash(t.nmEmpty); return; }
+    if(AL.items.some(function(x){ return x.name.toLowerCase() === nm.toLowerCase(); })){ flash(t.nmDup); return; }
+    if(AL.items.length >= 50) return;
+    var id = "a" + Date.now().toString(36) + rnd(1296).toString(36);
+    AL.items.push({ id:id, name:nm }); saveList(); $("mNm").value = ""; sv("an_data_" + id, { names:[], out:[], fix:0, pay:{}, ul:{} });
+    openArisan(id);
+  }
+  function toMenu(){
+    if(busy) return;
+    if(ON.role === "host"){ flash(T().inRm); return; }
+    if(ON.role === "guest") leave();
+    aid = ""; emptyA(); LAST = ""; fper = 0; scr = "M"; mode = "off"; flash(""); paint();
+  }
+  function viewOnly(){ aid = ""; emptyA(); scr = "A"; tab = "K"; mode = "on"; flash(""); paint(); }
+  function paintM(){
+    var t = T(), ul = $("arl"); ul.textContent = "";
+    $("mNL").textContent = t.mNL; $("mNm").placeholder = t.mNP; $("bNew").textContent = t.mNew; $("bView").textContent = t.mView;
+    $("mLL").textContent = fill(t.mLL, { n:AL.items.length }); $("mNo").textContent = t.mNo; $("mNo").hidden = AL.items.length > 0; $("mLP").hidden = false;
+    AL.items.forEach(function(x){
+      var d = lsj("an_data_" + x.id, null), n = d && Array.isArray(d.names) ? d.names.length : 0;
+      var b = el("button", "aop"); b.type = "button"; b.appendChild(el("span", "", "🎲 " + x.name)); b.appendChild(el("small", "", fill(t.mMem, { n:n })));
+      b.addEventListener("click", function(){ openArisan(x.id); });
+      var li = el("li"); li.appendChild(b);
+      var dx = el("button", "adel" + (delArm === x.id ? " arm" : ""), delArm === x.id ? t.delC : "🗑"); dx.type = "button"; dx.setAttribute("aria-label", t.del);
+      dx.addEventListener("click", function(){ deleteArisan(x.id); });
+      li.appendChild(dx); ul.appendChild(li);
+    });
+  }
+
   /* ===== TAMPILAN ===== */
   function paintOn(){
     var t = T(), u = meU(), inRoom = !!ON.role;
     $("onBox").hidden = mode !== "on"; if(mode !== "on") return;
     $("onNote").textContent = t.onNote;
     $("onLogin").hidden = !!u || inRoom; $("onMenu").hidden = !u || inRoom; $("onRoom").hidden = !inRoom;
-    $("bLogin").textContent = t.login; $("bMk").textContent = t.mk; $("bJn").textContent = t.jn; $("jc").placeholder = t.code;
+    $("bLogin").textContent = t.login; $("bMk").textContent = t.mk; $("bMk").hidden = !aid; $("bJn").textContent = t.jn; $("jc").placeholder = t.code;
     var sf = lsj("an_follow", null), okf = !!(sf && typeof sf.code === "string" && sf.code && (Date.now() - (+sf.at || 0)) < 43200000);
     $("bRes").hidden = !okf; if(okf) $("bRes").textContent = fill(t.resume, { c:sf.code });
     if(inRoom){
@@ -13769,7 +13846,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     $("mOff").textContent = t.mOff; $("mOn").textContent = t.mOn;
     $("mOff").classList.toggle("on", mode === "off"); $("mOn").classList.toggle("on", mode === "on");
     paintOn();
-    $("cap").textContent = t.cap; $("bGo").hidden = sp; $("bGo").textContent = busy ? t.run : t.go; $("bGo").disabled = busy;
+    $("cap").textContent = t.cap; $("bGo").hidden = sp || !aid; $("bGo").textContent = busy ? t.run : t.go; $("bGo").disabled = busy;
     if(!busy){ $("nm").textContent = LAST || "?"; if(!LAST) $("rl").className = "reel idle"; }
     if(hold) return;
     $("lbQ").textContent = fill(t.lbQ, { n:q.length }); $("noQ").textContent = (sp || A.names.length) ? t.noQ : t.noM; $("noQ").hidden = q.length > 0;
@@ -13781,6 +13858,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     });
     $("lbO").textContent = t.lbO; $("noO").textContent = t.noO; $("noO").hidden = o.length > 0;
     $("bRs").hidden = sp || !A.out.length; $("bRs").textContent = rsArm ? t.rsC : t.rs;
+   
     var ol = $("outl"); ol.textContent = "";
     o.forEach(function(n, i){ var li = el("li"); li.appendChild(el("span", "who", (i + 1) + ". " + n)); ol.appendChild(li); });
   }
@@ -13833,8 +13911,8 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
   /* ===== LAPORAN PDF (kanvas -> JPEG -> PDF lewat stPdfBlob milik Beranda) ===== */
   var rbusy = false;
   var RT = {
-    id:{ ti:"LAPORAN ARISAN", dt:"Dibuat {d}", m:"Anggota", fx:"Ketetapan / anggota", cp:"Periode berjalan", tc:"Total terkumpul", t1:"Rekap per periode", t2:"Rekap per anggota", hp:"Periode", hr:"Penerima", hk:"Lunas", hc:"Terkumpul", hn:"No", hm:"Nama", hl:"Periode lunas", ht:"Total dibayar", ho:"Tunggakan", ft:"Dibuat dengan Satu Titik · Acak Nama", fin:"Selesai" },
-    en:{ ti:"ARISAN REPORT", dt:"Created {d}", m:"Members", fx:"Fixed / member", cp:"Current period", tc:"Total collected", t1:"Summary by period", t2:"Summary by member", hp:"Period", hr:"Recipient", hk:"Paid", hc:"Collected", hn:"No", hm:"Name", hl:"Periods paid", ht:"Total paid", ho:"Arrears", ft:"Made with Satu Titik · Name Draw", fin:"Done" }
+    id:{ ti:"LAPORAN ARISAN", dt:"Dibuat {d}", m:"Anggota", fx:"Ketetapan / anggota", cp:"Periode berjalan", tc:"Total terkumpul", t1:"Rekap per periode", t2:"Rekap per anggota", hp:"Periode", hr:"Penerima", hk:"Lunas", hc:"Terkumpul", hn:"No", hm:"Nama", hl:"Periode lunas", ht:"Total dibayar", ho:"Tunggakan", ft:"Dibuat dengan Satu Titik · Arisan", fin:"Selesai" },
+    en:{ ti:"ARISAN REPORT", dt:"Created {d}", m:"Members", fx:"Fixed / member", cp:"Current period", tc:"Total collected", t1:"Summary by period", t2:"Summary by member", hp:"Period", hr:"Recipient", hk:"Paid", hc:"Collected", hn:"No", hm:"Name", hl:"Periods paid", ht:"Total paid", ho:"Arrears", ft:"Made with Satu Titik · Arisan", fin:"Done" }
   };
   function reportCanvas(){
     var R = RT[lang], N = A.names.length, W = 1190, M = 64, RH = 46, TW = W - 2 * M, cur = Math.min(A.out.length + 1, N), per = [], mem = [], all = 0, i;
@@ -13855,7 +13933,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     }
     g.fillStyle = "#fff"; g.fillRect(0, 0, W, H);
     g.fillStyle = "#12161f"; g.fillRect(0, 0, W, 150); g.fillStyle = "#d4a94f"; g.fillRect(0, 150, W, 5);
-    tx(R.ti, M, 62, { w:700, s:44, c:"#f0cf86" });
+    tx(R.ti + (aName() ? " · " + aName().toUpperCase() : ""), M, 62, { w:700, s:44, c:"#f0cf86" });
     tx(fill(R.dt, { d:new Date().toLocaleDateString(lang === "en" ? "en-US" : "id-ID", { day:"numeric", month:"long", year:"numeric" }) }), M, 112, { s:22, c:"#aab0bf" });
     var cw = (TW - 48) / 4, sy = 185, st = [[R.m, String(N)], [R.fx, fm(A.fix)], [R.cp, (N && A.out.length >= N) ? R.fin : cur + " / " + N], [R.tc, fm(all)]];
     st.forEach(function(q, j){
@@ -13917,7 +13995,12 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
   }
   function paint(){
     var t = T();
-    $("sub").textContent = t.sub; $("tK").textContent = t.tK; $("tF").textContent = t.tF;
+    var menu = scr === "M" && !ON.role;
+    $("pM").hidden = !menu; $("aBar").hidden = menu; $("tabs").hidden = menu;
+    if(menu){ $("sub").textContent = t.subM; $("pK").hidden = true; $("pF").hidden = true; paintM(); updChat(); return; }
+    if(!aid && !spec()) tab = "K";
+    $("sub").textContent = t.sub; $("tK").textContent = t.tK; $("tF").textContent = t.tF; $("tF").hidden = !aid;
+    $("bBack").textContent = t.bk; $("aNm").textContent = aName();
     $("tK").classList.toggle("on", tab === "K"); $("tF").classList.toggle("on", tab === "F");
     $("pK").hidden = tab !== "K"; $("pF").hidden = tab !== "F";
     if(tab === "K") paintK(); else paintF();
@@ -13942,6 +14025,10 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
   $("bAdd").addEventListener("click", addNames);
   $("bGo").addEventListener("click", go);
   $("bRs").addEventListener("click", resetAll);
+  $("bNew").addEventListener("click", newArisan);
+  $("mNm").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); newArisan(); } });
+  $("bBack").addEventListener("click", toMenu);
+  $("bView").addEventListener("click", viewOnly);
   $("pp").addEventListener("click", function(){ if(fper > 1){ fper--; paintF(); } });
   $("pn").addEventListener("click", function(){ if(fper < A.names.length){ fper++; paintF(); } });
   $("fix").addEventListener("focus", function(){ this.value = A.fix || ""; });
@@ -14202,7 +14289,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     paintBadge(); cNote("", 0);
   }
 
-  readSettings(); paint();
+  readSettings(); loadList(); paint();
 })();
 </scr@@ipt>
 </body>
