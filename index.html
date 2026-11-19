@@ -13313,7 +13313,7 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-famil
 .tabs button,.seg button{min-height:40px;font:inherit;font-size:14px;font-weight:600;color:var(--muted);background:transparent;border:0;border-radius:10px;cursor:pointer}
 .tabs button.on,.seg button.on{color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold))}
 input,textarea{width:100%;font:inherit;font-size:16px;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
-textarea{resize:vertical;min-height:72px}
+textarea{resize:vertical;min-height:72px}textarea:disabled{opacity:.5;cursor:not-allowed}
 input:focus,textarea:focus{outline:0;border-color:var(--gold)}
 .go{width:100%;min-height:50px;margin-top:12px;font:inherit;font-size:15px;font-weight:700;letter-spacing:.12em;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0;border-radius:12px;cursor:pointer}
 .go:disabled{opacity:.55;cursor:default}
@@ -13464,6 +13464,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
   <div class="panel" id="namesP">
     <label class="label" id="lbN" for="nt"></label>
     <textarea id="nt" rows="3" maxlength="600"></textarea>
+    <p class="note" id="nLock" hidden></p>
     <button class="go" id="bAdd" type="button" style="min-height:44px;font-size:14px;letter-spacing:.06em"></button>
   </div>
   <p class="panel empty" id="fNo"></p>
@@ -13495,7 +13496,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       cp:"Salin", cpd:"Tersalin ✓", lv:"Berhenti mengikuti", cl:"Tutup ruang", hostI:"{n} pengikut di ruang ini. Bagikan kode ke anggota.", guestI:"Kamu mengikuti ruang milik {h} dan menonton langsung.",
       lbN:"Input anggota", ph:"Satu nama per baris atau pisahkan dengan koma", add:"Tambah anggota", dup:"Tidak ada nama baru (kosong atau sudah ada).",
       lbQ:"Antrian ({n})", noQ:"Tidak ada nama dalam antrian.", go:"🎲 KOCOK", run:"MENGOCOK…", need:"Tambahkan anggota di tab Keuangan dulu.", done:"Semua nama sudah keluar.", nopay:"Belum semua anggota lunas di periode {p} (masih {x} yang belum). Tandai pembayaran di tab Keuangan dulu.", cap:"KELUAR",
-      lbO:"Sudah keluar", noO:"Belum ada yang keluar.", inv:"👥 Undang teman", invd:"Undangan tersalin ✓", invT:"Ayo ikut arisan \"{n}\"! Buka menu ARISAN, pilih Online, lalu Gabung dan masukkan kode ruang: {c}",del:"🗑 Hapus arisan", delC:"Ketuk lagi untuk hapus", deld:"Arisan dihapus.", subM:"Buat arisan baru atau pilih arisan yang sudah ada.", mNL:"Nama arisan baru", mNP:"Contoh: Arisan Keluarga", mNew:"Buat", mLL:"Arisan saya ({n})", mNo:"Belum ada arisan. Buat dulu dengan memberi nama di atas.", mMem:"{n} anggota", bk:"‹ Daftar arisan", inRm:"Tutup ruang online dulu sebelum pindah arisan.", mView:"🌐 Ikuti ruang online (penonton)", nmDup:"Nama arisan itu sudah ada.", nmEmpty:"Isi nama arisan dulu.", rs:"Ulang", rsC:"Ketuk lagi: hapus hasil & catatan bayar", got:"🎉 {n} keluar di periode {p}!",
+      lbO:"Sudah keluar", noO:"Belum ada yang keluar.", inv:"👥 Undang teman", invd:"Undangan tersalin ✓", invT:"Ayo ikut arisan \"{n}\"! Buka menu ARISAN, pilih Online, lalu Gabung dan masukkan kode ruang: {c}",nLock:"🔒 Arisan sudah dimulai (periode 1 sudah dikocok), jadi anggota tidak bisa ditambah atau dihapus lagi.", del:"🗑 Hapus arisan", delC:"Ketuk lagi untuk hapus", deld:"Arisan dihapus.", subM:"Buat arisan baru atau pilih arisan yang sudah ada.", mNL:"Nama arisan baru", mNP:"Contoh: Arisan Keluarga", mNew:"Buat", mLL:"Arisan saya ({n})", mNo:"Belum ada arisan. Buat dulu dengan memberi nama di atas.", mMem:"{n} anggota", bk:"‹ Daftar arisan", inRm:"Tutup ruang online dulu sebelum pindah arisan.", mView:"🌐 Ikuti ruang online (penonton)", nmDup:"Nama arisan itu sudah ada.", nmEmpty:"Isi nama arisan dulu.", rs:"Ulang", rsC:"Ketuk lagi: hapus hasil & catatan bayar", got:"🎉 {n} keluar di periode {p}!",
       nf:"Kode ruang tidak ditemukan.", closed:"Ruang sudah ditutup pemilik.", denied:"Aturan Firestore untuk an_rooms belum dipasang.", off:"Tidak ada internet.", fail:"Gagal",
       fix:"Ketetapan angsuran per anggota", fixH:"Nominal wajib tiap anggota per periode, misalnya 50.000.", col:"Iuran periode ini (otomatis)", lbF:"Angsuran anggota", per:"Periode {p} dari {n}", rcv:"Penerima: {n}", rcv0:"Penerima: belum dikocok", sum:"{a} dari {n} anggota lunas", tg:"Target {b}", paid:"Lunas", short:"Kurang {x}", unpaid:"Belum bayar", tot:"Total dibayar: {x}", fill:"Isi penuh", nofix:"Atur ketetapan angsuran per anggota di tab Keuangan dulu.", noN:"Belum ada anggota. Tambahkan nama di atas.", noM:"Belum ada anggota. Tambahkan di tab Keuangan.", lock:"🔒 Periode ini sudah lunas & dikocok, angsurannya dikunci.", lockO:"Pemilik ruang bisa membuka kunci angsuran tiap anggota.", lockG:"Hanya pemilik ruang yang bisa membuka kunci.", ulk:"🔓 Buka kunci", rlk:"🔒 Kunci lagi", ulOn:"Kunci dibuka oleh pemilik ruang.", roleO:"PEMILIK RUANG", roleF:"PENGIKUT", fLb:"Pengikut ({n})", noF:"Belum ada pengikut. Bagikan kode ruang.", kick:"Keluarkan", kickC:"Ketuk lagi", kicked:"Kamu dikeluarkan dari ruang oleh pemilik.", banned:"Kamu dikeluarkan dari ruang ini oleh pemilik.", resume:"Lanjut mengikuti ruang {c}", fixLk:"Dikunci sejak periode 1 dikocok.", lbR:"Laporan", exp:"⬇ Export PDF", shr:"↗ Bagikan", rbusy:"Membuat PDF…", saved:"PDF tersimpan di Dokumen/Satu Titik.", dl:"PDF diunduh.", rfail:"Gagal membuat PDF." },
     en:{ sub:"Draw names like an arisan. A name that has come out never comes out again.", tK:"🎲 Draw", tF:"💰 Finance", mOff:"Offline", mOn:"Online",
@@ -13503,7 +13504,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       cp:"Copy", cpd:"Copied ✓", lv:"Unfollow", cl:"Close room", hostI:"{n} following this room. Share the code with members.", guestI:"You are following {h}'s room and watching live.",
       lbN:"Add members", ph:"One name per line or separate with commas", add:"Add members", dup:"No new names (empty or already added).",
       lbQ:"Queue ({n})", noQ:"No names in the queue.", go:"🎲 DRAW", run:"DRAWING…", need:"Add members in the Finance tab first.", done:"All names have been drawn.", nopay:"Not everyone has paid for period {p} yet ({x} still unpaid). Mark payments in the Finance tab first.", cap:"DRAWN",
-      lbO:"Already drawn", noO:"Nobody drawn yet.", inv:"👥 Invite friends", invd:"Invite copied ✓", invT:"Join my arisan \"{n}\"! Open the ARISAN menu, choose Online, then Join and enter the room code: {c}",del:"🗑 Delete arisan", delC:"Tap again to delete", deld:"Arisan deleted.", subM:"Create a new arisan or pick an existing one.", mNL:"New arisan name", mNP:"e.g. Family Arisan", mNew:"Create", mLL:"My arisans ({n})", mNo:"No arisan yet. Create one by giving it a name above.", mMem:"{n} members", bk:"‹ Arisan list", inRm:"Close the online room before switching arisan.", mView:"🌐 Follow an online room (viewer)", nmDup:"That arisan name already exists.", nmEmpty:"Enter an arisan name first.", rs:"Reset", rsC:"Tap again: clears results & payments", got:"🎉 {n} drawn in period {p}!",
+      lbO:"Already drawn", noO:"Nobody drawn yet.", inv:"👥 Invite friends", invd:"Invite copied ✓", invT:"Join my arisan \"{n}\"! Open the ARISAN menu, choose Online, then Join and enter the room code: {c}",nLock:"🔒 The arisan has started (period 1 is drawn), so members can no longer be added or removed.", del:"🗑 Delete arisan", delC:"Tap again to delete", deld:"Arisan deleted.", subM:"Create a new arisan or pick an existing one.", mNL:"New arisan name", mNP:"e.g. Family Arisan", mNew:"Create", mLL:"My arisans ({n})", mNo:"No arisan yet. Create one by giving it a name above.", mMem:"{n} members", bk:"‹ Arisan list", inRm:"Close the online room before switching arisan.", mView:"🌐 Follow an online room (viewer)", nmDup:"That arisan name already exists.", nmEmpty:"Enter an arisan name first.", rs:"Reset", rsC:"Tap again: clears results & payments", got:"🎉 {n} drawn in period {p}!",
       nf:"Room code not found.", closed:"The room was closed by the owner.", denied:"Firestore rules for an_rooms are not installed yet.", off:"No internet.", fail:"Failed",
       fix:"Fixed installment per member", fixH:"Amount each member must pay per period, e.g. 50,000.", col:"Collected this period (auto)", lbF:"Member installments", per:"Period {p} of {n}", rcv:"Recipient: {n}", rcv0:"Recipient: not drawn yet", sum:"{a} of {n} members paid", tg:"Target {b}", paid:"Paid", short:"Short {x}", unpaid:"Unpaid", tot:"Total paid: {x}", fill:"Fill full", nofix:"Set the fixed installment per member in the Finance tab first.", noN:"No members yet. Add names above.", noM:"No members yet. Add them in the Finance tab.", lock:"🔒 This period is fully paid & drawn; its installments are locked.", lockO:"The room owner can unlock each member's installment.", lockG:"Only the room owner can unlock.", ulk:"🔓 Unlock", rlk:"🔒 Lock again", ulOn:"Unlocked by the room owner.", roleO:"ROOM OWNER", roleF:"FOLLOWER", fLb:"Followers ({n})", noF:"No followers yet. Share the room code.", kick:"Remove", kickC:"Tap again", kicked:"The owner removed you from the room.", banned:"The owner removed you from this room.", resume:"Resume following room {c}", fixLk:"Locked since period 1 was drawn.", lbR:"Report", exp:"⬇ Export PDF", shr:"↗ Share", rbusy:"Creating PDF…", saved:"PDF saved to Documents/Satu Titik.", dl:"PDF downloaded.", rfail:"Could not create the PDF." }
   };
@@ -13742,8 +13743,9 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     if(ON.role === "host"){ ON.k++; wr({ k:ON.k, r:r }); }   /* penonton mulai menonton saat ini */
     play(r, q, function(){ A.out.push(r); save(); if(ON.role === "host") syncLists(); showWin(r); paint(); });
   }
+  function started(){ return A.out.length > 0; }
   function addNames(){
-    if(busy) return;
+    if(busy || started()) return;
     var added = 0;
     $("nt").value.split(/[\n,;]+/).forEach(function(s){
       s = clean(s); if(!s || A.names.length >= 60) return;
@@ -13755,7 +13757,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     paint();
   }
   function rmName(n){
-    if(busy || spec()) return;
+    if(busy || spec() || started()) return;
     A.names = A.names.filter(function(x){ return x !== n; }); delete A.pay[n]; delete A.ul[n]; save(); syncLists(); paint();
   }
   function resetAll(){
@@ -13889,7 +13891,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     var ch = $("chips"); ch.textContent = "";
     q.forEach(function(n){
       var c = el("span", "chip", n);
-      if(!sp && !busy){ var x = el("button", "x", "✕"); x.type = "button"; x.setAttribute("aria-label", "x"); x.addEventListener("click", function(){ rmName(n); }); c.appendChild(x); }
+      if(!sp && !busy && !started()){ var x = el("button", "x", "✕"); x.type = "button"; x.setAttribute("aria-label", "x"); x.addEventListener("click", function(){ rmName(n); }); c.appendChild(x); }
       ch.appendChild(c);
     });
     $("lbO").textContent = t.lbO; $("noO").textContent = t.noO; $("noO").hidden = o.length > 0;
@@ -13914,6 +13916,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
   function setAmt(n, v){ if(memLocked(n, fper)) return; var o = A.pay[n] || (A.pay[n] = {}); if(v > 0) o[fper] = v; else delete o[fper]; save(); upd(); }
   function paintF(){
     var t = T(), N = A.names.length;
+    $("nt").disabled = $("bAdd").disabled = started(); $("nLock").textContent = t.nLock; $("nLock").hidden = !started();
     $("lbN").textContent = t.lbN; $("nt").placeholder = t.ph; $("bAdd").textContent = t.add; $("fNo").textContent = t.noN; $("fNo").hidden = N > 0; $("fBox").hidden = !N; if(!N) return;
     if(!fper || fper > N) fper = Math.min(A.out.length + 1, N);
     $("fixL").textContent = t.fix; $("fixH").textContent = A.out.length ? t.fixLk : t.fixH; $("lbR").textContent = t.lbR; $("bExp").textContent = t.exp; $("bShr").textContent = t.shr; $("colL").textContent = t.col; $("lbF").textContent = t.lbF;
