@@ -734,7 +734,7 @@ const MENUS = [
   { id:"turnamen", cat:"manajemen", icon:"🏆", title:"TURNAMEN", desc:"Atur turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor", descEn:"Run a sports or eSports tournament: fixtures, scores, standings, knockout bracket, and top scorers", src:"src-turnamen" },
   { id:"tebak-inisial", cat:"hiburan", icon:"🔤", title:"TEBAK INISIAL", desc:"Acak huruf A–Z dan kategori untuk tebak-tebakan seru anak-anak", descEn:"Random letter A–Z and category for fun kids' guessing games", src:"src-tebak-inisial" },
   { id:"versus", cat:"hiburan", icon:"⚔️", title:"VERSUS", desc:"Tulis dua nama apa saja, lalu adu: menang, kalah, atau draw", descEn:"Type any two names and fight: win, lose, or draw", src:"src-versus" },
-  { id:"acak-nama", cat:"manajemen", icon:"🎲", title:"ARISAN", desc:"Kocok arisan: nama yang keluar tidak muncul lagi, bisa offline atau online (ditonton realtime), plus catatan keuangan arisan", descEn:"Arisan-style name draw: a drawn name never returns, play offline or online (watched live), plus arisan finance tracking", src:"src-acak-nama" },
+  { id:"acak-nama", cat:"manajemen", icon:"🎲", title:"ARISAN", desc:"Arisan: manajemen arisan kamu agar lebih rapi, bisa offline atau online (ditonton realtime), plus catatan keuangan arisan", descEn:"Arisan: manage your arisan more neatly, play offline or online (watched live), plus arisan finance tracking", src:"src-acak-nama" },
   { id:"keuangan", cat:"manajemen", icon:"💰", title:"KEUANGAN", desc:"Catat uang masuk dan uang keluar, atur jatah belanja, dan kumpulkan tabungan", descEn:"Record money in and out, set spending limits, and build your savings", src:"src-keuangan" }
 ];
 /* judul menu per bahasa: [beranda ID, beranda EN, judul di dalam menu ID, judul di dalam menu EN]. Nama aplikasi "Satu Titik" tidak diterjemahkan. */
@@ -13317,7 +13317,7 @@ function lockScreen(){
     '<label class="fld"><span>' + L("Masukkan PIN", "Enter your PIN") + '</span><input id="lkp" data-pin type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••" style="text-align:center;font-size:22px;letter-spacing:.3em"></label>' +
     '<p class="hint bad" id="lkx"></p><p class="hint" id="lkw"></p>' +
     '<button class="btn" data-a="lkgo">' + L("Buka", "Unlock") + '</button>' +
-    (c ? '<button class="btn ghost" style="margin-top:8px" data-a="lkbioask">👆 ' + L("Pakai sidik jari / kunci layar HP", "Use fingerprint / phone screen lock") + '</button>' : "") +
+    (c ? '<button class="btn ghost" style="margin-top:8px" data-a="lkbioask">👆 ' + L("Pakai Sidik Jari", "Use Fingerprint") + '</button>' : "") +
     (c && c.rh ? (recMode
       ? '<label class="fld"><span>' + L("Kode pemulihan", "Recovery code") + '</span><input id="lkrc" type="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="XXXXX-XXXXX" style="text-align:center;letter-spacing:.1em"></label><button class="btn ghost" data-a="lkrecuse">' + L("Hapus PIN dengan kode ini", "Remove PIN with this code") + '</button>'
       : '<button class="x" style="margin-top:12px" data-a="lkrecmode">🔑 ' + L("Pakai kode pemulihan", "Use recovery code") + '</button>') : "") +
