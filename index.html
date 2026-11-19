@@ -507,6 +507,20 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #stTerms .pvl li{margin:0 0 6px}
 #privacy .abh .pvu{margin:10px 0 0;font-size:12px;color:var(--muted)}
 #stTerms .abh .pvu{margin:10px 0 0;font-size:12px;color:var(--muted)}
+#privacy .abh{text-align:left;padding:4px 0 22px}
+#privacy .abh h1{font-size:30px;text-transform:none}
+#privacy .abh .pvu{display:inline-block;margin-top:12px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
+#privacy .pvtoc{margin:22px 0 4px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--bg2),var(--card))}
+#privacy .pvtoc h2{margin:0 0 6px;font:600 12px/1.2 var(--head);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+#privacy .pvtoc ol{margin:0;padding-left:22px;font-size:14.5px;line-height:1.5}
+#privacy .pvtoc li{margin:5px 0}
+#privacy .pvtoc a,#privacy .pvcard a{color:var(--gold2)}
+#privacy .absec{scroll-margin-top:8px}
+#privacy .absec h2{display:flex;align-items:center;gap:10px}
+#privacy .pvn{flex:none;min-width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:var(--gold);color:#1a1405;font:700 14px/1 var(--head)}
+#privacy .absec h3{margin:16px 0 4px;font:600 14.5px/1.3 var(--head);color:var(--gold2)}
+#privacy .pvl li::marker{color:var(--gold)}
+#privacy .pvcard{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);margin-top:12px}
 #about .abver{margin:6px 0 0;text-align:center;font-size:11px;letter-spacing:.04em;color:var(--muted);opacity:.75}
 @media (max-width:360px){#about .abgrid{grid-template-columns:1fr}}
 #splash{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--bg);transition:opacity .5s}
@@ -1454,7 +1468,7 @@ const PV = {
     {h:"7. Anak-anak", p:["Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun, dan kami tidak dengan sengaja mengumpulkan data mereka. Bila kamu orang tua dan menemukan data anak di aplikasi ini, hubungi kami lewat Kotak Saran."]},
     {h:"8. Hasil menu", p:["Hasil menu primbon, ramalan, dan hiburan hanya untuk hiburan dan kepercayaan tradisional, bukan kepastian atau dasar untuk keputusan penting. Hasil BMI, kalori, dan kehamilan adalah informasi umum, bukan diagnosis, nasihat medis, atau pengganti pemeriksaan tenaga kesehatan; konsultasikan kondisimu dengan dokter atau bidan."]},
     {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini."]},
-    {h:"10. Kontak", p:["Pertanyaan tentang privasi dapat dikirim lewat Kotak Saran di Pengaturan."]}
+    {h:"10. Kontak", p:["Pertanyaan tentang privasi, permintaan penghapusan data, atau pengaduan dapat dikirim ke email di bawah ini atau lewat Kotak Saran di Pengaturan."]}
   ]},
   en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 19 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. By using the app, you agree to this policy."]},
@@ -1473,17 +1487,28 @@ const PV = {
     {h:"7. Children", p:["This app is not intended for children under 13, and we do not knowingly collect their data. If you are a parent and find a child’s data in this app, contact us through the Suggestion Box."]},
     {h:"8. Menu results", p:["Primbon, fortune, and entertainment menu results are for entertainment and traditional belief only, not a certainty or a basis for important decisions. BMI, calorie, and pregnancy results are general information, not a diagnosis, medical advice, or a substitute for an examination by a health professional; consult a doctor or midwife about your condition."]},
     {h:"9. Changes to this policy", p:["This policy may be updated. The date of the latest update is shown at the top of this page."]},
-    {h:"10. Contact", p:["Privacy questions can be sent through the Suggestion Box in Settings."]}
+    {h:"10. Contact", p:["Privacy questions, data deletion requests, or complaints can be sent to the email below or through the Suggestion Box in Settings."]}
   ]}
 };
 function paintPrivacy(){
-  const d = PV[S.lang === "en" ? "en" : "id"], mk = (t, c, x) => { const e = document.createElement(t); if(c) e.className = c; if(x != null) e.textContent = x; return e; };
+  const d = PV[S.lang === "en" ? "en" : "id"], en = S.lang === "en", mk = (t, c, x) => { const e = document.createElement(t); if(c) e.className = c; if(x != null) e.textContent = x; return e; };
   $("pvBack").textContent = d.back; $("pvTitle").textContent = d.t; $("pvSub").textContent = d.sub; $("pvUpd").textContent = d.upd;
   const body = $("pvBody"); body.textContent = "";
-  d.secs.forEach(sc => {
-    const sec = mk("section", "absec"); if(sc.h) sec.appendChild(mk("h2", null, sc.h));
-    (sc.p || []).forEach(x => sec.appendChild(mk("p", null, x)));
-    if(sc.l){ const ul = mk("ul", "pvl"); sc.l.forEach(x => ul.appendChild(mk("li", null, x))); sec.appendChild(ul); }
+  /* kelompokkan: bagian tanpa judul (h) masuk ke bagian bernomor sebelumnya, labelnya jadi sub-judul */
+  const groups = []; d.secs.forEach(sc => { if(sc.h || !groups.length) groups.push({h: sc.h || "", parts: [sc]}); else groups[groups.length - 1].parts.push(sc); });
+  const EMAIL = "titikhilangs27@gmail.com";
+  const toc = mk("nav", "pvtoc"); toc.setAttribute("aria-label", en ? "Contents" : "Daftar isi"); toc.appendChild(mk("h2", null, en ? "Contents" : "Daftar isi"));
+  const ol = mk("ol"); toc.appendChild(ol); body.appendChild(toc);
+  groups.forEach((g, gi) => {
+    const sec = mk("section", "absec"); sec.id = "pv-s" + (gi + 1);
+    const h2 = mk("h2"); h2.appendChild(mk("span", "pvn", String(gi + 1))); h2.appendChild(document.createTextNode(g.h.replace(/^\d+\.\s*/, ""))); sec.appendChild(h2);
+    const li = mk("li"), a = mk("a", null, g.h.replace(/^\d+\.\s*/, "")); a.href = "#pv-s" + (gi + 1);
+    a.addEventListener("click", ev => { ev.preventDefault(); sec.scrollIntoView({behavior: "smooth", block: "start"}); }); li.appendChild(a); ol.appendChild(li);
+    g.parts.forEach(sc => {
+      (sc.p || []).forEach(x => { if(/:$/.test(x) && x.length < 80) sec.appendChild(mk("h3", null, x.slice(0, -1))); else sec.appendChild(mk("p", null, x)); });
+      if(sc.l){ const ul = mk("ul", "pvl"); sc.l.forEach(x => ul.appendChild(mk("li", null, x))); sec.appendChild(ul); }
+    });
+    if(gi === groups.length - 1){ const c = mk("p", "pvcard"); c.appendChild(mk("strong", null, "Aurenza27 \u00b7 Satu Titik")); c.appendChild(document.createElement("br")); const m = mk("a", null, EMAIL); m.href = "mailto:" + EMAIL; c.appendChild(m); sec.appendChild(c); }
     body.appendChild(sec);
   });
 }
