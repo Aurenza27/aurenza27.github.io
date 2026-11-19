@@ -13227,10 +13227,10 @@ const bio = (() => {
     try{ if(N){ const r = await N.isAvailable(); if(r && r.isAvailable) return true; } }catch(e){}
     return false;
   }
-  async function ask(reason){
+  async function ask(reason, fallback){
     init();
-    if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason, cancelTitle: L("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "KEUANGAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
-    if(N){ try{ await N.verifyIdentity({ reason, title: "KEUANGAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
+    if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason, cancelTitle: L("Pakai PIN", "Use PIN"), allowDeviceCredential: !!fallback, androidTitle: "KEUANGAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
+    if(N){ try{ await N.verifyIdentity({ reason, title: "KEUANGAN", subtitle: reason, useFallback: !!fallback, maxAttempts: 3 }); return true; }catch(e){} }
     return false;
   }
   return { ok, ask };
@@ -13328,7 +13328,7 @@ async function lkRecGate(){
   let ok = true;
   if(await bio.ok()){
     ok = false; asking = true;
-    try{ ok = await bio.ask(L("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code")); }catch(e){ ok = false; } finally{ asking = false; }
+    try{ ok = await bio.ask(L("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code"), true); }catch(e){ ok = false; } finally{ asking = false; }
   }
   if(!ok) return toast(L("Verifikasi dibatalkan.", "Verification cancelled."));
   recMode = true; paint();
@@ -14105,10 +14105,10 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       try{ if(N){ var r2 = await N.isAvailable(); if(r2 && r2.isAvailable) return true; } }catch(e){}
       return false;
     }
-    async function ask(reason){
+    async function ask(reason, fallback){
       init();
-      if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason: reason, cancelTitle: LL("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "ARISAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
-      if(N){ try{ await N.verifyIdentity({ reason: reason, title: "ARISAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
+      if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason: reason, cancelTitle: LL("Pakai PIN", "Use PIN"), allowDeviceCredential: !!fallback, androidTitle: "ARISAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
+      if(N){ try{ await N.verifyIdentity({ reason: reason, title: "ARISAN", subtitle: reason, useFallback: !!fallback, maxAttempts: 3 }); return true; }catch(e){} }
       return false;
     }
     return { ok: ok, ask: ask };
@@ -14233,7 +14233,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     var ok = true;
     if(await lkbio.ok()){
       ok = false; lkAsking = true;
-      try{ ok = await lkbio.ask(LL("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code")); }catch(e){ ok = false; } finally{ lkAsking = false; }
+      try{ ok = await lkbio.ask(LL("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code"), true); }catch(e){ ok = false; } finally{ lkAsking = false; }
     }
     if(!ok) return flash(LL("Verifikasi dibatalkan.", "Verification cancelled."));
     lkRecMode = true; lkRedraw();
