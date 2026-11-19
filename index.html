@@ -13194,7 +13194,150 @@ function txRow(x, del){
   return '<div class="row"><div class="l"><b>' + title + '</b><small>' + meta + '</small></div><div class="r ' + cl + '">' + sign + "Rp " + fmtN(x.a) + '</div>' + (del ? delBtn("deltx", x.id) : "") + '</div>';
 }
 
+/* ===== KUNCI MENU (PIN + sidik jari) =====
+   Konfigurasi hanya di perangkat ini (kg_lock, tidak ikut sinkron): { s: salt, h: hash PBKDF2 PIN, l: panjang PIN, g: detik sebelum terkunci lagi,
+   b: sidik jari aktif, o: uid Google pemasang (untuk pemulihan lupa PIN), f: salah berturut-turut, u: terkunci sampai (ms) }.
+   Ini kunci tampilan, bukan enkripsi: data di perangkat dan akun tetap tidak terenkripsi. */
+const LK = "kg_lock";
+let locked = false, asking = false, checking = false, hiddenAt = 0;
+const lcfg = () => { try{ const c = JSON.parse(localStorage.getItem(LK) || "null"); return c && c.h && c.s ? c : null; }catch(e){ return null; } };
+const lsave = c => { try{ localStorage.setItem(LK, JSON.stringify(c)); return true; }catch(e){ toast(L("Penyimpanan penuh, kunci tidak tersimpan.", "Storage is full, the lock was not saved.")); return false; } };
+const parentAuth = () => { try{ return window.parent !== window ? window.parent.satuTitikAuth : null; }catch(e){ return null; } };
+const hexOf = b => Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, "0")).join("");
+const newSalt = () => hexOf(crypto.getRandomValues(new Uint8Array(16)));
+async function hashPin(pin, salt){
+  const enc = new TextEncoder(), k = await crypto.subtle.importKey("raw", enc.encode(pin), "PBKDF2", false, ["deriveBits"]);
+  return hexOf(await crypto.subtle.deriveBits({ name:"PBKDF2", hash:"SHA-256", salt: enc.encode(salt), iterations: 100000 }, k, 256));
+}
+/* sidik jari lewat plugin Capacitor: @aparajita/capacitor-biometric-auth (BiometricAuthNative) atau capacitor-native-biometric (NativeBiometric) */
+const bio = (() => {
+  let P = null, N = null, ready = false;
+  const init = () => { if(ready) return; ready = true; try{
+    const C = window.parent.Capacitor || window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return;
+    const g = n => { try{ return (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null); }catch(e){ return null; } };
+    P = g("BiometricAuthNative"); N = g("NativeBiometric");
+  }catch(e){} };
+  const unimpl = e => !!e && (e.code === "UNIMPLEMENTED" || /not implemented|unimplemented/i.test(String(e.message || e)));
+  async function ok(){
+    init();
+    try{ if(P){ const r = await P.checkBiometry(); if(r && r.isAvailable) return true; } }catch(e){}
+    try{ if(N){ const r = await N.isAvailable(); if(r && r.isAvailable) return true; } }catch(e){}
+    return false;
+  }
+  async function ask(reason){
+    init();
+    if(P){ try{ await P.authenticate({ reason, cancelTitle: L("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "KEUANGAN", androidSubtitle: reason }); return true; }catch(e){ if(!(N && unimpl(e))) return false; } }
+    if(N){ try{ await N.verifyIdentity({ reason, title: "KEUANGAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
+    return false;
+  }
+  return { ok, ask };
+})();
+locked = !!lcfg();
+function lockNow(){ if(!lcfg()) return; locked = true; S.tab = "home"; S.f = newF(); $("ovl").hidden = true; paint(); setTimeout(askBio, 350); }
+function openLock(){ const c = lcfg(); if(c){ c.f = 0; c.u = 0; lsave(c); } locked = false; paint(); window.scrollTo(0, 0); }
+async function askBio(){
+  const c = lcfg(); if(!c || !c.b || !locked || asking) return;
+  asking = true; let ok = false;
+  try{ ok = await bio.ask(L("Buka menu Keuangan", "Unlock Finance")); }catch(e){} finally{ asking = false; }
+  if(ok && locked) openLock();
+}
+async function unlockWith(pin){
+  const c = lcfg(); if(!c){ locked = false; paint(); return; }
+  if(checking) return;
+  const wait = (+c.u || 0) - Date.now();
+  if(wait > 0){ lockTick(); return toast(L("Terlalu banyak percobaan. Coba lagi nanti.", "Too many attempts. Try again later.")); }
+  if(!/^\d{4,8}$/.test(pin || "")) return toast(L("Masukkan PIN 4 sampai 8 angka.", "Enter a 4 to 8 digit PIN."));
+  checking = true;
+  try{
+    if(await hashPin(pin, c.s) === c.h){ openLock(); return; }
+    c.f = (+c.f || 0) + 1;
+    if(c.f % 5 === 0) c.u = Date.now() + Math.min(30 * Math.pow(2, c.f / 5 - 1), 900) * 1000;
+    lsave(c); const i = $("lkp"); if(i){ i.value = ""; i.focus(); }
+    toast(L("PIN salah.", "Wrong PIN.")); lockTick();
+  }catch(e){ toast(L("Gagal memeriksa PIN.", "Could not check the PIN.")); }
+  finally{ checking = false; }
+}
+function lockTick(){
+  const w = $("lkx"); if(!w) return;
+  const c = lcfg(), r = c ? Math.ceil(((+c.u || 0) - Date.now()) / 1000) : 0;
+  w.textContent = r > 0 ? L("Terlalu banyak percobaan. Coba lagi dalam " + r + " detik.", "Too many attempts. Try again in " + r + " seconds.") : "";
+}
+setInterval(lockTick, 1000);
+function lockScreen(){
+  const c = lcfg();
+  return '<section class="panel" style="text-align:center"><div style="font-size:40px">🔒</div><span class="label" style="margin-top:6px">' + L("Menu Keuangan terkunci", "Finance is locked") + '</span>' +
+    '<label class="fld"><span>' + L("Masukkan PIN", "Enter your PIN") + '</span><input id="lkp" data-pin type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••" style="text-align:center;font-size:22px;letter-spacing:.3em"></label>' +
+    '<p class="hint bad" id="lkx"></p><p class="hint" id="lkw"></p>' +
+    '<button class="btn" data-a="lkgo">' + L("Buka", "Unlock") + '</button>' +
+    (c && c.b ? '<button class="btn ghost" style="margin-top:8px" data-a="lkbioask">👆 ' + L("Pakai sidik jari", "Use fingerprint") + '</button>' : "") +
+    '<button class="x" style="margin-top:12px" data-a="lkforgot">' + L("Lupa PIN?", "Forgot PIN?") + '</button></section>';
+}
+const pinFld = (id, label) => '<label class="fld"><span>' + label + '</span><input id="' + id + '" data-pin type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••"></label>';
+function lkView(){
+  const c = lcfg();
+  if(!c) return back() + '<section class="panel"><span class="label">🔒 ' + L("Kunci menu Keuangan", "Lock Finance") + '</span><p class="hint" style="margin:0 0 12px">' + L("Pasang PIN supaya menu ini hanya bisa dibuka olehmu. Kunci hanya berlaku di perangkat ini.", "Set a PIN so only you can open this menu. The lock only applies on this device.") + '</p>' +
+    pinFld("lk1", L("PIN baru (4-8 angka)", "New PIN (4-8 digits)")) + pinFld("lk2", L("Ulangi PIN", "Repeat PIN")) + '<button class="btn" data-a="lkset">' + L("Aktifkan kunci", "Turn on lock") + '</button></section>';
+  const g = +c.g || 0, opt = (v, i, e) => '<option value="' + v + '"' + (g === v ? " selected" : "") + '>' + L(i, e) + '</option>';
+  return back() + '<section class="panel"><span class="label">🔒 ' + L("Kunci aktif", "Lock is on") + ' <span class="ok">✓</span></span>' +
+    '<label class="fld"><span>' + L("Kunci lagi setelah keluar dari aplikasi", "Lock again after leaving the app") + '</span><select data-lg>' + opt(0, "Langsung", "Immediately") + opt(30, "30 detik", "30 seconds") + opt(60, "1 menit", "1 minute") + opt(300, "5 menit", "5 minutes") + '</select></label>' +
+    '<button class="btn ghost" data-a="lkbio">👆 ' + (c.b ? L("Matikan sidik jari", "Turn off fingerprint") : L("Aktifkan sidik jari", "Turn on fingerprint")) + '</button></section>' +
+    '<section class="panel"><span class="label">' + L("Ubah PIN", "Change PIN") + '</span>' + pinFld("lkc", L("PIN saat ini", "Current PIN")) + pinFld("lk1", L("PIN baru (4-8 angka)", "New PIN (4-8 digits)")) + pinFld("lk2", L("Ulangi PIN baru", "Repeat new PIN")) + '<button class="btn ghost" data-a="lkchg">' + L("Simpan PIN baru", "Save new PIN") + '</button></section>' +
+    '<section class="panel"><span class="label">' + L("Matikan kunci", "Turn off lock") + '</span>' + pinFld("lko", L("Masukkan PIN", "Enter PIN")) + '<button class="btn danger" data-a="lkoff">' + L("Matikan kunci", "Turn off lock") + '</button></section>';
+}
+function pinCheck(p1, p2){
+  if(!(window.crypto && crypto.subtle)) return L("Perangkat ini tidak mendukung kunci PIN.", "This device doesn't support PIN lock.");
+  if(!/^\d{4,8}$/.test(p1)) return L("PIN harus 4 sampai 8 angka.", "PIN must be 4 to 8 digits.");
+  if(p1 !== p2) return L("Kedua PIN tidak sama.", "The two PINs don't match.");
+  return "";
+}
+async function lkSet(){
+  const p1 = $("lk1").value, p2 = $("lk2").value, bad = pinCheck(p1, p2); if(bad) return toast(bad);
+  const s = newSalt(), A = parentAuth();
+  if(lsave({ s, h: await hashPin(p1, s), l: p1.length, g: 30, b: false, o: A && A.user ? A.user.uid : "", f: 0, u: 0 })){ toast(L("Kunci aktif ✓", "Lock is on ✓")); paint(); }
+}
+async function lkChg(){
+  const c = lcfg(); if(!c) return;
+  if(await hashPin($("lkc").value, c.s) !== c.h) return toast(L("PIN saat ini salah.", "Current PIN is wrong."));
+  const p1 = $("lk1").value, p2 = $("lk2").value, bad = pinCheck(p1, p2); if(bad) return toast(bad);
+  c.s = newSalt(); c.h = await hashPin(p1, c.s); c.l = p1.length;
+  if(lsave(c)){ toast(L("PIN diganti ✓", "PIN changed ✓")); paint(); }
+}
+async function lkOff(){
+  const c = lcfg(); if(!c) return;
+  if(await hashPin($("lko").value, c.s) !== c.h) return toast(L("PIN salah.", "Wrong PIN."));
+  try{ localStorage.removeItem(LK); }catch(e){} toast(L("Kunci dimatikan.", "Lock turned off.")); paint();
+}
+async function lkBio(){
+  const c = lcfg(); if(!c) return;
+  if(c.b){ c.b = false; lsave(c); toast(L("Sidik jari dimatikan.", "Fingerprint turned off.")); paint(); return; }
+  if(!(await bio.ok())) return toast(L("Sidik jari tidak tersedia. Pastikan sudah ada sidik jari terdaftar di HP dan aplikasi memakai plugin biometrik.", "Fingerprint isn't available. Make sure one is enrolled on the phone and the app includes the biometric plugin."), 4500);
+  let ok = false; asking = true;
+  try{ ok = await bio.ask(L("Aktifkan sidik jari untuk menu Keuangan", "Enable fingerprint for Finance")); }catch(e){} finally{ asking = false; }
+  if(ok){ c.b = true; lsave(c); toast(L("Sidik jari aktif ✓", "Fingerprint on ✓")); paint(); } else toast(L("Verifikasi dibatalkan.", "Verification cancelled."));
+}
+/* lupa PIN: bila PIN dipasang saat masuk Google, cukup masuk ulang dengan akun yang sama; bila tidak, satu-satunya jalan adalah menghapus data keuangan di perangkat ini */
+async function lkForgot(b){
+  const c = lcfg(); if(!c) return;
+  const A = parentAuth();
+  if(c.o && A && A.login){
+    toast(L("Masuk dengan akun Google yang sama untuk menghapus PIN.", "Sign in with the same Google account to remove the PIN."), 4000);
+    try{ if(A.user && A.logout) await A.logout(); await A.login(); for(let i = 0; i < 20 && !A.user; i++) await new Promise(r => setTimeout(r, 250)); }catch(e){}
+    if(A.user && A.user.uid === c.o){ try{ localStorage.removeItem(LK); }catch(e){} locked = false; paint(); toast(L("Kunci dihapus. Buat PIN baru lewat tombol Kunci.", "Lock removed. Set a new PIN with the Lock button."), 3500); }
+    else toast(L("Akun Google tidak cocok atau masuk dibatalkan.", "Google account doesn't match, or sign-in was cancelled."), 4000);
+    return;
+  }
+  const w = $("lkw"); if(w) w.textContent = L("PIN ini dipasang tanpa akun Google, jadi hanya bisa dipulihkan dengan menghapus semua data keuangan di perangkat ini. Ketuk sekali lagi untuk menghapus.", "This PIN was set without a Google account, so it can only be recovered by deleting all finance data on this device. Tap again to delete.");
+  arm(b, () => { try{ localStorage.removeItem(K); localStorage.removeItem("kg_ts"); localStorage.removeItem(LK); }catch(e){} db = load(); S.f = newF(); S.tab = "home"; locked = false; paint(); toast(L("Data keuangan di perangkat ini dihapus.", "Finance data on this device was deleted.")); });
+}
+/* kunci lagi saat kembali dari latar belakang (sesuai pengaturan g) */
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden){ hiddenAt = Date.now(); return; }
+  const c = lcfg(); if(!c || locked || asking || !hiddenAt) return;
+  if(Date.now() - hiddenAt >= (+c.g || 0) * 1000) lockNow();
+});
+
 const VIEWS = {
+  lk(){ return lkView(); },
   home(){
     const m = thisM(), a = inM(m), tot = db.w.reduce((s, w) => s + bal(w), 0);
     const bu = Object.keys(db.bu).filter(k => db.bu[k] > 0), sp = spentBy(m), left = bu.reduce((s, k) => s + db.bu[k] - (sp[k] || 0), 0);
@@ -13207,6 +13350,7 @@ const VIEWS = {
       (db.t.length ? '<section class="panel"><span class="label">' + L("Terakhir dicatat", "Latest") + '</span>' + rec.map(x => txRow(x)).join("") + '<button class="btn ghost" style="margin-top:10px" data-a="tab" data-v="hist">' + L("Lihat semua", "See all") + '</button></section>' :
         '<section class="panel tip"><span class="label">' + L("Cara pakai", "How to use") + '</span><ol><li>' + L("Tekan <b>Uang masuk</b> saat dapat uang.", "Tap <b>Money in</b> when you receive money.") + '</li><li>' + L("Tekan <b>Uang keluar</b> saat memakai uang.", "Tap <b>Money out</b> when you spend.") + '</li><li>' + L("Saldo dihitung otomatis.", "Your balance updates by itself.") + '</li></ol><p class="hint">' + L("Sudah punya uang sebelum mulai mencatat? Isi di <b>Dompet saya</b> bagian Saldo awal.", "Already have money before you start? Enter it under Starting balance in <b>My wallets</b>.") + '</p></section>') +
       '<button class="btn ghost" data-a="tab" data-v="wa">' + L("Dompet saya", "My wallets") + '</button>' +
+      '<button class="btn ghost" data-a="tab" data-v="lk">🔒 ' + L("Kunci menu", "Lock menu") + (lcfg() ? " ✓" : "") + '</button>' +
       '<button class="btn danger" data-a="askreset">' + L("Reset semua catatan keuangan", "Reset all financial records") + '</button>' +
       '<p class="hint" style="text-align:center">' + L("Data tersimpan di HP dan ikut tersinkron ke akun Google saat kamu masuk.", "Data is saved on this phone and syncs to your Google account when you sign in.") + '</p>';
   },
@@ -13264,18 +13408,26 @@ function warnMsg(f){
 }
 function paint(){
   $("t").textContent = L("KEUANGAN", "FINANCE");
+  $("tabs").hidden = locked;
   $("tabs").innerHTML = TABS.map(t => '<button class="tab' + (S.tab === t[0] ? " on" : "") + '" data-a="tab" data-v="' + t[0] + '">' + L(t[1], t[2]) + '</button>').join("");
-  $("v").innerHTML = VIEWS[S.tab]();
+  $("v").innerHTML = locked ? lockScreen() : VIEWS[S.tab]();
+  if(locked){ lockTick(); setTimeout(() => { const i = $("lkp"); if(i) i.focus(); }, 60); }
 }
 function grab(){
   if(S.tab !== "add" || !$("fa")) return;
   const f = S.f; f.a = $("fa").value; f.n = $("fn").value; f.d = $("fd").value || f.d; if($("fw")) f.w = $("fw").value;
 }
 function arm(b, fn){ if(b.dataset.arm){ fn(); return; } b.dataset.arm = "1"; b.dataset.o = b.textContent; b.textContent = L("Hapus?", "Delete?"); setTimeout(() => { if(b.isConnected){ delete b.dataset.arm; b.textContent = b.dataset.o; } }, 3000); }
-function csv(){
+async function csv(){
   const q = s => '"' + String(s).replace(/"/g, '""') + '"', nm = id => { const w = db.w.find(x => x.id === id); return w ? w.n : ""; };
   const rows = [["date","type","category","wallet","to_wallet","amount","note"].map(q).join(",")].concat(db.t.slice().sort(byDate).map(x => [x.d, x.k, x.k === "tf" ? "" : catName(x.c, x.k), nm(x.w), nm(x.w2), x.a, x.n].map(q).join(",")));
-  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + rows.join("\n")], {type:"text/csv"})); a.download = "keuangan.csv"; document.body.appendChild(a); a.click(); a.remove();
+  const blob = new Blob(["\ufeff" + rows.join("\n")], {type:"text/csv"}), name = "keuangan.csv";
+  /* Aplikasi Android: simpan ke cache lalu buka lembar bagikan (WebView tidak mendukung unduhan blob) */
+  try{ if(parent.stNativeShare && await parent.stNativeShare(blob, name, "Keuangan")) return; }catch(e){}
+  /* Web/PWA: unduhan biasa */
+  const u = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 4000);
 }
 
 document.addEventListener("click", e => {
@@ -13348,19 +13500,30 @@ document.addEventListener("click", e => {
     grab(); db.ci = db.ci.filter(x => x.id !== v); S.f.c = "sal"; save(); paint();
   });
   else if(a === "csv") csv();
+  else if(a === "lkset") lkSet();
+  else if(a === "lkchg") lkChg();
+  else if(a === "lkoff") lkOff();
+  else if(a === "lkbio") lkBio();
+  else if(a === "lkgo") unlockWith($("lkp") ? $("lkp").value : "");
+  else if(a === "lkbioask") askBio();
+  else if(a === "lkforgot") lkForgot(b);
 });
-document.addEventListener("keydown", e => { if(e.key === "Escape") $("ovl").hidden = true; });
-document.addEventListener("input", e => { const t = e.target; if(t.hasAttribute && t.hasAttribute("data-money")){ const n = num(t.value); t.value = n ? fmtN(n) : ""; } });
+document.addEventListener("keydown", e => { if(e.key === "Escape") $("ovl").hidden = true; if(e.key === "Enter" && e.target && e.target.id === "lkp") unlockWith(e.target.value); });
+document.addEventListener("input", e => { const t = e.target; if(t.hasAttribute && t.hasAttribute("data-money")){ const n = num(t.value); t.value = n ? fmtN(n) : ""; }
+  if(t.hasAttribute && t.hasAttribute("data-pin")){ t.value = t.value.replace(/\D/g, "").slice(0, 8); if(t.id === "lkp"){ const c = lcfg(); if(c && t.value.length === (+c.l || 0)) unlockWith(t.value); } } });
 document.addEventListener("change", e => {
   const t = e.target; if(!t.dataset) return;
   if(t.dataset.bu){ const n = num(t.value); if(n) db.bu[t.dataset.bu] = n; else delete db.bu[t.dataset.bu]; save(); paint(); }
   else if(t.dataset.wb){ const w = db.w.find(x => x.id === t.dataset.wb); if(w){ w.b = num(t.value); save(); paint(); } }
+  else if(t.dataset.lg !== undefined){ const c = lcfg(); if(c){ c.g = +t.value || 0; lsave(c); } }
 });
 window.addEventListener("storage", e => {
+  if((!e.key || e.key === LK) && !lcfg()){ locked = false; paint(); }
   if(!e.key || e.key === "kg_lang"){ const l = readLang(); if(l !== lang){ grab(); lang = l; paint(); } }
   if(!e.key || e.key === K){ grab(); db = load(); if(!db.w.some(w => w.id === S.f.w)) S.f = newF(S.f.k); paint(); }
 });
 paint();
+if(locked) setTimeout(askBio, 400);
 </scr@@ipt>
 </body>
 </html>
@@ -13799,7 +13962,9 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     <div class="panel"><p class="label" id="lbF"></p><ul id="fl"></ul></div>
     <div class="panel"><p class="label" id="lbR"></p><div class="two"><button class="go alt" id="bExp" type="button"></button><button class="go" id="bShr" type="button"></button></div></div>
   </div>
+  <button class="ghost" id="bLkCfg" type="button" style="align-self:center"></button>
 </section>
+<section id="pL" hidden style="display:flex;flex-direction:column;gap:14px"><div id="lkBox" style="display:flex;flex-direction:column;gap:14px"></div></section>
 </div>
 <script>
 (function(){
@@ -13857,6 +14022,209 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
   function buzz(){ try{ if(parent && typeof parent.haptic === "function") parent.haptic(false); }catch(e){} }
   function clean(s){ return String(s).replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 24); }
   function flash(m, ok){ var e = $("err"); e.className = "err" + (ok ? " ok" : ""); e.textContent = m; clearTimeout(msgT); if(m) msgT = setTimeout(function(){ e.textContent = ""; }, 4000); }
+
+  /* ===== KUNCI TAB KEUANGAN (PIN + sidik jari) =====
+     Konfigurasi hanya di perangkat ini (an_lock, tidak ikut sinkron): { s: salt, h: hash PBKDF2 PIN, l: panjang PIN, g: detik sebelum terkunci lagi,
+     b: sidik jari aktif, o: uid Google pemasang (untuk pemulihan lupa PIN), f: salah berturut-turut, u: terkunci sampai (ms) }.
+     Ini kunci tampilan, bukan enkripsi: data di perangkat dan akun tetap tidak terenkripsi. Hanya tab Keuangan yang dikunci; tab Kocok tetap bebas. */
+  var LKEY = "an_lock", lkd = false, lkMode = "", lkAsking = false, lkChecking = false, lkHiddenAt = 0, lkOpenedAt = 0, lkAuto = false, lkArm = false, lkSig = "";
+  function LL(i, e){ return lang === "en" ? e : i; }
+  function lkcfg(){ try{ var c = JSON.parse(localStorage.getItem(LKEY) || "null"); return c && c.h && c.s ? c : null; }catch(e){ return null; } }
+  function lkOn(){ return !!lkcfg(); }
+  function lksave(c){ try{ localStorage.setItem(LKEY, JSON.stringify(c)); return true; }catch(e){ flash(LL("Penyimpanan penuh, kunci tidak tersimpan.", "Storage is full, the lock was not saved.")); return false; } }
+  function lkhex(b){ return Array.prototype.map.call(new Uint8Array(b), function(x){ return (x < 16 ? "0" : "") + x.toString(16); }).join(""); }
+  function lksalt(){ return lkhex(crypto.getRandomValues(new Uint8Array(16))); }
+  async function lkhash(pin, salt){
+    var enc = new TextEncoder(), k = await crypto.subtle.importKey("raw", enc.encode(pin), "PBKDF2", false, ["deriveBits"]);
+    return lkhex(await crypto.subtle.deriveBits({ name:"PBKDF2", hash:"SHA-256", salt: enc.encode(salt), iterations: 100000 }, k, 256));
+  }
+  /* sidik jari lewat plugin Capacitor: @aparajita/capacitor-biometric-auth (BiometricAuthNative) atau capacitor-native-biometric (NativeBiometric) */
+  var lkbio = (function(){
+    var P = null, N = null, ready = false;
+    function init(){ if(ready) return; ready = true; try{
+      var C = window.parent.Capacitor || window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return;
+      var g = function(n){ try{ return (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null); }catch(e){ return null; } };
+      P = g("BiometricAuthNative"); N = g("NativeBiometric");
+    }catch(e){} }
+    function unimpl(e){ return !!e && (e.code === "UNIMPLEMENTED" || /not implemented|unimplemented/i.test(String(e.message || e))); }
+    async function ok(){
+      init();
+      try{ if(P){ var r = await P.checkBiometry(); if(r && r.isAvailable) return true; } }catch(e){}
+      try{ if(N){ var r2 = await N.isAvailable(); if(r2 && r2.isAvailable) return true; } }catch(e){}
+      return false;
+    }
+    async function ask(reason){
+      init();
+      if(P){ try{ await P.authenticate({ reason: reason, cancelTitle: LL("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "ARISAN", androidSubtitle: reason }); return true; }catch(e){ if(!(N && unimpl(e))) return false; } }
+      if(N){ try{ await N.verifyIdentity({ reason: reason, title: "ARISAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
+      return false;
+    }
+    return { ok: ok, ask: ask };
+  })();
+  function lkGate(){ return tab === "F" && ((lkd && lkOn()) || lkMode === "cfg"); }
+  function lkRedraw(){ lkSig = ""; paint(); }
+  function lockNow(){ if(!lkOn()) return; lkd = true; lkMode = ""; lkAuto = false; lkRedraw(); }
+  function openLock(){ var c = lkcfg(); if(c){ c.f = 0; c.u = 0; lksave(c); } lkd = false; lkAuto = false; lkHiddenAt = 0; lkOpenedAt = Date.now(); lkRedraw(); window.scrollTo(0, 0); }
+  async function lkAskBio(){
+    var c = lkcfg(); if(!c || !c.b || !lkd || lkAsking) return;
+    lkAsking = true; var ok = false;
+    try{ ok = await lkbio.ask(LL("Buka tab Keuangan Arisan", "Unlock Arisan finance")); }catch(e){} finally{ lkAsking = false; }
+    if(ok && lkd) openLock();
+  }
+  async function lkUnlock(pin){
+    var c = lkcfg(); if(!c){ lkd = false; lkRedraw(); return; }
+    if(lkChecking) return;
+    if((+c.u || 0) - Date.now() > 0){ lkTick(); return flash(LL("Terlalu banyak percobaan. Coba lagi nanti.", "Too many attempts. Try again later.")); }
+    if(!/^\d{4,8}$/.test(pin || "")) return flash(LL("Masukkan PIN 4 sampai 8 angka.", "Enter a 4 to 8 digit PIN."));
+    lkChecking = true;
+    try{
+      if(await lkhash(pin, c.s) === c.h){ openLock(); return; }
+      c.f = (+c.f || 0) + 1;
+      if(c.f % 5 === 0) c.u = Date.now() + Math.min(30 * Math.pow(2, c.f / 5 - 1), 900) * 1000;
+      lksave(c); var i = $("lkp"); if(i){ i.value = ""; i.focus(); }
+      flash(LL("PIN salah.", "Wrong PIN.")); lkTick();
+    }catch(e){ flash(LL("Gagal memeriksa PIN.", "Could not check the PIN.")); }
+    finally{ lkChecking = false; }
+  }
+  function lkTick(){
+    var w = $("lkx"); if(!w) return;
+    var c = lkcfg(), r = c ? Math.ceil(((+c.u || 0) - Date.now()) / 1000) : 0;
+    w.textContent = r > 0 ? LL("Terlalu banyak percobaan. Coba lagi dalam " + r + " detik.", "Too many attempts. Try again in " + r + " seconds.") : "";
+  }
+  setInterval(lkTick, 1000);
+  function lkPinFld(id, label){ return '<label class="label" for="' + id + '">' + label + '</label><input id="' + id + '" data-pin type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••" style="margin-bottom:10px">'; }
+  function lkScreen(){
+    var c = lkcfg();
+    return '<div class="panel" style="text-align:center"><div style="font-size:40px">🔒</div><p class="label" style="margin-top:6px">' + LL("Keuangan Arisan terkunci", "Arisan finance is locked") + '</p>' +
+      '<label class="label" for="lkp">' + LL("Masukkan PIN", "Enter your PIN") + '</label>' +
+      '<input id="lkp" data-pin type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••" style="text-align:center;font-size:22px;letter-spacing:.3em">' +
+      '<p class="note" id="lkx" style="color:var(--bad)"></p><p class="note" id="lkw"></p>' +
+      '<button class="go" type="button" data-lk="go">' + LL("Buka", "Unlock") + '</button>' +
+      (c && c.b ? '<button class="ghost" type="button" data-lk="bioask" style="width:100%;margin-top:8px">👆 ' + LL("Pakai sidik jari", "Use fingerprint") + '</button>' : "") +
+      '<button class="ghost" type="button" data-lk="forgot" style="width:100%;margin-top:8px;border-color:transparent">' + LL("Lupa PIN?", "Forgot PIN?") + '</button></div>';
+  }
+  function lkCfgView(){
+    var c = lkcfg(), back = '<button class="ghost" type="button" data-lk="back" style="align-self:flex-start">‹ ' + LL("Kembali", "Back") + '</button>';
+    if(!c) return back + '<div class="panel"><p class="label">🔒 ' + LL("Kunci tab Keuangan", "Lock the Finance tab") + '</p><p class="hint" style="margin:0 0 12px">' +
+      LL("Pasang PIN supaya tab Keuangan Arisan hanya bisa dibuka olehmu. Kunci hanya berlaku di perangkat ini. Tab Kocok tetap bisa dipakai tanpa PIN.", "Set a PIN so only you can open the Arisan Finance tab. The lock only applies on this device. The Draw tab stays open without a PIN.") + '</p>' +
+      lkPinFld("lk1", LL("PIN baru (4-8 angka)", "New PIN (4-8 digits)")) + lkPinFld("lk2", LL("Ulangi PIN", "Repeat PIN")) +
+      '<button class="go" type="button" data-lk="set">' + LL("Aktifkan kunci", "Turn on lock") + '</button></div>';
+    var g = +c.g || 0, opt = function(v, i, e){ return '<option value="' + v + '"' + (g === v ? " selected" : "") + '>' + LL(i, e) + '</option>'; };
+    var sel = 'style="width:100%;font:inherit;font-size:16px;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:10px"';
+    return back + '<div class="panel"><p class="label">🔒 ' + LL("Kunci aktif", "Lock is on") + ' ✓</p>' +
+      '<label class="label" for="lkg">' + LL("Kunci lagi setelah keluar dari aplikasi", "Lock again after leaving the app") + '</label>' +
+      '<select id="lkg" data-lg ' + sel + '>' + opt(0, "Langsung", "Immediately") + opt(30, "30 detik", "30 seconds") + opt(60, "1 menit", "1 minute") + opt(300, "5 menit", "5 minutes") + '</select>' +
+      '<button class="ghost" type="button" data-lk="bio" style="width:100%">👆 ' + (c.b ? LL("Matikan sidik jari", "Turn off fingerprint") : LL("Aktifkan sidik jari", "Turn on fingerprint")) + '</button></div>' +
+      '<div class="panel"><p class="label">' + LL("Ubah PIN", "Change PIN") + '</p>' + lkPinFld("lkc", LL("PIN saat ini", "Current PIN")) + lkPinFld("lk1", LL("PIN baru (4-8 angka)", "New PIN (4-8 digits)")) + lkPinFld("lk2", LL("Ulangi PIN baru", "Repeat new PIN")) +
+      '<button class="ghost" type="button" data-lk="chg" style="width:100%">' + LL("Simpan PIN baru", "Save new PIN") + '</button></div>' +
+      '<div class="panel"><p class="label">' + LL("Matikan kunci", "Turn off lock") + '</p>' + lkPinFld("lko", LL("Masukkan PIN", "Enter PIN")) +
+      '<button class="go" type="button" data-lk="off" style="background:var(--bad);color:#fff">' + LL("Matikan kunci", "Turn off lock") + '</button></div>';
+  }
+  function paintL(){
+    var c = lkcfg(), box = $("lkBox"), cfgView = lkMode === "cfg";
+    var sig = (cfgView ? "c" : "l") + lang + (c ? (c.b ? "b" : "n") + (c.g || 0) : "x");
+    if(sig === lkSig && box.firstChild){ if(!cfgView) lkTick(); return; }   /* jangan gambar ulang saat PIN sedang diketik */
+    lkSig = sig;
+    box.innerHTML = cfgView ? lkCfgView() : lkScreen();
+    if(!cfgView){
+      lkTick(); setTimeout(function(){ var i = $("lkp"); if(i) i.focus(); }, 60);
+      if(c && c.b && !lkAuto){ lkAuto = true; setTimeout(lkAskBio, 350); }
+    }
+  }
+  function lkLabel(){ var b = $("bLkCfg"); if(b) b.textContent = "🔒 " + (lkOn() ? LL("Kunci Keuangan: aktif", "Finance lock: on") : LL("Kunci Keuangan", "Lock Finance")); }
+  function lkPinCheck(p1, p2){
+    if(!(window.crypto && crypto.subtle)) return LL("Perangkat ini tidak mendukung kunci PIN.", "This device doesn't support PIN lock.");
+    if(!/^\d{4,8}$/.test(p1)) return LL("PIN harus 4 sampai 8 angka.", "PIN must be 4 to 8 digits.");
+    if(p1 !== p2) return LL("Kedua PIN tidak sama.", "The two PINs don't match.");
+    return "";
+  }
+  async function lkSet(){
+    var p1 = $("lk1").value, p2 = $("lk2").value, bad = lkPinCheck(p1, p2); if(bad) return flash(bad);
+    try{
+      var s = lksalt(), au = authO();
+      if(lksave({ s: s, h: await lkhash(p1, s), l: p1.length, g: 30, b: false, o: au && au.user ? au.user.uid : "", f: 0, u: 0 })){ flash(LL("Kunci aktif ✓", "Lock is on ✓"), true); lkd = false; lkRedraw(); }
+    }catch(e){ flash(LL("Gagal memasang kunci.", "Could not set the lock.")); }
+  }
+  async function lkChg(){
+    var c = lkcfg(); if(!c) return;
+    try{
+      if(await lkhash($("lkc").value, c.s) !== c.h) return flash(LL("PIN saat ini salah.", "Current PIN is wrong."));
+      var p1 = $("lk1").value, p2 = $("lk2").value, bad = lkPinCheck(p1, p2); if(bad) return flash(bad);
+      c.s = lksalt(); c.h = await lkhash(p1, c.s); c.l = p1.length;
+      if(lksave(c)){ flash(LL("PIN diganti ✓", "PIN changed ✓"), true); lkRedraw(); }
+    }catch(e){ flash(LL("Gagal mengganti PIN.", "Could not change the PIN.")); }
+  }
+  async function lkOff(){
+    var c = lkcfg(); if(!c) return;
+    try{
+      if(await lkhash($("lko").value, c.s) !== c.h) return flash(LL("PIN salah.", "Wrong PIN."));
+      try{ localStorage.removeItem(LKEY); }catch(e){}
+      lkd = false; lkMode = ""; flash(LL("Kunci dimatikan.", "Lock turned off."), true); lkRedraw();
+    }catch(e){ flash(LL("Gagal memeriksa PIN.", "Could not check the PIN.")); }
+  }
+  async function lkBio(){
+    var c = lkcfg(); if(!c) return;
+    if(c.b){ c.b = false; lksave(c); flash(LL("Sidik jari dimatikan.", "Fingerprint turned off."), true); lkRedraw(); return; }
+    if(!(await lkbio.ok())) return flash(LL("Sidik jari tidak tersedia. Pastikan sudah ada sidik jari terdaftar di HP dan aplikasi memakai plugin biometrik.", "Fingerprint isn't available. Make sure one is enrolled on the phone and the app includes the biometric plugin."));
+    var ok = false; lkAsking = true;
+    try{ ok = await lkbio.ask(LL("Aktifkan sidik jari untuk tab Keuangan Arisan", "Enable fingerprint for Arisan finance")); }catch(e){} finally{ lkAsking = false; }
+    if(ok){ c.b = true; lksave(c); flash(LL("Sidik jari aktif ✓", "Fingerprint on ✓"), true); lkRedraw(); } else flash(LL("Verifikasi dibatalkan.", "Verification cancelled."));
+  }
+  /* lupa PIN: bila PIN dipasang saat masuk Google, cukup masuk ulang dengan akun yang sama; bila tidak, satu-satunya jalan adalah menghapus data arisan di perangkat ini */
+  async function lkForgot(b){
+    var c = lkcfg(); if(!c) return;
+    var au = authO();
+    if(c.o && au && au.login){
+      flash(LL("Masuk dengan akun Google yang sama untuk menghapus PIN.", "Sign in with the same Google account to remove the PIN."), true);
+      try{ if(au.user && au.logout) await au.logout(); await au.login(); for(var i = 0; i < 20 && !au.user; i++) await new Promise(function(r){ setTimeout(r, 250); }); }catch(e){}
+      if(au.user && au.user.uid === c.o){ try{ localStorage.removeItem(LKEY); }catch(e){} lkd = false; lkMode = ""; lkRedraw(); flash(LL("Kunci dihapus. Pasang PIN baru lewat tombol Kunci Keuangan.", "Lock removed. Set a new PIN with the Lock Finance button."), true); }
+      else flash(LL("Akun Google tidak cocok atau masuk dibatalkan.", "Google account doesn't match, or sign-in was cancelled."));
+      return;
+    }
+    var w = $("lkw");
+    if(!lkArm){
+      lkArm = true; if(w) w.textContent = LL("PIN ini dipasang tanpa akun Google, jadi hanya bisa dipulihkan dengan menghapus semua data arisan di perangkat ini. Ketuk sekali lagi untuk menghapus.", "This PIN was set without a Google account, so it can only be recovered by deleting all arisan data on this device. Tap again to delete.");
+      b.textContent = LL("Hapus data?", "Delete data?");
+      setTimeout(function(){ lkArm = false; if(b.isConnected) b.textContent = LL("Lupa PIN?", "Forgot PIN?"); if(w && w.isConnected) w.textContent = ""; }, 4000);
+      return;
+    }
+    lkArm = false;
+    try{
+      var ks = []; for(var j = 0; j < localStorage.length; j++){ var k = localStorage.key(j); if(k === "an_list" || k === "an_data" || k === LKEY || (k && k.indexOf("an_data_") === 0)) ks.push(k); }
+      ks.forEach(function(k){ localStorage.removeItem(k); });
+    }catch(e){}
+    AL.items = []; aid = ""; A = { names:[], out:[], fix:0, pay:{}, ul:{} }; scr = "M"; tab = "K"; lkd = false; lkMode = "";
+    lkRedraw(); flash(LL("Data arisan di perangkat ini dihapus.", "Arisan data on this device was deleted."), true);
+  }
+  $("lkBox").addEventListener("click", function(e){
+    var b = e.target && e.target.closest ? e.target.closest("[data-lk]") : null; if(!b) return;
+    var a = b.getAttribute("data-lk");
+    if(a === "go") lkUnlock($("lkp") ? $("lkp").value : "");
+    else if(a === "bioask") lkAskBio();
+    else if(a === "forgot") lkForgot(b);
+    else if(a === "set") lkSet();
+    else if(a === "chg") lkChg();
+    else if(a === "off") lkOff();
+    else if(a === "bio") lkBio();
+    else if(a === "back"){ lkMode = ""; lkRedraw(); }
+  });
+  $("lkBox").addEventListener("input", function(e){
+    var t = e.target; if(!(t && t.hasAttribute && t.hasAttribute("data-pin"))) return;
+    t.value = t.value.replace(/\D/g, "").slice(0, 8);
+    if(t.id === "lkp"){ var c = lkcfg(); if(c && t.value.length === (+c.l || 0)) lkUnlock(t.value); }
+  });
+  $("lkBox").addEventListener("change", function(e){
+    var t = e.target; if(!(t && t.hasAttribute && t.hasAttribute("data-lg"))) return;
+    var c = lkcfg(); if(c){ c.g = +t.value || 0; lksave(c); lkSig = ""; }
+  });
+  $("bLkCfg").addEventListener("click", function(){ lkMode = "cfg"; lkRedraw(); window.scrollTo(0, 0); });
+  /* kunci lagi saat kembali dari latar belakang (sesuai pengaturan g) */
+  document.addEventListener("visibilitychange", function(){
+    if(document.hidden){ lkHiddenAt = Date.now(); return; }
+    var c = lkcfg(); if(!c || lkd || lkAsking || !lkHiddenAt || Date.now() - lkOpenedAt < 1500) return;
+    if(Date.now() - lkHiddenAt >= (+c.g || 0) * 1000) lockNow();
+  });
+  lkd = lkOn();
 
   /* data arisan (disimpan di perangkat, ikut tersinkron ke akun lewat localStorage) */
   var aid = "", scr = "M", AL = { items:[] };
@@ -14229,7 +14597,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
   }
   function setAmt(n, v){ if(memLocked(n, fper)) return; var o = A.pay[n] || (A.pay[n] = {}); if(v > 0) o[fper] = v; else delete o[fper]; save(); upd(); }
   function paintF(){
-    var t = T(), N = A.names.length;
+    var t = T(), N = A.names.length; lkLabel();
     $("nt").disabled = $("bAdd").disabled = started(); $("nLock").textContent = t.nLock; $("nLock").hidden = !started();
     $("lbN").textContent = t.lbN; $("nt").placeholder = t.ph; $("bAdd").textContent = t.add; $("fNo").textContent = t.noN; $("fNo").hidden = N > 0; $("fBox").hidden = !N; if(!N) return;
     if(!fper || fper > N) fper = Math.min(A.out.length + 1, N);
@@ -14350,18 +14718,19 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     var t = T();
     var menu = scr === "M" && !ON.role;
     $("pM").hidden = !menu; $("aBar").hidden = menu; $("tabs").hidden = menu;
-    if(menu){ $("sub").textContent = t.subM; $("pK").hidden = true; $("pF").hidden = true; paintM(); updChat(); return; }
+    if(menu){ lkMode = ""; $("sub").textContent = t.subM; $("pK").hidden = true; $("pF").hidden = true; $("pL").hidden = true; paintM(); updChat(); return; }
     if(!aid && !spec()) tab = "K";
     $("sub").textContent = t.sub; $("tK").textContent = t.tK; $("tF").textContent = t.tF; $("tF").hidden = !aid;
     $("bBack").textContent = t.bk; $("aNm").textContent = aName();
     $("tK").classList.toggle("on", tab === "K"); $("tF").classList.toggle("on", tab === "F");
-    $("pK").hidden = tab !== "K"; $("pF").hidden = tab !== "F";
-    if(tab === "K") paintK(); else paintF();
+    var gate = lkGate();
+    $("pK").hidden = tab !== "K"; $("pF").hidden = tab !== "F" || gate; $("pL").hidden = !gate;
+    if(tab === "K") paintK(); else if(gate) paintL(); else paintF();
     updChat();
   }
   function setMode(m){ if(m === mode) return; mode = m; if(m === "off" && ON.role) leave(); else paint(); }
 
-  $("tK").addEventListener("click", function(){ tab = "K"; paint(); });
+  $("tK").addEventListener("click", function(){ tab = "K"; lkMode = ""; paint(); });
   $("tF").addEventListener("click", function(){ tab = "F"; paint(); });
   $("mOff").addEventListener("click", function(){ setMode("off"); });
   $("mOn").addEventListener("click", function(){ setMode("on"); });
@@ -15066,7 +15435,7 @@ A.clearPhoto = async () => {
    Seluruh data aplikasi di localStorage (pengaturan, riwayat, hasil semua menu) disimpan di satu dokumen: users/{uid}.
    Cuma jalan saat sudah masuk dan online. Tanpa masuk, aplikasi memakai localStorage seperti biasa. */
 const SY = (() => {
-  const EX = /^(firebase:|st_sync_|kg_db$|kg_ts$|sp_saran_queue$|asd_livepos$|asd_livemini$|asd_sidepos$|asd_side$|kh_side$|kh_sideopen$)/;
+  const EX = /^(firebase:|st_sync_|kg_db$|kg_ts$|kg_lock$|an_lock$|sp_saran_queue$|asd_livepos$|asd_livemini$|asd_sidepos$|asd_side$|kh_side$|kh_sideopen$)/;
   const M_H = "st_sync_h", M_TS = "st_sync_ts", M_UID = "st_sync_uid", MAXTOT = 880000, EVERY = 20000;
   const rd = k => { try{ return JSON.parse(localStorage.getItem(k) || "{}") || {}; }catch(e){ return {}; } };
   const wr = (k, o) => { try{ localStorage.setItem(k, JSON.stringify(o)); }catch(e){} };
@@ -15228,7 +15597,7 @@ const KGS = (() => {
     if(uid === u) return; stop();
     /* pindah ke akun Google LAIN di perangkat yang sama: buang data keuangan lokal milik akun sebelumnya (masih aman di cloud-nya) */
     const owner = rd(M).uid || localStorage.getItem("st_sync_uid");
-    if(owner && owner !== u){ try{ localStorage.removeItem("kg_db"); localStorage.removeItem("kg_ts"); }catch(e){} wr(M, {}); }
+    if(owner && owner !== u){ try{ localStorage.removeItem("kg_db"); localStorage.removeItem("kg_ts"); localStorage.removeItem("kg_lock"); }catch(e){} wr(M, {}); }
     uid = u; merged = false; run(); timer = setInterval(tick, EVERY);
   }
   function stop(){ if(timer) clearInterval(timer); timer = 0; uid = null; merged = false; }
