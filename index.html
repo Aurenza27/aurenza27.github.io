@@ -601,6 +601,47 @@ h1{font-size:26px;line-height:1.15}
 #frpanel.out{animation:spOut .24s cubic-bezier(.5,0,.75,.4) forwards;pointer-events:none}
 @media (prefers-reduced-motion:reduce){#frpanel.in,#frpanel.out{animation:none}}
 @media (max-width:360px){h1{font-size:23px}.cgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.item{padding:12px}}
+/* ===== BERANDA v2: header satu baris, kartu menu ringkas, kartu "Lanjutkan" (hanya tampilan) ===== */
+#home{padding-top:calc(28px + env(safe-area-inset-top,0px))}
+.hd{grid-template-columns:auto minmax(0,1fr) auto auto auto;grid-template-areas:"logo ttl bell fr gear";column-gap:6px;row-gap:0;margin-bottom:18px}
+.hd .logowrap{grid-area:logo;justify-self:start;width:40px;height:40px;margin-right:6px}
+.hd .hdt{grid-area:ttl;padding:0;text-align:left}
+.hd .hdt h1{font-size:21px;line-height:1.15}
+.hd .hdt .sub{margin:2px 0 0;font-size:12.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd #bellBtn{grid-area:bell}.hd #frHome{grid-area:fr}.hd #gearHome{grid-area:gear}
+.hd #bellPanel{left:auto;right:0;top:52px;transform-origin:calc(100% - 66px) -30px}
+#list{gap:18px}
+#list .cgrid{grid-template-columns:1fr;gap:8px}
+#list .item{flex-direction:row;align-items:center;gap:12px;height:auto;padding:10px 12px;border-radius:14px}
+#list .item .ic{width:42px;height:42px;border-radius:12px}
+#list .item .ic svg{width:23px;height:23px}
+#list .item .tx{flex:1;min-width:0}
+#list .item .tx b{font-size:14.5px;letter-spacing:.03em}
+#list .item .tx small{margin-top:2px;font-size:12.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#list .item::after{content:"";flex:none;width:7px;height:7px;margin-right:4px;border-right:1.5px solid var(--muted);border-top:1.5px solid var(--muted);transform:rotate(45deg);opacity:.7}
+#list .item:hover::after,#list .item:focus-visible::after{border-color:var(--gold2);opacity:1}
+#list .item .bd{top:8px;right:28px}
+#recent[hidden]{display:none}
+#recent h2{display:flex;align-items:center;gap:8px;margin:0 0 8px;font:600 12.5px/1.2 var(--head);letter-spacing:.1em;text-transform:uppercase;color:var(--gold2)}
+#recent h2 .ln{flex:1;height:1px;background:linear-gradient(to right,var(--line),transparent)}
+.rhero{position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;text-align:left;font:inherit;color:var(--text);cursor:pointer;border:1px solid rgba(212,169,79,.5);border-radius:16px;background:linear-gradient(135deg,rgba(212,169,79,.16),rgba(212,169,79,.03)),var(--card);transition:border-color .2s,transform .1s}
+.rhero:hover,.rhero:focus-visible{border-color:var(--gold2);outline:none}
+.rhero:active{transform:scale(.985)}
+.rhero .ic{width:46px;height:46px}
+.rhero .tx{flex:1;min-width:0}
+.rhero .tx b{display:block;font:600 16px/1.2 var(--head);letter-spacing:.03em;overflow-wrap:anywhere}
+.rhero .tx small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rhero .rgo{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:999px;background:var(--gold);color:#1a1405}
+.rhero .rgo svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.rchips{display:flex;gap:8px;margin-top:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.rchips::-webkit-scrollbar{display:none}
+.rchip{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px 0 10px;font:inherit;font-size:13px;letter-spacing:.02em;color:var(--text);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:999px;cursor:pointer;white-space:nowrap;transition:border-color .2s,transform .1s}
+.rchip:hover,.rchip:focus-visible{border-color:var(--gold);outline:none}
+.rchip:active{transform:scale(.97)}
+.rchip .ci{display:grid;place-items:center;color:var(--gold2)}
+.rchip .ci svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:360px){.hd .hdt h1{font-size:19px}#list .item{padding:9px 10px}}
+@media (prefers-reduced-motion:reduce){.rhero,.rchip{transition:none}}
 </style>
 </head>
 <body>
@@ -796,6 +837,23 @@ const CATS = [
   { id:"hiburan", icon:"🎭", title:"Hiburan & Permainan", titleEn:"Entertainment & Games", sub:"Uji kemampuan dan seru-seruan.", subEn:"Test your skills and have fun." },
   { id:"primbon", icon:"🔮", title:"Primbon & Numerologi", titleEn:"Primbon & Numerology", sub:"Weton, shio, numerologi, khodam, dan jodoh.", subEn:"Weton, zodiac, numerology, khodam, and compatibility." }
 ];
+/* ===== BERANDA: deskripsi singkat untuk kartu (hanya tampilan beranda; isi MENUS tidak diubah) ===== */
+const HOME_SHORT = {
+  "th-analytics":["Uji ketajaman insting detektifmu.","Test your detective instincts."],
+  "cek-khodam":["Cek khodam yang menemanimu.","Find your khodam guardian."],
+  "hari-hoki":["Hari, angka, dan warna hoki.","Lucky days, numbers, and colors."],
+  "cek-watak":["Watak dari numerologi dan wuku.","Character via numerology."],
+  "cek-jodoh":["Cek kecocokan dua orang.","Check two people's match."],
+  "cek-bmi":["IMT, berat ideal, kalori harian.","BMI, target weight, calories."],
+  "cek-hamil":["Usia hamil, HPL, jadwal periksa.","Gestation, due date, checkups."],
+  "olahraga":["Rekam lari, jalan, sepeda dengan GPS.","Track runs and rides with GPS."],
+  "turnamen":["Jadwal, skor, klasemen, bagan.","Fixtures, scores, standings."],
+  "tebak-inisial":["Acak huruf dan kategori tebak-tebakan.","Random letter and category game."],
+  "versus":["Adu dua nama: menang, kalah, seri.","Pit two names against each other."],
+  "acak-nama":["Kelola arisan offline atau online.","Manage arisan offline or online."],
+  "keuangan":["Catat uang masuk, keluar, tabungan.","Track income, spending, savings."]
+};
+const homeDesc = (m, en) => { const t = HOME_SHORT[m.id]; return t ? t[en ? 1 : 0] : (en ? m.descEn : m.desc); };
 const ICONS = {
   "th-analytics":'<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><circle cx="10.5" cy="10.5" r="1.4" fill="currentColor"/></svg>',
   "cek-khodam":'<svg viewBox="0 0 24 24"><path d="M6 20v-9a6 6 0 0 1 12 0v9l-2-1.6-2 1.6-2-1.6-2 1.6-2-1.6z"/><circle cx="9.8" cy="11" r=".9" fill="currentColor"/><circle cx="14.2" cy="11" r=".9" fill="currentColor"/></svg>',
@@ -1397,7 +1455,8 @@ function paintHome(){
   T("abN1", ab.n1); T("abB1", ab.b1); T("abD1", ab.d1); T("abN2", ab.n2); T("abB2", ab.b2); T("abD2", ab.d2); T("abFt", ab.ft);
   $("list").querySelectorAll(".bd").forEach(e => { e.textContent = (BADGE[e.dataset.m] || BADGE_LBL)[S.lang === "en" ? "en" : "id"]; });
   const en = S.lang === "en";
-  MENUS.forEach(m => { const e = $("list").querySelector('.item[data-m="' + m.id + '"] small'); if(e) e.textContent = en ? m.descEn : m.desc; });
+  MENUS.forEach(m => { const e = $("list").querySelector('.item[data-m="' + m.id + '"] small'); if(e) e.textContent = homeDesc(m, en); });
+  try{ renderRecent(); }catch(e){}
   paintMenuTitles();
   CATS.forEach(c => {
     const q = x => $("list").querySelector('[data-c="' + c.id + '"] ' + x), set = (x, v) => { const e = q(x); if(e) e.textContent = v; };
@@ -1421,7 +1480,7 @@ function togglePanel(force){
   clearTimeout(spTimer); p.classList.remove("in", "out");
   if(open){
     /* geser panel sedikit ke bawah supaya tidak menutupi ikon pengaturan: di beranda ikon lebih rendah daripada di bilah menu */
-    const top = $("view").hidden ? 90 : 62;
+    const top = $("view").hidden ? 80 : 62;
     p.style.top = "calc(" + top + "px + env(safe-area-inset-top,0px))"; p.style.maxHeight = "calc(100% - " + (top + 16) + "px)";
     p.hidden = false; spOrigin(p);
     if(!calm){ void p.offsetWidth; p.classList.add("in"); }
@@ -2189,6 +2248,7 @@ function menuSrc(m){
 writeKeys(S); paintPanel();
 
 function openMenu(m){
+  try{ rcAdd(m.id); }catch(e){}   /* beranda: simpan untuk kartu "Lanjutkan" */
   window.satuTitikMenuOpenedAt = Date.now();   /* dipakai logika iklan: menu yang ditutup terlalu cepat tidak memicu iklan */
   $("vt").textContent = mTitle(m);
   const f = document.createElement("iframe");
@@ -2237,7 +2297,7 @@ CATS.forEach(c => {
   items.forEach(m => {
     const b = document.createElement("button");
     b.type = "button"; b.className = "item"; b.dataset.m = m.id;
-    b.innerHTML = '<span class="ic">' + (ICONS[m.id] || m.icon) + '</span><span class="tx"><b class="mt">' + mTitle(m) + '</b><small>' + m.desc + '</small></span>' + (badgeOn(m.id) ? '<span class="bd" data-m="' + m.id + '"></span>' : '');
+    b.innerHTML = '<span class="ic">' + (ICONS[m.id] || m.icon) + '</span><span class="tx"><b class="mt">' + mTitle(m) + '</b><small>' + homeDesc(m, S.lang === "en") + '</small></span>' + (badgeOn(m.id) ? '<span class="bd" data-m="' + m.id + '"></span>' : '');
     b.addEventListener("click", () => { location.hash = m.id; });
     grid.appendChild(b);
   });
@@ -2246,6 +2306,33 @@ CATS.forEach(c => {
   else if(!items.length){ const d = document.createElement("div"); d.className = "soon"; d.innerHTML = c.icon + '<b></b><p style="margin:0"></p>'; cin.appendChild(d); }
   $("list").appendChild(sec);
 });
+/* ===== BERANDA: "Lanjutkan" (menu yang terakhir dibuka). Hanya tampilan; tidak mengubah isi menu. ===== */
+const RC_KEY = "st_recent_menus";
+function rcGet(){
+  try{ const a = JSON.parse(localStorage.getItem(RC_KEY) || "[]"); return Array.isArray(a) ? a.filter(id => MENUS.some(m => m.id === id)).slice(0, 4) : []; }
+  catch(e){ return []; }
+}
+function rcAdd(id){
+  try{ const a = rcGet().filter(x => x !== id); a.unshift(id); localStorage.setItem(RC_KEY, JSON.stringify(a.slice(0, 4))); }catch(e){}
+  renderRecent();
+}
+function renderRecent(){
+  const sec = document.getElementById("recent"); if(!sec) return;
+  const ids = rcGet(), en = S.lang === "en";
+  if(!ids.length){ sec.hidden = true; sec.innerHTML = ""; return; }
+  const ms = ids.map(id => MENUS.find(m => m.id === id)).filter(Boolean), f = ms[0];
+  const ico = m => ICONS[m.id] || m.icon;
+  sec.hidden = false;
+  sec.innerHTML = '<h2><span class="ct">' + (en ? "Continue" : "Lanjutkan") + '</span><i class="ln"></i></h2>'
+    + '<button type="button" class="rhero" data-r="' + f.id + '"><span class="ic">' + ico(f) + '</span><span class="tx"><b class="mt">' + mTitle(f) + '</b><small>' + homeDesc(f, en) + '</small></span>'
+    + '<span class="rgo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span></button>'
+    + (ms.length > 1 ? '<div class="rchips">' + ms.slice(1).map(m => '<button type="button" class="rchip" data-r="' + m.id + '"><span class="ci">' + ico(m) + '</span>' + mTitle(m) + '</button>').join("") + '</div>' : "");
+}
+(function(){
+  const sec = document.createElement("section"); sec.id = "recent"; sec.hidden = true;
+  sec.addEventListener("click", e => { const b = e.target.closest("[data-r]"); if(b) location.hash = b.dataset.r; });
+  $("list").insertBefore(sec, $("list").firstChild);
+})();
 paintHome();
 $("back").addEventListener("click", () => {
   /* game online (Tebak Inisial) yang sedang berada di dalam ruangan menahan dulu dan meminta konfirmasi */
@@ -17101,7 +17188,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     const calm = window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches;
     clearTimeout(frTimer); panel.classList.remove("in", "out");
     if(on){
-      const top = $("view").hidden ? 90 : 62;
+      const top = $("view").hidden ? 80 : 62;
       panel.style.top = "calc(" + top + "px + env(safe-area-inset-top,0px))"; panel.style.maxHeight = "calc(100% - " + (top + 16) + "px)";
       panel.hidden = false; frOrigin();
       if(!calm){ void panel.offsetWidth; panel.classList.add("in"); }
