@@ -1430,37 +1430,39 @@ $("abBack").addEventListener("click", closeAbout);
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("about").hidden) closeAbout(); });
 /* ===== Kebijakan Privasi: halaman penuh seperti Tentang, dibuka dari tulisan di kaki beranda ===== */
 const PV = {
-  id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 18 November 2026", back:"‹ Beranda", secs:[
+  id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 19 November 2026", back:"‹ Beranda", secs:[
     {h:"1. Pendahuluan", p:["Satu Titik adalah aplikasi yang dikembangkan oleh Aurenza27 (“kami”). Kebijakan ini menjelaskan data apa yang diproses, untuk apa, dan pilihan yang kamu miliki saat memakai aplikasi ini. Dengan memakai aplikasi, kamu menyetujui kebijakan ini."]},
     {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, data turnamen, serta aktivitas olahraga beserta rute GPS yang kamu rekam di menu Olahraga) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google."]},
     {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, termasuk ketika layar terkunci atau aplikasi berada di latar belakang (notifikasi tampil selama merekam), dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Jumlah langkah dibaca dari sensor langkah HP (izin Aktivitas Fisik) hanya saat merekam di aplikasi Android, dan hanya dipakai untuk memeriksa kewajaran jarak. Angkanya tidak ditampilkan atau disimpan di riwayat aktivitas.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif."]},
-    {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, dan rute GPS olahraga) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, dan dihapus saat pertemanan dihapus."]},
+    {p:["Keuangan dan Arisan:"], l:["Catatan keuangan (uang masuk dan keluar, dompet, jatah belanja, tabungan) dan data Arisan (nama peserta, pemenang, status pembayaran) disimpan di perangkatmu. Bila kamu masuk dengan Google, data ini ikut tersalin ke akunmu.","Kunci menu: PIN dan kode pemulihan hanya disimpan di perangkat dalam bentuk hash (bukan teks asli), tidak dikirim ke server, dan tidak ikut tersalin ke akun. Sidik jari dan PIN/pola layar HP diperiksa oleh sistem Android; aplikasi tidak menerima atau menyimpan data sidik jarimu.","Ruangan Arisan online: nama host dan peserta, daftar nama kocokan, hasil, dan chat ruangan disimpan di server selama ruangan ada dan dihapus saat host menutup ruangan. Chat juga ditandai kedaluwarsa setelah 24 jam."]},
+    {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, rute GPS olahraga, serta data Keuangan dan Arisan) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, dan dihapus saat pertemanan dihapus."]},
     {p:["Blokir dan laporan:"], l:["Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.","Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan. Laporan hanya dibaca pengelola untuk meninjau pelanggaran."]},
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif."]},
     {p:["Pengecekan koneksi dan waktu:"], l:["Aplikasi mengirim permintaan sederhana ke server publik (Google, Cloudflare, dan WorldTimeAPI) untuk mengecek koneksi internet dan jam. Permintaan ini tidak berisi data pribadimu, tetapi seperti permintaan internet lainnya, alamat IP perangkat terlihat oleh server tersebut."]},
     {p:["Iklan (hanya pada versi aplikasi yang menampilkan iklan):"], l:["Versi aplikasi tertentu, misalnya versi APK, dapat menampilkan iklan dari jaringan iklan pihak ketiga seperti Google AdMob.","Jaringan iklan dapat memproses ID iklan perangkat, alamat IP, jenis perangkat, dan interaksi dengan iklan untuk menampilkan serta mengukur iklan. Pada wilayah yang mewajibkan, kamu akan diminta persetujuan terlebih dahulu.","Kamu dapat mengatur atau mereset ID iklan, dan membatasi personalisasi iklan, lewat pengaturan perangkat."]},
     {h:"3. Untuk apa data dipakai", l:["Menjalankan fitur aplikasi dan menampilkan hasil menu.","Memungkinkan masuk akun, sinkronisasi data, dan fitur turnamen online (undangan moderator memakai ID Akun).","Menampilkan profilmu, serta menerima dan membaca saran dari pengguna.","Menampilkan iklan pada versi aplikasi yang memuat iklan, sebagai sumber pendanaan pengembangan."], p:["Kami tidak menjual data pribadimu. Kami juga tidak membagikan data akun, username, atau hasil menumu kepada pengiklan."]},
     {h:"4. Layanan pihak ketiga", l:["Google Firebase (Authentication dan Cloud Firestore): untuk masuk akun dan menyimpan data akun.","Web3Forms: untuk mengirim pesan dari Kotak Saran.","Saweria: tautan Dukung Kami membuka halaman eksternal yang punya kebijakan privasinya sendiri.","Google, Cloudflare, dan WorldTimeAPI: untuk pengecekan koneksi dan waktu.","Jaringan iklan (misalnya Google AdMob): hanya pada versi yang menampilkan iklan."], p:["Layanan-layanan ini punya kebijakan privasi sendiri yang berlaku saat data diproses oleh mereka."]},
-    {h:"5. Penyimpanan dan keamanan", p:["Data lokal tersimpan di perangkatmu dan hilang bila data aplikasi atau browser dihapus. Data akun disimpan di layanan Google Firebase dan dikirim lewat koneksi terenkripsi (HTTPS). Tidak ada metode penyimpanan atau pengiriman data yang sepenuhnya bebas risiko, jadi kami tidak dapat menjamin keamanan mutlak."]},
-    {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk dengan Google, data di server ikut dihapus).","Hapus akun dan data cloud kapan saja lewat Pengaturan > Akun > Lihat profil > Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri.","Penghapusan akun menghapus ID Akun, username, foto profil, daftar teman dan pesan pribadi, salinan data yang tersinkron, serta turnamen online yang kamu buat. Laporan yang pernah kamu kirim dapat tetap disimpan pengelola untuk keperluan keamanan.","Tanpa memasang aplikasi: buka https://aurenza27.github.io di browser, masuk dengan Google, lalu pilih Hapus akun di halaman Profil. Bila tidak bisa masuk, kirim permintaan penghapusan lewat Kotak Saran di halaman yang sama dengan menyebut ID Akunmu (ST-xxxxxx)."]},
+    {h:"5. Penyimpanan dan keamanan", p:["Data lokal tersimpan di perangkatmu dan hilang bila data aplikasi atau browser dihapus. Data akun disimpan di layanan Google Firebase dan dikirim lewat koneksi terenkripsi (HTTPS). Tidak ada metode penyimpanan atau pengiriman data yang sepenuhnya bebas risiko, jadi kami tidak dapat menjamin keamanan mutlak. Kunci menu (PIN dan sidik jari) hanya mengunci tampilan, bukan enkripsi: data di perangkat dan di akunmu tidak dienkripsi tambahan oleh aplikasi."]},
+    {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk dengan Google, data di server ikut dihapus).","Reset semua catatan keuangan dan hapus arisan meminta verifikasi (sidik jari, PIN/pola layar HP, atau PIN menu) dan tidak bisa dibatalkan. Bila kamu masuk dengan Google, salinan di akun ikut terhapus saat sinkronisasi berjalan. Bila lupa PIN dan tidak punya kode pemulihan, satu-satunya jalan adalah menghapus data Keuangan atau Arisan di perangkat itu.","Hapus akun dan data cloud kapan saja lewat Pengaturan > Akun > Lihat profil > Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri.","Penghapusan akun menghapus ID Akun, username, foto profil, daftar teman dan pesan pribadi, salinan data yang tersinkron, serta turnamen online yang kamu buat. Laporan yang pernah kamu kirim dapat tetap disimpan pengelola untuk keperluan keamanan.","Tanpa memasang aplikasi: buka https://aurenza27.github.io di browser, masuk dengan Google, lalu pilih Hapus akun di halaman Profil. Bila tidak bisa masuk, kirim permintaan penghapusan lewat Kotak Saran di halaman yang sama dengan menyebut ID Akunmu (ST-xxxxxx)."]},
     {h:"7. Anak-anak", p:["Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun, dan kami tidak dengan sengaja mengumpulkan data mereka. Bila kamu orang tua dan menemukan data anak di aplikasi ini, hubungi kami lewat Kotak Saran."]},
     {h:"8. Hasil menu", p:["Hasil menu primbon, ramalan, dan hiburan hanya untuk hiburan dan kepercayaan tradisional, bukan kepastian atau dasar untuk keputusan penting. Hasil BMI, kalori, dan kehamilan adalah informasi umum, bukan diagnosis, nasihat medis, atau pengganti pemeriksaan tenaga kesehatan; konsultasikan kondisimu dengan dokter atau bidan."]},
     {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini."]},
     {h:"10. Kontak", p:["Pertanyaan tentang privasi dapat dikirim lewat Kotak Saran di Pengaturan."]}
   ]},
-  en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 18 November 2026", back:"‹ Home", secs:[
+  en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 19 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. By using the app, you agree to this policy."]},
     {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, tournament data, and the sports activities and GPS routes you record in the Sports menu) are stored on your own device.","This data is not sent to our servers unless you sign in with a Google account."]},
     {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, including while the screen is locked or the app is in the background (a notification shows while recording), and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","The step count is read from your phone's step sensor (Physical activity permission) only while recording in the Android app, and is used only to check that the distance is plausible. It is not shown or stored in the activity history.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on."]},
-    {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, menu results, and sports GPS routes) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, and are deleted when the friendship is removed."]},
+    {p:["Finance and Arisan:"], l:["Financial records (money in and out, wallets, spending limits, savings) and Arisan data (participant names, winners, payment status) are stored on your device. If you sign in with Google, this data is also copied to your account.","Menu lock: the PIN and recovery code are stored only on your device as a hash (not the original text), are not sent to a server, and are not copied to your account. Your fingerprint and the phone's screen PIN/pattern are checked by the Android system; the app does not receive or store your fingerprint data.","Online Arisan rooms: the names of the host and participants, the draw name list, results, and the room chat are stored on a server while the room exists and are deleted when the host closes the room. Chat is also marked to expire after 24 hours."]},
+    {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, menu results, sports GPS routes, and Finance and Arisan data) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, and are deleted when the friendship is removed."]},
     {p:["Blocking and reports:"], l:["The list of users you block is stored in your account so blocking applies on all your devices.","When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, and a copy of the reported text. Reports are read only by the maintainer to review violations."]},
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data."]},
     {p:["Connection and time checks:"], l:["The app sends simple requests to public servers (Google, Cloudflare, and WorldTimeAPI) to check your internet connection and the time. These requests do not contain your personal data, but as with any internet request, your device’s IP address is visible to those servers."]},
     {p:["Ads (only in app versions that show ads):"], l:["Certain app versions, such as the APK version, may show ads from third-party ad networks such as Google AdMob.","Ad networks may process the device advertising ID, IP address, device type, and your interactions with ads to serve and measure ads. Where required, you will be asked for consent first.","You can reset your advertising ID, and limit ad personalization, in your device settings."]},
     {h:"3. How data is used", l:["To run the app’s features and show menu results.","To enable sign-in, data sync, and online tournaments (moderator invitations use the Account ID).","To show your profile, and to receive and read user suggestions.","To show ads in app versions that contain ads, as a way to fund development."], p:["We do not sell your personal data. We also do not share your account data, username, or menu results with advertisers."]},
     {h:"4. Third-party services", l:["Google Firebase (Authentication and Cloud Firestore): for sign-in and storing account data.","Web3Forms: to deliver messages from the Suggestion Box.","Saweria: the Support Us link opens an external page with its own privacy policy.","Google, Cloudflare, and WorldTimeAPI: for connection and time checks.","Ad networks (for example Google AdMob): only in versions that show ads."], p:["These services have their own privacy policies, which apply when they process data."]},
-    {h:"5. Storage and security", p:["Local data stays on your device and is lost if you clear the app or browser data. Account data is stored in Google Firebase and sent over encrypted connections (HTTPS). No method of storage or transmission is completely risk-free, so we cannot guarantee absolute security."]},
-    {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in with Google, server data is deleted too).","Delete your account and cloud data at any time via Settings > Account > View profile > Delete account. Data on this device stays until you delete it yourself.","Deleting your account removes the Account ID, username, profile photo, friend list and private messages, synced data, and the online tournaments you created. Reports you submitted may still be kept by the administrators for safety purposes.","Without installing the app: open https://aurenza27.github.io in a browser, sign in with Google, and choose Delete account on the Profile page. If you cannot sign in, send a deletion request through the Suggestion Box on the same page, stating your Account ID (ST-xxxxxx)."]},
+    {h:"5. Storage and security", p:["Local data stays on your device and is lost if you clear the app or browser data. Account data is stored in Google Firebase and sent over encrypted connections (HTTPS). No method of storage or transmission is completely risk-free, so we cannot guarantee absolute security. The menu lock (PIN and fingerprint) only locks the screen and is not encryption: data on your device and in your account is not additionally encrypted by the app."]},
+    {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in with Google, server data is deleted too).","Resetting all financial records and deleting an arisan ask for verification (fingerprint, the phone's screen PIN/pattern, or the menu PIN) and cannot be undone. If you are signed in with Google, the copy in your account is deleted too once sync runs. If you forget the PIN and have no recovery code, the only way is to delete the Finance or Arisan data on that device.","Delete your account and cloud data at any time via Settings > Account > View profile > Delete account. Data on this device stays until you delete it yourself.","Deleting your account removes the Account ID, username, profile photo, friend list and private messages, synced data, and the online tournaments you created. Reports you submitted may still be kept by the administrators for safety purposes.","Without installing the app: open https://aurenza27.github.io in a browser, sign in with Google, and choose Delete account on the Profile page. If you cannot sign in, send a deletion request through the Suggestion Box on the same page, stating your Account ID (ST-xxxxxx)."]},
     {h:"7. Children", p:["This app is not intended for children under 13, and we do not knowingly collect their data. If you are a parent and find a child’s data in this app, contact us through the Suggestion Box."]},
     {h:"8. Menu results", p:["Primbon, fortune, and entertainment menu results are for entertainment and traditional belief only, not a certainty or a basis for important decisions. BMI, calorie, and pregnancy results are general information, not a diagnosis, medical advice, or a substitute for an examination by a health professional; consult a doctor or midwife about your condition."]},
     {h:"9. Changes to this policy", p:["This policy may be updated. The date of the latest update is shown at the top of this page."]},
@@ -13233,7 +13235,14 @@ const bio = (() => {
     if(N){ try{ await N.verifyIdentity({ reason, title: "KEUANGAN", subtitle: reason, useFallback: !!fallback, maxAttempts: 3 }); return true; }catch(e){} }
     return false;
   }
-  return { ok, ask };
+  /* true bila ada pengaman perangkat: biometrik terdaftar ATAU PIN/pola/password layar HP */
+  async function can(){
+    if(await ok()) return true;
+    init();
+    try{ if(P){ const r = await P.checkBiometry(); if(r && r.deviceIsSecure) return true; } }catch(e){}
+    return false;
+  }
+  return { ok, ask, can };
 })();
 locked = !!lcfg();
 function lockNow(){ if(!lcfg()) return; locked = true; recMode = false; S.tab = "home"; S.f = newF(); $("ovl").hidden = true; paint(); setTimeout(askBio, 350); }
@@ -13321,6 +13330,58 @@ async function lkOff(){
   const c = lcfg(); if(!c) return;
   if(await hashPin($("lko").value, c.s) !== c.h) return toast(L("PIN salah.", "Wrong PIN."));
   try{ localStorage.removeItem(LK); }catch(e){} toast(L("Kunci dimatikan.", "Lock turned off.")); paint();
+}
+/* kotak PIN menu untuk verifikasi aksi berbahaya (jalur cadangan bila HP tanpa sidik jari/PIN layar) */
+function pinPrompt(reason){
+  return new Promise(res => {
+    if(!lcfg()) return res(false);
+    const o = document.createElement("div"); o.className = "ovl"; o.style.zIndex = "30";
+    o.setAttribute("role", "alertdialog"); o.setAttribute("aria-modal", "true");
+    o.innerHTML = '<div class="dlg"><h2>' + L("Masukkan PIN menu", "Enter your menu PIN") + '</h2><p>' + reason + '</p>' +
+      '<input id="gpin" data-pin type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••" style="width:100%;text-align:center;font-size:22px;letter-spacing:.3em;margin-bottom:8px">' +
+      '<p id="gpe" style="color:var(--bad);min-height:18px;margin:0 0 10px"></p>' +
+      '<div class="two"><button class="btn ghost" id="gno" type="button">' + L("Batal", "Cancel") + '</button><button class="btn sure" id="gok" type="button">' + L("Lanjut", "Continue") + '</button></div></div>';
+    document.body.appendChild(o);
+    const inp = o.querySelector("#gpin"), err = o.querySelector("#gpe"); let busy = false;
+    const done = v => { o.remove(); res(v); };
+    const go = async () => {
+      if(busy) return; const c = lcfg(); if(!c) return done(false);
+      const wait = (+c.u || 0) - Date.now();
+      if(wait > 0){ err.textContent = L("Terlalu banyak percobaan. Coba lagi dalam " + Math.ceil(wait / 1000) + " detik.", "Too many attempts. Try again in " + Math.ceil(wait / 1000) + " seconds."); return; }
+      if(!/^\d{4,8}$/.test(inp.value)){ err.textContent = L("Masukkan PIN 4 sampai 8 angka.", "Enter a 4 to 8 digit PIN."); return; }
+      busy = true;
+      try{
+        if(await hashPin(inp.value, c.s) === c.h){ c.f = 0; c.u = 0; lsave(c); return done(true); }
+        c.f = (+c.f || 0) + 1;
+        if(c.f % 5 === 0) c.u = Date.now() + Math.min(30 * Math.pow(2, c.f / 5 - 1), 900) * 1000;
+        lsave(c); inp.value = ""; inp.focus(); err.textContent = L("PIN salah.", "Wrong PIN.");
+      }catch(e){ err.textContent = L("Gagal memeriksa PIN.", "Could not check the PIN."); }
+      finally{ busy = false; }
+    };
+    o.querySelector("#gok").addEventListener("click", go);
+    o.querySelector("#gno").addEventListener("click", () => done(false));
+    inp.addEventListener("keydown", e => { if(e.key === "Enter") go(); else if(e.key === "Escape") done(false); });
+    setTimeout(() => inp.focus(), 50);
+  });
+}
+/* verifikasi aksi berbahaya: 1) sidik jari (dialog sistem juga menerima PIN/pola layar HP),
+   2) bila gagal atau HP tak punya pengaman: PIN menu, 3) tanpa pengaman sama sekali: lanjut seperti biasa */
+async function secureGate(reason){
+  if(asking) return false;
+  const avail = await bio.can();
+  if(avail){
+    asking = true; let ok = false;
+    try{ ok = await bio.ask(reason, true); }catch(e){ ok = false; } finally{ asking = false; }
+    if(ok) return true;
+  }
+  if(lcfg()) return await pinPrompt(reason);
+  return !avail;
+}
+async function doReset(){
+  $("ovl").hidden = true;
+  if(!(await secureGate(L("Verifikasi untuk menghapus semua data keuangan", "Verify to delete all financial data")))) return toast(L("Verifikasi dibatalkan. Data tidak dihapus.", "Verification cancelled. Nothing was deleted."));
+  const old = db; db = {v:1, w:[{id:uid(), n:"Tunai", t:"cash", b:0}], t:[], bu:{}, g:[], cc:[], ci:[]};
+  if(save()){ S.f = newF(); S.m = thisM(); S.tab = "home"; toast(L("Semua data keuangan sudah dihapus.", "All financial data was deleted.")); paint(); window.scrollTo(0, 0); } else db = old;
 }
 /* memakai kode pemulihan: minta sidik jari dulu (bila HP punya sidik jari/biometrik terdaftar) */
 async function lkRecGate(){
@@ -13535,10 +13596,7 @@ document.addEventListener("click", e => {
     $("ovl").hidden = false; $("ovNo").focus();
   }
   else if(a === "cancelreset") $("ovl").hidden = true;
-  else if(a === "doreset"){
-    const old = db; db = {v:1, w:[{id:uid(), n:"Tunai", t:"cash", b:0}], t:[], bu:{}, g:[], cc:[], ci:[]};
-    if(save()){ S.f = newF(); S.m = thisM(); S.tab = "home"; $("ovl").hidden = true; toast(L("Semua data keuangan sudah dihapus.", "All financial data was deleted.")); paint(); window.scrollTo(0, 0); } else db = old;
-  }
+  else if(a === "doreset") doReset();
   else if(a === "delci") arm(b, () => {
     if(db.t.some(x => x.c === v)) return toast(L("Kategori ini sudah dipakai di catatan, jadi tidak bisa dihapus.", "This category is used in records, so it can't be deleted."));
     grab(); db.ci = db.ci.filter(x => x.id !== v); S.f.c = "sal"; save(); paint();
@@ -14111,7 +14169,14 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       if(N){ try{ await N.verifyIdentity({ reason: reason, title: "ARISAN", subtitle: reason, useFallback: !!fallback, maxAttempts: 3 }); return true; }catch(e){} }
       return false;
     }
-    return { ok: ok, ask: ask };
+    /* true bila ada pengaman perangkat: biometrik terdaftar ATAU PIN/pola/password layar HP */
+    async function can(){
+      if(await ok()) return true;
+      init();
+      try{ if(P){ var r = await P.checkBiometry(); if(r && r.deviceIsSecure) return true; } }catch(e){}
+      return false;
+    }
+    return { ok: ok, ask: ask, can: can };
   })();
   function lkGate(){ return tab === "F" && ((lkd && lkOn()) || lkMode === "cfg"); }
   function lkRedraw(){ lkSig = ""; paint(); }
@@ -14226,6 +14291,55 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       try{ localStorage.removeItem(LKEY); }catch(e){}
       lkd = false; lkMode = ""; flash(LL("Kunci dimatikan.", "Lock turned off."), true); lkRedraw();
     }catch(e){ flash(LL("Gagal memeriksa PIN.", "Could not check the PIN.")); }
+  }
+  /* kotak PIN menu untuk verifikasi aksi berbahaya (jalur cadangan bila HP tanpa sidik jari/PIN layar) */
+  function lkPinPrompt(reason){
+    return new Promise(function(res){
+      if(!lkcfg()) return res(false);
+      var o = document.createElement("div");
+      o.style.cssText = "position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.7)";
+      o.setAttribute("role", "alertdialog"); o.setAttribute("aria-modal", "true");
+      o.innerHTML = '<div class="panel" style="width:100%;max-width:360px;text-align:center"><p class="label">' + LL("Masukkan PIN menu", "Enter your menu PIN") + '</p>' +
+        '<p class="note" style="margin:0 0 10px">' + reason + '</p>' +
+        '<input id="gpin" data-pin type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••" style="text-align:center;font-size:22px;letter-spacing:.3em">' +
+        '<p class="note" id="gpe" style="color:var(--bad);min-height:18px"></p>' +
+        '<button class="go" id="gok" type="button">' + LL("Lanjut", "Continue") + '</button>' +
+        '<button class="ghost" id="gno" type="button" style="width:100%;margin-top:8px">' + LL("Batal", "Cancel") + '</button></div>';
+      document.body.appendChild(o);
+      var inp = o.querySelector("#gpin"), err = o.querySelector("#gpe"), busy = false;
+      function done(v){ o.remove(); res(v); }
+      async function go(){
+        if(busy) return; var c = lkcfg(); if(!c) return done(false);
+        var wait = (+c.u || 0) - Date.now();
+        if(wait > 0){ err.textContent = LL("Terlalu banyak percobaan. Coba lagi dalam " + Math.ceil(wait / 1000) + " detik.", "Too many attempts. Try again in " + Math.ceil(wait / 1000) + " seconds."); return; }
+        if(!/^\d{4,8}$/.test(inp.value)){ err.textContent = LL("Masukkan PIN 4 sampai 8 angka.", "Enter a 4 to 8 digit PIN."); return; }
+        busy = true;
+        try{
+          if(await lkhash(inp.value, c.s) === c.h){ c.f = 0; c.u = 0; lksave(c); return done(true); }
+          c.f = (+c.f || 0) + 1;
+          if(c.f % 5 === 0) c.u = Date.now() + Math.min(30 * Math.pow(2, c.f / 5 - 1), 900) * 1000;
+          lksave(c); inp.value = ""; inp.focus(); err.textContent = LL("PIN salah.", "Wrong PIN.");
+        }catch(e){ err.textContent = LL("Gagal memeriksa PIN.", "Could not check the PIN."); }
+        finally{ busy = false; }
+      }
+      o.querySelector("#gok").addEventListener("click", go);
+      o.querySelector("#gno").addEventListener("click", function(){ done(false); });
+      inp.addEventListener("keydown", function(e){ if(e.key === "Enter") go(); else if(e.key === "Escape") done(false); });
+      setTimeout(function(){ inp.focus(); }, 50);
+    });
+  }
+  /* verifikasi aksi berbahaya: 1) sidik jari (dialog sistem juga menerima PIN/pola layar HP),
+     2) bila gagal atau HP tak punya pengaman: PIN menu, 3) tanpa pengaman sama sekali: lanjut seperti biasa */
+  async function lkSecureGate(reason){
+    if(lkAsking) return false;
+    var avail = await lkbio.can();
+    if(avail){
+      lkAsking = true; var ok = false;
+      try{ ok = await lkbio.ask(reason, true); }catch(e){ ok = false; } finally{ lkAsking = false; }
+      if(ok) return true;
+    }
+    if(lkcfg()) return await lkPinPrompt(reason);
+    return !avail;
   }
   /* memakai kode pemulihan: minta sidik jari dulu (bila HP punya sidik jari/biometrik terdaftar) */
   async function lkRecGate(){
@@ -14552,14 +14666,10 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     if(busy || ON.role) return;
     if(delArm !== id){ delArm = id; paintM(); setTimeout(function(){ if(delArm === id){ delArm = 0; if(scr === "M") paintM(); } }, 3500); return; }
     delArm = 0;
-    /* bila sidik jari aktif di kunci Arisan, hapus arisan harus diverifikasi dengan sidik jari */
-    var lc = lkcfg();
-    if(lc && lc.b){
-      var vok = false; lkAsking = true;
-      try{ vok = await lkbio.ask(LL("Verifikasi sidik jari untuk menghapus arisan", "Verify your fingerprint to delete the arisan")); }catch(e){} finally{ lkAsking = false; }
-      if(!vok){ if(scr === "M") paintM(); flash(LL("Verifikasi dibatalkan. Arisan tidak dihapus.", "Verification cancelled. The arisan was not deleted.")); return; }
-      if(busy || ON.role) return;
-    }
+    /* hapus arisan selalu diverifikasi: sidik jari -> PIN/pola layar HP -> PIN menu */
+    var vok = await lkSecureGate(LL("Verifikasi untuk menghapus arisan", "Verify to delete the arisan"));
+    if(!vok){ if(scr === "M") paintM(); flash(LL("Verifikasi dibatalkan. Arisan tidak dihapus.", "Verification cancelled. The arisan was not deleted.")); return; }
+    if(busy || ON.role) return;
     try{ localStorage.removeItem("an_data_" + id); }catch(e){}
     AL.items = AL.items.filter(function(x){ return x.id !== id; }); saveList();
     paint(); flash(T().deld, true);
@@ -17123,7 +17233,7 @@ if(navigator.onLine !== false) init().catch(() => {});
 
   /* ---------- Syarat Penggunaan (halaman penuh) ---------- */
   const TM = {
-    id:{ t:"Syarat Penggunaan", sub:"Satu Titik", upd:"Terakhir diperbarui: 17 November 2026", back:"‹ Kembali", secs:[
+    id:{ t:"Syarat Penggunaan", sub:"Satu Titik", upd:"Terakhir diperbarui: 19 November 2026", back:"‹ Kembali", secs:[
       {h:"1. Penerimaan", p:["Dengan masuk dan memakai fitur sosial Satu Titik (teman, pesan pribadi, komentar turnamen, dan ruangan game), kamu menyetujui Syarat Penggunaan ini beserta Kebijakan Privasi. Bila tidak setuju, jangan masuk akun. Menu yang tidak membutuhkan akun tetap bisa dipakai."]},
       {h:"2. Akunmu", l:["Pakai akunmu sendiri dan jaga keamanannya.","Jangan menyamar sebagai orang lain.","Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun."]},
       {h:"3. Perilaku dan konten yang dilarang", p:["Saat membuat konten (pesan, komentar, nama, atau foto profil), kamu dilarang:"], l:["Melecehkan, merundung, mengancam, atau menakut-nakuti orang lain.","Menyebarkan ujaran kebencian atau merendahkan orang berdasarkan suku, agama, ras, antargolongan, gender, disabilitas, atau orientasi seksual.","Membuat atau membagikan konten seksual, pornografi, atau vulgar, termasuk apa pun yang mengeksploitasi anak.","Mendorong kekerasan, melukai diri sendiri, atau kegiatan yang melanggar hukum.","Melakukan penipuan, spam, atau membagikan tautan berbahaya.","Membagikan data pribadi orang lain tanpa izin.","Mengganggu atau menyalahgunakan cara kerja aplikasi."]},
@@ -17134,10 +17244,11 @@ if(navigator.onLine !== false) init().catch(() => {});
       {h:"8. Hasil menu", p:["Ketentuan tentang hasil menu ada di Kebijakan Privasi bagian 8."]},
       {h:"9. Iklan", p:["Versi aplikasi tertentu menampilkan iklan dari pihak ketiga. Rinciannya ada di Kebijakan Privasi."]},
       {h:"10. Menghapus akun", p:["Kamu bisa menghapus akunmu lewat halaman Profil di Pengaturan. Data akun dan pesan terkait ikut dihapus."]},
-      {h:"11. Perubahan syarat", p:["Syarat ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Bila ada perubahan penting, kamu akan diminta menyetujui lagi."]},
-      {h:"12. Kontak", p:["Pertanyaan tentang syarat ini dapat dikirim lewat Kotak Saran di Pengaturan."]}
+      {h:"11. Kunci menu dan penghapusan data", p:["Kamu bertanggung jawab menjaga PIN dan kode pemulihan menu Keuangan dan Arisan. Kami tidak bisa memulihkannya. Data yang sudah dihapus lewat reset atau hapus arisan tidak bisa dikembalikan. Kunci menu hanya mengunci tampilan dan bukan enkripsi."]},
+      {h:"12. Perubahan syarat", p:["Syarat ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Bila ada perubahan penting, kamu akan diminta menyetujui lagi."]},
+      {h:"13. Kontak", p:["Pertanyaan tentang syarat ini dapat dikirim lewat Kotak Saran di Pengaturan."]}
     ]},
-    en:{ t:"Terms of Use", sub:"Satu Titik", upd:"Last updated: 17 November 2026", back:"‹ Back", secs:[
+    en:{ t:"Terms of Use", sub:"Satu Titik", upd:"Last updated: 19 November 2026", back:"‹ Back", secs:[
       {h:"1. Acceptance", p:["By signing in and using Satu Titik’s social features (friends, private messages, tournament comments, and game rooms), you agree to these Terms of Use and the Privacy Policy. If you do not agree, do not sign in. Menus that do not need an account remain available."]},
       {h:"2. Your account", l:["Use your own account and keep it secure.","Do not impersonate anyone.","This app is not intended for children under 13."]},
       {h:"3. Prohibited behavior and content", p:["When you create content (messages, comments, names, or profile photos), you must not:"], l:["Harass, bully, threaten, or intimidate others.","Spread hate speech or demean people based on ethnicity, religion, race, group identity, gender, disability, or sexual orientation.","Create or share sexual, pornographic, or vulgar content, including anything that exploits children.","Encourage violence, self-harm, or illegal activity.","Commit fraud, send spam, or share harmful links.","Share other people’s personal data without permission.","Disrupt or abuse how the app works."]},
@@ -17148,8 +17259,9 @@ if(navigator.onLine !== false) init().catch(() => {});
       {h:"8. Menu results", p:["Terms about menu results are in section 8 of the Privacy Policy."]},
       {h:"9. Ads", p:["Certain app versions show third-party ads. Details are in the Privacy Policy."]},
       {h:"10. Deleting your account", p:["You can delete your account from the Profile page in Settings. Account data and related messages are deleted as well."]},
-      {h:"11. Changes to these terms", p:["These terms may be updated. The date of the latest update is shown at the top of this page. For important changes you will be asked to agree again."]},
-      {h:"12. Contact", p:["Questions about these terms can be sent through the Suggestion Box in Settings."]}
+      {h:"11. Menu lock and data deletion", p:["You are responsible for keeping the PIN and recovery code of the Finance and Arisan menus safe. We cannot recover them. Data deleted through reset or by deleting an arisan cannot be restored. The menu lock only locks the screen and is not encryption."]},
+      {h:"12. Changes to these terms", p:["These terms may be updated. The date of the latest update is shown at the top of this page. For important changes you will be asked to agree again."]},
+      {h:"13. Contact", p:["Questions about these terms can be sent through the Suggestion Box in Settings."]}
     ]}
   };
   let tmFrom = null;
