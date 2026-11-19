@@ -13226,7 +13226,7 @@ const bio = (() => {
   }
   async function ask(reason){
     init();
-    if(P){ try{ await P.authenticate({ reason, cancelTitle: L("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "KEUANGAN", androidSubtitle: reason }); return true; }catch(e){ if(!(N && unimpl(e))) return false; } }
+    if(P){ try{ await P.authenticate({ reason, cancelTitle: L("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "KEUANGAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
     if(N){ try{ await N.verifyIdentity({ reason, title: "KEUANGAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
     return false;
   }
@@ -13313,7 +13313,7 @@ async function lkBio(){
   if(!(await bio.ok())) return toast(L("Sidik jari tidak tersedia. Pastikan sudah ada sidik jari terdaftar di HP dan aplikasi memakai plugin biometrik.", "Fingerprint isn't available. Make sure one is enrolled on the phone and the app includes the biometric plugin."), 4500);
   let ok = false; asking = true;
   try{ ok = await bio.ask(L("Aktifkan sidik jari untuk menu Keuangan", "Enable fingerprint for Finance")); }catch(e){} finally{ asking = false; }
-  if(ok){ c.b = true; lsave(c); toast(L("Sidik jari aktif ✓", "Fingerprint on ✓")); paint(); } else toast(L("Verifikasi dibatalkan.", "Verification cancelled."));
+  if(ok){ c.b = true; lsave(c); toast(L("Sidik jari aktif ✓", "Fingerprint on ✓")); paint(); } else toast(L("Verifikasi dibatalkan.", "Verification cancelled.") + (window.__bioErr ? " [" + window.__bioErr + "]" : ""), 6000);
 }
 /* lupa PIN: bila PIN dipasang saat masuk Google, cukup masuk ulang dengan akun yang sama; bila tidak, satu-satunya jalan adalah menghapus data keuangan di perangkat ini */
 async function lkForgot(b){
@@ -14055,7 +14055,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     }
     async function ask(reason){
       init();
-      if(P){ try{ await P.authenticate({ reason: reason, cancelTitle: LL("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "ARISAN", androidSubtitle: reason }); return true; }catch(e){ if(!(N && unimpl(e))) return false; } }
+      if(P){ try{ await P.authenticate({ reason: reason, cancelTitle: LL("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "ARISAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
       if(N){ try{ await N.verifyIdentity({ reason: reason, title: "ARISAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
       return false;
     }
@@ -14168,7 +14168,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     if(!(await lkbio.ok())) return flash(LL("Sidik jari tidak tersedia. Pastikan sudah ada sidik jari terdaftar di HP dan aplikasi memakai plugin biometrik.", "Fingerprint isn't available. Make sure one is enrolled on the phone and the app includes the biometric plugin."));
     var ok = false; lkAsking = true;
     try{ ok = await lkbio.ask(LL("Aktifkan sidik jari untuk tab Keuangan Arisan", "Enable fingerprint for Arisan finance")); }catch(e){} finally{ lkAsking = false; }
-    if(ok){ c.b = true; lksave(c); flash(LL("Sidik jari aktif ✓", "Fingerprint on ✓"), true); lkRedraw(); } else flash(LL("Verifikasi dibatalkan.", "Verification cancelled."));
+    if(ok){ c.b = true; lksave(c); flash(LL("Sidik jari aktif ✓", "Fingerprint on ✓"), true); lkRedraw(); } else flash(LL("Verifikasi dibatalkan.", "Verification cancelled.") + (window.__bioErr ? " [" + window.__bioErr + "]" : ""));
   }
   /* lupa PIN: bila PIN dipasang saat masuk Google, cukup masuk ulang dengan akun yang sama; bila tidak, satu-satunya jalan adalah menghapus data arisan di perangkat ini */
   async function lkForgot(b){
