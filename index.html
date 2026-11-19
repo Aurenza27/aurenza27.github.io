@@ -13226,7 +13226,7 @@ const bio = (() => {
   }
   async function ask(reason){
     init();
-    if(P){ try{ await P.authenticate({ reason, cancelTitle: L("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "KEUANGAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
+    if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason, cancelTitle: L("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "KEUANGAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
     if(N){ try{ await N.verifyIdentity({ reason, title: "KEUANGAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
     return false;
   }
@@ -14055,7 +14055,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     }
     async function ask(reason){
       init();
-      if(P){ try{ await P.authenticate({ reason: reason, cancelTitle: LL("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "ARISAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
+      if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason: reason, cancelTitle: LL("Pakai PIN", "Use PIN"), allowDeviceCredential: false, androidTitle: "ARISAN", androidSubtitle: reason }); return true; }catch(e){ window.__bioErr = String((e && (e.code || e.message)) || e); if(!(N && unimpl(e))) return false; } }
       if(N){ try{ await N.verifyIdentity({ reason: reason, title: "ARISAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
       return false;
     }
