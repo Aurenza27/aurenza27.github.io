@@ -976,7 +976,7 @@ document.addEventListener("visibilitychange", () => { if(!document.hidden) Net.p
 { const _nc = Net.conn(); if(_nc && _nc.addEventListener) _nc.addEventListener("change", () => Net.probe()); }
 document.addEventListener("visibilitychange", () => { if(!document.hidden && Net.on() && Date.now() - (Net.last || 0) > 300000) Net.sync(); });
 /* simpan aplikasi di perangkat supaya bisa dibuka tanpa internet (butuh file sw.js di samping aplikasi; di file:// dilewati) */
-if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){ addEventListener("load", () => {
+if("serviceWorker" in navigator && /^https?:$/.test(location.protocol) && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())){ addEventListener("load", () => {
   navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(reg => {
     /* setelah aplikasi terbuka, unduh video dan musik di latar belakang supaya tetap jalan saat offline (dilewati bila Penghemat Data aktif atau koneksi 2G) */
     const cn = navigator.connection || {};
@@ -4075,7 +4075,7 @@ setLang(lang, true);
 
 </scr@@ipt>
 <script>
-if("serviceWorker" in navigator){ addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
+if("serviceWorker" in navigator && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())){ addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
 </scr@@ipt>
 </body>
 </html>
