@@ -13233,7 +13233,14 @@ const bio = (() => {
     if(N){ try{ await N.verifyIdentity({ reason, title: "KEUANGAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
     return false;
   }
-  return { ok, ask };
+  /* verifikasi dengan kunci layar HP (sidik jari ATAU PIN/pola HP). Hasil: "ok" | "fail" | "na" (tidak ada kunci layar / bukan aplikasi Android) */
+  async function askDevice(reason){
+    init();
+    if(!P) return "na";
+    try{ const r = await P.checkBiometry(); if(!(r && (r.deviceIsSecure || r.isAvailable))) return "na"; }catch(e){ return "na"; }
+    try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason, cancelTitle: L("Batal", "Cancel"), allowDeviceCredential: true, androidTitle: "KEUANGAN", androidSubtitle: reason }); return "ok"; }catch(e){ return "fail"; }
+  }
+  return { ok, ask, askDevice };
 })();
 locked = !!lcfg();
 function lockNow(){ if(!lcfg()) return; locked = true; S.tab = "home"; S.f = newF(); $("ovl").hidden = true; paint(); setTimeout(askBio, 350); }
@@ -13361,6 +13368,9 @@ async function lkForgot(b){
   const c = lcfg(); if(!c) return;
   const A = parentAuth();
   if(c.o && A && A.login){
+    let d = "na"; asking = true;
+    try{ d = await bio.askDevice(L("Verifikasi dulu untuk menghapus PIN Keuangan", "Verify first to remove the Finance PIN")); }catch(e){ d = "fail"; } finally{ asking = false; }
+    if(d === "fail") return toast(L("Verifikasi dibatalkan. PIN tidak dihapus.", "Verification cancelled. The PIN was not removed."), 4000);
     toast(L("Masuk dengan akun Google yang sama untuk menghapus PIN.", "Sign in with the same Google account to remove the PIN."), 4000);
     try{ if(A.user && A.logout) await A.logout(); await A.login(); for(let i = 0; i < 20 && !A.user; i++) await new Promise(r => setTimeout(r, 250)); }catch(e){}
     if(A.user && A.user.uid === c.o){ try{ localStorage.removeItem(LK); }catch(e){} locked = false; paint(); toast(L("Kunci dihapus. Buat PIN baru lewat tombol Kunci.", "Lock removed. Set a new PIN with the Lock button."), 3500); }
@@ -14108,7 +14118,13 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       if(N){ try{ await N.verifyIdentity({ reason: reason, title: "ARISAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
       return false;
     }
-    return { ok: ok, ask: ask };
+    async function askDevice(reason){
+      init();
+      if(!P) return "na";
+      try{ var r = await P.checkBiometry(); if(!(r && (r.deviceIsSecure || r.isAvailable))) return "na"; }catch(e){ return "na"; }
+      try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason: reason, cancelTitle: LL("Batal", "Cancel"), allowDeviceCredential: true, androidTitle: "ARISAN", androidSubtitle: reason }); return "ok"; }catch(e){ return "fail"; }
+    }
+    return { ok: ok, ask: ask, askDevice: askDevice };
   })();
   function lkGate(){ return tab === "F" && ((lkd && lkOn()) || lkMode === "cfg"); }
   function lkRedraw(){ lkSig = ""; paint(); }
@@ -14262,6 +14278,9 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     var c = lkcfg(); if(!c) return;
     var au = authO();
     if(c.o && au && au.login){
+      var dv = "na"; lkAsking = true;
+      try{ dv = await lkbio.askDevice(LL("Verifikasi dulu untuk menghapus PIN Arisan", "Verify first to remove the Arisan PIN")); }catch(e){ dv = "fail"; } finally{ lkAsking = false; }
+      if(dv === "fail") return flash(LL("Verifikasi dibatalkan. PIN tidak dihapus.", "Verification cancelled. The PIN was not removed."));
       flash(LL("Masuk dengan akun Google yang sama untuk menghapus PIN.", "Sign in with the same Google account to remove the PIN."), true);
       try{ if(au.user && au.logout) await au.logout(); await au.login(); for(var i = 0; i < 20 && !au.user; i++) await new Promise(function(r){ setTimeout(r, 250); }); }catch(e){}
       if(au.user && au.user.uid === c.o){ try{ localStorage.removeItem(LKEY); }catch(e){} lkd = false; lkMode = ""; lkRedraw(); flash(LL("Kunci dihapus. Pasang PIN baru lewat tombol Kunci Keuangan.", "Lock removed. Set a new PIN with the Lock Finance button."), true); }
