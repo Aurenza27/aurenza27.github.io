@@ -1,121 +1,196 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kebijakan Privasi - Satu Titik</title>
-<meta name="robots" content="index,follow">
+<title>Kebijakan Privasi – Satu Titik</title>
 <style>
-:root{color-scheme:dark light}
-body{margin:0;background:#0b0d12;color:#ece7da;font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:760px;margin:0 auto;padding:28px 18px 60px}
-h1{font-size:1.7rem;margin:.2em 0 .1em;color:#f0cf86}
-h2{font-size:1.15rem;margin:1.8em 0 .4em;color:#d4a94f}
-p,li{color:#d8d3c6}
-a{color:#f0cf86}
-.meta{color:#8d93a3;font-size:.9rem}
-table{border-collapse:collapse;width:100%;font-size:.93rem;margin:.6em 0}
-th,td{border:1px solid #2a3040;padding:8px 10px;text-align:left;vertical-align:top}
-th{background:#141821;color:#f0cf86}
-.box{background:#141821;border:1px solid #2a3040;border-radius:10px;padding:12px 14px;margin:1em 0}
-hr{border:0;border-top:1px solid #2a3040;margin:2.4em 0}
-@media (prefers-color-scheme:light){
-  body{background:#fbf9f4;color:#222}
-  h1{color:#7a5a12}h2{color:#8a6a1a}p,li{color:#333}a{color:#7a5a12}
-  th{background:#efe9da;color:#4a3a10}th,td{border-color:#d8d0bc}.box{background:#f3eee0;border-color:#d8d0bc}
-}
+:root{--bg:#ffffff;--fg:#1c1b1f;--mut:#5f5b66;--line:#e3e0e8;--acc:#3b5bdb}
+@media (prefers-color-scheme:dark){:root{--bg:#121214;--fg:#ececf1;--mut:#a5a1ad;--line:#2b2a30;--acc:#8fa6ff}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 18px 64px}
+.bar{display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px}
+.bar button{background:none;border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:6px 14px;font:inherit;font-size:14px;cursor:pointer}
+.bar button[aria-pressed="true"]{border-color:var(--acc);color:var(--acc);font-weight:600}
+h1{font-size:1.7rem;line-height:1.25;margin:.4em 0 .1em}
+.sub{color:var(--mut);margin:0 0 1.4em;font-size:.95rem}
+h2{font-size:1.1rem;margin:1.8em 0 .4em;padding-top:1em;border-top:1px solid var(--line)}
+section:first-of-type h2{border-top:0;padding-top:0}
+p{margin:.6em 0}
+ul{margin:.4em 0 .8em;padding-left:1.3em}
+li{margin:.4em 0}
 </style>
 </head>
 <body>
 <main>
-
-<h1>Kebijakan Privasi</h1>
-<p class="meta">Aplikasi: <strong>Satu Titik</strong> (com.aurenza27.satutitik) &middot; Pengembang: AURENZA27<br>
-Berlaku sejak 14 November 2026 &middot; <a href="#english">English version below</a></p>
-
-<p>Kebijakan ini menjelaskan data apa yang dipakai Satu Titik, untuk apa, dan pilihan Anda. Intinya: menu primbon dan kesehatan berjalan di perangkat Anda dan <strong>tidak perlu akun</strong>. Akun hanya dibutuhkan untuk fitur <strong>Turnamen online</strong>.</p>
-
-<h2>1. Data yang tersimpan hanya di perangkat Anda</h2>
-<p>Disimpan di penyimpanan lokal peramban/aplikasi (localStorage) dan tidak dikirim ke server kami:</p>
-<ul>
-<li>Pengaturan: tema, ukuran huruf, bahasa, volume, musik, animasi.</li>
-<li>Isian dan hasil menu: nama, tanggal lahir, tinggi/berat badan, tanggal haid terakhir, dan hasil hitungan pada menu Khodam, Tri Hoki, Watak, Jodoh, BMI &amp; Kalori, dan Kehamilan. <strong>Data kesehatan ini diproses di perangkat Anda dan tidak kami kirim ke mana pun.</strong></li>
-<li>Skor, riwayat, dan data turnamen yang Anda buat dalam mode lokal.</li>
-</ul>
-<p>Anda dapat menghapusnya kapan saja lewat Pengaturan aplikasi Android &rarr; Satu Titik &rarr; Penyimpanan &rarr; Hapus data, atau dengan mencopot pemasangan aplikasi.</p>
-
-<h2>2. Data akun dan Turnamen online (opsional)</h2>
-<p>Bila Anda masuk dengan Google untuk memakai Turnamen online, kami memakai layanan Google Firebase (Authentication dan Cloud Firestore). Data yang disimpan:</p>
-<table>
-<tr><th>Data</th><th>Tujuan</th></tr>
-<tr><td>ID pengguna Firebase (UID)</td><td>Mengenali akun Anda dan mengatur hak akses.</td></tr>
-<tr><td>Nama tampilan dan foto profil Google</td><td>Ditampilkan pada profil, undangan moderator, dan turnamen. Nama dan foto juga masuk ke direktori ID akun sehingga orang lain yang mengetahui ID akun Anda dapat melihat pratinjau nama dan foto saat mengundang Anda sebagai moderator.</td></tr>
-<tr><td>ID akun Satu Titik (contoh ST-000001)</td><td>Pengenal publik agar Anda bisa diundang sebagai moderator.</td></tr>
-<tr><td>Data turnamen (nama, olahraga/eSports, jadwal, skor, klasemen, daftar moderator)</td><td>Menjalankan dan membagikan turnamen. Pengguna lain yang masuk dapat membuka turnamen bila mengetahui kodenya.</td></tr>
-<tr><td>Undangan moderator dan daftar pengikut turnamen</td><td>Mengelola undangan dan notifikasi dalam aplikasi.</td></tr>
-</table>
-<p>Alamat email Google Anda diproses oleh Firebase Authentication untuk proses masuk, tetapi tidak kami tampilkan kepada pengguna lain. Kami tidak menjual data Anda dan tidak memakainya untuk iklan.</p>
-
-<h2>3. Layanan pihak ketiga</h2>
-<ul>
-<li><strong>Google Firebase / Google Sign-In</strong>: untuk akun dan basis data online. Server Google dapat berada di luar Indonesia. Lihat <a href="https://policies.google.com/privacy" rel="noopener">kebijakan privasi Google</a> dan <a href="https://firebase.google.com/support/privacy" rel="noopener">privasi Firebase</a>. Pustaka Firebase dimuat dari <code>gstatic.com</code>.</li>
-<li><strong>Web3Forms</strong> (api.web3forms.com): hanya bila Anda mengirim saran lewat formulir masukan. Yang dikirim adalah isi pesan yang Anda ketik. Jangan menulis data pribadi atau data kesehatan di dalamnya. Lihat <a href="https://web3forms.com/privacy" rel="noopener">kebijakan Web3Forms</a>.</li>
-<li><strong>WorldTimeAPI</strong> (worldtimeapi.org): dipakai sebagai cadangan untuk mengambil jam internet. Seperti setiap permintaan internet, alamat IP perangkat terlihat oleh layanan ini. Tidak ada data pribadi yang dikirim.</li>
-<li><strong>Saweria</strong>: tautan dukungan membuka situs saweria.co di peramban. Transaksi sepenuhnya di bawah kebijakan Saweria.</li>
-<li><strong>Suara bacaan</strong> memakai mesin text-to-speech bawaan perangkat Anda.</li>
-</ul>
-<p>Satu Titik <strong>tidak</strong> memakai iklan, pelacak analitik, atau SDK iklan, dan tidak meminta izin lokasi, kamera, mikrofon, atau kontak.</p>
-
-<h2>4. Penyimpanan, keamanan, dan penghapusan</h2>
-<ul>
-<li>Data akun dan turnamen online disimpan di Cloud Firestore dan dilindungi aturan akses (Security Rules) sehingga data pribadi hanya dapat dibaca pemiliknya.</li>
-<li>Koneksi ke Firebase memakai HTTPS.</li>
-<li><strong>Penghapusan data:</strong> kirim email ke alamat di bawah dari akun Google yang Anda pakai, sebutkan ID akun (ST-xxxxxx). Kami akan menghapus profil, ID akun, undangan, dan turnamen milik Anda dalam waktu wajar, paling lambat 30 hari. Anda juga dapat menghapus turnamen milik Anda sendiri langsung dari aplikasi.</li>
-</ul>
-
-<h2>5. Anak-anak</h2>
-<p>Satu Titik berperingkat usia 12+ dan tidak ditujukan untuk anak di bawah 12 tahun. Fitur akun dan Turnamen online sebaiknya dipakai oleh pengguna yang sudah memenuhi batas usia akun Google di wilayahnya. Bila Anda orang tua dan mengetahui anak Anda membuat akun, hubungi kami untuk penghapusan.</p>
-
-<h2>6. Penafian</h2>
-<div class="box">
-<p><strong>Primbon</strong> (Khodam, Tri Hoki, Watak, Jodoh) dibuat untuk hiburan dan bukan dasar keputusan penting.<br>
-<strong>Menu kesehatan</strong> (BMI &amp; Kalori, Kehamilan) hanya memberi perkiraan umum, bukan saran, diagnosis, atau pengobatan medis. Konsultasikan dengan tenaga kesehatan profesional.</p>
+<div class="bar">
+<button type="button" id="bid" aria-pressed="true">Indonesia</button>
+<button type="button" id="ben" aria-pressed="false">English</button>
 </div>
-
-<h2>7. Perubahan kebijakan</h2>
-<p>Perubahan akan dipublikasikan di halaman ini dengan tanggal berlaku yang baru.</p>
-
-<h2>8. Kontak</h2>
-<p>Email: <a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a></p>
-
-<hr>
-
-<h1 id="english">Privacy Policy (English)</h1>
-<p class="meta">App: <strong>Satu Titik</strong> (com.aurenza27.satutitik) &middot; Developer: AURENZA27 &middot; Effective 14 November 2026</p>
-
-<p><strong>Summary.</strong> The primbon and health menus run on your device and need no account. An account is only needed for the optional <strong>online Tournament</strong> feature.</p>
-
-<h2>On-device data</h2>
-<p>Settings, the values you type into menus (name, birth date, height/weight, last menstrual period) and their results are stored locally on your device (localStorage) and are not sent to our servers. Clear them via Android Settings &rarr; Apps &rarr; Satu Titik &rarr; Storage, or by uninstalling the app.</p>
-
-<h2>Account and online Tournament (optional)</h2>
-<p>If you sign in with Google, we use Google Firebase (Authentication and Cloud Firestore) and store: your Firebase user ID, display name and profile photo, your Satu Titik account ID (e.g. ST-000001), tournament data you create, moderator invitations and follower lists. Your name and photo appear in an account-ID directory, so someone who knows your account ID can preview them when inviting you as a moderator. Your email is processed by Firebase Authentication only for sign-in and is not shown to other users. We do not sell data or use it for advertising.</p>
-
-<h2>Third parties</h2>
-<p>Google Firebase / Google Sign-In (accounts and database; libraries loaded from gstatic.com), Web3Forms (only if you send feedback; only the message text is sent; do not include personal or health data), WorldTimeAPI (backup internet clock; your IP address is visible to the service as with any request), Saweria (support link, opens saweria.co). Text-to-speech uses your device's built-in engine. The app has no ads, analytics trackers, and requests no location, camera, microphone or contacts permission.</p>
-
-<h2>Deletion</h2>
-<p>Email <a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a> from your Google account with your account ID (ST-xxxxxx) to request deletion of your profile, account ID, invitations and tournaments; we will act within 30 days. You can also delete tournaments you own from within the app.</p>
-
-<h2>Children</h2>
-<p>The app is rated 12+ and is not directed to children under 12.</p>
-
-<h2>Disclaimer</h2>
-<p>Primbon menus are for entertainment only. Health menus give general estimates only and are not medical advice, diagnosis or treatment; consult a qualified health professional.</p>
-
-<h2>Contact</h2>
-<p><a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a></p>
-
+<div id="id" class="lang">
+<h1>Kebijakan Privasi</h1><p class="sub">Satu Titik · Terakhir diperbarui: 19 November 2026</p>
+<section>
+<h2>1. Pendahuluan</h2>
+<p>Satu Titik adalah aplikasi yang dikembangkan oleh Aurenza27 (“kami”). Kebijakan ini menjelaskan data apa yang diproses, untuk apa, dan pilihan yang kamu miliki saat memakai aplikasi ini. Dengan memakai aplikasi, kamu menyetujui kebijakan ini.</p>
+</section>
+<section>
+<h2>2. Data yang kami proses</h2>
+<p>Tanpa masuk akun:</p>
+<ul><li>Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, data turnamen, serta aktivitas olahraga beserta rute GPS yang kamu rekam di menu Olahraga) disimpan di perangkatmu sendiri.</li><li>Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google.</li></ul>
+</section>
+<section>
+<p>Lokasi (menu Olahraga):</p>
+<ul><li>Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, termasuk ketika layar terkunci atau aplikasi berada di latar belakang (notifikasi tampil selama merekam), dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.</li><li>Jumlah langkah dibaca dari sensor langkah HP (izin Aktivitas Fisik) hanya saat merekam di aplikasi Android, dan hanya dipakai untuk memeriksa kewajaran jarak. Angkanya tidak ditampilkan atau disimpan di riwayat aktivitas.</li><li>Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif.</li></ul>
+</section>
+<section>
+<p>Keuangan dan Arisan:</p>
+<ul><li>Catatan keuangan (uang masuk dan keluar, dompet, jatah belanja, tabungan) dan data Arisan (nama peserta, pemenang, status pembayaran) disimpan di perangkatmu. Bila kamu masuk dengan Google, data ini ikut tersalin ke akunmu.</li><li>Kunci menu: PIN dan kode pemulihan hanya disimpan di perangkat dalam bentuk hash (bukan teks asli), tidak dikirim ke server, dan tidak ikut tersalin ke akun. Sidik jari dan PIN/pola layar HP diperiksa oleh sistem Android; aplikasi tidak menerima atau menyimpan data sidik jarimu.</li><li>Ruangan Arisan online: nama host dan peserta, daftar nama kocokan, hasil, dan chat ruangan disimpan di server selama ruangan ada dan dihapus saat host menutup ruangan. Chat juga ditandai kedaluwarsa setelah 24 jam.</li><li>File cadangan: fitur Cadangkan di menu Keuangan dan Arisan membuat file di perangkatmu atas permintaanmu, lalu kamu sendiri yang memilih tempat menyimpannya. File ini tidak dienkripsi dan tidak berisi PIN atau kode pemulihan, jadi simpan di tempat aman.</li></ul>
+</section>
+<section>
+<p>Setelah masuk dengan Google:</p>
+<ul><li>Nama tampilan, alamat email, dan foto dari akun Google.</li><li>ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.</li><li>Salinan data aplikasi (pengaturan, riwayat, hasil menu, rute GPS olahraga, serta data Keuangan dan Arisan) agar bisa tersinkron antarperangkat.</li><li>Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.</li><li>Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu).</li><li>Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, dan dihapus saat pertemanan dihapus.</li></ul>
+</section>
+<section>
+<p>Blokir dan laporan:</p>
+<ul><li>Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.</li><li>Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan. Laporan hanya dibaca pengelola untuk meninjau pelanggaran.</li></ul>
+</section>
+<section>
+<p>Kotak Saran:</p>
+<ul><li>Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif.</li></ul>
+</section>
+<section>
+<p>Pengecekan koneksi dan waktu:</p>
+<ul><li>Aplikasi mengirim permintaan sederhana ke server publik (Google, Cloudflare, dan WorldTimeAPI) untuk mengecek koneksi internet dan jam. Permintaan ini tidak berisi data pribadimu, tetapi seperti permintaan internet lainnya, alamat IP perangkat terlihat oleh server tersebut.</li></ul>
+</section>
+<section>
+<p>Iklan (hanya pada versi aplikasi yang menampilkan iklan):</p>
+<ul><li>Versi aplikasi tertentu, misalnya versi APK, dapat menampilkan iklan dari jaringan iklan pihak ketiga seperti Google AdMob.</li><li>Jaringan iklan dapat memproses ID iklan perangkat, alamat IP, jenis perangkat, dan interaksi dengan iklan untuk menampilkan serta mengukur iklan. Pada wilayah yang mewajibkan, kamu akan diminta persetujuan terlebih dahulu.</li><li>Kamu dapat mengatur atau mereset ID iklan, dan membatasi personalisasi iklan, lewat pengaturan perangkat.</li></ul>
+</section>
+<section>
+<h2>3. Untuk apa data dipakai</h2>
+<p>Kami tidak menjual data pribadimu. Kami juga tidak membagikan data akun, username, atau hasil menumu kepada pengiklan.</p>
+<ul><li>Menjalankan fitur aplikasi dan menampilkan hasil menu.</li><li>Memungkinkan masuk akun, sinkronisasi data, dan fitur turnamen online (undangan moderator memakai ID Akun).</li><li>Menampilkan profilmu, serta menerima dan membaca saran dari pengguna.</li><li>Menampilkan iklan pada versi aplikasi yang memuat iklan, sebagai sumber pendanaan pengembangan.</li></ul>
+</section>
+<section>
+<h2>4. Layanan pihak ketiga</h2>
+<p>Layanan-layanan ini punya kebijakan privasi sendiri yang berlaku saat data diproses oleh mereka.</p>
+<ul><li>Google Firebase (Authentication dan Cloud Firestore): untuk masuk akun dan menyimpan data akun.</li><li>Web3Forms: untuk mengirim pesan dari Kotak Saran.</li><li>Saweria: tautan Dukung Kami membuka halaman eksternal yang punya kebijakan privasinya sendiri.</li><li>Google, Cloudflare, dan WorldTimeAPI: untuk pengecekan koneksi dan waktu.</li><li>Jaringan iklan (misalnya Google AdMob): hanya pada versi yang menampilkan iklan.</li></ul>
+</section>
+<section>
+<h2>5. Penyimpanan dan keamanan</h2>
+<p>Data lokal tersimpan di perangkatmu dan hilang bila data aplikasi atau browser dihapus. Data akun disimpan di layanan Google Firebase dan dikirim lewat koneksi terenkripsi (HTTPS). Tidak ada metode penyimpanan atau pengiriman data yang sepenuhnya bebas risiko, jadi kami tidak dapat menjamin keamanan mutlak. Kunci menu (PIN dan sidik jari) hanya mengunci tampilan, bukan enkripsi: data di perangkat dan di akunmu tidak dienkripsi tambahan oleh aplikasi.</p>
+</section>
+<section>
+<h2>6. Pilihan dan hak kamu</h2>
+<ul><li>Ubah username dan foto profil kapan saja lewat Pengaturan &gt; Akun &gt; Lihat profil.</li><li>Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.</li><li>Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk dengan Google, data di server ikut dihapus).</li><li>Reset semua catatan keuangan dan hapus arisan meminta verifikasi (sidik jari, PIN/pola layar HP, atau PIN menu) dan tidak bisa dibatalkan. Bila kamu masuk dengan Google, salinan di akun ikut terhapus saat sinkronisasi berjalan. Bila lupa PIN dan tidak punya kode pemulihan, satu-satunya jalan adalah menghapus data Keuangan atau Arisan di perangkat itu.</li><li>Hapus akun dan data cloud kapan saja lewat Pengaturan &gt; Akun &gt; Lihat profil &gt; Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri.</li><li>Penghapusan akun menghapus ID Akun, username, foto profil, daftar teman dan pesan pribadi, salinan data yang tersinkron, serta turnamen online yang kamu buat. Laporan yang pernah kamu kirim dapat tetap disimpan pengelola untuk keperluan keamanan.</li><li>Tanpa memasang aplikasi: buka https://aurenza27.github.io di browser, masuk dengan Google, lalu pilih Hapus akun di halaman Profil. Bila tidak bisa masuk, kirim permintaan penghapusan lewat Kotak Saran di halaman yang sama dengan menyebut ID Akunmu (ST-xxxxxx).</li></ul>
+</section>
+<section>
+<h2>7. Anak-anak</h2>
+<p>Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun, dan kami tidak dengan sengaja mengumpulkan data mereka. Bila kamu orang tua dan menemukan data anak di aplikasi ini, hubungi kami lewat Kotak Saran.</p>
+</section>
+<section>
+<h2>8. Hasil menu</h2>
+<p>Hasil menu primbon, ramalan, dan hiburan hanya untuk hiburan dan kepercayaan tradisional, bukan kepastian atau dasar untuk keputusan penting. Hasil BMI, kalori, dan kehamilan adalah informasi umum, bukan diagnosis, nasihat medis, atau pengganti pemeriksaan tenaga kesehatan; konsultasikan kondisimu dengan dokter atau bidan.</p>
+</section>
+<section>
+<h2>9. Perubahan kebijakan</h2>
+<p>Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini.</p>
+</section>
+<section>
+<h2>10. Kontak</h2>
+<p>Pertanyaan tentang privasi dapat dikirim lewat Kotak Saran di Pengaturan.</p>
+</section>
+</div>
+<div id="en" class="lang" hidden>
+<h1>Privacy Policy</h1><p class="sub">Satu Titik · Last updated: 19 November 2026</p>
+<section>
+<h2>1. Introduction</h2>
+<p>Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. By using the app, you agree to this policy.</p>
+</section>
+<section>
+<h2>2. Data we process</h2>
+<p>Without signing in:</p>
+<ul><li>Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, tournament data, and the sports activities and GPS routes you record in the Sports menu) are stored on your own device.</li><li>This data is not sent to our servers unless you sign in with a Google account.</li></ul>
+</section>
+<section>
+<p>Location (Sports menu):</p>
+<ul><li>GPS location is read only while you press Start in the Sports menu, including while the screen is locked or the app is in the background (a notification shows while recording), and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.</li><li>The step count is read from your phone&#x27;s step sensor (Physical activity permission) only while recording in the Android app, and is used only to check that the distance is plausible. It is not shown or stored in the activity history.</li><li>Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on.</li></ul>
+</section>
+<section>
+<p>Finance and Arisan:</p>
+<ul><li>Financial records (money in and out, wallets, spending limits, savings) and Arisan data (participant names, winners, payment status) are stored on your device. If you sign in with Google, this data is also copied to your account.</li><li>Menu lock: the PIN and recovery code are stored only on your device as a hash (not the original text), are not sent to a server, and are not copied to your account. Your fingerprint and the phone&#x27;s screen PIN/pattern are checked by the Android system; the app does not receive or store your fingerprint data.</li><li>Online Arisan rooms: the names of the host and participants, the draw name list, results, and the room chat are stored on a server while the room exists and are deleted when the host closes the room. Chat is also marked to expire after 24 hours.</li><li>Backup file: the Back up feature in the Finance and Arisan menus creates a file on your device at your request, and you choose where to save it. This file is not encrypted and does not contain the PIN or recovery code, so keep it somewhere safe.</li></ul>
+</section>
+<section>
+<p>After signing in with Google:</p>
+<ul><li>The display name, email address, and photo of your Google account.</li><li>The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.</li><li>A copy of your app data (settings, history, menu results, sports GPS routes, and Finance and Arisan data) so it can sync across devices.</li><li>For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.</li><li>Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see).</li><li>Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, and are deleted when the friendship is removed.</li></ul>
+</section>
+<section>
+<p>Blocking and reports:</p>
+<ul><li>The list of users you block is stored in your account so blocking applies on all your devices.</li><li>When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, and a copy of the reported text. Reports are read only by the maintainer to review violations.</li></ul>
+</section>
+<section>
+<p>Suggestion Box:</p>
+<ul><li>The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data.</li></ul>
+</section>
+<section>
+<p>Connection and time checks:</p>
+<ul><li>The app sends simple requests to public servers (Google, Cloudflare, and WorldTimeAPI) to check your internet connection and the time. These requests do not contain your personal data, but as with any internet request, your device’s IP address is visible to those servers.</li></ul>
+</section>
+<section>
+<p>Ads (only in app versions that show ads):</p>
+<ul><li>Certain app versions, such as the APK version, may show ads from third-party ad networks such as Google AdMob.</li><li>Ad networks may process the device advertising ID, IP address, device type, and your interactions with ads to serve and measure ads. Where required, you will be asked for consent first.</li><li>You can reset your advertising ID, and limit ad personalization, in your device settings.</li></ul>
+</section>
+<section>
+<h2>3. How data is used</h2>
+<p>We do not sell your personal data. We also do not share your account data, username, or menu results with advertisers.</p>
+<ul><li>To run the app’s features and show menu results.</li><li>To enable sign-in, data sync, and online tournaments (moderator invitations use the Account ID).</li><li>To show your profile, and to receive and read user suggestions.</li><li>To show ads in app versions that contain ads, as a way to fund development.</li></ul>
+</section>
+<section>
+<h2>4. Third-party services</h2>
+<p>These services have their own privacy policies, which apply when they process data.</p>
+<ul><li>Google Firebase (Authentication and Cloud Firestore): for sign-in and storing account data.</li><li>Web3Forms: to deliver messages from the Suggestion Box.</li><li>Saweria: the Support Us link opens an external page with its own privacy policy.</li><li>Google, Cloudflare, and WorldTimeAPI: for connection and time checks.</li><li>Ad networks (for example Google AdMob): only in versions that show ads.</li></ul>
+</section>
+<section>
+<h2>5. Storage and security</h2>
+<p>Local data stays on your device and is lost if you clear the app or browser data. Account data is stored in Google Firebase and sent over encrypted connections (HTTPS). No method of storage or transmission is completely risk-free, so we cannot guarantee absolute security. The menu lock (PIN and fingerprint) only locks the screen and is not encryption: data on your device and in your account is not additionally encrypted by the app.</p>
+</section>
+<section>
+<h2>6. Your choices and rights</h2>
+<ul><li>Change your username and profile photo at any time via Settings &gt; Account &gt; View profile.</li><li>Sign out from the Profile page; local data stays on your device.</li><li>Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in with Google, server data is deleted too).</li><li>Resetting all financial records and deleting an arisan ask for verification (fingerprint, the phone&#x27;s screen PIN/pattern, or the menu PIN) and cannot be undone. If you are signed in with Google, the copy in your account is deleted too once sync runs. If you forget the PIN and have no recovery code, the only way is to delete the Finance or Arisan data on that device.</li><li>Delete your account and cloud data at any time via Settings &gt; Account &gt; View profile &gt; Delete account. Data on this device stays until you delete it yourself.</li><li>Deleting your account removes the Account ID, username, profile photo, friend list and private messages, synced data, and the online tournaments you created. Reports you submitted may still be kept by the administrators for safety purposes.</li><li>Without installing the app: open https://aurenza27.github.io in a browser, sign in with Google, and choose Delete account on the Profile page. If you cannot sign in, send a deletion request through the Suggestion Box on the same page, stating your Account ID (ST-xxxxxx).</li></ul>
+</section>
+<section>
+<h2>7. Children</h2>
+<p>This app is not intended for children under 13, and we do not knowingly collect their data. If you are a parent and find a child’s data in this app, contact us through the Suggestion Box.</p>
+</section>
+<section>
+<h2>8. Menu results</h2>
+<p>Primbon, fortune, and entertainment menu results are for entertainment and traditional belief only, not a certainty or a basis for important decisions. BMI, calorie, and pregnancy results are general information, not a diagnosis, medical advice, or a substitute for an examination by a health professional; consult a doctor or midwife about your condition.</p>
+</section>
+<section>
+<h2>9. Changes to this policy</h2>
+<p>This policy may be updated. The date of the latest update is shown at the top of this page.</p>
+</section>
+<section>
+<h2>10. Contact</h2>
+<p>Privacy questions can be sent through the Suggestion Box in Settings.</p>
+</section>
+</div>
 </main>
+<script>
+(function(){
+  var id=document.getElementById("id"),en=document.getElementById("en"),bid=document.getElementById("bid"),ben=document.getElementById("ben");
+  function set(l){
+    id.hidden=l!=="id";en.hidden=l!=="en";
+    bid.setAttribute("aria-pressed",String(l==="id"));ben.setAttribute("aria-pressed",String(l==="en"));
+    document.documentElement.lang=l;
+    document.title=l==="en"?"Privacy Policy – Satu Titik":"Kebijakan Privasi – Satu Titik";
+    window.scrollTo(0,0);
+  }
+  bid.onclick=function(){set("id")};ben.onclick=function(){set("en")};
+  if(/^en/i.test(navigator.language||"")&&!/^id/i.test(navigator.language||""))set("en");
+})();
+</script>
 </body>
 </html>
