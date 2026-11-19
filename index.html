@@ -10575,7 +10575,7 @@ function updateLive(){
     const o = aoff(), ok = rec.aLast !== null;
     LV.alt.textContent = ok ? fmtAlt(rec.aLast + o) : "--"; LV.amax.textContent = rec.amax !== null ? fmtAlt(rec.amax + o) : "--";
     LV.eg.textContent = fmtAlt(rec.eg); LV.ed.textContent = fmtAlt(rec.ed);
-    LV.ahint.textContent = (ok ? "" : L("Menunggu altitude GPS… ", "Waiting for GPS altitude… ")) + L("Ketinggian dari GPS HP hanya perkiraan dan bisa meleset puluhan meter. Kalibrasi bila kamu tahu ketinggian aslinya.", "Phone GPS altitude is only an estimate and can be off by tens of meters. Calibrate if you know your real altitude.") + (o ? L(" Koreksi aktif: ", " Offset active: ") + (o > 0 ? "+" : "") + o + " m." : "");
+    LV.ahint.textContent = (ok ? "" : L("Menunggu altitude GPS… ", "Waiting for GPS altitude… ")) + L("Ketinggian dari GPS HP hanya perkiraan. Kalibrasi bila kamu tahu ketinggian aslinya.", "Phone GPS altitude is only an estimate. Calibrate if you know your real altitude.") + (o ? L(" Koreksi aktif: ", " Offset active: ") + (o > 0 ? "+" : "") + o + " m." : "");
   }
   LV.gps.className = "gps " + gt[0]; LV.gps.lastChild.textContent = gt[1];
   if(LV.map && rec.pts.length >= 2 && Date.now() - (LV.mt || 0) > 1500){ LV.mt = Date.now(); LV.map.hidden = false; drawRoute(LV.map, rec.pts); }
