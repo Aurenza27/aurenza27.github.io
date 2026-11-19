@@ -13281,10 +13281,12 @@ const bio = (() => {
 locked = !!lcfg();
 function lockNow(){ if(!lcfg()) return; locked = true; recMode = false; bioAuto = false; S.tab = "home"; S.f = newF(); $("ovl").hidden = true; paint(); }
 function openLock(){ const c = lcfg(); if(c){ c.f = 0; c.u = 0; lsave(c); } locked = false; recMode = false; bioAuto = false; paint(); window.scrollTo(0, 0); }
-async function askBio(){
-  const c = lcfg(); if(!c || !c.b || !locked || asking) return;
+/* minta kunci layar HP: sidik jari, atau pola/PIN/password layar sebagai cadangan. Bila HP tak punya pengaman, tetap pakai PIN menu. */
+async function askBio(manual){
+  const c = lcfg(); if(!c || !locked || asking) return;
+  if(!(await bio.can())){ if(manual === true) toast(L("HP ini belum punya kunci layar. Pakai PIN menu.", "This phone has no screen lock. Use the menu PIN."), 3500); return; }
   asking = true; let ok = false;
-  try{ ok = await bio.ask(L("Buka menu Keuangan", "Unlock Finance")); }catch(e){} finally{ asking = false; }
+  try{ ok = await bio.ask(L("Buka menu Keuangan", "Unlock Finance"), true); }catch(e){} finally{ asking = false; }
   if(ok && locked) openLock();
 }
 async function unlockWith(pin){
@@ -13315,7 +13317,7 @@ function lockScreen(){
     '<label class="fld"><span>' + L("Masukkan PIN", "Enter your PIN") + '</span><input id="lkp" data-pin type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••" style="text-align:center;font-size:22px;letter-spacing:.3em"></label>' +
     '<p class="hint bad" id="lkx"></p><p class="hint" id="lkw"></p>' +
     '<button class="btn" data-a="lkgo">' + L("Buka", "Unlock") + '</button>' +
-    (c && c.b ? '<button class="btn ghost" style="margin-top:8px" data-a="lkbioask">👆 ' + L("Pakai sidik jari", "Use fingerprint") + '</button>' : "") +
+    (c ? '<button class="btn ghost" style="margin-top:8px" data-a="lkbioask">👆 ' + L("Pakai sidik jari / kunci layar HP", "Use fingerprint / phone screen lock") + '</button>' : "") +
     (c && c.rh ? (recMode
       ? '<label class="fld"><span>' + L("Kode pemulihan", "Recovery code") + '</span><input id="lkrc" type="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="XXXXX-XXXXX" style="text-align:center;letter-spacing:.1em"></label><button class="btn ghost" data-a="lkrecuse">' + L("Hapus PIN dengan kode ini", "Remove PIN with this code") + '</button>'
       : '<button class="x" style="margin-top:12px" data-a="lkrecmode">🔑 ' + L("Pakai kode pemulihan", "Use recovery code") + '</button>') : "") +
@@ -13420,10 +13422,12 @@ async function doReset(){
 /* memakai kode pemulihan: minta sidik jari dulu (bila HP punya sidik jari/biometrik terdaftar) */
 async function lkRecGate(){
   if(asking) return;
+  /* menyesuaikan HP: ada sidik jari -> sidik jari dulu; tanpa sidik jari tapi ada PIN/pola layar -> PIN/pola layar; tanpa pengaman layar -> langsung ke kode */
   let ok = true;
-  if(await bio.ok()){
+  const hasFp = await bio.ok(), hasLock = hasFp || await bio.can();
+  if(hasLock){
     ok = false; asking = true; window.__bioErr = "";
-    try{ ok = await bio.ask(L("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code"), true); }catch(e){ ok = false; } finally{ asking = false; }
+    try{ ok = await bio.ask(hasFp ? L("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code") : L("Masukkan PIN atau pola layar HP untuk memakai kode pemulihan", "Enter your phone PIN or pattern to use the recovery code"), true); }catch(e){ ok = false; } finally{ asking = false; }
   }
   if(!ok) return toast(L("Verifikasi dibatalkan.", "Verification cancelled.") + (window.__bioErr ? " [" + window.__bioErr + "]" : ""), 5000);
   recMode = true; paint();
@@ -13475,6 +13479,21 @@ document.addEventListener("visibilitychange", () => {
   if(Date.now() - hiddenAt >= (+c.g || 0) * 1000) lockNow();
 });
 
+/* ringkasan jatah belanja yang ikut berubah saat mengetik (tanpa menunggu tersimpan) */
+function buSumHtml(tot, nw){
+  const inc = inM(S.m).filter(x => x.k === "in").reduce((a, x) => a + x.a, 0), all = tot + nw, left = inc - all;
+  return '<span class="label">' + L("Total jatah belanja", "Total spending limits") + '</span>' +
+    '<div class="big" style="font-size:28px;margin-bottom:4px">' + rp(all) + '</div>' +
+    '<small>' + (nw ? L("Sudah termasuk jatah baru ", "Includes the new limit ") + '<b>' + rp(nw) + '</b>' : L("Jumlah semua batas bulan ini", "Sum of all limits this month")) + '</small>' +
+    '<div class="tiles" style="margin-top:12px"><div class="tile"><small>' + L("Pemasukan bulan ini", "Income this month") + '</small><b>' + rp(inc) + '</b></div>' +
+    '<div class="tile"><small>' + L("Sisa setelah jatah", "Left after limits") + '</small><b class="' + (left < 0 ? "bad" : "ok") + '">' + (left < 0 ? "−" : "") + rp(Math.abs(left)) + '</b></div></div>' +
+    '<small style="display:block;margin-top:10px" class="' + (left < 0 ? "bad" : "") + '">' + (!inc ? L("Belum ada pemasukan bulan ini, jadi belum ada pembanding.", "No income this month yet, so there is nothing to compare with.") : left < 0 ? L("Jatah melebihi pemasukan sebesar ", "Limits exceed income by ") + rp(-left) + "." : L("Jatah memakai ", "Limits use ") + Math.round(all / inc * 100) + L("% dari pemasukan.", "% of income.")) + '</small>';
+}
+function buUpdate(){
+  const box = $("bsum"); if(!box) return;
+  let tot = 0; document.querySelectorAll("[data-bu]").forEach(i => { tot += num(i.value); });
+  box.innerHTML = buSumHtml(tot, $("ccl") ? num($("ccl").value) : 0);
+}
 const VIEWS = {
   lk(){ return lkView(); },
   home(){
@@ -13522,7 +13541,7 @@ const VIEWS = {
       return '<div class="brow"><div class="rowh"><span>' + c[1] + " " + cn(c) + '</span><input data-bu="' + c[0] + '" data-money inputmode="numeric" placeholder="' + L("Batas", "Limit") + '" aria-label="' + L("Batas ", "Limit for ") + cn(c) + '" value="' + (lim ? fmtN(lim) : "") + '"></div>' +
         (lim ? '<div class="bar"><i class="' + cl + '" style="width:' + Math.min(100, s / lim * 100) + '%"></i></div><small class="' + (cl === "bad" ? "bad" : "") + '">' + L("Terpakai ", "Used ") + rp(s) + L(" dari ", " of ") + rp(lim) + (s > lim ? L(". Sudah lewat!", ". Over the limit!") : cl === "warn" ? L(". Hampir habis!", ". Almost used up!") : "") + '</small>' : (s ? '<small>' + L("Terpakai ", "Used ") + rp(s) + '</small>' : "")) + (c[4] ? '<div style="text-align:right;margin-top:6px">' + delBtn("delcc", c[0]) + '</div>' : "") + '</div>';
     }).join("");
-    return '<section class="panel">' + mnav() + '<p class="hint">' + L("Tentukan batas uang keluar tiap bulan untuk hal yang ingin kamu jaga. Kosongkan kalau tidak perlu.", "Set a monthly limit for what you want to keep in check. Leave empty if not needed.") + '</p></section><section class="panel">' + rows + '</section>' +
+    return '<section class="panel">' + mnav() + '<p class="hint">' + L("Tentukan batas uang keluar tiap bulan untuk hal yang ingin kamu jaga. Kosongkan kalau tidak perlu.", "Set a monthly limit for what you want to keep in check. Leave empty if not needed.") + '</p></section><section class="panel" id="bsum" style="position:sticky;top:8px;z-index:3;box-shadow:0 8px 24px rgba(0,0,0,.35)">' + buSumHtml(allCats().reduce((a, c) => a + (+db.bu[c[0]] || 0), 0), 0) + '</section><section class="panel">' + rows + '</section>' +
       '<section class="panel"><span class="label">' + L("Tambah jatah belanja", "Add a spending limit") + '</span><label class="fld"><span>' + L("Judul jatah belanja", "Title") + '</span><input id="ccn" maxlength="30" autocomplete="off" placeholder="' + L("Contoh: Jajan anak, Kopi", "Example: Coffee, Kids' snacks") + '"></label><label class="fld"><span>' + L("Batas tiap bulan (Rp, boleh kosong)", "Monthly limit (Rp, optional)") + '</span><input id="ccl" data-money inputmode="numeric" autocomplete="off"></label><button class="btn" data-a="addcc">' + L("Tambah jatah belanja", "Add spending limit") + '</button></section>';
   },
   go(){
@@ -13553,7 +13572,7 @@ function paint(){
   $("tabs").hidden = locked;
   $("tabs").innerHTML = TABS.map(t => '<button class="tab' + (S.tab === t[0] ? " on" : "") + '" data-a="tab" data-v="' + t[0] + '">' + L(t[1], t[2]) + '</button>').join("");
   $("v").innerHTML = locked ? lockScreen() : VIEWS[S.tab]();
-  if(locked){ lockTick(); setTimeout(() => { const i = $("lkp"); if(i) i.focus(); }, 60); const c = lcfg(); if(c && c.b && !bioAuto){ bioAuto = true; setTimeout(askBio, 350); } }
+  if(locked){ lockTick(); setTimeout(() => { const i = $("lkp"); if(i) i.focus(); }, 60); const c = lcfg(); if(c && !bioAuto){ bioAuto = true; setTimeout(askBio, 350); } }
 }
 function grab(){
   if(S.tab !== "add" || !$("fa")) return;
@@ -13754,7 +13773,7 @@ document.addEventListener("click", e => {
   else if(a === "lkoff") lkOff();
   else if(a === "lkbio") lkBio();
   else if(a === "lkgo") unlockWith($("lkp") ? $("lkp").value : "");
-  else if(a === "lkbioask") askBio();
+  else if(a === "lkbioask") askBio(true);
   else if(a === "lkforgot") lkForgot(b);
   else if(a === "lkrecnew") lkRecNew();
   else if(a === "lkrecuse") lkRecUse();
@@ -13765,6 +13784,7 @@ document.addEventListener("click", e => {
 document.addEventListener("keydown", e => { if(e.key === "Escape") $("ovl").hidden = true; if(e.key === "Enter" && e.target && e.target.id === "lkp") unlockWith(e.target.value); });
 document.addEventListener("input", e => { const t = e.target; if(t.hasAttribute && t.hasAttribute("data-money")){ const n = num(t.value); t.value = n ? fmtN(n) : ""; }
   if(t.hasAttribute && t.hasAttribute("data-pin")){ t.value = t.value.replace(/\D/g, "").slice(0, 8); if(t.id === "lkp"){ const c = lcfg(); if(c && t.value.length === (+c.l || 0)) unlockWith(t.value); } } });
+document.addEventListener("input", e => { const t = e.target; if(t && t.matches && t.matches("[data-bu],#ccl")) buUpdate(); });
 document.addEventListener("change", e => {
   const t = e.target; if(!t.dataset) return;
   if(t.dataset.bu){ const n = num(t.value); if(n) db.bu[t.dataset.bu] = n; else delete db.bu[t.dataset.bu]; save(); paint(); }
@@ -14519,10 +14539,11 @@ input:focus,textarea:focus,.money:focus-within{border-color:var(--gold);box-shad
   /* memakai kode pemulihan: minta sidik jari dulu (bila HP punya sidik jari/biometrik terdaftar) */
   async function lkRecGate(){
     if(lkAsking) return;
-    var ok = true;
-    if(await lkbio.ok()){
+    /* menyesuaikan HP: ada sidik jari -> sidik jari dulu; tanpa sidik jari tapi ada PIN/pola layar -> PIN/pola layar; tanpa pengaman layar -> langsung ke kode */
+    var ok = true, hasFp = await lkbio.ok(), hasLock = hasFp || await lkbio.can();
+    if(hasLock){
       ok = false; lkAsking = true; window.__bioErr = "";
-      try{ ok = await lkbio.ask(LL("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code"), true); }catch(e){ ok = false; } finally{ lkAsking = false; }
+      try{ ok = await lkbio.ask(hasFp ? LL("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code") : LL("Masukkan PIN atau pola layar HP untuk memakai kode pemulihan", "Enter your phone PIN or pattern to use the recovery code"), true); }catch(e){ ok = false; } finally{ lkAsking = false; }
     }
     if(!ok) return flash(LL("Verifikasi dibatalkan.", "Verification cancelled.") + (window.__bioErr ? " [" + window.__bioErr + "]" : ""));
     lkRecMode = true; lkRedraw();
