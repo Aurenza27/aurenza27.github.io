@@ -13437,6 +13437,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
         <span class="role" id="rRole"></span>
         <div class="code"><b id="rc"></b><button class="ghost" id="bCp" type="button"></button></div>
         <p class="hint" id="rInfo"></p>
+        <button class="go" id="bInv" type="button" style="min-height:44px;font-size:14px;letter-spacing:.06em" hidden></button>
         <div id="folBox" hidden><p class="label" id="fLb"></p><ul id="fols"></ul></div>
         <button class="ghost" id="bLv" type="button" style="margin-top:10px"></button>
       </div>
@@ -13494,7 +13495,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       cp:"Salin", cpd:"Tersalin ✓", lv:"Berhenti mengikuti", cl:"Tutup ruang", hostI:"{n} pengikut di ruang ini. Bagikan kode ke anggota.", guestI:"Kamu mengikuti ruang milik {h} dan menonton langsung.",
       lbN:"Input anggota", ph:"Satu nama per baris atau pisahkan dengan koma", add:"Tambah anggota", dup:"Tidak ada nama baru (kosong atau sudah ada).",
       lbQ:"Antrian ({n})", noQ:"Tidak ada nama dalam antrian.", go:"🎲 KOCOK", run:"MENGOCOK…", need:"Tambahkan anggota di tab Keuangan dulu.", done:"Semua nama sudah keluar.", nopay:"Belum semua anggota lunas di periode {p} (masih {x} yang belum). Tandai pembayaran di tab Keuangan dulu.", cap:"KELUAR",
-      lbO:"Sudah keluar", noO:"Belum ada yang keluar.", del:"🗑 Hapus arisan", delC:"Ketuk lagi untuk hapus", deld:"Arisan dihapus.", subM:"Buat arisan baru atau pilih arisan yang sudah ada.", mNL:"Nama arisan baru", mNP:"Contoh: Arisan Keluarga", mNew:"Buat", mLL:"Arisan saya ({n})", mNo:"Belum ada arisan. Buat dulu dengan memberi nama di atas.", mMem:"{n} anggota", bk:"‹ Daftar arisan", inRm:"Tutup ruang online dulu sebelum pindah arisan.", mView:"🌐 Ikuti ruang online (penonton)", nmDup:"Nama arisan itu sudah ada.", nmEmpty:"Isi nama arisan dulu.", rs:"Ulang", rsC:"Ketuk lagi: hapus hasil & catatan bayar", got:"🎉 {n} keluar di periode {p}!",
+      lbO:"Sudah keluar", noO:"Belum ada yang keluar.", inv:"👥 Undang teman", invd:"Undangan tersalin ✓", invT:"Ayo ikut arisan \"{n}\"! Buka menu ARISAN, pilih Online, lalu Gabung dan masukkan kode ruang: {c}",del:"🗑 Hapus arisan", delC:"Ketuk lagi untuk hapus", deld:"Arisan dihapus.", subM:"Buat arisan baru atau pilih arisan yang sudah ada.", mNL:"Nama arisan baru", mNP:"Contoh: Arisan Keluarga", mNew:"Buat", mLL:"Arisan saya ({n})", mNo:"Belum ada arisan. Buat dulu dengan memberi nama di atas.", mMem:"{n} anggota", bk:"‹ Daftar arisan", inRm:"Tutup ruang online dulu sebelum pindah arisan.", mView:"🌐 Ikuti ruang online (penonton)", nmDup:"Nama arisan itu sudah ada.", nmEmpty:"Isi nama arisan dulu.", rs:"Ulang", rsC:"Ketuk lagi: hapus hasil & catatan bayar", got:"🎉 {n} keluar di periode {p}!",
       nf:"Kode ruang tidak ditemukan.", closed:"Ruang sudah ditutup pemilik.", denied:"Aturan Firestore untuk an_rooms belum dipasang.", off:"Tidak ada internet.", fail:"Gagal",
       fix:"Ketetapan angsuran per anggota", fixH:"Nominal wajib tiap anggota per periode, misalnya 50.000.", col:"Iuran periode ini (otomatis)", lbF:"Angsuran anggota", per:"Periode {p} dari {n}", rcv:"Penerima: {n}", rcv0:"Penerima: belum dikocok", sum:"{a} dari {n} anggota lunas", tg:"Target {b}", paid:"Lunas", short:"Kurang {x}", unpaid:"Belum bayar", tot:"Total dibayar: {x}", fill:"Isi penuh", nofix:"Atur ketetapan angsuran per anggota di tab Keuangan dulu.", noN:"Belum ada anggota. Tambahkan nama di atas.", noM:"Belum ada anggota. Tambahkan di tab Keuangan.", lock:"🔒 Periode ini sudah lunas & dikocok, angsurannya dikunci.", lockO:"Pemilik ruang bisa membuka kunci angsuran tiap anggota.", lockG:"Hanya pemilik ruang yang bisa membuka kunci.", ulk:"🔓 Buka kunci", rlk:"🔒 Kunci lagi", ulOn:"Kunci dibuka oleh pemilik ruang.", roleO:"PEMILIK RUANG", roleF:"PENGIKUT", fLb:"Pengikut ({n})", noF:"Belum ada pengikut. Bagikan kode ruang.", kick:"Keluarkan", kickC:"Ketuk lagi", kicked:"Kamu dikeluarkan dari ruang oleh pemilik.", banned:"Kamu dikeluarkan dari ruang ini oleh pemilik.", resume:"Lanjut mengikuti ruang {c}", fixLk:"Dikunci sejak periode 1 dikocok.", lbR:"Laporan", exp:"⬇ Export PDF", shr:"↗ Bagikan", rbusy:"Membuat PDF…", saved:"PDF tersimpan di Dokumen/Satu Titik.", dl:"PDF diunduh.", rfail:"Gagal membuat PDF." },
     en:{ sub:"Draw names like an arisan. A name that has come out never comes out again.", tK:"🎲 Draw", tF:"💰 Finance", mOff:"Offline", mOn:"Online",
@@ -13502,7 +13503,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       cp:"Copy", cpd:"Copied ✓", lv:"Unfollow", cl:"Close room", hostI:"{n} following this room. Share the code with members.", guestI:"You are following {h}'s room and watching live.",
       lbN:"Add members", ph:"One name per line or separate with commas", add:"Add members", dup:"No new names (empty or already added).",
       lbQ:"Queue ({n})", noQ:"No names in the queue.", go:"🎲 DRAW", run:"DRAWING…", need:"Add members in the Finance tab first.", done:"All names have been drawn.", nopay:"Not everyone has paid for period {p} yet ({x} still unpaid). Mark payments in the Finance tab first.", cap:"DRAWN",
-      lbO:"Already drawn", noO:"Nobody drawn yet.", del:"🗑 Delete arisan", delC:"Tap again to delete", deld:"Arisan deleted.", subM:"Create a new arisan or pick an existing one.", mNL:"New arisan name", mNP:"e.g. Family Arisan", mNew:"Create", mLL:"My arisans ({n})", mNo:"No arisan yet. Create one by giving it a name above.", mMem:"{n} members", bk:"‹ Arisan list", inRm:"Close the online room before switching arisan.", mView:"🌐 Follow an online room (viewer)", nmDup:"That arisan name already exists.", nmEmpty:"Enter an arisan name first.", rs:"Reset", rsC:"Tap again: clears results & payments", got:"🎉 {n} drawn in period {p}!",
+      lbO:"Already drawn", noO:"Nobody drawn yet.", inv:"👥 Invite friends", invd:"Invite copied ✓", invT:"Join my arisan \"{n}\"! Open the ARISAN menu, choose Online, then Join and enter the room code: {c}",del:"🗑 Delete arisan", delC:"Tap again to delete", deld:"Arisan deleted.", subM:"Create a new arisan or pick an existing one.", mNL:"New arisan name", mNP:"e.g. Family Arisan", mNew:"Create", mLL:"My arisans ({n})", mNo:"No arisan yet. Create one by giving it a name above.", mMem:"{n} members", bk:"‹ Arisan list", inRm:"Close the online room before switching arisan.", mView:"🌐 Follow an online room (viewer)", nmDup:"That arisan name already exists.", nmEmpty:"Enter an arisan name first.", rs:"Reset", rsC:"Tap again: clears results & payments", got:"🎉 {n} drawn in period {p}!",
       nf:"Room code not found.", closed:"The room was closed by the owner.", denied:"Firestore rules for an_rooms are not installed yet.", off:"No internet.", fail:"Failed",
       fix:"Fixed installment per member", fixH:"Amount each member must pay per period, e.g. 50,000.", col:"Collected this period (auto)", lbF:"Member installments", per:"Period {p} of {n}", rcv:"Recipient: {n}", rcv0:"Recipient: not drawn yet", sum:"{a} of {n} members paid", tg:"Target {b}", paid:"Paid", short:"Short {x}", unpaid:"Unpaid", tot:"Total paid: {x}", fill:"Fill full", nofix:"Set the fixed installment per member in the Finance tab first.", noN:"No members yet. Add names above.", noM:"No members yet. Add them in the Finance tab.", lock:"🔒 This period is fully paid & drawn; its installments are locked.", lockO:"The room owner can unlock each member's installment.", lockG:"Only the room owner can unlock.", ulk:"🔓 Unlock", rlk:"🔒 Lock again", ulOn:"Unlocked by the room owner.", roleO:"ROOM OWNER", roleF:"FOLLOWER", fLb:"Followers ({n})", noF:"No followers yet. Share the room code.", kick:"Remove", kickC:"Tap again", kicked:"The owner removed you from the room.", banned:"The owner removed you from this room.", resume:"Resume following room {c}", fixLk:"Locked since period 1 was drawn.", lbR:"Report", exp:"⬇ Export PDF", shr:"↗ Share", rbusy:"Creating PDF…", saved:"PDF saved to Documents/Satu Titik.", dl:"PDF downloaded.", rfail:"Could not create the PDF." }
   };
@@ -13808,6 +13809,40 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     });
   }
 
+  /* undangan teman dari panel Teman di Beranda */
+  window.__anInviteCtx = function(){
+    try{
+      if(mode !== "on" || ON.role !== "host" || !ON.code || !meU()) return null;
+      return { g:"an", code:ON.code, name:aName() || ON.code, n:ON.players.length, pl:ON.players.map(function(p){ return p.u; }) };
+    }catch(e){ return null; }
+  };
+  window.__anJoin = async function(code){
+    code = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5);
+    if(code.length !== 5) return "stop";
+    var nap = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }, w;
+    if(ON.role === "host") return "stop";
+    if(ON.role === "guest" && ON.code === code) return true;
+    for(w = 0; w < 20 && !meU(); w++) await nap(300);
+    if(!meU()) return false;
+    if(ON.role === "guest") await leave();
+    aid = ""; emptyA(); LAST = ""; scr = "A"; tab = "K"; mode = "on"; paint();
+    await joinRoom(code);
+    return ON.code === code ? true : false;
+  };
+  (function pend(){
+    try{
+      var P = parent, v = P && P.__anPendingRoom;
+      if(v && v.code){
+        if(Date.now() - (+v.at || 0) >= 90000) P.__anPendingRoom = null;
+        else if(document.readyState === "complete" && meU()){
+          P.__anPendingRoom = null;
+          window.__anJoin(v.code).then(function(ok){ if(ok === false){ try{ P.__anPendingRoom = v; }catch(e){} } }, function(){ try{ P.__anPendingRoom = v; }catch(e){} });
+        }
+      }
+    }catch(e){}
+    setTimeout(pend, 700);
+  })();
+
   /* ===== TAMPILAN ===== */
   function paintOn(){
     var t = T(), u = meU(), inRoom = !!ON.role;
@@ -13822,6 +13857,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       $("bLv").textContent = ON.role === "host" ? t.cl : t.lv;
       $("rInfo").textContent = ON.role === "host" ? fill(t.hostI, { n:ON.n }) : fill(t.guestI, { h:(ON.data && ON.data.hn) || "" });
       $("rRole").textContent = ON.role === "host" ? t.roleO : t.roleF;
+      $("bInv").hidden = ON.role !== "host"; $("bInv").textContent = t.inv;
     }
     paintFol();
   }
@@ -14021,6 +14057,12 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     $("bCp").textContent = T().cpd; setTimeout(paintOn, 1500);
   });
   $("bLv").addEventListener("click", function(){ leave(); });
+  $("bInv").addEventListener("click", async function(){
+    if(ON.role !== "host") return;
+    var txt = fill(T().invT, { n:aName() || "Arisan", c:ON.code });
+    try{ if(navigator.share){ await navigator.share({ text:txt }); return; } }catch(e){ if(e && e.name === "AbortError") return; }
+    try{ await navigator.clipboard.writeText(txt); flash(T().invd, true); }catch(e){ flash(txt, true); }
+  });
   $("bRes").addEventListener("click", function(){ var sf = lsj("an_follow", null); if(sf && sf.code) joinRoom(sf.code); });
   $("bAdd").addEventListener("click", addNames);
   $("bGo").addEventListener("click", go);
@@ -14896,7 +14938,7 @@ const NSRC = (() => {
           if(ch.type === "removed") return;
           const x = ch.doc.data() || {}, st = x.status; if(st !== "accepted" && st !== "declined") return;
           const who = String(x.toName || x.toAccountId || "Pengguna"), nm = String(x.tName || "Turnamen"), ts = +x.at || Date.now(), yes = st === "accepted", fl = x.kind === "follow", rm = x.kind === "room";
-          n.add({ id: "ir_" + ch.doc.id + "_" + st + "_" + ts, type: "invite", ts, read: ts < Date.now() - 14 * 864e5, act: { menu: rm ? "tebak-inisial" : "turnamen" },
+          n.add({ id: "ir_" + ch.doc.id + "_" + st + "_" + ts, type: "invite", ts, read: ts < Date.now() - 14 * 864e5, act: { menu: rm ? (String(x.tName || "").indexOf("Arisan · ") === 0 ? "acak-nama" : "tebak-inisial") : "turnamen" },
             title: yes ? { id: "Undangan diterima", en: "Invitation accepted" } : { id: "Undangan ditolak", en: "Invitation declined" },
             body: rm ? (yes ? { id: who + " bergabung ke ruangan " + nm + ".", en: who + " joined the " + nm + " room." } : { id: who + " menolak ajakan ke ruangan " + nm + ".", en: who + " declined the invitation to the " + nm + " room." })
                 : yes ? { id: who + " menerima undangan " + (fl ? "mengikuti" : "moderator") + " turnamen \"" + nm + "\".", en: who + " accepted the " + (fl ? "follower" : "moderator") + " invitation for \"" + nm + "\"." }
@@ -14909,11 +14951,11 @@ const NSRC = (() => {
   const invTx = (x, st) => {
     const nm = String(x.tName || "Turnamen"), ow = String(x.ownerName || "Admin"), fl = x.kind === "follow";
     if(x.kind === "room"){
-      const cd = String(x.oid || ""), rn = "Tebak Inisial (" + cd + ")";
+      const cd = String(x.oid || ""), isAn = String(x.tName || "").indexOf("Arisan · ") === 0, rn = isAn ? "Arisan \"" + String(x.tName).slice(9) + "\" (" + cd + ")" : "Tebak Inisial (" + cd + ")";
       if(st === "accepted") return { title: { id: "Undangan diterima", en: "Invitation accepted" }, body: { id: "Kamu bergabung ke ruangan " + rn + ".", en: "You joined the " + rn + " room." } };
       if(st === "declined") return { title: { id: "Undangan ditolak", en: "Invitation declined" }, body: { id: "Kamu menolak ajakan ke ruangan " + rn + ".", en: "You declined the invitation to the " + rn + " room." } };
       if(st === "cancelled") return { title: { id: "Undangan dibatalkan", en: "Invitation cancelled" }, body: { id: ow + " membatalkan ajakan ke ruangan " + rn + ".", en: ow + " cancelled the invitation to the " + rn + " room." } };
-      return { title: { id: "Undangan ruangan game", en: "Game room invitation" }, body: { id: ow + " mengajakmu bergabung ke ruangan " + rn + ". Terima atau tolak undangan ini.", en: ow + " invited you to join the " + rn + " room. Accept or decline." } };
+      return { title: isAn ? { id: "Undangan ruangan arisan", en: "Arisan room invitation" } : { id: "Undangan ruangan game", en: "Game room invitation" }, body: { id: ow + " mengajakmu bergabung ke ruangan " + rn + ". Terima atau tolak undangan ini.", en: ow + " invited you to join the " + rn + " room. Accept or decline." } };
     }
     const ri = fl ? "mengikuti" : "moderator", re = fl ? "follower" : "moderator";
     if(st === "accepted") return fl ? { title: { id: "Undangan diterima", en: "Invitation accepted" }, body: { id: "Kamu sekarang mengikuti turnamen \"" + nm + "\".", en: "You are now following \"" + nm + "\"." } }
@@ -14941,6 +14983,17 @@ const NSRC = (() => {
     window.__tiPendingRoom = { code, at: Date.now() };
     location.hash = "tebak-inisial";
   };
+  window.satuTitikJoinArisan = function(code){
+    code = String(code || "");
+    try{ const f = document.getElementById("frame"), v = document.getElementById("view"), w = f && v && !v.hidden ? f.contentWindow : null;
+      if(w && typeof w.__anJoin === "function"){
+        const keep = { code, at: Date.now() };
+        Promise.resolve(w.__anJoin(code)).then(ok => { if(ok === false) window.__anPendingRoom = keep; }, () => { window.__anPendingRoom = keep; });
+        return;
+      } }catch(e){}
+    window.__anPendingRoom = { code, at: Date.now() };
+    location.hash = "acak-nama";
+  };
   async function respond(n, accept){
     try{
       const u = A.user, acc = A.accountId;
@@ -14950,7 +15003,7 @@ const NSRC = (() => {
       const rm = n.inv.kind === "room";
       if(accept && !fl && !rm && !acc) return { ok: false, err: "id" };
       if(accept && rm){   /* ruangan harus masih ada */
-        const { m: m0, db: d0 } = await A.getDb(), rs = await m0.getDoc(m0.doc(d0, "ti_rooms", n.inv.oid));
+        const { m: m0, db: d0 } = await A.getDb(), rs = await m0.getDoc(m0.doc(d0, String(n.inv.tName || "").indexOf("Arisan · ") === 0 ? "an_rooms" : "ti_rooms", n.inv.oid));
         if(!rs.exists()) return { ok: false, err: "ruangan sudah ditutup" };
       }
       const { m, db } = await A.getDb(), b = m.writeBatch(db);
@@ -14963,7 +15016,7 @@ const NSRC = (() => {
       try{ window.stPush && window.stPush("invite_reply", { iid: n.inv.docId }); }catch(e){}
       if(accept && rm){
         try{ const bb = document.getElementById("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click(); }catch(e){}
-        try{ window.satuTitikJoinRoom(n.inv.oid); }catch(e){}
+        try{ if(String(n.inv.tName || "").indexOf("Arisan · ") === 0) window.satuTitikJoinArisan(n.inv.oid); else window.satuTitikJoinRoom(n.inv.oid); }catch(e){}
       } else if(accept){
         try{ const bb = document.getElementById("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click(); }catch(e){}
         try{ window.satuTitikOpenTournaments(n.inv.oid); }catch(e){}
@@ -15239,7 +15292,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       invH:"Undang ke turnamen “{n}”:", invM:"Jadikan moderator", invF:"Undang pengikut", invW:"Menunggu…", invMem:"Moderator ✓", invFd:"Undang lagi", invMd:"Undang lagi (moderator)", invMok:"Undangan moderator terkirim.", invFok:"Undangan pengikut terkirim.",
       e_max:"Daftar temanmu sudah penuh (maksimal 20 teman, termasuk permintaan terkirim).",
       e_invp:"Undangan masih menunggu jawaban.", e_banned:"Akun ini tidak bisa bergabung kembali ke ruangan ini karena sudah dikeluarkan pemilik ruangan.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
-      invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
+      invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invAH:"Undang ke arisan “{n}” (ruang online):", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
     en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addS:"Add friend", stOn:"Online", stOff:"Offline", lastOn:"Last online {t}", lastUnk:"Last online unknown", agoNow:"just now", agoM:"{n} min ago", agoH:"{n} h ago", agoD:"{n} d ago", agoMo:"over a month ago", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
       inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", pm:"💬 Message", back:"Back", msgPh:"Write a message…", msgNone:"No messages yet. Say hi!", msgDel:"Delete message", msgGone:"This message was deleted", msgSend:"Send", blk:"🚫 Block user", ublk:"✅ Unblock", rpt:"⚠ Report user", rptm:"⚠ Report", blkd:"You blocked this user. They cannot send you messages.", blkOk:"User blocked.", ublkOk:"User unblocked.", e_nosend:"The message could not be sent to this user.", e_noreq:"The request could not be sent to this user.", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
       sent:"Request sent.", acd:"You are now friends.", rmd:"Friend removed.", decd:"Request declined.", cand:"Request cancelled.",
@@ -15250,7 +15303,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       invH:"Invite to tournament “{n}”:", invM:"Make moderator", invF:"Invite follower", invW:"Pending…", invMem:"Moderator ✓", invFd:"Invite again", invMd:"Invite again (moderator)", invMok:"Moderator invite sent.", invFok:"Follower invite sent.",
       e_max:"Your friend list is full (maximum 20 friends, including sent requests).",
       e_invp:"The invite is still pending.", e_banned:"This account cannot rejoin this room because it was removed by the room owner.", e_invmem:"They are already a moderator.", e_invmax:"At most 20 moderators.", e_noctx:"Open an online tournament’s detail (as admin) first.", e_invself:"That is your own account.",
-      invRH:"Invite to Guess the Initial room “{n}”:", invR:"Invite to room", invRin:"Already in the room ✓", invRf:"Room is full", invRok:"Room invite sent." }
+      invRH:"Invite to Guess the Initial room “{n}”:", invAH:"Invite to arisan “{n}” (online room):", invR:"Invite to room", invRin:"Already in the room ✓", invRf:"Room is full", invRok:"Room invite sent." }
   };
   const MAX_FRIENDS = 20;
   const A = () => window.satuTitikAuth || null;
@@ -15481,16 +15534,19 @@ if(navigator.onLine !== false) init().catch(() => {});
   }
   /* konteks ruangan Tebak Inisial dari menu yang sedang terbuka (null bila tidak sedang di dalam ruangan online) */
   function rctx(){
-    try{ const f = $("frame"), v = $("view"); if(f && v && !v.hidden && f.contentWindow && typeof f.contentWindow.__tiInviteCtx === "function") return f.contentWindow.__tiInviteCtx(); }catch(e){}
+    try{ const f = $("frame"), v = $("view"); if(f && v && !v.hidden && f.contentWindow){
+      if(typeof f.contentWindow.__tiInviteCtx === "function"){ const c = f.contentWindow.__tiInviteCtx(); if(c) return c; }
+      if(typeof f.contentWindow.__anInviteCtx === "function") return f.contentWindow.__anInviteCtx();
+    } }catch(e){}
     return null;
   }
   const sigNow = () => { const a = tctx(), b = rctx(); return (a || b) ? JSON.stringify([a, b, b ? invOut : 0]) : ""; };
   async function inviteRoom(rc, r){
     const a = A(), u = a && a.user; if(!u) throw new Error("e_fail");
     if(r.acc === myAcc()) throw new Error("e_invself");
-    const { m, db } = await a.getDb(), id = "ti_" + rc.code + "_" + r.acc, ref = m.doc(db, "invites", id);
+    const { m, db } = await a.getDb(), id = (rc.g === "an" ? "an_" : "ti_") + rc.code + "_" + r.acc, ref = m.doc(db, "invites", id);
     /* pemain yang dikeluarkan dengan opsi larang bergabung (daftar kk di dokumen ruangan) tidak bisa diundang lagi */
-    try{ const rs = await m.getDoc(m.doc(db, "ti_rooms", rc.code)), kk = rs.exists() ? (rs.data() || {}).kk : null; if(Array.isArray(kk) && kk.indexOf(r.uid) >= 0) throw new Error("e_banned"); }
+    try{ const rs = await m.getDoc(m.doc(db, rc.g === "an" ? "an_rooms" : "ti_rooms", rc.code)), kk = rs.exists() ? (rs.data() || {}).kk : null; if(Array.isArray(kk) && kk.indexOf(r.uid) >= 0) throw new Error("e_banned"); }
     catch(e){ if(e && e.message === "e_banned") throw e; }
     const ex = await m.getDoc(ref);
     if(ex.exists()){
@@ -15499,11 +15555,11 @@ if(navigator.onLine !== false) init().catch(() => {});
       await m.deleteDoc(ref);
     }
     const nm = String((a.username && a.usernameUid === u.uid ? a.username : "") || u.displayName || u.email || "");
-    await m.setDoc(ref, { oid: rc.code, kind: "room", tName: "Tebak Inisial · " + rc.code, ownerUid: u.uid, ownerName: nm, toUid: r.uid, toAccountId: r.acc, toName: nameOf(r.acc), status: "pending", ts: Date.now() });
+    await m.setDoc(ref, { oid: rc.code, kind: "room", tName: rc.g === "an" ? "Arisan · " + String(rc.name || rc.code).slice(0, 30) : "Tebak Inisial · " + rc.code, ownerUid: u.uid, ownerName: nm, toUid: r.uid, toAccountId: r.acc, toName: nameOf(r.acc), status: "pending", ts: Date.now() });
     try{ window.stPush && window.stPush("invite", { iid: id }); }catch(e){}
   }
   function roomBar(r, t, c){
-    const bar = mk("div", "frinv"), o = invOut["ti_" + c.code + "_" + r.acc], inRoom = c.pl.includes(r.uid), pend = !!o && o.st === "pending" && Date.now() - o.ts < 600000, full = c.n >= 8;
+    const bar = mk("div", "frinv"), o = invOut[(c.g === "an" ? "an_" : "ti_") + c.code + "_" + r.acc], inRoom = c.pl.includes(r.uid), pend = !!o && o.st === "pending" && Date.now() - o.ts < 600000, full = c.n >= (c.g === "an" ? 60 : 8);
     const label = inRoom ? t.invRin : pend ? t.invW : full ? t.invRf : (o ? t.invFd : t.invR);
     bar.appendChild(btn(label, "ok sm", () => run("invRok", async () => { await inviteRoom(c, r); }), inRoom || pend || full));
     return bar;
@@ -15693,7 +15749,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     const fr = accepted(), s = mk("div", "frbox"), tc = tctx(), rc = tc ? null : rctx(); lastSig = sigNow();
     s.appendChild(mk("p", "frl", t.fr + " (" + fr.length + "/" + MAX_FRIENDS + ")"));
     if(tc && fr.length) s.appendChild(mk("p", "frh", t.invH.replace("{n}", tc.name || tc.oid)));
-    else if(rc && fr.length) s.appendChild(mk("p", "frh", t.invRH.replace("{n}", rc.code)));
+    else if(rc && fr.length) s.appendChild(mk("p", "frh", (rc.g === "an" ? t.invAH : t.invRH).replace("{n}", rc.name || rc.code)));
     if(!fr.length) s.appendChild(mk("p", "frh", t.none));
     fr.forEach(r => {
       if(confirmId === r.id){
