@@ -13201,7 +13201,7 @@ function txRow(x, del){
    b: sidik jari aktif, o: uid Google pemasang (untuk pemulihan lupa PIN), f: salah berturut-turut, u: terkunci sampai (ms) }.
    Ini kunci tampilan, bukan enkripsi: data di perangkat dan akun tetap tidak terenkripsi. */
 const LK = "kg_lock";
-let locked = false, asking = false, checking = false, hiddenAt = 0, recShow = "", recMode = false;
+let locked = false, asking = false, checking = false, hiddenAt = 0, recShow = "", recMode = false, bioAuto = false;
 const REC_ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const newRecCode = () => { const a = crypto.getRandomValues(new Uint8Array(10)); let t = ""; for(let i = 0; i < 10; i++){ t += REC_ABC[a[i] % 32]; if(i === 4) t += "-"; } return t; };
 const recNorm = t => String(t || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -13245,8 +13245,8 @@ const bio = (() => {
   return { ok, ask, can };
 })();
 locked = !!lcfg();
-function lockNow(){ if(!lcfg()) return; locked = true; recMode = false; S.tab = "home"; S.f = newF(); $("ovl").hidden = true; paint(); setTimeout(askBio, 350); }
-function openLock(){ const c = lcfg(); if(c){ c.f = 0; c.u = 0; lsave(c); } locked = false; recMode = false; paint(); window.scrollTo(0, 0); }
+function lockNow(){ if(!lcfg()) return; locked = true; recMode = false; bioAuto = false; S.tab = "home"; S.f = newF(); $("ovl").hidden = true; paint(); }
+function openLock(){ const c = lcfg(); if(c){ c.f = 0; c.u = 0; lsave(c); } locked = false; recMode = false; bioAuto = false; paint(); window.scrollTo(0, 0); }
 async function askBio(){
   const c = lcfg(); if(!c || !c.b || !locked || asking) return;
   asking = true; let ok = false;
@@ -13317,7 +13317,7 @@ function pinCheck(p1, p2){
 async function lkSet(){
   const p1 = $("lk1").value, p2 = $("lk2").value, bad = pinCheck(p1, p2); if(bad) return toast(bad);
   const s = newSalt(), A = parentAuth(), rc = newRecCode(), rs = newSalt();
-  if(lsave({ s, h: await hashPin(p1, s), l: p1.length, g: 30, b: false, o: A && A.user ? A.user.uid : "", f: 0, u: 0, rs, rh: await hashPin(recNorm(rc), rs) })){ recShow = rc; toast(L("Kunci aktif ✓", "Lock is on ✓")); paint(); }
+  if(lsave({ s, h: await hashPin(p1, s), l: p1.length, g: 30, b: await bio.ok(), o: A && A.user ? A.user.uid : "", f: 0, u: 0, rs, rh: await hashPin(recNorm(rc), rs) })){ recShow = rc; toast(L("Kunci aktif ✓", "Lock is on ✓")); paint(); }
 }
 async function lkChg(){
   const c = lcfg(); if(!c) return;
@@ -13519,7 +13519,7 @@ function paint(){
   $("tabs").hidden = locked;
   $("tabs").innerHTML = TABS.map(t => '<button class="tab' + (S.tab === t[0] ? " on" : "") + '" data-a="tab" data-v="' + t[0] + '">' + L(t[1], t[2]) + '</button>').join("");
   $("v").innerHTML = locked ? lockScreen() : VIEWS[S.tab]();
-  if(locked){ lockTick(); setTimeout(() => { const i = $("lkp"); if(i) i.focus(); }, 60); }
+  if(locked){ lockTick(); setTimeout(() => { const i = $("lkp"); if(i) i.focus(); }, 60); const c = lcfg(); if(c && c.b && !bioAuto){ bioAuto = true; setTimeout(askBio, 350); } }
 }
 function grab(){
   if(S.tab !== "add" || !$("fa")) return;
@@ -13565,14 +13565,54 @@ function cleanDb(raw){
   ["cc", "ci"].forEach(key => (Array.isArray(d[key]) ? d[key] : []).slice(0, 100).forEach(x => { const i = x && id(x.id), n = x && tx(x.n, 30); if(!i || !n || seen.has(key + i)) return; seen.add(key + i); out[key].push({id:i, n}); }));
   return {d:out, skip};
 }
-async function backupExport(){
-  const blob = new Blob([JSON.stringify({app:"satu-titik-keuangan", fmt:1, at:new Date().toISOString(), data:db})], {type:"application/json"}), name = "Cadangan_Keuangan_" + today() + ".json";
-  /* Aplikasi Android: simpan ke cache lalu buka lembar bagikan (pilih Drive, File, dsb.) */
-  try{ if(parent.stNativeShare && await parent.stNativeShare(blob, name, "Keuangan")){ toast(L("Pilih tempat menyimpan file cadangan.", "Choose where to save the backup file."), 3500); return; } }catch(e){}
+/* ===== EKSPOR: dua pilihan, "Simpan di HP" (folder Dokumen/Satu Titik) dan "Bagikan" (lembar bagikan) ===== */
+function exportChoice(){
+  return new Promise(res => {
+    const o = document.createElement("div"); o.className = "ovl"; o.style.zIndex = "30";
+    o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true");
+    o.innerHTML = '<div class="dlg"><h2>' + L("Ekspor file", "Export file") + '</h2><p>' + L("Mau disimpan atau dibagikan?", "Save it or share it?") + '</p>' +
+      '<button class="btn" id="exs" type="button" style="margin-bottom:8px">💾 ' + L("Simpan di HP", "Save on phone") + '</button>' +
+      '<button class="btn ghost" id="exh" type="button" style="margin-bottom:8px">📤 ' + L("Bagikan", "Share") + '</button>' +
+      '<button class="x" id="exc" type="button">' + L("Batal", "Cancel") + '</button></div>';
+    document.body.appendChild(o);
+    const done = v => { o.remove(); res(v); };
+    o.querySelector("#exs").addEventListener("click", () => done("save"));
+    o.querySelector("#exh").addEventListener("click", () => done("share"));
+    o.querySelector("#exc").addEventListener("click", () => done(""));
+    o.addEventListener("click", e => { if(e.target === o) done(""); });
+  });
+}
+function exportDownload(blob, name){
   const u = URL.createObjectURL(blob), a = document.createElement("a");
   a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(u), 4000);
-  toast(L("File cadangan diunduh.", "Backup file downloaded."), 3500);
+}
+async function exportFile(blob, name, title){
+  const m = await exportChoice(); if(!m) return;
+  if(m === "save"){
+    /* Aplikasi Android: tulis langsung ke Dokumen/Satu Titik */
+    try{
+      const C = parent.Capacitor;
+      if(C && C.isNativePlatform && C.isNativePlatform()){
+        const FS = (C.Plugins && C.Plugins.Filesystem) || (C.registerPlugin && C.registerPlugin("Filesystem"));
+        if(FS){
+          const b64 = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = no; r.readAsDataURL(blob); });
+          try{ await FS.requestPermissions(); }catch(e){}
+          try{ await FS.writeFile({ path:"Satu Titik/" + name, data:b64, directory:"DOCUMENTS", recursive:true }); toast(L("Disimpan di Dokumen/Satu Titik.", "Saved to Documents/Satu Titik."), 3500); return; }catch(e){}
+        }
+        /* gagal simpan langsung: buka lembar bagikan supaya bisa disimpan manual */
+        if(parent.stNativeShare && await parent.stNativeShare(blob, name, title)){ toast(L("Pilih tempat menyimpan file.", "Choose where to save the file."), 3500); return; }
+      }
+    }catch(e){}
+    exportDownload(blob, name); toast(L("File diunduh.", "File downloaded."), 3500); return;
+  }
+  try{ if(parent.stNativeShare && await parent.stNativeShare(blob, name, title)) return; }catch(e){}
+  try{ const f = new File([blob], name, {type:blob.type}); if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title}); return; } }catch(e){ if(e && e.name === "AbortError") return; }
+  exportDownload(blob, name); toast(L("File diunduh.", "File downloaded."), 3500);
+}
+async function backupExport(){
+  const blob = new Blob([JSON.stringify({app:"satu-titik-keuangan", fmt:1, at:new Date().toISOString(), data:db})], {type:"application/json"}), name = "Cadangan_Keuangan_" + today() + ".json";
+  await exportFile(blob, name, "Keuangan");
 }
 let bkIn = null;
 function backupImport(){
@@ -13603,12 +13643,7 @@ async function csv(){
   const q = s => '"' + String(s).replace(/"/g, '""') + '"', nm = id => { const w = db.w.find(x => x.id === id); return w ? w.n : ""; };
   const rows = [["date","type","category","wallet","to_wallet","amount","note"].map(q).join(",")].concat(db.t.slice().sort(byDate).map(x => [x.d, x.k, x.k === "tf" ? "" : catName(x.c, x.k), nm(x.w), nm(x.w2), x.a, x.n].map(q).join(",")));
   const blob = new Blob(["\ufeff" + rows.join("\n")], {type:"text/csv"}), name = "keuangan.csv";
-  /* Aplikasi Android: simpan ke cache lalu buka lembar bagikan (WebView tidak mendukung unduhan blob) */
-  try{ if(parent.stNativeShare && await parent.stNativeShare(blob, name, "Keuangan")) return; }catch(e){}
-  /* Web/PWA: unduhan biasa */
-  const u = URL.createObjectURL(blob), a = document.createElement("a");
-  a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(u), 4000);
+  await exportFile(blob, name, "Keuangan");
 }
 
 document.addEventListener("click", e => {
@@ -13708,7 +13743,6 @@ window.addEventListener("storage", e => {
   if(!e.key || e.key === K){ grab(); db = load(); if(!db.w.some(w => w.id === S.f.w)) S.f = newF(S.f.k); paint(); }
 });
 paint();
-if(locked) setTimeout(askBio, 400);
 </scr@@ipt>
 </body>
 </html>
@@ -14351,7 +14385,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     var p1 = $("lk1").value, p2 = $("lk2").value, bad = lkPinCheck(p1, p2); if(bad) return flash(bad);
     try{
       var s = lksalt(), au = authO(), rc = lkNewRec(), rs = lksalt();
-      if(lksave({ s: s, h: await lkhash(p1, s), l: p1.length, g: 30, b: false, o: au && au.user ? au.user.uid : "", f: 0, u: 0, rs: rs, rh: await lkhash(lkRecNorm(rc), rs) })){ lkRec = rc; flash(LL("Kunci aktif ✓", "Lock is on ✓"), true); lkd = false; lkRedraw(); }
+      if(lksave({ s: s, h: await lkhash(p1, s), l: p1.length, g: 30, b: await lkbio.ok(), o: au && au.user ? au.user.uid : "", f: 0, u: 0, rs: rs, rh: await lkhash(lkRecNorm(rc), rs) })){ lkRec = rc; flash(LL("Kunci aktif ✓", "Lock is on ✓"), true); lkd = false; lkRedraw(); }
     }catch(e){ flash(LL("Gagal memasang kunci.", "Could not set the lock.")); }
   }
   async function lkChg(){
@@ -15040,13 +15074,41 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     });
     return R;
   }
+  /* ekspor dua pilihan: simpan di HP (Dokumen/Satu Titik) atau bagikan */
+  function expChoice(){
+    return new Promise(function(res){
+      var o = document.createElement("div");
+      o.style.cssText = "position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55)";
+      o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true");
+      o.innerHTML = '<div style="width:100%;max-width:520px;box-sizing:border-box;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,var(--bg2),var(--card));border:1px solid var(--line);border-radius:18px 18px 0 0">' +
+        '<p class="label" style="text-align:center;margin:0 0 12px">' + LL("Ekspor file", "Export file") + '</p>' +
+        '<div class="two"><button class="go alt" id="xcS" type="button">💾 ' + LL("Simpan di HP", "Save on phone") + '</button><button class="go" id="xcH" type="button">📤 ' + LL("Bagikan", "Share") + '</button></div>' +
+        '<button class="ghost" id="xcC" type="button" style="width:100%;margin-top:8px">' + LL("Batal", "Cancel") + '</button></div>';
+      document.body.appendChild(o);
+      function done(v){ o.remove(); res(v); }
+      o.querySelector("#xcS").addEventListener("click", function(){ done("save"); });
+      o.querySelector("#xcH").addEventListener("click", function(){ done("share"); });
+      o.querySelector("#xcC").addEventListener("click", function(){ done(""); });
+      o.addEventListener("click", function(e){ if(e.target === o) done(""); });
+    });
+  }
+  async function shareFile(blob, name, title){
+    try{ if(parent.stNativeShare && await parent.stNativeShare(blob, name, title)) return ""; }catch(e){}
+    try{
+      var f = new File([blob], name, { type:blob.type });
+      if(navigator.canShare && navigator.canShare({ files:[f] })){ await navigator.share({ files:[f], title:title }); return ""; }
+    }catch(e){ if(e && e.name === "AbortError") return ""; }
+    return await saveFile(blob, name, title);
+  }
   async function bkExport(){
     if(!AL.items.length) return flash(LL("Belum ada arisan untuk dicadangkan.", "No arisan to back up yet."));
     /* data pembayaran ikut di file, jadi bila kunci PIN dipasang, ekspor harus diverifikasi */
     if(lkOn() && !(await lkSecureGate(LL("Verifikasi untuk mencadangkan data arisan", "Verify to back up the arisan data")))) return flash(LL("Verifikasi dibatalkan.", "Verification cancelled."));
     var items = AL.items.map(function(x){ return { id:x.id, name:x.name, data:lsj("an_data_" + x.id, null) || { names:[], out:[], fix:0, pay:{}, ul:{} } }; });
     var blob = new Blob([JSON.stringify({ app:"satu-titik-arisan", fmt:1, at:new Date().toISOString(), items:items })], { type:"application/json" });
-    var name = "Cadangan_Arisan_" + new Date().toISOString().slice(0, 10) + ".json", r = await saveFile(blob, name, "Arisan");
+    var name = "Cadangan_Arisan_" + new Date().toISOString().slice(0, 10) + ".json", m = await expChoice();
+    if(!m) return;
+    var r = m === "share" ? await shareFile(blob, name, "Arisan") : await saveFile(blob, name, "Arisan");
     flash(r ? LL("Cadangan disimpan. Simpan filenya di tempat aman (Google Drive, email, atau penyimpanan lain).", "Backup saved. Keep the file somewhere safe (Google Drive, email, or other storage).") : "", true);
   }
   var bkIn = null;
