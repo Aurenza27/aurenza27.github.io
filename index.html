@@ -13233,18 +13233,11 @@ const bio = (() => {
     if(N){ try{ await N.verifyIdentity({ reason, title: "KEUANGAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
     return false;
   }
-  /* verifikasi dengan kunci layar HP (sidik jari ATAU PIN/pola HP). Hasil: "ok" | "fail" | "na" (tidak ada kunci layar / bukan aplikasi Android) */
-  async function askDevice(reason){
-    init();
-    if(!P) return "na";
-    try{ const r = await P.checkBiometry(); if(!(r && (r.deviceIsSecure || r.isAvailable))) return "na"; }catch(e){ return "na"; }
-    try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason, cancelTitle: L("Batal", "Cancel"), allowDeviceCredential: true, androidTitle: "KEUANGAN", androidSubtitle: reason }); return "ok"; }catch(e){ return "fail"; }
-  }
-  return { ok, ask, askDevice };
+  return { ok, ask };
 })();
 locked = !!lcfg();
-function lockNow(){ if(!lcfg()) return; locked = true; S.tab = "home"; S.f = newF(); $("ovl").hidden = true; paint(); setTimeout(askBio, 350); }
-function openLock(){ const c = lcfg(); if(c){ c.f = 0; c.u = 0; lsave(c); } locked = false; paint(); window.scrollTo(0, 0); }
+function lockNow(){ if(!lcfg()) return; locked = true; recMode = false; S.tab = "home"; S.f = newF(); $("ovl").hidden = true; paint(); setTimeout(askBio, 350); }
+function openLock(){ const c = lcfg(); if(c){ c.f = 0; c.u = 0; lsave(c); } locked = false; recMode = false; paint(); window.scrollTo(0, 0); }
 async function askBio(){
   const c = lcfg(); if(!c || !c.b || !locked || asking) return;
   asking = true; let ok = false;
@@ -13283,7 +13276,7 @@ function lockScreen(){
     (c && c.rh ? (recMode
       ? '<label class="fld"><span>' + L("Kode pemulihan", "Recovery code") + '</span><input id="lkrc" type="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="XXXXX-XXXXX" style="text-align:center;letter-spacing:.1em"></label><button class="btn ghost" data-a="lkrecuse">' + L("Hapus PIN dengan kode ini", "Remove PIN with this code") + '</button>'
       : '<button class="x" style="margin-top:12px" data-a="lkrecmode">🔑 ' + L("Pakai kode pemulihan", "Use recovery code") + '</button>') : "") +
-    '<button class="x" style="margin-top:12px" data-a="lkforgot">' + L("Lupa PIN?", "Forgot PIN?") + '</button></section>';
+    (c && c.rh ? "" : '<button class="x" style="margin-top:12px" data-a="lkforgot">' + L("Lupa PIN?", "Forgot PIN?") + '</button>') + '</section>';
 }
 const pinFld = (id, label) => '<label class="fld"><span>' + label + '</span><input id="' + id + '" data-pin type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="••••"></label>';
 function recView(){
@@ -13296,7 +13289,7 @@ function recView(){
 function lkView(){
   const c = lcfg();
   if(recShow) return recView();
-  if(!c) return back() + '<section class="panel"><span class="label">🔒 ' + L("Kunci menu Keuangan", "Lock Finance") + '</span><p class="hint" style="margin:0 0 12px">' + L("Pasang PIN supaya menu ini hanya bisa dibuka olehmu. Kunci hanya berlaku di perangkat ini.", "Set a PIN so only you can open this menu. The lock only applies on this device.") + '</p>' +
+  if(!c) return back() + '<section class="panel"><span class="label">🔒 ' + L("Kunci menu Keuangan", "Lock Finance") + '</span><p class="hint" style="margin:0 0 12px">' + L("Pasang PIN supaya menu ini hanya bisa dibuka olehmu. Kunci hanya berlaku di perangkat ini. Kamu akan mendapat kode pemulihan: catat kodenya, karena itu satu-satunya cara bila lupa PIN.", "Set a PIN so only you can open this menu. The lock only applies on this device. You will get a recovery code: write it down, it is the only way back in if you forget the PIN.") + '</p>' +
     pinFld("lk1", L("PIN baru (4-8 angka)", "New PIN (4-8 digits)")) + pinFld("lk2", L("Ulangi PIN", "Repeat PIN")) + '<button class="btn" data-a="lkset">' + L("Aktifkan kunci", "Turn on lock") + '</button></section>';
   const g = +c.g || 0, opt = (v, i, e) => '<option value="' + v + '"' + (g === v ? " selected" : "") + '>' + L(i, e) + '</option>';
   return back() + '<section class="panel"><span class="label">🔒 ' + L("Kunci aktif", "Lock is on") + ' <span class="ok">✓</span></span>' +
@@ -13304,7 +13297,7 @@ function lkView(){
     '<button class="btn ghost" data-a="lkbio">👆 ' + (c.b ? L("Matikan sidik jari", "Turn off fingerprint") : L("Aktifkan sidik jari", "Turn on fingerprint")) + '</button></section>' +
     '<section class="panel"><span class="label">' + L("Ubah PIN", "Change PIN") + '</span>' + pinFld("lkc", L("PIN saat ini", "Current PIN")) + pinFld("lk1", L("PIN baru (4-8 angka)", "New PIN (4-8 digits)")) + pinFld("lk2", L("Ulangi PIN baru", "Repeat new PIN")) + '<button class="btn ghost" data-a="lkchg">' + L("Simpan PIN baru", "Save new PIN") + '</button></section>' +
     '<section class="panel"><span class="label">' + L("Matikan kunci", "Turn off lock") + '</span>' + pinFld("lko", L("Masukkan PIN", "Enter PIN")) + '<button class="btn danger" data-a="lkoff">' + L("Matikan kunci", "Turn off lock") + '</button></section>' +
-    '<section class="panel"><span class="label">🔑 ' + (c.rh ? L("Buat ulang kode pemulihan", "Create a new recovery code") : L("Buat kode pemulihan", "Create a recovery code")) + '</span><p class="hint" style="margin:0 0 12px">' + L("Kode pemulihan dipakai bila kamu lupa PIN, tanpa menghapus data. Kode lama tidak berlaku lagi setelah dibuat ulang.", "A recovery code lets you remove the lock if you forget your PIN, without deleting data. The old code stops working once a new one is made.") + '</p>' + pinFld("lkrp", L("Masukkan PIN", "Enter PIN")) + '<button class="btn ghost" data-a="lkrecnew">' + L("Buat kode", "Create code") + '</button></section>';
+    '<section class="panel"><span class="label">🔑 ' + (c.rh ? L("Buat ulang kode pemulihan", "Create a new recovery code") : L("Buat kode pemulihan", "Create a recovery code")) + '</span><p class="hint" style="margin:0 0 12px">' + (c.rh ? "" : L("⚠️ Belum ada kode pemulihan. Tanpa kode, lupa PIN hanya bisa diatasi dengan menghapus data. ", "⚠️ No recovery code yet. Without one, a forgotten PIN can only be fixed by deleting data. ")) + L("Kode pemulihan dipakai bila kamu lupa PIN, tanpa menghapus data. Kode lama tidak berlaku lagi setelah dibuat ulang.", "A recovery code lets you remove the lock if you forget your PIN, without deleting data. The old code stops working once a new one is made.") + '</p>' + pinFld("lkrp", L("Masukkan PIN", "Enter PIN")) + '<button class="btn ghost" data-a="lkrecnew">' + L("Buat kode", "Create code") + '</button></section>';
 }
 function pinCheck(p1, p2){
   if(!(window.crypto && crypto.subtle)) return L("Perangkat ini tidak mendukung kunci PIN.", "This device doesn't support PIN lock.");
@@ -13328,6 +13321,17 @@ async function lkOff(){
   const c = lcfg(); if(!c) return;
   if(await hashPin($("lko").value, c.s) !== c.h) return toast(L("PIN salah.", "Wrong PIN."));
   try{ localStorage.removeItem(LK); }catch(e){} toast(L("Kunci dimatikan.", "Lock turned off.")); paint();
+}
+/* memakai kode pemulihan: minta sidik jari dulu (bila HP punya sidik jari/biometrik terdaftar) */
+async function lkRecGate(){
+  if(asking) return;
+  let ok = true;
+  if(await bio.ok()){
+    ok = false; asking = true;
+    try{ ok = await bio.ask(L("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code")); }catch(e){ ok = false; } finally{ asking = false; }
+  }
+  if(!ok) return toast(L("Verifikasi dibatalkan.", "Verification cancelled."));
+  recMode = true; paint();
 }
 async function lkRecNew(){
   const c = lcfg(); if(!c) return;
@@ -13365,19 +13369,8 @@ async function lkBio(){
 }
 /* lupa PIN: bila PIN dipasang saat masuk Google, cukup masuk ulang dengan akun yang sama; bila tidak, satu-satunya jalan adalah menghapus data keuangan di perangkat ini */
 async function lkForgot(b){
-  const c = lcfg(); if(!c) return;
-  const A = parentAuth();
-  if(c.o && A && A.login){
-    let d = "na"; asking = true;
-    try{ d = await bio.askDevice(L("Verifikasi dulu untuk menghapus PIN Keuangan", "Verify first to remove the Finance PIN")); }catch(e){ d = "fail"; } finally{ asking = false; }
-    if(d === "fail") return toast(L("Verifikasi dibatalkan. PIN tidak dihapus.", "Verification cancelled. The PIN was not removed."), 4000);
-    toast(L("Masuk dengan akun Google yang sama untuk menghapus PIN.", "Sign in with the same Google account to remove the PIN."), 4000);
-    try{ if(A.user && A.logout) await A.logout(); await A.login(); for(let i = 0; i < 20 && !A.user; i++) await new Promise(r => setTimeout(r, 250)); }catch(e){}
-    if(A.user && A.user.uid === c.o){ try{ localStorage.removeItem(LK); }catch(e){} locked = false; paint(); toast(L("Kunci dihapus. Buat PIN baru lewat tombol Kunci.", "Lock removed. Set a new PIN with the Lock button."), 3500); }
-    else toast(L("Akun Google tidak cocok atau masuk dibatalkan.", "Google account doesn't match, or sign-in was cancelled."), 4000);
-    return;
-  }
-  const w = $("lkw"); if(w) w.textContent = L("PIN ini dipasang tanpa akun Google, jadi hanya bisa dipulihkan dengan menghapus semua data keuangan di perangkat ini. Ketuk sekali lagi untuk menghapus.", "This PIN was set without a Google account, so it can only be recovered by deleting all finance data on this device. Tap again to delete.");
+  const c = lcfg(); if(!c || c.rh) return;   /* PIN yang punya kode pemulihan: pemulihan hanya lewat kode */
+  const w = $("lkw"); if(w) w.textContent = L("PIN ini belum punya kode pemulihan, jadi hanya bisa dipulihkan dengan menghapus semua data keuangan di perangkat ini. Ketuk sekali lagi untuk menghapus.", "This PIN has no recovery code, so it can only be recovered by deleting all finance data on this device. Tap again to delete.");
   arm(b, () => { try{ localStorage.removeItem(K); localStorage.removeItem("kg_ts"); localStorage.removeItem(LK); }catch(e){} db = load(); S.f = newF(); S.tab = "home"; locked = false; paint(); toast(L("Data keuangan di perangkat ini dihapus.", "Finance data on this device was deleted.")); });
 }
 /* kunci lagi saat kembali dari latar belakang (sesuai pengaturan g) */
@@ -13560,7 +13553,7 @@ document.addEventListener("click", e => {
   else if(a === "lkforgot") lkForgot(b);
   else if(a === "lkrecnew") lkRecNew();
   else if(a === "lkrecuse") lkRecUse();
-  else if(a === "lkrecmode"){ recMode = true; paint(); }
+  else if(a === "lkrecmode") lkRecGate();
   else if(a === "lkrecok"){ recShow = ""; paint(); }
   else if(a === "lkreccopy"){ try{ navigator.clipboard.writeText(recShow).then(() => toast(L("Kode disalin.", "Code copied."))).catch(() => toast(L("Tidak bisa menyalin. Catat manual.", "Couldn't copy. Write it down."))); }catch(e){ toast(L("Tidak bisa menyalin. Catat manual.", "Couldn't copy. Write it down.")); } }
 });
@@ -14118,18 +14111,12 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       if(N){ try{ await N.verifyIdentity({ reason: reason, title: "ARISAN", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
       return false;
     }
-    async function askDevice(reason){
-      init();
-      if(!P) return "na";
-      try{ var r = await P.checkBiometry(); if(!(r && (r.deviceIsSecure || r.isAvailable))) return "na"; }catch(e){ return "na"; }
-      try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason: reason, cancelTitle: LL("Batal", "Cancel"), allowDeviceCredential: true, androidTitle: "ARISAN", androidSubtitle: reason }); return "ok"; }catch(e){ return "fail"; }
-    }
-    return { ok: ok, ask: ask, askDevice: askDevice };
+    return { ok: ok, ask: ask };
   })();
   function lkGate(){ return tab === "F" && ((lkd && lkOn()) || lkMode === "cfg"); }
   function lkRedraw(){ lkSig = ""; paint(); }
-  function lockNow(){ if(!lkOn()) return; lkd = true; lkMode = ""; lkAuto = false; lkRedraw(); }
-  function openLock(){ var c = lkcfg(); if(c){ c.f = 0; c.u = 0; lksave(c); } lkd = false; lkAuto = false; lkHiddenAt = 0; lkOpenedAt = Date.now(); lkRedraw(); window.scrollTo(0, 0); }
+  function lockNow(){ if(!lkOn()) return; lkd = true; lkMode = ""; lkAuto = false; lkRecMode = false; lkRedraw(); }
+  function openLock(){ var c = lkcfg(); if(c){ c.f = 0; c.u = 0; lksave(c); } lkd = false; lkAuto = false; lkRecMode = false; lkHiddenAt = 0; lkOpenedAt = Date.now(); lkRedraw(); window.scrollTo(0, 0); }
   async function lkAskBio(){
     var c = lkcfg(); if(!c || !c.b || !lkd || lkAsking) return;
     lkAsking = true; var ok = false;
@@ -14169,7 +14156,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       (c && c.rh ? (lkRecMode
         ? '<label class="label" for="lkrc" style="margin-top:8px">' + LL("Kode pemulihan", "Recovery code") + '</label><input id="lkrc" type="text" autocomplete="off" autocapitalize="characters" maxlength="12" placeholder="XXXXX-XXXXX" style="text-align:center;letter-spacing:.1em;margin-bottom:10px"><button class="ghost" type="button" data-lk="recuse" style="width:100%">' + LL("Hapus PIN dengan kode ini", "Remove PIN with this code") + '</button>'
         : '<button class="ghost" type="button" data-lk="recmode" style="width:100%;margin-top:8px;border-color:transparent">🔑 ' + LL("Pakai kode pemulihan", "Use recovery code") + '</button>') : "") +
-      '<button class="ghost" type="button" data-lk="forgot" style="width:100%;margin-top:8px;border-color:transparent">' + LL("Lupa PIN?", "Forgot PIN?") + '</button></div>';
+      (c && c.rh ? "" : '<button class="ghost" type="button" data-lk="forgot" style="width:100%;margin-top:8px;border-color:transparent">' + LL("Lupa PIN?", "Forgot PIN?") + '</button>') + '</div>';
   }
   function lkRecView(){
     return '<div class="panel" style="text-align:center"><div style="font-size:40px">🔑</div><p class="label" style="margin-top:6px">' + LL("Kode pemulihan", "Recovery code") + '</p>' +
@@ -14182,7 +14169,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     if(lkRec) return lkRecView();
     var c = lkcfg(), back = '<button class="ghost" type="button" data-lk="back" style="align-self:flex-start">‹ ' + LL("Kembali", "Back") + '</button>';
     if(!c) return back + '<div class="panel"><p class="label">🔒 ' + LL("Kunci Arisan", "Lock Arisan") + '</p><p class="hint" style="margin:0 0 12px">' +
-      LL("Pasang PIN supaya tab Keuangan Arisan hanya bisa dibuka olehmu. Kunci hanya berlaku di perangkat ini. Tab Kocok tetap bisa dipakai tanpa PIN.", "Set a PIN so only you can open the Arisan Finance tab. The lock only applies on this device. The Draw tab stays open without a PIN.") + '</p>' +
+      LL("Pasang PIN supaya tab Keuangan Arisan hanya bisa dibuka olehmu. Kunci hanya berlaku di perangkat ini. Tab Kocok tetap bisa dipakai tanpa PIN. Kamu akan mendapat kode pemulihan: catat kodenya, karena itu satu-satunya cara bila lupa PIN.", "Set a PIN so only you can open the Arisan Finance tab. The lock only applies on this device. The Draw tab stays open without a PIN. You will get a recovery code: write it down, it is the only way back in if you forget the PIN.") + '</p>' +
       lkPinFld("lk1", LL("PIN baru (4-8 angka)", "New PIN (4-8 digits)")) + lkPinFld("lk2", LL("Ulangi PIN", "Repeat PIN")) +
       '<button class="go" type="button" data-lk="set">' + LL("Aktifkan kunci", "Turn on lock") + '</button></div>';
     var g = +c.g || 0, opt = function(v, i, e){ return '<option value="' + v + '"' + (g === v ? " selected" : "") + '>' + LL(i, e) + '</option>'; };
@@ -14195,7 +14182,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       '<button class="ghost" type="button" data-lk="chg" style="width:100%">' + LL("Simpan PIN baru", "Save new PIN") + '</button></div>' +
       '<div class="panel"><p class="label">' + LL("Matikan kunci", "Turn off lock") + '</p>' + lkPinFld("lko", LL("Masukkan PIN", "Enter PIN")) +
       '<button class="go" type="button" data-lk="off" style="background:var(--bad);color:#fff">' + LL("Matikan kunci", "Turn off lock") + '</button></div>' +
-      '<div class="panel"><p class="label">🔑 ' + (c.rh ? LL("Buat ulang kode pemulihan", "Create a new recovery code") : LL("Buat kode pemulihan", "Create a recovery code")) + '</p><p class="hint" style="margin:0 0 12px">' + LL("Kode pemulihan dipakai bila kamu lupa PIN, tanpa menghapus data. Kode lama tidak berlaku lagi setelah dibuat ulang.", "A recovery code lets you remove the lock if you forget your PIN, without deleting data. The old code stops working once a new one is made.") + '</p>' + lkPinFld("lkrp", LL("Masukkan PIN", "Enter PIN")) +
+      '<div class="panel"><p class="label">🔑 ' + (c.rh ? LL("Buat ulang kode pemulihan", "Create a new recovery code") : LL("Buat kode pemulihan", "Create a recovery code")) + '</p><p class="hint" style="margin:0 0 12px">' + (c.rh ? "" : LL("⚠️ Belum ada kode pemulihan. Tanpa kode, lupa PIN hanya bisa diatasi dengan menghapus data. ", "⚠️ No recovery code yet. Without one, a forgotten PIN can only be fixed by deleting data. ")) + LL("Kode pemulihan dipakai bila kamu lupa PIN, tanpa menghapus data. Kode lama tidak berlaku lagi setelah dibuat ulang.", "A recovery code lets you remove the lock if you forget your PIN, without deleting data. The old code stops working once a new one is made.") + '</p>' + lkPinFld("lkrp", LL("Masukkan PIN", "Enter PIN")) +
       '<button class="ghost" type="button" data-lk="recnew" style="width:100%">' + LL("Buat kode", "Create code") + '</button></div>';
   }
   function paintL(){
@@ -14240,6 +14227,17 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
       lkd = false; lkMode = ""; flash(LL("Kunci dimatikan.", "Lock turned off."), true); lkRedraw();
     }catch(e){ flash(LL("Gagal memeriksa PIN.", "Could not check the PIN.")); }
   }
+  /* memakai kode pemulihan: minta sidik jari dulu (bila HP punya sidik jari/biometrik terdaftar) */
+  async function lkRecGate(){
+    if(lkAsking) return;
+    var ok = true;
+    if(await lkbio.ok()){
+      ok = false; lkAsking = true;
+      try{ ok = await lkbio.ask(LL("Verifikasi sidik jari untuk memakai kode pemulihan", "Verify your fingerprint to use the recovery code")); }catch(e){ ok = false; } finally{ lkAsking = false; }
+    }
+    if(!ok) return flash(LL("Verifikasi dibatalkan.", "Verification cancelled."));
+    lkRecMode = true; lkRedraw();
+  }
   async function lkRecNew(){
     var c = lkcfg(); if(!c) return;
     try{
@@ -14275,21 +14273,10 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
   }
   /* lupa PIN: bila PIN dipasang saat masuk Google, cukup masuk ulang dengan akun yang sama; bila tidak, satu-satunya jalan adalah menghapus data arisan di perangkat ini */
   async function lkForgot(b){
-    var c = lkcfg(); if(!c) return;
-    var au = authO();
-    if(c.o && au && au.login){
-      var dv = "na"; lkAsking = true;
-      try{ dv = await lkbio.askDevice(LL("Verifikasi dulu untuk menghapus PIN Arisan", "Verify first to remove the Arisan PIN")); }catch(e){ dv = "fail"; } finally{ lkAsking = false; }
-      if(dv === "fail") return flash(LL("Verifikasi dibatalkan. PIN tidak dihapus.", "Verification cancelled. The PIN was not removed."));
-      flash(LL("Masuk dengan akun Google yang sama untuk menghapus PIN.", "Sign in with the same Google account to remove the PIN."), true);
-      try{ if(au.user && au.logout) await au.logout(); await au.login(); for(var i = 0; i < 20 && !au.user; i++) await new Promise(function(r){ setTimeout(r, 250); }); }catch(e){}
-      if(au.user && au.user.uid === c.o){ try{ localStorage.removeItem(LKEY); }catch(e){} lkd = false; lkMode = ""; lkRedraw(); flash(LL("Kunci dihapus. Pasang PIN baru lewat tombol Kunci Arisan.", "Lock removed. Set a new PIN with the Lock Arisan button."), true); }
-      else flash(LL("Akun Google tidak cocok atau masuk dibatalkan.", "Google account doesn't match, or sign-in was cancelled."));
-      return;
-    }
+    var c = lkcfg(); if(!c || c.rh) return;   /* PIN yang punya kode pemulihan: pemulihan hanya lewat kode */
     var w = $("lkw");
     if(!lkArm){
-      lkArm = true; if(w) w.textContent = LL("PIN ini dipasang tanpa akun Google, jadi hanya bisa dipulihkan dengan menghapus semua data arisan di perangkat ini. Ketuk sekali lagi untuk menghapus.", "This PIN was set without a Google account, so it can only be recovered by deleting all arisan data on this device. Tap again to delete.");
+      lkArm = true; if(w) w.textContent = LL("PIN ini belum punya kode pemulihan, jadi hanya bisa dipulihkan dengan menghapus semua data arisan di perangkat ini. Ketuk sekali lagi untuk menghapus.", "This PIN has no recovery code, so it can only be recovered by deleting all arisan data on this device. Tap again to delete.");
       b.textContent = LL("Hapus data?", "Delete data?");
       setTimeout(function(){ lkArm = false; if(b.isConnected) b.textContent = LL("Lupa PIN?", "Forgot PIN?"); if(w && w.isConnected) w.textContent = ""; }, 4000);
       return;
@@ -14313,7 +14300,7 @@ body.noanim .reel.run .nm,body.noanim .reel.land,body.noanim .pop{animation:none
     else if(a === "off") lkOff();
     else if(a === "recnew") lkRecNew();
     else if(a === "recuse") lkRecUse();
-    else if(a === "recmode"){ lkRecMode = true; lkRedraw(); }
+    else if(a === "recmode") lkRecGate();
     else if(a === "recok"){ lkRec = ""; lkRedraw(); }
     else if(a === "reccopy"){ try{ navigator.clipboard.writeText(lkRec).then(function(){ flash(LL("Kode disalin.", "Code copied."), true); }).catch(function(){ flash(LL("Tidak bisa menyalin. Catat manual.", "Couldn't copy. Write it down.")); }); }catch(e){ flash(LL("Tidak bisa menyalin. Catat manual.", "Couldn't copy. Write it down.")); } }
     else if(a === "bio") lkBio();
