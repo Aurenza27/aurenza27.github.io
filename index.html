@@ -1620,7 +1620,7 @@ const PV = {
     {p:["Keuangan dan Arisan:"], l:["Catatan keuangan (uang masuk dan keluar, dompet, jatah belanja, tabungan) dan data Arisan (nama peserta, pemenang, status pembayaran) disimpan di perangkatmu. Bila kamu masuk dengan Google, data ini ikut tersalin ke akunmu.","Kunci menu: PIN dan kode pemulihan hanya disimpan di perangkat dalam bentuk hash (bukan teks asli), tidak dikirim ke server, dan tidak ikut tersalin ke akun. Sidik jari dan PIN/pola layar HP diperiksa oleh sistem Android; aplikasi tidak menerima atau menyimpan data sidik jarimu.","Ruangan Arisan online: nama host dan peserta, daftar nama kocokan, hasil, dan chat ruangan disimpan di server selama ruangan ada dan dihapus saat host menutup ruangan. Chat juga ditandai kedaluwarsa setelah 24 jam.","File cadangan: fitur Cadangkan di menu Keuangan dan Arisan membuat file di perangkatmu atas permintaanmu, lalu kamu sendiri yang memilih tempat menyimpannya. File ini tidak dienkripsi dan tidak berisi PIN atau kode pemulihan, jadi simpan di tempat aman."]},
     {p:["Ringkasan per menu (data di perangkat):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, dan Jodoh: nama, tanggal lahir, dan isian lain yang kamu ketik, riwayat, papan skor, serta pengaturan suara dan musik. Fitur bacaan suara memakai mesin suara bawaan perangkatmu.","BMI & Kalori, Kehamilan, dan Kandungan Makanan: data tubuh dan kehamilan yang kamu isi (misalnya usia, jenis kelamin, berat, dan tinggi badan), profil AKG (termasuk status hamil atau menyusui), dan isi Piringku. Ini data kesehatan, jadi jaga perangkatmu.","Stopwatch: hanya pengaturan tampilan. Alarm dan notifikasi stopwatch dibuat di perangkatmu (notifikasi lokal), tanpa server.","Tebak Inisial, Puzzle Arena, dan Versus: bila dimainkan di satu perangkat, datanya hanya di perangkat. Ruangan online dijelaskan di bawah.","Turnamen, Olahraga, Keuangan, dan Arisan: dijelaskan di bagian lain di kebijakan ini.","Semua data di atas ikut tersalin ke akunmu bila kamu masuk dengan Google dan sinkronisasi aktif, kecuali PIN dan kode pemulihan kunci menu."]},
     {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir. Nama dan foto profilmu dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui ID Akunmu (misalnya saat mereka menambah teman); di aplikasi, foto itu hanya bisa dibuka oleh temanmu. Status online dan waktu terakhir aktifmu hanya bisa dilihat temanmu. Alamat emailmu tidak terlihat pengguna lain.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, rute GPS olahraga, serta data Keuangan dan Arisan) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, nama (username) admin, moderator, atau pengikut, serta suara dan komentar yang kamu kirim (isi komentar, username, ID Akun, dan waktu) yang dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui kode turnamen tersebut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online; hanya bisa dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, ditandai kedaluwarsa setelah 30 hari, dan dihapus saat pertemanan dihapus.","Tanda dibaca: waktu terakhir kamu membuka chat dengan temanmu. Hanya bisa dilihat temanmu (untuk menandai pesan sudah dibaca) dan dihapus saat pertemanan dihapus."]},
-    {p:["Ruangan game online (Main bersama lewat kode ruang):"], l:["Hanya untuk pengguna yang masuk dengan Google. Pada Tebak Inisial dan Puzzle Arena, kode ruang, nama host dan pemain, jawaban, skor atau hasil permainan (serta chat ruangan di Tebak Inisial) disimpan di server selama ruangan dipakai dan dihapus saat host menutup ruangan. Chat ditandai kedaluwarsa setelah 24 jam. Ruangan yang tidak ditutup dengan benar (misalnya aplikasi dihentikan paksa) dapat tersimpan lebih lama. Siapa pun yang sudah masuk akun dan mengetahui kode ruangan dapat melihat isi ruangan, termasuk chatnya."]},
+    {p:["Ruangan game online (Main bersama lewat kode ruang):"], l:["Hanya untuk pengguna yang masuk dengan Google. Pada Tebak Inisial dan Puzzle Arena, kode ruang, nama host dan pemain, jawaban, skor atau hasil permainan (serta chat ruangan di Tebak Inisial dan Puzzle Arena) disimpan di server selama ruangan dipakai dan dihapus saat host menutup ruangan. Chat ditandai kedaluwarsa setelah 24 jam. Ruangan yang tidak ditutup dengan benar (misalnya aplikasi dihentikan paksa) dapat tersimpan lebih lama. Siapa pun yang sudah masuk akun dan mengetahui kode ruangan dapat melihat isi ruangan, termasuk chatnya."]},
     {p:["Notifikasi push (hanya aplikasi Android, setelah masuk dengan Google):"], l:["Aplikasi menyimpan token perangkat dari Firebase Cloud Messaging bersama ID penggunamu, jenis platform, dan waktu, supaya notifikasi tetap muncul walau aplikasi ditutup. Izin notifikasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Notifikasi dikirim untuk pesan teman, permintaan dan persetujuan pertemanan, serta undangan (moderator turnamen, pengikut turnamen, atau ruangan permainan) beserta balasannya. Saat kejadian itu terjadi, aplikasi mengirim jenis kejadian dan pengenal terkait ke server pengirim notifikasi (Cloudflare Workers) bersama token masuk akunmu untuk verifikasi. Server memeriksa kejadian itu, membaca data yang dibutuhkan dari akun (nama pengirim dan, untuk pesan teman, 100 huruf pertama isi pesan), lalu meneruskannya sebagai isi notifikasi lewat Firebase Cloud Messaging milik Google. Isi notifikasi dapat tampil di layar kunci sesuai pengaturan notifikasi HP-mu; matikan notifikasi aplikasi bila kamu tidak menghendakinya.","Token perangkat dihapus saat kamu keluar dari akun (perangkat itu) atau menghapus akun (semua perangkat)."]},
     {p:["Blokir dan laporan:"], l:["Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.","Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan dan catatan tambahan (bila kamu menulisnya). Laporan hanya dibaca pengelola untuk meninjau pelanggaran."]},
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif. Bila sedang offline, pesan disimpan sementara di perangkatmu sampai berhasil terkirim."]},
@@ -1642,7 +1642,7 @@ const PV = {
     {p:["Finance and Arisan:"], l:["Financial records (money in and out, wallets, spending limits, savings) and Arisan data (participant names, winners, payment status) are stored on your device. If you sign in with Google, this data is also copied to your account.","Menu lock: the PIN and recovery code are stored only on your device as a hash (not the original text), are not sent to a server, and are not copied to your account. Your fingerprint and the phone's screen PIN/pattern are checked by the Android system; the app does not receive or store your fingerprint data.","Online Arisan rooms: the names of the host and participants, the draw name list, results, and the room chat are stored on a server while the room exists and are deleted when the host closes the room. Chat is also marked to expire after 24 hours.","Backup file: the Back up feature in the Finance and Arisan menus creates a file on your device at your request, and you choose where to save it. This file is not encrypted and does not contain the PIN or recovery code, so keep it somewhere safe."]},
     {p:["Summary by menu (data on your device):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, and Jodoh: names, birth dates, and other text you type, history, scoreboards, and sound and music settings. The read-aloud feature uses your device’s built-in speech engine.","BMI & Kalori, Kehamilan, and Kandungan Makanan: the body and pregnancy data you enter (for example age, sex, weight, and height), the RDA (AKG) profile (including pregnant or breastfeeding status), and the contents of My Plate (Piringku). This is health data, so keep your device secure.","Stopwatch: display settings only. Stopwatch alarms and notifications are created on your device (local notifications), without a server.","Tebak Inisial, Puzzle Arena, and Versus: when played on a single device, the data stays on the device. Online rooms are described below.","Tournaments, Sports, Finance, and Arisan: described elsewhere in this policy.","All of the above is also copied to your account if you sign in with Google and sync is on, except the PIN and recovery code of the menu lock."]},
     {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time. Your name and profile photo can be seen by other signed-in users who know your Account ID (for example when they add a friend); in the app, the photo can only be opened by your friends. Your online status and last-active time can only be seen by your friends. Your email address is not visible to other users.","A copy of your app data (settings, history, menu results, sports GPS routes, and Finance and Arisan data) so it can sync across devices.","For online tournaments: tournament data, tournament codes, the names (usernames) of admins, moderators, and followers, and the votes and comments you submit (comment text, username, Account ID, and time), which can be seen by other signed-in users who know that tournament’s code.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light; visible only to your friends).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, are marked to expire after 30 days, and are deleted when the friendship is removed.","Read receipts: the time you last opened the chat with your friend. Only your friend can see it (to mark messages as read), and it is deleted when the friendship is removed."]},
-    {p:["Online game rooms (Play together via room code):"], l:["Only for users signed in with Google. In Tebak Inisial and Puzzle Arena, the room code, host and player names, answers, scores or game results (and the room chat in Tebak Inisial) are stored on a server while the room is in use and deleted when the host closes the room. Chat is marked to expire after 24 hours. A room that is not closed properly (for example if the app is force-stopped) may be kept longer. Anyone signed in who knows the room code can see the room contents, including the chat."]},
+    {p:["Online game rooms (Play together via room code):"], l:["Only for users signed in with Google. In Tebak Inisial and Puzzle Arena, the room code, host and player names, answers, scores or game results (and the room chat in Tebak Inisial and Puzzle Arena) are stored on a server while the room is in use and deleted when the host closes the room. Chat is marked to expire after 24 hours. A room that is not closed properly (for example if the app is force-stopped) may be kept longer. Anyone signed in who knows the room code can see the room contents, including the chat."]},
     {p:["Push notifications (Android app only, after signing in with Google):"], l:["The app stores a device token from Firebase Cloud Messaging together with your user ID, the platform type, and a timestamp, so notifications still appear when the app is closed. Notification permission is requested by your device and you can revoke it at any time.","Notifications are sent for friend messages, friend requests and acceptances, and invitations (tournament moderator, tournament follower, or game room) and their replies. When such an event happens, the app sends the event type and related identifiers to the notification server (Cloudflare Workers) together with your sign-in token for verification. The server checks the event, reads the data it needs from your account (the sender’s name and, for friend messages, the first 100 characters of the message), and passes it on as the notification text through Google’s Firebase Cloud Messaging. The notification text may appear on your lock screen depending on your phone’s notification settings; turn off the app’s notifications if you do not want this.","The device token is deleted when you sign out (that device) or delete your account (all devices)."]},
     {p:["Blocking and reports:"], l:["The list of users you block is stored in your account so blocking applies on all your devices.","When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, a copy of the reported text, and your optional note. Reports are read only by the maintainer to review violations."]},
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data. While offline, the message is kept temporarily on your device until it is sent."]},
@@ -15505,10 +15505,81 @@ input{font:inherit;font-weight:700;letter-spacing:.2em;text-align:center;backgro
 .lv{display:flex;gap:8px}.lv button{flex:1;padding:10px 4px}
 .noanim *{transition:none!important;animation:none!important}
 .pr .kb{margin-left:auto;flex:none;width:auto;padding:4px 10px;font-size:13px;border-radius:10px;background:rgba(224,69,58,.18);border:1px solid rgba(224,69,58,.5);color:#ffb4ac;cursor:pointer}.pr.kq{flex-wrap:wrap}.pr .ka{width:100%;display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.pr .ka button{flex:1;min-width:84px;width:auto;padding:7px 8px;font-size:13px}
-</style></head><body><div class="app"><h1>🧩 PUZZLE ARENA</h1><div id="msg"></div>
+.tot{align-self:center;display:flex;gap:6px;align-items:baseline;padding:6px 16px;border-radius:999px;background:rgba(240,184,74,.12);border:1px solid rgba(240,184,74,.4);font-size:13px;color:var(--muted)}.tot b{font-size:20px;color:var(--gold2);font-variant-numeric:tabular-nums}.tot small{font-size:12px;color:#8ff0c0;font-weight:700}.tot.bd2{gap:10px;font-size:14px;color:var(--text);font-weight:700}.tot.bd2 b{font-size:20px;letter-spacing:.04em}.tot.mu{flex-direction:column;align-items:stretch;gap:3px;border-radius:16px;width:100%;max-width:300px;padding:8px 14px}.tot.mu .rw{display:flex;gap:8px;align-items:center;font-size:14px}.tot.mu .rw span.n{flex:1;max-width:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tot.mu .rw.me{color:var(--gold2)}.tot.mu .hd{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.06em}.tot.bd2 span{max-width:30vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ===== Chat lobby + tombol reset skor ===== */
+.rs{background:rgba(224,69,58,.14);border:1px solid rgba(224,69,58,.5);color:#ffb4ac;font-size:14px;padding:9px 12px}.rs.ask{background:rgba(224,69,58,.32);color:#fff;font-weight:700}
+.cfab{position:fixed;left:0;top:0;touch-action:none;user-select:none;-webkit-user-select:none;transition:left .18s ease,top .18s ease,transform .12s;z-index:40;width:46px;height:46px;padding:0;border-radius:50%;border:1px solid var(--gold);background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font-size:20px;line-height:1;display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.45);cursor:pointer}
+.cfab:active{transform:scale(.94)}
+.cfab.drag{transition:none;transform:scale(1.08);opacity:.92;box-shadow:0 10px 26px rgba(0,0,0,.55)}
+.cbadge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#e0453a;color:#fff;font:700 11px/18px system-ui,sans-serif;text-align:center}
+.csheet{max-width:calc(100% - 16px);max-height:calc(100% - 16px);position:fixed;left:8px;top:8px;width:340px;height:420px;z-index:45;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg2),#10142a);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.6);overflow:hidden}
+.chd{flex:none;display:flex;align-items:center;gap:8px;padding:10px 12px 6px}
+.chd b{flex:1;font-size:14px;letter-spacing:.04em;color:var(--gold2)}
+.ccount{font-size:11.5px;color:var(--muted)}
+.cx{flex:none;width:28px;height:28px;padding:0;border-radius:50%;font-size:13px;line-height:1;cursor:pointer}
+.crules{flex:none;max-height:5.6em;overflow-y:auto;margin:0;padding:0 12px 8px;font-size:11px;line-height:1.4;color:var(--muted);border-bottom:1px solid var(--line)}
+.clist{flex:1;min-height:0;overflow-y:auto;padding:10px 12px;overscroll-behavior:contain}
+.cempty{margin:18px 0;text-align:center;font-size:12.5px;font-style:italic;color:var(--muted)}
+.cm{display:flex;flex-direction:column;align-items:flex-start;margin:0 0 8px}
+.cm.me{align-items:flex-end}
+.cm .cn{margin:0 6px 2px;font-size:10.5px;color:var(--muted)}
+.cm .cb{max-width:82%;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04);font-size:14px;line-height:1.35;overflow-wrap:anywhere;white-space:pre-wrap;-webkit-user-select:text;user-select:text}
+.cm.me .cb{background:rgba(240,184,74,.14);border-color:rgba(240,184,74,.45)}
+.cm .cb.hid{font-style:italic;font-size:12px;color:var(--muted)}
+.cnote{flex:none;margin:0;padding:4px 12px 0;font-size:11.5px;line-height:1.35;color:#e8a05a}
+.cnote:empty{display:none}
+.cform{flex:none;display:flex;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px))}
+.cin{flex:1;width:auto;min-width:0;min-height:40px;padding:0 12px;font:inherit;font-size:15px;font-weight:400;letter-spacing:normal;text-align:left;text-transform:none;color:var(--text);background:#0d1017;border:1px solid var(--line);border-radius:10px;outline:0}
+.cin:focus{border-color:var(--gold)}
+.cin:disabled{opacity:.5}
+.cgo{flex:none;min-height:40px;padding:0 14px;font:inherit;font-size:13px;font-weight:700;letter-spacing:.06em;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0;border-radius:10px;cursor:pointer}
+.cgo:disabled{opacity:.45}
+
+/* ===== Tema sederhana + animasi (hanya tampilan) ===== */
+:root{--bg:#0e1116;--bg2:#171b22;--card:#151920;--line:rgba(255,255,255,.08);--text:#e8eaee;--muted:#8b93a3;--gold:#6c8cff;--gold2:#a9bcff}
+body{background:var(--bg)}
+h1{font-size:17px;font-weight:700;letter-spacing:.16em;background:none;color:var(--text);margin:4px 0 0}
+.panel{background:var(--card);backdrop-filter:none;border-radius:16px}
+button{background:rgba(255,255,255,.06);border-radius:10px;transition:transform .1s,background .2s,border-color .2s}
+button:hover:not(:disabled){background:rgba(255,255,255,.1)}
+button.go{background:var(--gold);color:#fff;box-shadow:none}
+button.go:hover:not(:disabled){background:#7f9cff}
+.cgo{background:var(--gold);color:#fff}.cfab{background:var(--gold);border-color:var(--gold);color:#fff}
+input{background:rgba(0,0,0,.25);border-radius:10px}
+.code{font-size:30px;background:rgba(0,0,0,.25);color:var(--text)}
+.tot{background:rgba(255,255,255,.05);border-color:var(--line)}.tot b{color:var(--text)}
+.mc.on{border-color:var(--gold);background:rgba(108,140,255,.14)}
+.pr{background:rgba(255,255,255,.04)}
+.bar{height:6px}.bar i{background:var(--gold)}
+#gS{color:var(--text)}#gS.bp{animation:bp .25s}@keyframes bp{40%{transform:scale(1.14)}}
+#bw{background:#12161d;border-radius:18px;box-shadow:none;padding:8px}
+#bd{gap:4px}
+.c{border-radius:10px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.22);transition:transform .16s}
+.g0{background:#e5534b}.g1{background:#e3b341}.g2{background:#a371f7}.g3{background:#3fb950}.g4{background:#58a6ff}.rk{background:#3a404c}
+.c.sel{transform:scale(1.07);box-shadow:0 0 0 2px #fff,0 4px 14px rgba(0,0,0,.4)}
+.c.bm{animation:bmp 1s ease-in-out infinite;box-shadow:inset 0 0 0 2px rgba(255,255,255,.9)}@keyframes bmp{50%{filter:brightness(1.35);transform:scale(1.05)}}
+.c.pop{opacity:1;transform:none;transition:none;animation:pop .2s ease-in forwards}
+.c.rk.pop{animation:crm .2s ease-in forwards}
+@keyframes pop{35%{transform:scale(1.18);filter:brightness(1.5)}100%{transform:scale(.1);opacity:0}}
+@keyframes crm{25%{transform:translateX(-3px) rotate(-6deg)}50%{transform:translateX(3px) rotate(6deg)}100%{transform:scale(.4) rotate(14deg);opacity:0}}
+.c.in{animation:cin .34s ease-out var(--d,0s) both}@keyframes cin{from{transform:scale(.4);opacity:0}}
+@keyframes fl0{0%{transform:translateY(calc(var(--f)*-112%))}72%{transform:translateY(3%)}100%{transform:none}}@keyframes bn0{0%{transform:scale(.4)}55%{transform:scale(1.28)}100%{transform:scale(1)}}@keyframes rin0{0%{transform:translateY(-150%) scale(.8);opacity:0}65%{transform:translateY(4%);opacity:1}100%{transform:none}}.c.fl0{animation:fl0 .24s cubic-bezier(.3,.7,.4,1) var(--d,0s) both}.c.bn0{animation:bn0 .3s ease-out both}.c.rin0{animation:rin0 .32s ease-out both}@keyframes fl1{0%{transform:translateY(calc(var(--f)*-112%))}72%{transform:translateY(3%)}100%{transform:none}}@keyframes bn1{0%{transform:scale(.4)}55%{transform:scale(1.28)}100%{transform:scale(1)}}@keyframes rin1{0%{transform:translateY(-150%) scale(.8);opacity:0}65%{transform:translateY(4%);opacity:1}100%{transform:none}}.c.fl1{animation:fl1 .24s cubic-bezier(.3,.7,.4,1) var(--d,0s) both}.c.bn1{animation:bn1 .3s ease-out both}.c.rin1{animation:rin1 .32s ease-out both}
+#bd.dg{box-shadow:0 0 0 2px #e5534b;animation:dg 1s ease-in-out infinite}@keyframes dg{50%{box-shadow:0 0 0 2px #e5534b,0 0 22px rgba(229,83,75,.55)}}
+#bw.shk{animation:shk .28s}#bw.shk2{animation:shk .36s;--a:5px}#bw.hit{animation:shk .24s;--a:3px}#bw.pls{animation:pls .22s}
+@keyframes shk{20%{transform:translate(calc(var(--a,3px)*-1),1px)}40%{transform:translate(var(--a,3px),-1px)}60%{transform:translate(calc(var(--a,3px)*-.6),0)}80%{transform:translate(calc(var(--a,3px)*.4),0)}}@keyframes pls{50%{transform:scale(1.012)}}
+#cb{top:40%;font-size:22px;letter-spacing:.08em;padding:6px 18px;border-radius:999px;background:rgba(14,17,22,.85);border:1px solid var(--gold);color:var(--gold2);text-shadow:none;z-index:3}
+#cb.t3{border-color:#e3b341;color:#f2cf70}#cb.t4,#cb.t5{border-color:#e5534b;color:#ff9a93;font-size:26px}
+.pt{position:absolute;width:6px;height:6px;margin:-3px;border-radius:50%;pointer-events:none;z-index:2;animation:pt .55s ease-out forwards}@keyframes pt{to{transform:translate(var(--x),var(--y)) scale(.2);opacity:0}}
+.fp{position:absolute;z-index:3;pointer-events:none;font-weight:800;font-size:16px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.7);animation:fp .7s ease-out forwards}@keyframes fp{0%{opacity:0;transform:translate(-50%,-30%) scale(.7)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-150%)}}
+#sM,#sC,#sL,#sG{animation:fi .28s ease-out}@keyframes fi{from{opacity:0;transform:translateY(6px)}}
+#gR{animation:fo .25s}@keyframes fo{from{opacity:0}}
+#gR .tr{animation:tp .45s cubic-bezier(.2,1.4,.4,1)}@keyframes tp{from{transform:scale(.6);opacity:0}}
+#gR .pr{animation:fi .3s both}#gR .pr:nth-child(3){animation-delay:.06s}#gR .pr:nth-child(4){animation-delay:.12s}#gR .pr:nth-child(5){animation-delay:.18s}
+.noanim *{transition:none!important;animation:none!important}
+</style></head><body><div class="app"><h1>🧩 PUZZLE ARENA</h1><div class="tot" title="Skor dari semua babak yang sudah selesai, berlaku di semua mode">⭐ Total Skor <b id="dpT">0</b><small id="dpL"></small></div><div class="tot bd2" id="dpB" hidden></div><div id="msg"></div>
 <div id="sM" class="panel"><p class="muted">Cocokkan 3+ permen sama. Geser atau ketuk untuk menukar. Main bareng teman lewat kode ruang.</p><button class="go" id="bMk">＋ Buat ruang</button><div class="or">atau gabung ke ruang teman</div><div class="row"><input id="iC" placeholder="KODE" maxlength="5"><button id="bJn">Gabung</button></div><div class="or">atau main sendiri</div><button id="bCpu">🤖 Lawan Komputer (offline)</button></div>
 <div id="sC" class="panel" hidden><div class="tr" style="font-size:18px">🤖 Lawan Komputer</div><p class="muted">Main offline, tanpa internet dan tanpa login.</p><div class="lt"><b>Mode</b></div><div id="cMd" class="col"></div><div class="lt"><b>Tingkat kesulitan</b></div><div class="lv" id="cLv"></div><button class="go" id="bGo">▶ MULAI</button><button id="bBk">Kembali</button></div>
-<div id="sL" class="panel" hidden><div class="muted">KODE RUANG · ketuk untuk menyalin</div><div class="code" id="lC"></div><div class="lt"><b>Pemain</b><span id="lN"></span></div><div id="lP" class="col"></div><div class="lt"><b>Mode</b></div><div id="lMd" class="col"></div><p class="muted" id="lH"></p><button class="go" id="bSt">▶ MULAI</button><button id="bLv">Keluar</button></div>
+<div id="sL" class="panel" hidden><div class="muted">KODE RUANG · ketuk untuk menyalin</div><div class="code" id="lC"></div><div class="lt"><b>Pemain</b><span id="lN"></span></div><div id="lP" class="col"></div><div class="lt"><b>Mode</b></div><div id="lMd" class="col"></div><p class="muted" id="lH"></p><button class="rs" id="bRs" hidden>🔄 Reset skor ruang</button><button class="go" id="bSt">▶ MULAI</button><button id="bLv">Keluar</button></div>
 <div id="sG" hidden><div class="panel"><div class="hud"><div id="gT"></div><div id="gS"></div></div><div class="bar"><i id="gB"></i></div><div id="gO" class="col"></div></div><div id="bw"><div id="bd"></div><div id="cb"></div></div><div id="gR" hidden></div></div></div>
 <script>
 (function(){
@@ -15523,21 +15594,181 @@ function nm(){if(OFF)return"Kamu";var a=auth(),u=me();if(!u)return"";var n=(a.us
 var FB=null;function lib(){if(FB)return Promise.resolve(FB);var a=auth();if(!a||!a.getDb)return Promise.reject(new Error("nofb"));return a.getDb().then(function(x){return FB=x})}
 function po(o){var P=parent;if(Array.isArray(o)){var a=new P.Array();o.forEach(function(x){a.push(po(x))});return a}if(o&&typeof o==="object"&&Object.getPrototypeOf(o)===Object.prototype){var r=new P.Object();for(var k in o)r[k]=po(o[k]);return r}return o}
 function flash(t){$("msg").textContent=t;setTimeout(function(){if($("msg").textContent===t)$("msg").textContent=""},3500)}
-function show(s){["sM","sC","sL","sG"].forEach(function(i){$(i).hidden=i!==s})}
+function show(s){["sM","sC","sL","sG"].forEach(function(i){$(i).hidden=i!==s});try{updChat()}catch(e){}}
 function ms(t){return t&&t.toMillis?t.toMillis():Date.now()}
 function mkr(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 var R={code:"",d:null,ps:{},uR:null,uP:null,mode:"race"},G=null,TM=null,KQ="";
+/* ===== total skor lintas babak & mode: bertambah saat 1 babak selesai, tidak direset saat ganti mode ===== */
+var TL={};/* papan menang antar pemain di ruang: uid -> jumlah babak dimenangkan */
+var TOT=0;(function(){var v=+ls("dp_total","0");try{var pv=+parent.__dpTotal;if(pv>v)v=pv}catch(e){}TOT=isFinite(v)&&v>0?Math.floor(v):0})();
+function fmt(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".")}
+function paintT(){var t=$("dpT"),l=$("dpL");if(t)t.textContent=fmt(TOT);if(l)l.textContent=(G&&!G.over&&!G.banked&&G.score>0)?"+"+fmt(G.score):"";paintB()}
+function bpl(){return plist().sort(function(a,b){return (a.j||0)-(b.j||0)})}
+function boardTxt(){var ps=bpl();if(ps.length<2)return"";if(ps.length===2)return ps[0].n+" ("+(TL[ps[0].u]||0)+"-"+(TL[ps[1].u]||0)+") "+ps[1].n;return ps.map(function(p){return p.n+" "+(TL[p.u]||0)}).join(" · ")}
+function rankRows(e,ps){var u=me()&&me().uid,a=ps.slice().sort(function(x,y){return (TL[y.u]||0)-(TL[x.u]||0)||(x.j||0)-(y.j||0)}),top=TL[a[0].u]||0;
+  a.forEach(function(p,i){var w=TL[p.u]||0,r=document.createElement("div");r.className="rw"+(p.u===u?" me":"");
+    var m=document.createElement("span");m.textContent=(w>0&&w===top)?"🏆":(i+1)+".";m.style.width="24px";var n=document.createElement("span");n.className="n";n.textContent=p.n+(p.u===u?" (kamu)":"");var b=document.createElement("b");b.textContent=w+" menang";b.style.fontSize="14px";
+    r.appendChild(m);r.appendChild(n);r.appendChild(b);e.appendChild(r)})}
+function paintB(){var e=$("dpB");if(!e)return;var ps=R.code?bpl():[];if(ps.length<2||(ps.length>2&&G&&!G.over)){e.hidden=true;e.innerHTML="";return}e.hidden=false;e.innerHTML="";
+  function sp(t){var x=document.createElement("span");x.textContent=t;return x}function bb(t){var x=document.createElement("b");x.textContent=t;return x}
+  if(ps.length===2){e.className="tot bd2";e.appendChild(sp(ps[0].n));e.appendChild(bb((TL[ps[0].u]||0)+" - "+(TL[ps[1].u]||0)));e.appendChild(sp(ps[1].n))}
+  else{e.className="tot bd2 mu";var h=document.createElement("div");h.className="hd";h.textContent="🏆 PAPAN SKOR RUANG";e.appendChild(h);rankRows(e,ps)}}
+function saveT(){try{localStorage.setItem("dp_total",String(TOT))}catch(e){}try{parent.__dpTotal=TOT}catch(e){}}
+function bank(){if(!G||G.banked)return 0;G.banked=1;var g=G.score||0;TOT+=g;saveT();paintT();return g}
+paintT();
 function isHost(){var u=me();return !!(u&&R.d&&R.d.host===u.uid)}
 function plist(){return Object.keys(R.ps).map(function(k){var p=R.ps[k];p.u=k;return p})}
 function rf(db,m,sub,id){return sub?m.doc(db,"dp_rooms",R.code,sub,id):m.doc(db,"dp_rooms",R.code)}
 function needLogin(){if(!me()){flash("Masuk dengan Google di Beranda untuk bermain online.");return true}return false}
 
+/* ===== RESET SKOR RUANG (hanya pemilik ruang / admin ruang) ===== */
+var RSQ=0;
+function paintRs(){var b=$("bRs");if(!b)return;var on=isHost()&&!OFF&&!!R.code&&R.code!=="CPU";b.hidden=!on;if(!on)return;
+  var has=Object.keys(TL).some(function(k){return TL[k]>0});b.disabled=!has;b.classList.toggle("ask",!!RSQ&&has);
+  b.textContent=!has?"🔄 Skor ruang masih kosong":(RSQ?"Yakin? Ketuk lagi untuk reset":"🔄 Reset skor ruang")}
+/* semua pemain ikut mereset papan skor ruang saat penanda "rs" di dokumen ruang berubah */
+function rsSync(){var v=+((R.d&&R.d.rs)||0);if(R.rs===undefined){R.rs=v;return}if(v===R.rs)return;R.rs=v;TL={};paintB();paintRs();flash(isHost()?"Skor ruang direset.":"Skor ruang direset oleh pemilik ruang.")}
+$("bRs").onclick=async function(){
+  if(!isHost()||OFF||!R.code||R.code==="CPU")return;
+  if(!RSQ){RSQ=setTimeout(function(){RSQ=0;paintRs()},4000);paintRs();return}
+  clearTimeout(RSQ);RSQ=0;
+  try{var f=await lib();await f.m.updateDoc(rf(f.db,f.m),po({rs:Date.now()}))}catch(e){flash("Gagal mereset skor ruang.")}
+  paintRs()};
+
+/* ===== CHAT lobby (Firestore: dp_rooms/{kode}/m). Hanya tampil & bisa dipakai di lobby (saat pilih mode). Aturan: dilarang spam dan kata kasar ===== */
+var CT={title:"Chat ruangan",ph:"Ketik pesan…",send:"KIRIM",empty:"Belum ada pesan. Sapa pemain lain!",
+  rules:"Aturan chat: dilarang spam dan kata kasar. Pelanggaran berulang membuat chat dibisukan sementara. Chat hanya aktif di lobby (saat memilih mode).",
+  hid:"Pesan disembunyikan karena melanggar aturan",openL:"Buka chat",closeL:"Tutup chat",
+  slow:"Terlalu cepat, tunggu sebentar.",dup:"Jangan mengirim pesan yang sama berulang kali.",rep:"Terdeteksi spam: huruf atau kata diulang-ulang.",
+  link:"Tautan tidak diperbolehkan di chat.",bad:"Pesan mengandung kata kasar dan tidak dikirim.",spam:"Terlalu banyak pesan dalam waktu singkat.",
+  warn:"Peringatan {n}/3.",muted:"Chat dibisukan {s} detik.",mutedNow:"Chat dibisukan, tunggu {s} detik.",
+  noacc:"Chat belum aktif: aturan Firestore untuk chat Puzzle Arena belum dipasang.",fail:"Pesan gagal dikirim."};
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function btn(c,x,f){var b=el("button",c,x);b.type="button";b.addEventListener("click",f);return b}
+function lsj(k,d){try{var v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function norm(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"")}
+var LEET={"0":"o","1":"i","3":"e","4":"a","5":"s","7":"t","8":"b","@":"a","$":"s"};
+function fold(s){var x=String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""),o="",i;for(i=0;i<x.length;i++)o+=(LEET[x.charAt(i)]||x.charAt(i));return o}
+function squash(w){return w.replace(/([a-z])\1+/g,"$1")}
+var BAD_SUB=["anjing","anjink","bangsat","bangke","bajingan","kontol","memek","ngentot","ngewe","jancok","jancuk","jembut","goblok","tolol","kampret","brengsek","keparat","bedebah","sialan","pelacur","lonte","pantek","fuck","shit","bitch","asshole","bastard","whore","nigger","nigga","pussy"].map(squash);
+var BAD_WORD=["asu","babi","anjir","anjg","anj","jing","cuk","tai","taik","bego","bodoh","dungu","idiot","dick","cunt","slut","retard","kntl","pepek","peler","entot","mampus","perek","jablay","gblk","goblog"].map(squash);
+function isBad(text){var f=fold(text),toks=f.split(/\s+/),i,j,t,ws;
+  for(i=0;i<toks.length;i++){t=squash(toks[i].replace(/[^a-z]/g,""));if(!t)continue;for(j=0;j<BAD_SUB.length;j++)if(t.indexOf(BAD_SUB[j])>=0)return true;if(BAD_WORD.indexOf(t)>=0)return true}
+  ws=f.split(/[^a-z]+/);for(i=0;i<ws.length;i++)if(ws[i]&&BAD_WORD.indexOf(squash(ws[i]))>=0)return true;
+  t=squash(f.replace(/[^a-z]/g,""));for(j=0;j<BAD_SUB.length;j++)if(BAD_SUB[j].length>=6&&t.indexOf(BAD_SUB[j])>=0)return true;return false}
+function spamKind(txt){
+  if(/(https?:|www\.|\b[a-z0-9-]{2,}\.(com|net|org|id|co|io|xyz|me|link|gg|ly|app|site|top|click)\b)/i.test(txt))return"link";
+  if(/(.)\1{5,}/u.test(txt))return"rep";
+  if(/(^|\s)(\S+)(\s+\2){3,}(\s|$)/i.test(txt))return"rep";
+  var seen={},n=0,ch;for(ch of txt){if(!seen[ch]){seen[ch]=1;n++}}
+  if(txt.length>=14&&n<=2)return"rep";return""}
+var CH={open:false,show:false,msgs:[],seen:{},ready:false,unread:0,uM:null,timer:0,times:[],last:null,strikes:0,strikeAt:0,muteUntil:0,wasMuted:false,noteT:0,err:""};
+function strike(key){var now=Date.now(),secs;
+  if(CH.strikeAt&&now-CH.strikeAt>600000)CH.strikes=0;CH.strikeAt=now;CH.strikes++;
+  if(CH.strikes>=3){secs=Math.min(30*Math.pow(2,CH.strikes-3),300);CH.muteUntil=now+secs*1000;return CT[key]+" "+CT.muted.replace("{s}",secs)}
+  return CT[key]+" "+CT.warn.replace("{n}",CH.strikes)}
+function checkChat(txt){var now=Date.now(),k,nt;
+  if(now<CH.muteUntil)return CT.mutedNow.replace("{s}",Math.ceil((CH.muteUntil-now)/1000));
+  if(CH.last&&now-CH.last.at<2000)return CT.slow;
+  k=spamKind(txt);if(k)return strike(k==="link"?"link":"rep");
+  if(isBad(txt))return strike("bad");
+  nt=norm(txt);if(CH.last&&nt&&nt===CH.last.n&&now-CH.last.at<60000)return strike("dup");
+  CH.times=CH.times.filter(function(x){return now-x<15000});if(CH.times.length>=5)return strike("spam");return""}
+function cNote(msg,ms){var n=$("cNote");if(!n)return;n.textContent=msg||"";clearTimeout(CH.noteT);
+  if(msg&&ms)CH.noteT=setTimeout(function(){var x=$("cNote");if(x&&!CH.err&&Date.now()>=CH.muteUntil)x.textContent=""},ms)}
+function paintBadge(){var b=$("cBadge");if(!b)return;b.hidden=!CH.unread;b.textContent=CH.unread>9?"9+":String(CH.unread)}
+function paintMute(){var inp=$("cIn"),sb=$("cSend");if(!inp||!sb)return;var now=Date.now(),m=now<CH.muteUntil;
+  inp.disabled=sb.disabled=(m||!!CH.err);
+  if(m)cNote(CT.mutedNow.replace("{s}",Math.ceil((CH.muteUntil-now)/1000)),0);else if(CH.wasMuted&&!CH.err)cNote("",0);CH.wasMuted=m}
+function paintMsgs(force){var box=$("cList");if(!box||!CH.open)return;
+  var near=box.scrollHeight-box.scrollTop-box.clientHeight<60,u=me(),mu=u?u.uid:"";box.textContent="";
+  if(!CH.msgs.length)box.appendChild(el("p","cempty",CH.err?"":CT.empty));
+  CH.msgs.forEach(function(m){var mine=m.u===mu,row=el("div","cm"+(mine?" me":"")),bad=isBad(m.t);
+    if(!mine)row.appendChild(el("span","cn",m.n||"?"));row.appendChild(el("div","cb"+(bad?" hid":""),bad?CT.hid:m.t));box.appendChild(row)});
+  if(force||near)box.scrollTop=box.scrollHeight}
+function onMsgs(s){var a=[],u=me(),mu=u?u.uid:"",add=0;
+  s.forEach(function(x){var v=x.data()||{};a.push({id:x.id,u:String(v.u||""),n:String(v.n||"").slice(0,20),t:String(v.t||"").slice(0,120),at:(v.at&&v.at.toMillis)?v.at.toMillis():Date.now()})});
+  a.sort(function(p,q){return(p.at-q.at)||(p.id<q.id?-1:1)});
+  a.forEach(function(m){if(!CH.seen[m.id]){CH.seen[m.id]=1;if(CH.ready&&m.u!==mu)add++}});
+  CH.ready=true;CH.msgs=a;if(add&&!CH.open){CH.unread+=add;paintBadge()}paintMsgs(false)}
+/* tombol chat melayang: bisa digeser, lepas jari = menempel ke sisi kiri/kanan layar (posisi diingat) */
+var CF={s:"r",y:0.8,drag:false,moved:false};
+(function(){var v=lsj("dp_cfab",null)||lsj("ti_cfab",null);if(v&&(v.s==="l"||v.s==="r")&&typeof v.y==="number"){CF.s=v.s;CF.y=Math.min(1,Math.max(0,v.y))}})();
+function vpDim(a,b,c){var v=[a,b,c].filter(function(n){return n>0});return v.length?Math.min.apply(null,v):0}
+function zf(){var z=parseFloat(getComputedStyle(document.documentElement).zoom);return z>0?z:1}
+function vpW(){var vv=window.visualViewport;return(vpDim(document.documentElement.clientWidth,vv&&vv.width,window.innerWidth)||360)/zf()}
+function vpH(){var vv=window.visualViewport;return(vpDim(document.documentElement.clientHeight,vv&&vv.height,window.innerHeight)||640)/zf()}
+function placeFab(){var f=$("cFab");if(!f)return;
+  var z=46,m=8,x=CF.s==="l"?m:Math.max(m,vpW()-z-m),y=m+CF.y*Math.max(0,vpH()-z-2*m);
+  if(CF.s==="r"){f.style.left="auto";f.style.right=m+"px"}else{f.style.right="auto";f.style.left=m+"px"}
+  f.style.top=Math.round(y)+"px";placeSheet(Math.round(x),Math.round(y))}
+function placeSheet(bx,by){var sh=$("cSheet");if(!sh||sh.hidden)return;
+  var f=$("cFab"),z=46,m=8,g=8,W=vpW(),H=vpH();
+  if(bx==null){bx=f?f.offsetLeft:0;by=f?f.offsetTop:0}
+  var w=Math.max(200,Math.min(340,W-2*m)),want=Math.min(420,Math.round(H*0.62));
+  var up=by-m-g,dn=H-(by+z)-m-g,above=up>=want||up>=dn,room=above?up:dn;
+  var h=Math.max(Math.min(want,room),Math.min(want,150));h=Math.max(120,Math.min(h,H-2*m));
+  var left=(bx+z/2)<W/2?bx:bx+z-w;left=Math.min(Math.max(left,m),Math.max(m,W-w-m));
+  var top=above?by-g-h:by+z+g;top=Math.min(Math.max(top,m),Math.max(m,H-h-m));
+  sh.style.width=Math.round(w)+"px";sh.style.height=Math.round(h)+"px";sh.style.left=Math.round(left)+"px";sh.style.top=Math.round(top)+"px"}
+function dragFab(f){var sx=0,sy=0,ox=0,oy=0,on=false,pid=null;
+  f.addEventListener("pointerdown",function(e){if(e.button>0)return;on=true;CF.drag=false;pid=e.pointerId;sx=e.clientX;sy=e.clientY;ox=f.offsetLeft;oy=f.offsetTop;try{f.setPointerCapture(pid)}catch(x){}});
+  f.addEventListener("pointermove",function(e){if(!on)return;var zz=zf(),dx=(e.clientX-sx)/zz,dy=(e.clientY-sy)/zz;
+    if(!CF.drag){if(Math.abs(dx)+Math.abs(dy)<8)return;CF.drag=true;f.classList.add("drag")}
+    var nx=Math.min(Math.max(ox+dx,0),vpW()-46),ny=Math.min(Math.max(oy+dy,0),vpH()-46);
+    f.style.right="auto";f.style.left=nx+"px";f.style.top=ny+"px";placeSheet(nx,ny)});
+  function fin(){if(!on)return;on=false;try{f.releasePointerCapture(pid)}catch(x){}
+    if(CF.drag){var span=Math.max(1,vpH()-46-16);CF.s=(f.offsetLeft+23)<vpW()/2?"l":"r";CF.y=Math.min(1,Math.max(0,(f.offsetTop-8)/span));
+      f.classList.remove("drag");placeFab();sv("dp_cfab",{s:CF.s,y:Math.round(CF.y*1000)/1000});CF.moved=true;setTimeout(function(){CF.moved=false},350)}
+    CF.drag=false}
+  f.addEventListener("pointerup",fin);f.addEventListener("pointercancel",fin)}
+function setChatOpen(v){ensureChat();CH.open=!!v;$("cSheet").hidden=!CH.open;$("cFab").hidden=!CH.show;if(CH.open)placeFab();
+  if(CH.open){CH.unread=0;paintBadge();paintMsgs(true);paintMute();setTimeout(function(){var i=$("cIn");if(i&&!i.disabled)i.focus()},60)}}
+function ensureChat(){if($("cFab"))return;
+  var fab=el("button","cfab"),bd=el("span","cbadge"),sh=el("section","csheet"),hd=el("div","chd"),ti=el("b"),cn=el("span","ccount"),
+    x=btn("cx","✕",function(){setChatOpen(false)}),ru=el("p","crules"),box=el("div","clist"),nt=el("p","cnote"),fm=el("div","cform"),inp=el("input","cin"),sd=btn("cgo","",sendChat);
+  fab.id="cFab";fab.type="button";fab.hidden=true;fab.appendChild(el("span","","💬"));bd.id="cBadge";bd.hidden=true;fab.appendChild(bd);
+  fab.addEventListener("click",function(){if(CF.moved){CF.moved=false;return}setChatOpen(!CH.open)});
+  dragFab(fab);window.addEventListener("resize",placeFab);window.addEventListener("orientationchange",function(){setTimeout(placeFab,250)});
+  if(window.visualViewport)window.visualViewport.addEventListener("resize",placeFab);
+  sh.id="cSheet";sh.hidden=true;sh.setAttribute("role","dialog");
+  ti.id="cTitle";cn.id="cCount";x.id="cClose";ru.id="cRules";box.id="cList";box.setAttribute("aria-live","polite");nt.id="cNote";nt.setAttribute("role","status");
+  inp.id="cIn";inp.type="text";inp.maxLength=120;inp.setAttribute("autocomplete","off");inp.setAttribute("enterkeyhint","send");
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();sendChat()}});sd.id="cSend";
+  hd.appendChild(ti);hd.appendChild(cn);hd.appendChild(x);fm.appendChild(inp);fm.appendChild(sd);
+  sh.appendChild(hd);sh.appendChild(ru);sh.appendChild(box);sh.appendChild(nt);sh.appendChild(fm);
+  document.body.appendChild(fab);document.body.appendChild(sh);placeFab()}
+/* chat hanya terlihat saat layar lobby (sL) tampil; saat bermain / hasil / menu awal otomatis tersembunyi */
+function updChat(){
+  var on=!!R.code&&!OFF&&R.code!=="CPU"&&!!R.d&&!$("sL").hidden&&!!me();
+  if(!on&&!$("cFab"))return;ensureChat();
+  CH.show=on;if(!on&&CH.open)setChatOpen(false);$("cFab").hidden=!on;if(on)placeFab();
+  $("cTitle").textContent="💬 "+CT.title;$("cRules").textContent=CT.rules;$("cIn").placeholder=CT.ph;$("cSend").textContent=CT.send;
+  $("cFab").setAttribute("aria-label",CT.openL);$("cClose").setAttribute("aria-label",CT.closeL);$("cSheet").setAttribute("aria-label",CT.title);
+  var np=plist().length;$("cCount").textContent=np?"👥 "+np:""}
+async function sendChat(){
+  var u=me(),inp=$("cIn");if(!u||!R.code||OFF||!CH.show||!inp||inp.disabled)return;
+  var raw=inp.value,txt=raw.replace(/\s+/g," ").trim().slice(0,120);if(!txt)return;
+  var why=checkChat(txt);if(why){cNote(why,4500);paintMute();return}
+  var now=Date.now();CH.times.push(now);CH.last={n:norm(txt),at:now};inp.value="";cNote("",0);
+  try{var f=await lib(),m=f.m;
+    await m.addDoc(m.collection(f.db,"dp_rooms",R.code,"m"),po({u:u.uid,n:nm(),t:txt,at:m.serverTimestamp(),exp:m.Timestamp.fromMillis(Date.now()+86400000)}))
+  }catch(e){var cc=String((e&&(e.code||e.message))||"");inp.value=raw;cNote(/permission/i.test(cc)?CT.noacc:CT.fail,4500)}}
+function chatOn(m,db,code){chatOff();
+  CH.msgs=[];CH.seen={};CH.ready=false;CH.unread=0;CH.err="";CH.times=[];CH.last=null;
+  try{CH.uM=m.onSnapshot(m.query(m.collection(db,"dp_rooms",code,"m"),m.orderBy("at","desc"),m.limit(60)),onMsgs,function(e){
+    CH.err=String((e&&e.code)||"err");cNote(/permission/i.test(CH.err)?CT.noacc:CT.fail,0);paintMute()})}catch(e){CH.err="err"}
+  if(!CH.timer)CH.timer=setInterval(paintMute,500)}
+function chatOff(){try{if(CH.uM)CH.uM()}catch(e){}CH.uM=null;if(CH.timer){clearInterval(CH.timer);CH.timer=0}
+  CH.msgs=[];CH.seen={};CH.ready=false;CH.unread=0;CH.err="";if(CH.open)setChatOpen(false);paintBadge();cNote("",0)}
+
 /* ===== ruang ===== */
 async function listen(code){
-  var f=await lib(),m=f.m,db=f.db;R.code=code;R.ps={};R.seen=false;R.chk=false;R.leaving=false;
+  var f=await lib(),m=f.m,db=f.db;R.code=code;R.ps={};R.seen=false;R.chk=false;R.leaving=false;R.rs=undefined;chatOn(m,db,code);
   R.uR=m.onSnapshot(m.doc(db,"dp_rooms",code),function(s){
     if(!s.exists()){if(R.code){flash("Ruang ditutup.");reset()}return}
-    R.d=s.data();if(R.d.st==="lobby"||R.d.st===undefined){if(G){G.over=true;clearInterval(TM)}G=null;R.mode=R.d.mode||"race";paintL();show("sL")}
+    R.d=s.data();rsSync();if(R.d.st==="lobby"||R.d.st===undefined){if(G){G.over=true;clearInterval(TM)}G=null;paintT();R.mode=R.d.mode||"race";paintL();show("sL")}
     else if(R.d.st==="play"&&(!G||G.rd!==R.d.rd))startGame();
   },function(e){flash("Gagal: "+(e&&e.code||e))});
   R.uP=m.onSnapshot(m.collection(db,"dp_rooms",code,"p"),function(s){
@@ -15546,7 +15777,7 @@ async function listen(code){
     if(!G)paintL();else{paintOpp();incoming();check()}
   });
 }
-function reset(){try{R.uR&&R.uR();R.uP&&R.uP()}catch(e){}R.uR=R.uP=null;OFF=false;clearInterval(BT);R.seen=R.chk=R.leaving=false;KQ="";R.code="";R.d=null;R.ps={};G=null;clearInterval(TM);show("sM")}
+function reset(){try{chatOff()}catch(e){}if(R.code!=="CPU")TL={};try{R.uR&&R.uR();R.uP&&R.uP()}catch(e){}R.uR=R.uP=null;OFF=false;clearInterval(BT);R.seen=R.chk=R.leaving=false;KQ="";R.code="";R.d=null;R.ps={};G=null;clearInterval(TM);paintT();show("sM")}
 async function me0(){var f=await lib();return po({n:nm(),j:Date.now(),s:0,pr:0,ro:0,as:0,at:"",lo:false,rd:0,exp:f.m.Timestamp.fromMillis(Date.now()+86400000)})}
 $("bMk").onclick=async function(){
   if(needLogin())return;
@@ -15568,7 +15799,7 @@ $("bJn").onclick=async function(){
 };
 $("bLv").onclick=async function(){if(OFF){reset();return}
   R.leaving=true;try{var f=await lib(),m=f.m,db=f.db,u=me().uid;
-    if(isHost()){var ps=await m.getDocs(m.collection(db,"dp_rooms",R.code,"p"));await Promise.all(ps.docs.map(function(x){return m.deleteDoc(x.ref)}));await m.deleteDoc(m.doc(db,"dp_rooms",R.code))}
+    if(isHost()){try{var ms=await m.getDocs(m.collection(db,"dp_rooms",R.code,"m")),mr=ms.docs.map(function(x){return x.ref});for(var mi=0;mi<mr.length;mi+=400){var wb=m.writeBatch(db);mr.slice(mi,mi+400).forEach(function(r){wb.delete(r)});await wb.commit()}}catch(e){}var ps=await m.getDocs(m.collection(db,"dp_rooms",R.code,"p"));await Promise.all(ps.docs.map(function(x){return m.deleteDoc(x.ref)}));await m.deleteDoc(m.doc(db,"dp_rooms",R.code))}
     else await m.deleteDoc(m.doc(db,"dp_rooms",R.code,"p",u))}catch(e){}
   reset()
 };
@@ -15596,6 +15827,22 @@ $("bSt").onclick=async function(){var f=await lib(),m=f.m,d=R.d,n=plist().length
   m.updateDoc(rf(f.db,m),po({st:"play",rd:(d.rd||0)+1,seed:1+Math.floor(Math.random()*1e9),dur:d.mode==="duel"?150:90,ts:m.serverTimestamp()})).catch(function(){flash("Gagal memulai.")})};
 
 /* ===== papan ===== */
+function fxb(c){var w=$("bw");if(!w)return;w.classList.remove("shk","shk2","pls","hit");void w.offsetWidth;w.classList.add(c)}
+function swapAnim(a,b,cb){var ch=$("bd").children,x=ch[a],y=ch[b];if(!x||!y){cb();return}
+  var dx=y.offsetLeft-x.offsetLeft,dy=y.offsetTop-x.offsetTop;x.style.zIndex=2;x.style.transition=y.style.transition="transform .13s ease";
+  x.style.transform="translate("+dx+"px,"+dy+"px)";y.style.transform="translate("+(-dx)+"px,"+(-dy)+"px)";
+  setTimeout(function(){x.style.transition=y.style.transition="none";x.style.transform=y.style.transform="";x.style.zIndex="";if(G)cb();requestAnimationFrame(function(){x.style.transition=y.style.transition=""})},140)}
+function nope(a,b){var ch=$("bd").children,x=ch[a],y=ch[b];if(!x||!y){G.busy=false;return}
+  var dx=(y.offsetLeft-x.offsetLeft)*.38,dy=(y.offsetTop-x.offsetTop)*.38,e=[x,y];
+  e.forEach(function(c,i){c.style.transition="transform .1s ease";c.style.transform="translate("+(i?-dx:dx)+"px,"+(i?-dy:dy)+"px)"});
+  setTimeout(function(){e.forEach(function(c){c.style.transform=""});setTimeout(function(){e.forEach(function(c){c.style.transition=""});if(G){G.busy=false;draw()}},110)},110)}
+function fx(all,rk,lv,gain){if(document.body.className==="noanim")return;var bw=$("bw"),ch=$("bd").children,ps=[],np=all.length>14?2:4,sx=0,sy=0,n=0;
+  function mk(k,color,m){var c=ch[k];if(!c)return;var cx=c.offsetLeft+c.offsetWidth/2,cy=c.offsetTop+c.offsetHeight/2;sx+=cx;sy+=cy;n++;
+    for(var j=0;j<m;j++){var p=document.createElement("i"),a=Math.random()*6.283,d=22+Math.random()*26;p.className="pt";p.style.cssText="left:"+cx+"px;top:"+cy+"px;background:"+color+";--x:"+Math.cos(a)*d+"px;--y:"+Math.sin(a)*d+"px";bw.appendChild(p);ps.push(p)}}
+  all.forEach(function(k){var c=col(G.b[k]);mk(k,c<0?"#8b93a3":CO[c],np)});rk.forEach(function(k){mk(k,"#8b93a3",3)});
+  if(n&&gain>0){var f=document.createElement("b");f.className="fp";f.textContent="+"+gain;f.style.left=sx/n+"px";f.style.top=sy/n+"px";bw.appendChild(f);ps.push(f)}
+  var g=$("gS");if(g){g.classList.remove("bp");void g.offsetWidth;g.classList.add("bp")}
+  setTimeout(function(){ps.forEach(function(p){p.remove()})},700)}
 function col(t){return t===ROCK?-1:t%10}
 function rnd(){return Math.floor(G.rng()*5)}
 function fresh(){var b=[];for(var i=0;i<64;i++){var c;do{c=rnd()}while((i%8>=2&&col(b[i-1])===c&&col(b[i-2])===c)||(i>=16&&col(b[i-8])===c&&col(b[i-16])===c));b.push(c)}return b}
@@ -15605,7 +15852,7 @@ function finds(b){var s={},big={},i,j,k,x,c;
   return{s:s,big:big}}
 function hasMove(b){for(var i=0;i<64;i++){[1,8].forEach(function(d){var j=i+d;if(d===1&&i%8===7||j>63||b[i]===ROCK||b[j]===ROCK)return;var t=b[i];b[i]=b[j];b[j]=t;if(Object.keys(finds(b).s).length)hasMove.ok=1;t=b[i];b[i]=b[j];b[j]=t})}var r=!!hasMove.ok;hasMove.ok=0;return r}
 function expand(b,s){var q=Object.keys(s).map(Number),d={};while(q.length){var k=q.pop();if(d[k])continue;d[k]=1;if(b[k]>=10&&b[k]!==ROCK){var x0=k%8,y0=k/8|0;for(var y=y0-1;y<=y0+1;y++)for(var x=x0-1;x<=x0+1;x++)if(x>=0&&x<8&&y>=0&&y<8){var t=y*8+x;if(b[t]!==ROCK&&!s[t]){s[t]=1;q.push(t)}}}}}
-function drop(){for(var x=0;x<8;x++){var a=[];for(var y=7;y>=0;y--)if(G.b[y*8+x]>=0)a.push(G.b[y*8+x]);for(y=7;y>=0;y--)G.b[y*8+x]=a.length?a.shift():rnd()}}
+function drop(){G.fd={};for(var x=0;x<8;x++){var a=[],o=[],y;for(y=7;y>=0;y--)if(G.b[y*8+x]>=0){a.push(G.b[y*8+x]);o.push(y)}var nw=8-a.length;for(y=7;y>=0;y--){if(a.length){G.b[y*8+x]=a.shift();G.fd[y*8+x]=y-o.shift()}else{G.b[y*8+x]=rnd();G.fd[y*8+x]=nw}}}}
 function draw(){var bd=$("bd");if(!bd.children.length){for(var i=0;i<64;i++){var e=document.createElement("div");e.onclick=(function(i){return function(){tap(i)}})(i);bd.appendChild(e)}}
   for(i=0;i<64;i++){var t=G.b[i],e=bd.children[i],c=col(t);e.className="c"+(t===ROCK?" rk":"")+(t>=10&&t!==ROCK?" bm":"")+(G.sel===i?" sel":"");e.style.background=c<0?"":CO[c];e.textContent=c<0?"🪨":EM[c]}}
 function sw(a,b){var t=G.b[a];G.b[a]=G.b[b];G.b[b]=t}
@@ -15613,25 +15860,25 @@ function tap(i){if(!G||G.busy||G.over||G.b[i]===ROCK)return;
   if(G.sel==null){G.sel=i;draw();return}
   var a=G.sel;G.sel=null;var d=Math.abs(a-i);
   if(!((d===1&&(a/8|0)===(i/8|0))||d===8)){G.sel=i;draw();return}
-  sw(a,i);if(!Object.keys(finds(G.b).s).length){sw(a,i);draw();return}
-  G.busy=true;G.mv=0;draw();setTimeout(function(){casc(1)},100)}
+  sw(a,i);if(!Object.keys(finds(G.b).s).length){sw(a,i);G.busy=true;nope(a,i);return}
+  G.busy=true;G.mv=0;swapAnim(a,i,function(){draw();setTimeout(function(){casc(1)},50)})}
 function casc(lv){
   var f=finds(G.b),ks=Object.keys(f.s);if(!ks.length){settle();return}
-  Object.keys(f.big).forEach(function(k){if(f.s[k]){delete f.s[k];G.b[k]=col(G.b[k])+10}});
+  Object.keys(f.big).forEach(function(k){if(f.s[k]){delete f.s[k];G.b[k]=col(G.b[k])+10;(G.bn=G.bn||{})[k]=1}});
   expand(G.b,f.s);var all=Object.keys(f.s).map(Number),rr={},ch=$("bd").children;
   all.forEach(function(k){f.s[k]&&ch[k]&&(ch[k].className+=" pop");[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(v){var x=k%8+v[0],y=(k/8|0)+v[1];if(x>=0&&x<8&&y>=0&&y<8&&G.b[y*8+x]===ROCK)rr[y*8+x]=1})});
   Object.keys(rr).forEach(function(k){ch[k].className+=" pop"});
-  var n=all.length;toast(lv);G.score+=n*10*lv;G.mv+=Math.max(0,n-2)+(lv>1?lv-1:0)+(all.some(function(k){return G.b[k]>=10})?2:0);
-  setTimeout(function(){all.forEach(function(k){G.b[k]=-1});Object.keys(rr).forEach(function(k){G.b[k]=-1;G.rocks--});drop();draw();setTimeout(function(){casc(lv+1)},180)},190)}
+  var n=all.length;toast(lv);fx(all,Object.keys(rr),lv,n*10*lv);G.score+=n*10*lv;paintT();G.mv+=Math.max(0,n-2)+(lv>1?lv-1:0)+(all.some(function(k){return G.b[k]>=10})?2:0);
+  setTimeout(function(){all.forEach(function(k){G.b[k]=-1});Object.keys(rr).forEach(function(k){G.b[k]=-1;G.rocks--});drop();draw();setTimeout(function(){casc(lv+1)},220)},200)}
 function settle(){
   var d=R.d,duel=d.mode==="duel";
   if(duel){var send=Math.floor(G.mv/2),off=Math.min(send,G.pend);G.pend-=off;send-=off;
     if(send>0){var tg=plist().filter(function(p){return p.u!==me().uid&&p.rd===d.rd&&!p.lo}).sort(function(a,b){return b.ro-a.ro})[0];if(tg){G.as+=send;G.at=tg.u;G.urg=1}}
-    while(G.pend>0){var x=Math.floor(G.rng()*8),y=0;while(y<7&&G.b[y*8+x]===ROCK)y++;if(G.b[y*8+x]!==ROCK){G.b[y*8+x]=ROCK;G.rocks++}G.pend--}
+    while(G.pend>0){var x=Math.floor(G.rng()*8),y=0;while(y<7&&G.b[y*8+x]===ROCK)y++;if(G.b[y*8+x]!==ROCK){G.b[y*8+x]=ROCK;G.rocks++;(G.nr=G.nr||{})[y*8+x]=1;fxb("hit")}G.pend--}
     if(G.rocks>=MAXR){G.dead=true}}
   if(!hasMove(G.b)){for(var t=0;t<30;t++){var a=[];G.b.forEach(function(v,i){if(v!==ROCK)a.push(i)});var v=a.map(function(i){return G.b[i]});for(var i=v.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),q=v[i];v[i]=v[j];v[j]=q}a.forEach(function(k,i){G.b[k]=v[i]});if(!Object.keys(finds(G.b).s).length&&hasMove(G.b))break}}
   G.busy=false;draw();push(G.dead||G.score>=3000||G.urg);G.urg=0;hud();check()}
-async function pushNow(){try{var f=OFF?{m:{serverTimestamp:function(){var t=Date.now();return{toMillis:function(){return t}}}}}:await lib(),m=f.m,u=me().uid,o={n:nm(),j:R.ps[u]&&R.ps[u].j||Date.now(),s:G.score,pr:Math.min(100,Math.floor(G.score/30)),ro:G.rocks,as:G.as,at:G.at,lo:!!G.dead,rd:G.rd,exp:m.Timestamp.fromMillis(Date.now()+86400000)};
+async function pushNow(){try{var f=OFF?{m:{Timestamp:{fromMillis:function(t){return t}},serverTimestamp:function(){var t=Date.now();return{toMillis:function(){return t}}}}}:await lib(),m=f.m,u=me().uid,o={n:nm(),j:R.ps[u]&&R.ps[u].j||Date.now(),s:G.score,pr:Math.min(100,Math.floor(G.score/30)),ro:G.rocks,as:G.as,at:G.at,lo:!!G.dead,rd:G.rd,exp:m.Timestamp.fromMillis(Date.now()+86400000)};
   if(o.pr>=100&&d0().mode==="race"&&!G.ft){G.ft=1;o.ft=m.serverTimestamp()}else if(G.ft&&R.ps[u]&&R.ps[u].ft)o.ft=R.ps[u].ft;
   if(OFF){R.ps[u]=o;check();return}await m.setDoc(m.doc(f.db,"dp_rooms",R.code,"p",u),po(o))}catch(e){}}
 function d0(){return R.d||{}}
@@ -15643,7 +15890,7 @@ function settle0(){G.busy=true;settle()}
 function startGame(){
   var d=R.d;clearInterval(TM);
   G={rd:d.rd,rng:mkr(d.seed),score:0,rocks:0,pend:0,as:0,at:"",seen:{},sel:null,busy:false,over:false,dead:false,ft:0,mv:0,end:Date.now()+d.dur*1000};
-  G.b=fresh();$("bd").innerHTML="";$("gR").hidden=true;show("sG");draw();hud();push(true);
+  G.b=fresh();G.intro=1;setTimeout(function(){if(G)G.intro=0},900);$("bd").innerHTML="";paintT();$("gR").hidden=true;show("sG");draw();hud();push(true);
   TM=setInterval(function(){hud();check()},400)}
 function hud(){if(!G)return;if(G.end<=Date.now()&&!G.fin&&R.d.mode!=="race"){G.fin=1;push(true)}var d=R.d,left=Math.max(0,Math.ceil((G.end-Date.now())/1000)),pr=Math.min(100,Math.floor(G.score/30));
   $("gT").textContent=d.mode==="race"?"Kamu":MODES[d.mode]+" · "+left+"s";$("gS").textContent=d.mode==="duel"?"🪨 "+G.rocks+"/"+MAXR+(G.pend?" (+"+G.pend+")":""):d.mode==="race"?pr+"%":G.score;
@@ -15673,19 +15920,24 @@ function paintL(){var h=isHost(),d=R.d||{},md0=d.mode||"race",ps=plist().sort(fu
       if(KQ===p.u){e.classList.add("kq");var ka=document.createElement("div");ka.className="ka";[["Keluarkan",false],["Keluarkan & blokir",true],["Batal",null]].forEach(function(o){var b=document.createElement("button");b.textContent=o[0];b.onclick=function(ev){ev.stopPropagation();KQ="";if(o[1]===null){paintL();return}kick(p.u,o[1],p.n)};ka.appendChild(b)});e.appendChild(ka)}}
     else e.appendChild(t);L.appendChild(e)});
   var md=$("lMd");md.innerHTML="";Object.keys(MI).forEach(function(k){var b=document.createElement("button");b.className="mc"+(k===md0?" on":"");b.disabled=!h||(k==="duel"&&np>2);b.innerHTML="<i></i><div><b></b><small></small></div>";b.querySelector("i").textContent=MI[k][0];b.querySelector("b").textContent=MI[k][1];b.querySelector("small").textContent=MI[k][2];b.onclick=async function(){var f=await lib();f.m.updateDoc(rf(f.db,f.m),po({mode:k}))};md.appendChild(b)});
-  $("lH").textContent=HINT[md0]+(h?"":" Menunggu pemilik ruang…");
-  var okp=md0==="duel"?np===2:(np>=2&&np<=5);$("bSt").hidden=!h;$("bSt").disabled=!okp;$("bSt").textContent=okp?"▶ MULAI":(md0==="duel"?"Serang Balik butuh tepat 2 pemain":(np<2?"Butuh min. 2 pemain":"Maks. 5 pemain"))}
+  $("lH").textContent=HINT[md0]+(h?"":" Menunggu pemilik ruang…");paintB();
+  var okp=md0==="duel"?np===2:(np>=2&&np<=5);$("bSt").hidden=!h;$("bSt").disabled=!okp;$("bSt").textContent=okp?"▶ MULAI":(md0==="duel"?"Serang Balik butuh tepat 2 pemain":(np<2?"Butuh min. 2 pemain":"Maks. 5 pemain"));paintRs();updChat()}
 function draw(){var bd=$("bd"),i,e,t,c;if(!bd.children.length){for(i=0;i<64;i++){e=document.createElement("div");e.dataset.i=i;bd.appendChild(e)}}
-  for(i=0;i<64;i++){t=G.b[i];e=bd.children[i];c=col(t);e.className="c "+(t===ROCK?"rk":"g"+c)+(t>=10&&t!==ROCK?" bm":"")+(G.sel===i?" sel":"");e.textContent=c<0?"🪨":EM[c]}
+  for(i=0;i<64;i++){t=G.b[i];e=bd.children[i];c=col(t);var ex="",al=G.al?1:0,fd=G.fd&&G.fd[i];e.style.removeProperty("--f");e.style.removeProperty("--d");
+    if(fd>0){ex=" fl"+al;e.style.setProperty("--f",fd)}else if(G.bn&&G.bn[i])ex=" bn"+al;else if(G.nr&&G.nr[i])ex=" rin"+al;else if(G.intro){ex=" in";e.style.setProperty("--d",((i%8)+(i>>3))*28+"ms")}
+    e.className="c "+(t===ROCK?"rk":"g"+c)+(t>=10&&t!==ROCK?" bm":"")+(G.sel===i?" sel":"")+ex;e.textContent=c<0?"🪨":EM[c]}G.al=G.al?0:1;G.fd=G.bn=G.nr=null;
   bd.classList.toggle("dg",G.rocks>=14)}
-function toast(lv){if(lv<2)return;var e=$("cb");e.textContent="COMBO ×"+lv;e.className="";void e.offsetWidth;e.className="show"}
+function toast(lv){if(lv<2)return;var e=$("cb");e.textContent="COMBO ×"+lv;e.className="";void e.offsetWidth;e.className="show t"+Math.min(lv,5);fxb(lv>=4?"shk2":lv>=3?"shk":"pls")}
 function paintOpp(){if(!G)return;var d=R.d,o=$("gO");o.innerHTML="";plist().filter(function(p){return p.u!==me().uid}).forEach(function(p,i){
   var v=p.rd!==G.rd?0:d.mode==="duel"?p.ro:d.mode==="race"?p.pr:p.s,t=d.mode==="duel"?"🪨 "+v+(p.lo?" ☠":""):d.mode==="race"?v+"%":v,e=document.createElement("div");e.className="op";
   e.innerHTML="<div class=ob><small><span></span><span></span></small><div class=bar><i></i></div></div>";var s=e.querySelectorAll("small span");s[0].textContent=p.n.slice(0,14);s[1].textContent=t;
-  e.querySelector("i").style.width=(d.mode==="duel"?Math.min(100,v*5):d.mode==="race"?v:Math.min(100,v/30))+"%";e.insertBefore(av(p.n,i+1),e.firstChild);o.appendChild(e)})}
+  e.querySelector("i").style.width=(d.mode==="duel"?Math.min(100,v*5):d.mode==="race"?v:Math.min(100,v/30))+"%";e.insertBefore(av(p.n,i+1),e.firstChild);o.appendChild(e)});paintB()}
 function end(r){G.over=true;clearInterval(TM);var d=R.d,win=r[0],box=$("gR"),c=document.createElement("div");box.hidden=false;box.innerHTML="";c.className="card panel";
   var h=document.createElement("div");h.className="tr";h.textContent=win&&win.u===me().uid?"🏆 Kamu menang!":"🏁 "+(win?win.n:"-")+" menang";c.appendChild(h);
   r.forEach(function(p,i){var e=document.createElement("div");e.className="pr";var m=document.createElement("span");m.className="md";m.textContent=["🥇","🥈","🥉"][i]||(i+1);var n=document.createElement("span");n.textContent=p.n+(p.u===me().uid?" (kamu)":"");var v=document.createElement("b");v.textContent=d.mode==="race"?p.pr+"%":d.mode==="score"?p.s:(p.lo?"☠ ":"")+"🪨"+p.ro;e.appendChild(m);e.appendChild(n);e.appendChild(v);c.appendChild(e)});
+  if(!G.tld){G.tld=1;if(win&&win.u)TL[win.u]=(TL[win.u]||0)+1}paintB();var bps=bpl();if(bps.length>2){var bh=document.createElement("div");bh.className="tot bd2 mu";bh.style.maxWidth="none";bh.innerHTML="<div class=hd>🏆 PAPAN SKOR RUANG</div>";rankRows(bh,bps);c.appendChild(bh)}else{var bt=boardTxt();if(bt){var br=document.createElement("div");br.className="pr";br.innerHTML="<span>🏆 Papan skor</span><b></b>";br.querySelector("b").textContent=bt;br.style.flexWrap="wrap";c.appendChild(br)}}
+  var gn=bank(),tl=document.createElement("div");tl.className="pr";tl.innerHTML="<span>⭐ Skor babak ini</span><b></b>";tl.querySelector("b").textContent="+"+fmt(gn);c.appendChild(tl);
+  var tt=document.createElement("div");tt.className="pr";tt.innerHTML="<span>⭐ Total Skor</span><b></b>";tt.querySelector("b").textContent=fmt(TOT);c.appendChild(tt);
   if(isHost()){var b=document.createElement("button");b.className="go";b.textContent="Main lagi";b.onclick=OFF?function(){box.hidden=true;box.innerHTML="";startCpu(CP.mode,CP.lv)}:async function(){var f=await lib();f.m.updateDoc(rf(f.db,f.m),po({st:"lobby"}))};c.appendChild(b)}
   else{var p0=document.createElement("p");p0.className="muted";p0.textContent="Menunggu pemilik ruang…";c.appendChild(p0)}
   var l=document.createElement("button");l.textContent="Keluar";l.onclick=function(){$("bLv").onclick()};c.appendChild(l);box.appendChild(c)}
