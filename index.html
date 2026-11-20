@@ -528,6 +528,21 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #privacy .absec h3{margin:16px 0 4px;font:600 14.5px/1.3 var(--head);color:var(--gold2)}
 #privacy .pvl li::marker{color:var(--gold)}
 #privacy .pvcard{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);margin-top:12px}
+/* Syarat Penggunaan: tampilan disamakan dengan Kebijakan Privasi */
+#stTerms .abh{text-align:left;padding:4px 0 22px}
+#stTerms .abh h1{font-size:30px;text-transform:none}
+#stTerms .abh .pvu{display:inline-block;margin-top:12px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
+#stTerms .pvtoc{margin:22px 0 4px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--bg2),var(--card))}
+#stTerms .pvtoc h2{margin:0 0 6px;font:600 12px/1.2 var(--head);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+#stTerms .pvtoc ol{margin:0;padding-left:22px;font-size:14.5px;line-height:1.5}
+#stTerms .pvtoc li{margin:5px 0}
+#stTerms .pvtoc a,#stTerms .pvcard a{color:var(--gold2)}
+#stTerms .absec{scroll-margin-top:8px}
+#stTerms .absec h2{display:flex;align-items:center;gap:10px}
+#stTerms .pvn{flex:none;min-width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:var(--gold);color:#1a1405;font:700 14px/1 var(--head)}
+#stTerms .absec h3{margin:16px 0 4px;font:600 14.5px/1.3 var(--head);color:var(--gold2)}
+#stTerms .pvl li::marker{color:var(--gold)}
+#stTerms .pvcard{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);margin-top:12px}
 #about .abver{margin:6px 0 0;text-align:center;font-size:11px;letter-spacing:.04em;color:var(--muted);opacity:.75}
 @media (max-width:360px){#about .abgrid{grid-template-columns:1fr}}
 #splash{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--bg);transition:opacity .5s}
@@ -19575,10 +19590,19 @@ if(navigator.onLine !== false) init().catch(() => {});
     const d = TM[en() ? "en" : "id"];
     $("tmBack").textContent = d.back; $("tmTitle").textContent = d.t; $("tmSub").textContent = d.sub; $("tmUpd").textContent = d.upd;
     const body = $("tmBody"); body.textContent = "";
-    d.secs.forEach(sc => {
-      const s = mk("section", "absec"); if(sc.h) s.appendChild(mk("h2", null, sc.h));
+    const E = en(), EMAIL = "titikhilangs27@gmail.com", strip = h => String(h || "").replace(/^\d+\.\s*/, "");
+    const toc = mk("nav", "pvtoc"); toc.setAttribute("aria-label", E ? "Contents" : "Daftar isi"); toc.appendChild(mk("h2", null, E ? "Contents" : "Daftar isi"));
+    const ol = mk("ol"); toc.appendChild(ol); body.appendChild(toc);
+    d.secs.forEach((sc, i) => {
+      const s = mk("section", "absec"); s.id = "tm-s" + (i + 1);
+      if(sc.h){
+        const h2 = mk("h2"); h2.appendChild(mk("span", "pvn", String(i + 1))); h2.appendChild(document.createTextNode(strip(sc.h))); s.appendChild(h2);
+        const li = mk("li"), a = mk("a", null, strip(sc.h)); a.href = "#tm-s" + (i + 1);
+        a.addEventListener("click", ev => { ev.preventDefault(); s.scrollIntoView({ behavior: "smooth", block: "start" }); }); li.appendChild(a); ol.appendChild(li);
+      }
       (sc.p || []).forEach(x => s.appendChild(mk("p", null, x)));
       if(sc.l){ const ul = mk("ul", "pvl"); sc.l.forEach(x => ul.appendChild(mk("li", null, x))); s.appendChild(ul); }
+      if(i === d.secs.length - 1){ const c = mk("p", "pvcard"); c.appendChild(mk("strong", null, "Aurenza27 \u00b7 Satu Titik")); c.appendChild(document.createElement("br")); const m = mk("a", null, EMAIL); m.href = "mailto:" + EMAIL; c.appendChild(m); s.appendChild(c); }
       body.appendChild(s);
     });
   }
