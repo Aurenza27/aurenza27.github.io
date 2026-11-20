@@ -10726,65 +10726,84 @@ resetForm();text();build();syncSnd();tick();setInterval(tick,250);
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>INFO KANDUNGAN MAKANAN</title>
 <style>
-:root{--bg:#0b0d12;--bg2:#141821;--card:#161a23;--line:#2a3040;--text:#ece7da;--muted:#8d93a3;--gold:#d4a94f;--gold2:#f0cf86;--ok:#4cc38a;--warn:#e8904a;--bad:#e2644f;--blue:#5fa8ff}
+:root{--bg:#0f1218;--bg2:#171b24;--card:#171b24;--line:#272d3a;--text:#e9ebf0;--muted:#9aa1b2;--gold:#d4a94f;--gold2:#e6c77a;--ok:#4cc38a;--warn:#e8904a;--bad:#e2644f;--blue:#5fa8ff}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
-body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#1c2230 0%,var(--bg) 60%) fixed,var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif;display:flex;justify-content:center}
-.app{width:100%;max-width:420px;padding:18px 16px calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
-.brand{text-align:center;margin-top:4px}.brand .icon{font-size:42px;filter:drop-shadow(0 0 18px rgba(212,169,79,.35))}.brand h1{margin:4px 0 0;font-size:22px;letter-spacing:.08em}
-.sub{color:var(--muted);font-style:italic;text-align:center;font-size:14px;line-height:1.45;margin:0}
-.panel{background:linear-gradient(180deg,var(--bg2),var(--card));border:1px solid var(--line);border-radius:16px;padding:16px}
-.label{display:block;font-size:12px;letter-spacing:.2em;color:var(--gold);margin:0 0 10px;text-transform:uppercase}
-.hint{font-size:12.5px;line-height:1.5;color:var(--muted);margin:10px 0 0}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.45;display:flex;justify-content:center}
+.app{width:100%;max-width:480px;padding:16px 16px calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.brand{display:flex;align-items:center;gap:12px}.brand .icon{font-size:30px;line-height:1}.brand h1{margin:0;font-size:19px;font-weight:700;letter-spacing:0}
+.sub{color:var(--muted);font-size:14px;line-height:1.5;margin:-6px 0 0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.label{display:block;font-size:14px;font-weight:700;color:var(--text);margin:0 0 10px}
+.hint{font-size:13px;line-height:1.5;color:var(--muted);margin:10px 0 0}
 button{font:inherit;cursor:pointer;color:inherit}
-.btn{width:100%;min-height:50px;font-weight:700;letter-spacing:.1em;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0;border-radius:12px}
-.btn.ghost{background:transparent;color:var(--gold2);border:1px solid var(--line);font-weight:600;letter-spacing:.06em}
-.btn.danger{background:transparent;color:var(--bad);border:1px solid var(--line);font-weight:600;letter-spacing:.06em}
-.btn.sm{width:auto;min-height:36px;padding:0 14px;font-size:13px;border-radius:10px}
-.tabs{display:flex;gap:6px;padding:4px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03)}
-.tab{flex:1;min-width:0;min-height:40px;padding:0 4px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:12.5px;letter-spacing:.02em}
-.tab.on{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font-weight:700}
+button:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.btn{width:100%;min-height:48px;font-weight:600;font-size:15px;color:#1a1405;background:var(--gold);border:0;border-radius:12px}
+.btn:active{filter:brightness(.92)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid var(--line)}
+.btn.sm{width:auto;min-height:36px;padding:0 14px;font-size:14px;border-radius:10px}
+.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--bg2)}
+.tab{flex:1;min-width:0;min-height:40px;padding:0 6px;border:0;border-radius:9px;background:transparent;color:var(--muted);font-size:13.5px;font-weight:500}
+.tab.on{background:var(--gold);color:#1a1405;font-weight:700}
 .sbox{position:relative}
-.sbox input{width:100%;min-height:48px;padding:0 44px 0 14px;font:inherit;font-size:16px;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px}
+.sbox input{width:100%;min-height:48px;padding:0 44px 0 14px;font:inherit;font-size:16px;color:var(--text);background:var(--bg2);border:1px solid var(--line);border-radius:12px}
 .sbox input:focus{outline:2px solid var(--gold2);outline-offset:1px}
 .sbox .x{position:absolute;right:4px;top:4px;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:16px}
 .cats{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}
-.chip{flex:none;min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--text);font-size:13px;white-space:nowrap}
-.chip.on{border-color:var(--gold);color:var(--gold2);background:rgba(212,169,79,.12)}
-.fi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;margin:0 0 8px;background:linear-gradient(180deg,var(--bg2),var(--card));border:1px solid var(--line);border-radius:14px}
-.fi:active{background:rgba(255,255,255,.06)}
+.chip{flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:13.5px;white-space:nowrap}
+.chip.on{border-color:var(--gold);color:var(--gold2);background:rgba(212,169,79,.12);font-weight:600}
+.fi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;margin:0 0 8px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.fi:active{background:#1d2230}
 .fi .em{font-size:26px;flex:none;width:34px;text-align:center}
-.fi .nb{flex:1;min-width:0}.fi .nb b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fi .nb small{display:block;margin-top:2px;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fi .kc{flex:none;text-align:right;font-size:18px;font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}.fi .kc small{display:block;font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.06em}
-.dh{display:flex;align-items:center;gap:12px}.dh .em{font-size:40px}.dh h2{margin:0;font-size:19px;line-height:1.25}.dh small{color:var(--muted);font-size:12px}
+.fi .nb{flex:1;min-width:0}.fi .nb b{display:block;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi .nb small{display:block;margin-top:2px;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi .kc{flex:none;text-align:right;font-size:18px;font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}.fi .kc small{display:block;font-size:10.5px;color:var(--muted);font-weight:400}
+.dh{display:flex;align-items:center;gap:12px}.dh .em{font-size:38px}.dh h2{margin:0;font-size:19px;line-height:1.25}.dh small{color:var(--muted);font-size:13px}
 .row2{display:flex;gap:8px;flex-wrap:wrap}
 .gin{display:flex;gap:8px;align-items:center;margin-top:12px}
-.gin input{flex:1;min-width:0;min-height:46px;padding:0 14px;font:inherit;font-size:17px;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px}
+.gin input{flex:1;min-width:0;min-height:46px;padding:0 14px;font:inherit;font-size:17px;color:var(--text);background:var(--bg2);border:1px solid var(--line);border-radius:12px}
 .gin input:focus{outline:2px solid var(--gold2);outline-offset:1px}.gin span{color:var(--muted);font-size:14px}
-.big{text-align:center;font-size:54px;font-weight:700;line-height:1.05;color:var(--gold2);font-variant-numeric:tabular-nums}.big small{display:block;margin-top:4px;font-size:12px;letter-spacing:.18em;color:var(--muted);font-weight:400}
+.big{text-align:center;font-size:48px;font-weight:700;line-height:1.05;color:var(--gold2);font-variant-numeric:tabular-nums}.big small{display:block;margin-top:4px;font-size:13px;color:var(--muted);font-weight:400}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
-.tile{padding:10px 4px;text-align:center;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);min-width:0}
-.tile small{display:block;font-size:10px;letter-spacing:.1em;color:var(--muted)}.tile b{display:block;font-size:19px;margin-top:3px;font-variant-numeric:tabular-nums}.tile em{font-style:normal;font-size:11px;color:var(--muted)}
+.tile{padding:10px 4px;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);min-width:0}
+.tile small{display:block;font-size:11px;letter-spacing:.04em;color:var(--muted)}.tile b{display:block;font-size:19px;margin-top:3px;font-variant-numeric:tabular-nums}.tile em{font-style:normal;font-size:12px;color:var(--muted)}
 .split{display:flex;height:10px;border-radius:99px;overflow:hidden;margin-top:14px;background:var(--line)}.split i{display:block;height:100%}
-.leg{display:flex;justify-content:space-between;gap:6px;margin-top:6px;font-size:11px;color:var(--muted)}.leg b{font-weight:400}
+.leg{display:flex;justify-content:space-between;gap:6px;margin-top:6px;font-size:12px;color:var(--muted)}.leg b{font-weight:400}
 .leg .p::before,.leg .f::before,.leg .c::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.leg .p::before{background:var(--ok)}.leg .f::before{background:var(--gold)}.leg .c::before{background:var(--blue)}
-.nr{margin-top:12px}.nr .h{display:flex;justify-content:space-between;font-size:13.5px}.nr .h b{font-variant-numeric:tabular-nums}.nr .h em{font-style:normal;color:var(--muted);font-size:12px;margin-left:6px}
-.nr .bar{height:7px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:5px}.nr .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}.nr .bar i.lim{background:linear-gradient(90deg,#d9803a,var(--warn))}.nr .bar i.hi{background:var(--bad)}
-.flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.flag{padding:5px 11px;border-radius:999px;font-size:12px;border:1px solid var(--line)}.flag.bad{color:var(--warn);border-color:rgba(232,144,74,.5);background:rgba(232,144,74,.1)}.flag.good{color:var(--ok);border-color:rgba(76,195,138,.5);background:rgba(76,195,138,.1)}
+.nr{margin-top:12px}.nr .h{display:flex;justify-content:space-between;font-size:14px}.nr .h b{font-variant-numeric:tabular-nums}.nr .h em{font-style:normal;color:var(--muted);font-size:12.5px;margin-left:6px}
+.nr .bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:5px}.nr .bar i{display:block;height:100%;background:var(--gold)}.nr .bar i.lim{background:var(--warn)}.nr .bar i.hi{background:var(--bad)}
+.flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.flag{padding:5px 11px;border-radius:999px;font-size:12.5px;border:1px solid var(--line)}.flag.bad{color:var(--warn);border-color:rgba(232,144,74,.5);background:rgba(232,144,74,.1)}.flag.good{color:var(--ok);border-color:rgba(76,195,138,.5);background:rgba(76,195,138,.1)}
 .pi{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}.pi:first-of-type{border-top:0}
-.pi .em{font-size:24px}.pi .nb{flex:1;min-width:0}.pi .nb b{display:block;font-size:14.5px}.pi .nb small{color:var(--muted);font-size:12px}
-.pi .st{display:flex;align-items:center;gap:4px}.pi .st button{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:transparent;font-size:16px}
+.pi .em{font-size:24px}.pi .nb{flex:1;min-width:0}.pi .nb b{display:block;font-size:14.5px;font-weight:600}.pi .nb small{color:var(--muted);font-size:12.5px}
+.pi .st{display:flex;align-items:center;gap:4px}.pi .st button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:transparent;font-size:16px}
 .pi .st .rm{color:var(--bad)}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--gold);color:#1a1405;font-weight:700;font-size:14px;padding:10px 18px;border-radius:999px;transition:.25s;z-index:20;max-width:90vw;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--gold);color:#1a1405;font-weight:600;font-size:14px;padding:10px 18px;border-radius:999px;transition:.25s;z-index:20;max-width:90vw;text-align:center}
 .toast.on{opacity:1;transform:translate(-50%,0)}
-.flab{display:block;font-size:12px;letter-spacing:.06em;color:var(--muted);margin:14px 0 6px}
-.sel{width:100%;min-height:46px;padding:0 12px;font:inherit;font-size:16px;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px}.sel:focus{outline:2px solid var(--gold2);outline-offset:1px}.sel option{background:#161a23;color:#ece7da}
-.mut{display:block;color:var(--muted);font-size:11.5px;line-height:1.45;margin-top:4px}
-.dt{border:1px solid var(--line);border-radius:14px;margin-top:10px;background:rgba(255,255,255,.03)}.dt summary{padding:13px 14px;cursor:pointer;color:var(--gold2);font-size:14px;letter-spacing:.04em}
-.dg{display:grid;grid-template-columns:1fr auto;gap:7px 12px;padding:0 14px 14px;font-size:13px}.dg span{color:var(--muted)}.dg b{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
-.sec{margin:16px 0 0;font-size:12px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase}
-.tiny{color:var(--muted);font-size:11.5px;line-height:1.5;margin:0;text-align:center}
+.flab{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:14px 0 6px}
+.sel{width:100%;min-height:46px;padding:0 12px;font:inherit;font-size:16px;color:var(--text);background:var(--bg2);border:1px solid var(--line);border-radius:12px}.sel:focus{outline:2px solid var(--gold2);outline-offset:1px}.sel option{background:#171b24;color:#e9ebf0}
+.mut{display:block;color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:4px}
+.dt{border:1px solid var(--line);border-radius:12px;margin-top:10px;background:var(--bg)}.dt summary{padding:13px 14px;cursor:pointer;color:var(--text);font-size:14px;font-weight:600}
+.dt .hint{margin:0;padding:0 14px 14px}
+.dg{display:grid;grid-template-columns:1fr auto;gap:7px 12px;padding:0 14px 14px;font-size:13.5px}.dg span{color:var(--muted)}.dg b{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.sec{margin:18px 0 0;font-size:14px;font-weight:700;color:var(--text)}
+.tiny{color:var(--muted);font-size:12px;line-height:1.5;margin:0}
+/* level menu Piringku */
+.lv-head{display:flex;align-items:center;gap:14px}
+.lv-badge{flex:none;width:64px;height:64px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--lvc);color:#10131a}
+.lv-badge small{font-size:10px;font-weight:700;letter-spacing:.08em}.lv-badge b{font-size:28px;line-height:1.05}
+.lv-tx{min-width:0}.lv-name{display:block;font-size:19px;font-weight:700}.lv-tx small{color:var(--muted);font-size:13px}
+.lv-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:14px}.lv-scale i{display:block;height:8px;border-radius:99px;background:var(--line)}.lv-scale i.on{background:var(--lvc)}
+.lv-ends{display:flex;justify-content:space-between;gap:8px;margin-top:5px;font-size:11.5px;color:var(--muted)}
+.lv-desc{margin:12px 0 0;font-size:14.5px;line-height:1.55}
+.lv-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}.lv-row:first-of-type{border-top:0}
+.lv-row .dot{flex:none;width:10px;height:10px;border-radius:50%}
+.lv-row .nm{flex:1;min-width:0;font-size:14px}.lv-row .nm small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+.lv-row b{font-size:14px;font-variant-numeric:tabular-nums;text-align:right}
+.lv-tips{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.lv-tips li{position:relative;padding:10px 12px 10px 34px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:14px;line-height:1.5}
+.lv-tips li::before{content:"\2192";position:absolute;left:12px;top:10px;color:var(--lvc);font-weight:700}
+.lv-tips li.note::before{content:"i";font-style:italic;font-family:Georgia,serif;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -11421,7 +11440,7 @@ function paintDetail(){
   inp.addEventListener("input", () => { const v = parseFloat(String(inp.value).replace(",", ".")); if(isFinite(v) && v > 0 && v <= 5000){ grams = v; paintChipsOn(); paintRes(); } });
   gin.append(inp, el("span", "", L("gram", "grams"))); p1.append(gin); d.append(p1);
   const res = el("div", "panel"); res.id = "dRes"; d.append(res);
-  const add = btn("＋ " + L("TAMBAH KE PIRINGKU", "ADD TO MY PLATE"), "btn", () => { addPlate(f, grams); });
+  const add = btn("＋ " + L("Tambah ke Piringku", "Add to My plate"), "btn", () => { addPlate(f, grams); });
   d.append(add);
   paintRes();
 }
@@ -11429,7 +11448,7 @@ function paintChipsOn(){ const c = $("pChips"); if(!c) return; [...c.children].f
 function paintRes(){
   const r = $("dRes"); if(!r || !sel) return; r.textContent = "";
   const t = calc([{f:sel, g:grams}]);
-  const big = el("div", "big", fx(Math.round(t.kcal), 0)); big.append(el("small", "", L("KKAL · ", "KCAL · ") + fx(grams, grams % 1 ? 1 : 0) + " g")); r.append(big);
+  const big = el("div", "big", fx(Math.round(t.kcal), 0)); big.append(el("small", "", L("kkal · ", "kcal · ") + fx(grams, grams % 1 ? 1 : 0) + " g")); r.append(big);
   r.append(el("p", "hint", enNote(t)));
   const tl = el("div", "tiles");
   [[L("PROTEIN", "PROTEIN"), t.p], [L("LEMAK", "FAT"), t.f], [L("KARBO", "CARBS"), t.c]].forEach(x => { const c = el("div", "tile"); c.append(el("small", "", x[0]), el("b", "", fx(x[1], 1)), el("em", "", "g")); tl.append(c); });
@@ -11444,11 +11463,104 @@ function addPlate(f, g){
   else plate.push({k:f.key, g:g2});
   savePlate(); paintTabs(); toast(L("Ditambahkan ke Piringku.", "Added to My plate."));
 }
+/* ===== level menu Piringku =====
+   Menilai KESEIMBANGAN gizi (bukan jumlah kalori), sehingga berlaku untuk satu kali makan maupun sehari penuh.
+   Skor 0-100 dari enam kriteria berbobot; level 1-5 dari skor. */
+const LV_COL = ["#e2644f", "#e8904a", "#e6c77a", "#8fd16f", "#4cc38a"];
+function lvInfo(n){
+  return [
+    [L("Perlu diperbaiki", "Needs work"), L("Susunan gizi masih jauh dari seimbang: ada zat yang terlalu banyak atau terlalu sedikit. Ikuti saran di bawah untuk memperbaikinya.", "The nutrient mix is far from balanced: some nutrients are too high or too low. Follow the suggestions below to improve it.")],
+    [L("Cukup", "Fair"), L("Sebagian gizi sudah pas, tetapi masih ada beberapa yang perlu dibenahi agar menu lebih seimbang.", "Some nutrients are on target, but a few still need adjusting for a more balanced menu.")],
+    [L("Baik", "Good"), L("Susunan gizi sudah cukup seimbang. Sedikit penyesuaian akan membuatnya lebih baik lagi.", "The nutrient mix is fairly balanced. A small adjustment would make it even better.")],
+    [L("Sangat baik", "Very good"), L("Hampir seimbang. Hanya satu atau dua zat yang masih bisa diperbaiki.", "Almost balanced. Only one or two nutrients could still be improved.")],
+    [L("Seimbang", "Balanced"), L("Susunan gizi seimbang menurut kriteria di bawah. Pertahankan dan tetap variasikan menu harianmu.", "The nutrient mix is balanced by the criteria below. Keep it up and keep varying your daily menu.")]
+  ][n - 1];
+}
+function plateLevel(t){
+  const em = t.p * 4 + t.f * 9 + t.c * 4;
+  if(!(t.kcal >= 1) || !(em > 0)) return null;
+  const kid = akgSt.use && akgKid(akgSt.k);
+  const band = (v, a, b, ta, tb) => v >= a && v <= b ? 1 : v < a ? Math.max(0, (v - ta) / (a - ta)) : Math.max(0, (tb - v) / (tb - b));
+  const pc = t.p * 4 / em * 100, fc = t.f * 9 / em * 100, cc = t.c * 4 / em * 100;
+  const fiD = t.fi / t.kcal * 1000, naD = t.na / t.kcal * 1000, suS = t.su * 4 / t.kcal * 100;
+  const fLo = kid ? 25 : 20, fHi = kid ? 45 : 35;
+  const C = [
+    {k:"c", w:20, v:cc, s:band(cc, 45, 65, 25, 80), dir:cc < 45 ? -1 : cc > 65 ? 1 : 0, lo:45, hi:65},
+    {k:"p", w:15, v:pc, s:band(pc, 10, 35, 3, 50), dir:pc < 10 ? -1 : pc > 35 ? 1 : 0, lo:10, hi:35},
+    {k:"f", w:20, v:fc, s:band(fc, fLo, fHi, fLo - 10, fHi + 15), dir:fc < fLo ? -1 : fc > fHi ? 1 : 0, lo:fLo, hi:fHi},
+    {k:"fi", w:20, v:fiD, s:Math.min(1, fiD / 14), dir:fiD < 14 ? -1 : 0},
+    {k:"na", w:15, v:naD, s:naD <= 1000 ? 1 : naD >= 2000 ? 0 : (2000 - naD) / 1000, dir:naD > 1000 ? 1 : 0, skip:t.unk.na && !t.na},
+    {k:"su", w:10, v:suS, s:suS <= 10 ? 1 : suS >= 25 ? 0 : (25 - suS) / 15, dir:suS > 10 ? 1 : 0, skip:t.unk.su && !t.su}
+  ].filter(x => !x.skip);
+  const W = C.reduce((a, x) => a + x.w, 0), score = Math.round(C.reduce((a, x) => a + x.w * x.s, 0) / W * 100);
+  return {score:score, n:score >= 90 ? 5 : score >= 75 ? 4 : score >= 60 ? 3 : score >= 40 ? 2 : 1, C:C, kid:kid};
+}
+function lvName(k){ return {c:L("Karbohidrat", "Carbohydrate"), p:L("Protein", "Protein"), f:L("Lemak", "Fat"), fi:L("Serat", "Fiber"), na:L("Natrium", "Sodium"), su:L("Gula", "Sugar")}[k]; }
+function lvVal(x){ return x.k === "fi" ? fx(x.v, 0) + " g/1000 " + L("kkal", "kcal") : x.k === "na" ? fx(x.v, 0) + " mg/1000 " + L("kkal", "kcal") : Math.round(x.v) + "% " + L("energi", "energy"); }
+function lvTarget(x){ return x.k === "fi" ? "≥ 14 g/1000 " + L("kkal", "kcal") : x.k === "na" ? "≤ 1000 mg/1000 " + L("kkal", "kcal") : x.k === "su" ? "≤ 10% " + L("energi", "energy") : x.lo + "–" + x.hi + "% " + L("energi", "energy"); }
+function lvTip(x){
+  const k = x.k + (x.dir < 0 ? "-" : "+");
+  const T = {
+    "c-":[L("Karbohidrat kurang. Tambahkan sumber karbohidrat kompleks seperti nasi merah, ubi, jagung, atau roti gandum.", "Carbohydrates are low. Add complex carbs such as brown rice, sweet potato, corn, or whole-grain bread."), 0],
+    "c+":[L("Karbohidrat terlalu dominan. Kurangi porsi nasi, mi, atau roti, lalu tambah lauk dan sayur.", "Carbohydrates dominate. Reduce the rice, noodles, or bread and add protein foods and vegetables."), 0],
+    "p-":[L("Protein kurang. Tambahkan telur, ikan, ayam tanpa kulit, tempe, tahu, atau kacang-kacangan.", "Protein is low. Add eggs, fish, skinless chicken, tempeh, tofu, or legumes."), 0],
+    "p+":[L("Protein terlalu dominan. Imbangi dengan karbohidrat kompleks dan sayur.", "Protein dominates. Balance it with complex carbs and vegetables."), 0],
+    "f-":[L("Lemak agak rendah. Tambahkan lemak sehat seperti alpukat, kacang, atau ikan berlemak.", "Fat is a bit low. Add healthy fats such as avocado, nuts, or oily fish."), 0],
+    "f+":[L("Lemak tinggi. Kurangi gorengan, santan, dan makanan berminyak; pilih cara masak direbus, dikukus, atau dipanggang.", "Fat is high. Cut down on fried food, coconut milk, and oily dishes; choose boiling, steaming, or grilling."), 0],
+    "fi-":[L("Serat kurang. Tambahkan sayur, buah utuh (bukan jus), kacang-kacangan, atau biji-bijian.", "Fiber is low. Add vegetables, whole fruit (not juice), legumes, or whole grains."), 0],
+    "na+":[L("Natrium tinggi. Kurangi makanan asin dan olahan, kuah, kecap, serta saus; jangan menambah garam.", "Sodium is high. Cut down on salty and processed foods, broth, soy sauce, and sauces; do not add extra salt."), 0],
+    "su+":[L("Gula tinggi. Ganti minuman manis dengan air putih atau teh tawar, dan kurangi kue serta camilan manis.", "Sugar is high. Swap sweet drinks for water or plain tea and cut down on cakes and sweet snacks."), 0]
+  };
+  return T[k] ? T[k][0] : null;
+}
+function levelPanel(t){
+  const r = plateLevel(t); if(!r) return null;
+  const info = lvInfo(r.n), p = el("div", "panel");
+  p.style.setProperty("--lvc", LV_COL[r.n - 1]);
+  p.append(el("span", "label", L("Level menu", "Menu level")));
+  const hd = el("div", "lv-head"), bd = el("div", "lv-badge"), tx = el("div", "lv-tx");
+  bd.append(el("small", "", "LEVEL"), el("b", "", String(r.n)));
+  tx.append(el("b", "lv-name", info[0]), el("small", "", L("Skor ", "Score ") + r.score + "/100"));
+  hd.append(bd, tx); p.append(hd);
+  const sc = el("div", "lv-scale"); for(let i = 1; i <= 5; i++) sc.append(el("i", i <= r.n ? "on" : ""));
+  const en = el("div", "lv-ends"); en.append(el("span", "", "1 " + lvInfo(1)[0]), el("span", "", "5 " + lvInfo(5)[0]));
+  p.append(sc, en, el("p", "lv-desc", info[1]));
+
+  p.append(el("p", "sec", L("Rincian penilaian", "Score breakdown")));
+  const rows = el("div"); rows.style.marginTop = "6px";
+  r.C.forEach(x => {
+    const row = el("div", "lv-row"), dot = el("span", "dot"), nm2 = el("div", "nm");
+    const st = x.s >= .85 ? [L("Ideal", "Ideal"), "var(--ok)"] : x.s >= .4 ? [L("Cukup", "Fair"), "var(--gold2)"] : [L("Perlu perhatian", "Needs attention"), "var(--bad)"];
+    dot.style.background = st[1];
+    nm2.append(el("span", "", lvName(x.k)), el("small", "", st[0] + " · " + L("target ", "target ") + lvTarget(x)));
+    row.append(dot, nm2, el("b", "", lvVal(x))); rows.append(row);
+  });
+  p.append(rows);
+
+  p.append(el("p", "sec", L("Saran", "Suggestions")));
+  const tips = r.C.filter(x => x.s < .85).sort((a, b) => b.w * (1 - b.s) - a.w * (1 - a.s)).slice(0, 4).map(lvTip).filter(Boolean);
+  const ul = el("ul", "lv-tips");
+  if(!tips.length) tips.push(L("Susunan gizi sudah seimbang. Pertahankan variasi makanan dan minum air putih yang cukup.", "The nutrient mix is balanced. Keep varying your foods and drink enough water."));
+  tips.forEach(s => ul.append(el("li", "", s)));
+  const pct = Math.round(t.kcal / REF.kcal * 100);
+  if(pct > 110) ul.append(el("li", "note", L("Total energi sudah " + pct + "% dari " + refTxt() + ". Jika ini untuk sehari penuh, kurangi porsi.", "Total energy is already " + pct + "% of " + refTxt() + ". If this is for a full day, reduce the portions.")));
+  if(t.unk.na || t.unk.su) ul.append(el("li", "note", L("Ada makanan yang nilai gula atau natriumnya belum diketahui, jadi penilaian zat itu belum lengkap.", "Some foods have unknown sugar or sodium values, so that part of the score is incomplete.")));
+  if(r.kid) ul.append(el("li", "note", L("Profil AKG anak dipakai: rentang lemak dilebarkan, tetapi level tetap perkiraan umum.", "A child RDA profile is on: the fat range is widened, but the level is still a general estimate.")));
+  p.append(ul);
+
+  const d = el("details", "dt"); d.append(el("summary", "", L("Cara penilaian level", "How the level is scored")));
+  const g = el("div", "dg");
+  r.C.forEach(x => g.append(el("span", "", lvName(x.k) + " (" + L("bobot ", "weight ") + x.w + ")"), el("b", "", lvTarget(x))));
+  d.append(g, el("p", "hint", L("Level 1: skor di bawah 40 · Level 2: 40–59 · Level 3: 60–74 · Level 4: 75–89 · Level 5: 90–100.", "Level 1: score below 40 · Level 2: 40–59 · Level 3: 60–74 · Level 4: 75–89 · Level 5: 90–100.")),
+    el("p", "hint", L("Level menilai keseimbangan gizi, bukan jumlah kalori, dan berlaku untuk satu kali makan maupun sehari penuh. Gula dihitung sebagai gula total (termasuk gula alami buah dan susu). Kriteria memakai rentang umum pedoman gizi (mis. AMDR dan batas natrium 2000 mg per hari); ini panduan umum, bukan diagnosis. Bila punya kondisi khusus (diabetes, hipertensi, ginjal, hamil) atau menyusun menu anak, konsultasikan ke dokter atau ahli gizi.", "The level rates nutrient balance, not calorie count, and works for a single meal or a full day. Sugar is counted as total sugar (including natural sugar from fruit and milk). The criteria use common nutrition-guideline ranges (e.g. AMDR and the 2,000 mg daily sodium limit); this is general guidance, not a diagnosis. If you have a medical condition (diabetes, hypertension, kidney disease, pregnancy) or are planning a child's menu, consult a doctor or dietitian.")));
+  p.append(d);
+  return p;
+}
 function paintPlate(){
   const d = $("vPlate"); d.textContent = "";
   if(!plate.length){
     const p = el("div", "panel"); p.append(el("span", "label", L("Piringku", "My plate")), el("p", "hint", L("Belum ada makanan. Pilih makanan, atur porsinya, lalu ketuk Tambah ke Piringku untuk menjumlah kalori dan gizi satu hari atau satu kali makan.", "No food yet. Pick a food, set the portion, then tap Add to My plate to total calories and nutrients for a day or a meal.")));
-    p.firstChild.nextSibling.style.marginTop = "0"; d.append(p, btn(L("CARI MAKANAN", "FIND FOOD"), "btn", () => go("list"))); return;
+    p.firstChild.nextSibling.style.marginTop = "0"; d.append(p, btn(L("Cari makanan", "Find food"), "btn", () => go("list"))); return;
   }
   const items = plate.map(x => ({f:byKey[x.k], g:x.g, x}));
   const p1 = el("div", "panel"); p1.append(el("span", "label", L("Isi piring", "On the plate")));
@@ -11462,12 +11574,13 @@ function paintPlate(){
   });
   d.append(p1);
   const t = calc(items), p2 = el("div", "panel");
-  const big = el("div", "big", fx(Math.round(t.kcal), 0)); big.append(el("small", "", L("TOTAL KKAL", "TOTAL KCAL"))); p2.append(big);
+  const lvp = levelPanel(t); if(lvp) d.append(lvp);
+  const big = el("div", "big", fx(Math.round(t.kcal), 0)); big.append(el("small", "", L("Total kkal", "Total kcal"))); p2.append(big);
   p2.append(el("p", "hint", enNote(t)));
   const es = energySplit(t); if(es) p2.append(es);
   const fl = flagsFor(t); if(fl) p2.append(fl);
   p2.append(nutRows(t)); d.append(p2);
-  const clr = btn(L("KOSONGKAN PIRING", "CLEAR PLATE"), "btn danger", () => { if(!clr.dataset.sure){ clr.dataset.sure = "1"; clr.textContent = L("KETUK LAGI UNTUK MENGHAPUS", "TAP AGAIN TO CLEAR"); setTimeout(() => { if(clr.isConnected){ delete clr.dataset.sure; clr.textContent = L("KOSONGKAN PIRING", "CLEAR PLATE"); } }, 3000); return; } plate = []; savePlate(); paintTabs(); paintPlate(); });
+  const clr = btn(L("Kosongkan piring", "Clear plate"), "btn danger", () => { if(!clr.dataset.sure){ clr.dataset.sure = "1"; clr.textContent = L("Ketuk lagi untuk menghapus", "Tap again to clear"); setTimeout(() => { if(clr.isConnected){ delete clr.dataset.sure; clr.textContent = L("Kosongkan piring", "Clear plate"); } }, 3000); return; } plate = []; savePlate(); paintTabs(); paintPlate(); });
   d.append(clr);
 }
 
@@ -11515,7 +11628,7 @@ function paintAkg(){
   p2.append(el("span", "label", L("Kebutuhan gizi harian (AKG)", "Daily nutrient needs (RDA)")));
   p2.append(el("div", "dh")); p2.lastChild.append(el("h2", "", akgLabel(r)));
   if(r.g.bb) p2.lastChild.append(el("small", "", L("Acuan: berat " + r.g.bb + " kg, tinggi " + r.g.tb + " cm", "Reference: " + r.g.bb + " kg, " + r.g.tb + " cm")));
-  const big = el("div", "big", fx(Math.round(r.t[0]), 0)); big.append(el("small", "", L("KKAL PER HARI", "KCAL PER DAY"))); big.style.marginTop = "12px"; p2.append(big);
+  const big = el("div", "big", fx(Math.round(r.t[0]), 0)); big.append(el("small", "", L("kkal per hari", "kcal per day"))); big.style.marginTop = "12px"; p2.append(big);
   if(r.ad) p2.append(el("p", "hint", L("Sudah termasuk tambahan untuk kondisi ini sesuai Permenkes.", "Includes the extra amounts for this condition as set by the regulation.")));
   const tl = el("div", "tiles");
   [[L("PROTEIN", "PROTEIN"), r.t[1]], [L("LEMAK", "FAT"), r.t[2]], [L("KARBO", "CARBS"), r.t[5]]].forEach(x => { const c = el("div", "tile"); c.append(el("small", "", x[0]), el("b", "", fx(x[1], x[1] % 1 ? 1 : 0)), el("em", "", "g")); tl.append(c); });
@@ -11532,7 +11645,7 @@ function paintAkg(){
   p2.append(aRow(L("Gula (batas anjuran)", "Sugar (recommended limit)"), 50, "g", 0, pl ? pl.su : null, true, L("Bukan bagian AKG; batas anjuran Kemenkes (Permenkes 30/2013) 50 g, setara 4 sendok makan.", "Not part of the RDA; Indonesian MoH recommended limit (Permenkes 30/2013) of 50 g, about 4 tablespoons.") + (pl && pl.unk.su ? " " + L("Ada makanan yang gulanya belum diketahui.", "Some foods have unknown sugar.") : "")));
   if(!t) p2.append(el("p", "hint", L("Tambahkan makanan ke Piringku untuk membandingkan asupan Anda dengan angka di atas.", "Add foods to My plate to compare your intake with the numbers above.")));
   d.append(p2);
-  if(!t) d.append(btn(L("CARI MAKANAN", "FIND FOOD"), "btn ghost", () => go("list")));
+  if(!t) d.append(btn(L("Cari makanan", "Find food"), "btn ghost", () => go("list")));
 
   const p3 = el("div", "panel");
   p3.append(el("span", "label", L("Lemak esensial, vitamin, dan mineral", "Essential fats, vitamins, and minerals")));
@@ -11542,13 +11655,13 @@ function paintAkg(){
   p3.append(el("p", "hint", L("Angka vitamin dan mineral adalah acuan kebutuhan. Aplikasi ini belum menghitung kandungannya dari makanan.", "Vitamin and mineral figures are reference needs. This app does not yet calculate them from foods.")));
   d.append(p3);
 
-  d.append(btn(akgSt.use ? "✓ " + L("DIPAKAI SEBAGAI ACUAN HARIAN", "USED AS DAILY REFERENCE") : L("PAKAI SEBAGAI ACUAN HARIAN", "USE AS DAILY REFERENCE"), akgSt.use ? "btn" : "btn ghost", () => { akgSt.use = !akgSt.use; saveAkg(); applyRef(); paintAkg(); toast(akgSt.use ? L("Persen di menu ini kini mengikuti AKG Anda.", "Percentages in this menu now follow your RDA.") : L("Kembali ke acuan label gizi 2150 kkal.", "Back to the 2,150 kcal label reference.")); }));
+  d.append(btn(akgSt.use ? "✓ " + L("Dipakai sebagai acuan harian", "Used as daily reference") : L("Pakai sebagai acuan harian", "Use as daily reference"), akgSt.use ? "btn" : "btn ghost", () => { akgSt.use = !akgSt.use; saveAkg(); applyRef(); paintAkg(); toast(akgSt.use ? L("Persen di menu ini kini mengikuti AKG Anda.", "Percentages in this menu now follow your RDA.") : L("Kembali ke acuan label gizi 2150 kkal.", "Back to the 2,150 kcal label reference.")); }));
   d.append(el("p", "hint", L("Bila dipakai, persen pada detail makanan dan Piringku memakai AKG di atas (gula tetap batas 50 g, natrium tetap batas 2000 mg untuk penanda “tinggi”).", "When on, percentages in food details and My plate use the RDA above (sugar stays at 50 g and sodium at 2,000 mg for the “high” flags).")));
   d.append(el("p", "tiny", L("Sumber: Permenkes RI No. 28 Tahun 2019 tentang Angka Kecukupan Gizi yang Dianjurkan untuk Masyarakat Indonesia (Lampiran I). AKG adalah angka rata-rata untuk orang sehat menurut kelompok umur, jenis kelamin, dan berat serta tinggi acuan; kebutuhan pribadi dapat berbeda menurut aktivitas dan kondisi kesehatan. Untuk perkiraan pribadi, gunakan menu BMI & KALORI. Bukan pengganti saran dokter atau ahli gizi.", "Source: Indonesian Ministry of Health Regulation No. 28 of 2019 on the Recommended Dietary Allowances (Annex I). RDAs are averages for healthy people by age group, sex, and reference weight and height; personal needs vary with activity and health. For a personal estimate use the BMI & CALORIES menu. Not a substitute for medical or dietitian advice.")));
 }
 function paint(){
   document.documentElement.lang = lang;
-  $("t").textContent = L("INFO KANDUNGAN MAKANAN", "FOOD NUTRITION INFO");
+  $("t").textContent = L("Info Kandungan Makanan", "Food Nutrition Info");
   $("sub").textContent = L("Kalori dan gizi makanan sehari-hari, per porsi, plus kalkulator AKG.", "Calories and nutrients of everyday foods, per portion, plus an RDA calculator.");
   $("q").placeholder = L("Cari makanan (mis. nasi, jus mangga, tempe)", "Search food (e.g. rice, mango juice, tempeh)");
   $("note").textContent = L("Nilai perkiraan rata-rata (acuan TKPI Kemenkes dan USDA); bisa berbeda menurut merek, resep, dan cara masak. Bukan pengganti saran dokter atau ahli gizi.", "Approximate average values (TKPI Indonesia and USDA references); they vary by brand, recipe, and cooking method. Not a substitute for medical or dietitian advice.");
