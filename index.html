@@ -159,6 +159,10 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #frpanel .frrow{display:flex;align-items:center;gap:10px;padding:6px 0}
 #frpanel .frrow+.frrow{border-top:1px solid var(--line)}
 #frpanel .fav{flex:none;width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--bg2)}
+.fav.nopick{pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.frcand{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:8px 0;border:1px solid var(--line);border-radius:12px}
+.frcand .fav{width:56px;height:56px}
+.frcandw{min-width:0}
 #frpanel .fal{display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold2)}
 #frpanel .frwho{flex:1;min-width:0}
 #frpanel .frnm{margin:0;font-size:14.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -796,6 +800,7 @@ const MENUS = [
   { id:"cek-watak", cat:"primbon", icon:"🔮", title:"WATAK", desc:"Watak berdasarkan numerologi dan wuku.", descEn:"Character reading based on numerology and wuku.", src:"src-cek-watak" },
   { id:"cek-jodoh", cat:"primbon", icon:"💞", title:"JODOH", desc:"Cek kecocokan dua orang.", descEn:"Check compatibility between two people.", src:"src-cek-jodoh" },
   { id:"cek-bmi", cat:"medis", icon:"⚖️", title:"BMI & KALORI", desc:"Hitung IMT, target berat badan, dan kebutuhan kalori harian.", descEn:"Calculate BMI, target weight, and daily calorie needs.", src:"src-cek-bmi" },
+  { id:"info-makanan", cat:"medis", icon:"🥗", title:"KANDUNGAN MAKANAN", desc:"Cari kalori, protein, lemak, karbohidrat, serat, gula, dan natrium makanan, jus, serta gorengan, jumlahkan di Piringku, lalu bandingkan dengan kalkulator AKG.", descEn:"Look up calories, protein, fat, carbs, fiber, sugar, and sodium of foods, juices, and fried snacks, total them in My Plate, then compare with the RDA calculator.", src:"src-info-makanan" },
   { id:"cek-hamil", cat:"medis", icon:"🤰", title:"KEHAMILAN", desc:"Hitung usia kehamilan, HPL, jadwal periksa, dan kenaikan berat badan.", descEn:"Calculate gestational age, due date (EDD), checkup schedule, and weight gain.", src:"src-cek-hamil" },
   { id:"olahraga", cat:"medis", icon:"🏃", title:"OLAHRAGA", desc:"Catat lari, jalan, bersepeda, dan hiking dengan GPS: rute, pace, riwayat, dan statistik.", descEn:"Track runs, walks, rides, and hikes with GPS: route, pace, splits, history, and stats.", src:"src-olahraga" },
   { id:"stopwatch", cat:"manajemen", icon:"⏱️", title:"STOPWATCH", desc:"Atur beberapa jam mulai dan jam selesai sekaligus dalam satu daftar, nama bisa diganti. Alarm tiap stopwatch berbunyi otomatis, bahkan saat aplikasi ditutup (aplikasi Android).", descEn:"Set several start and end times in one list, with renamable names. Each alarm rings automatically, even when the app is closed (Android app).", src:"src-stopwatch" },
@@ -814,6 +819,7 @@ const MTITLE = {
   "cek-watak":["WATAK","CHARACTER","CEK WATAK","CHARACTER CHECK"],
   "cek-jodoh":["JODOH","MATCH","CEK JODOH","MATCH CHECK"],
   "cek-bmi":["BMI & KALORI","BMI & CALORIES","CEK BMI & KALORI","BMI & CALORIE CHECK"],
+  "info-makanan":["KANDUNGAN MAKANAN","FOOD NUTRITION","INFO KANDUNGAN MAKANAN","FOOD NUTRITION INFO"],
   "cek-hamil":["KEHAMILAN","PREGNANCY","CEK KEHAMILAN","PREGNANCY CHECK"],
   "turnamen":["TURNAMEN","TOURNAMENT","TURNAMEN","TOURNAMENT"],
   "olahraga":["OLAHRAGA","EXERCISE","CATAT OLAHRAGA","EXERCISE LOG"],
@@ -854,6 +860,7 @@ const HOME_SHORT = {
   "cek-watak":["Watak dari numerologi dan wuku.","Character via numerology."],
   "cek-jodoh":["Cek kecocokan dua orang.","Check two people's match."],
   "cek-bmi":["IMT, berat ideal, kalori harian.","BMI, target weight, calories."],
+  "info-makanan":["Gizi makanan, jus, gorengan, dan kalkulator AKG.","Food, juice, and fried snack nutrition, plus RDA calculator."],
   "cek-hamil":["Usia hamil, HPL, jadwal periksa.","Gestation, due date, checkups."],
   "olahraga":["Rekam lari, jalan, sepeda dengan GPS.","Track runs and rides with GPS."],
   "stopwatch":["Beberapa stopwatch sekaligus, alarm otomatis.","Several stopwatches, automatic alarms."],
@@ -872,6 +879,7 @@ const ICONS = {
   "cek-watak":'<svg viewBox="0 0 24 24"><circle cx="12" cy="10.5" r="7"/><path d="M9 8.5a4 4 0 0 1 3-1.6M7.5 18l-1.5 3M16.5 18l1.5 3M6 21h12"/></svg>',
   "cek-jodoh":'<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
   "cek-bmi":'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.5 10a4.5 4.5 0 0 1 7 0"/><path d="M12 13.5l2.2-3"/></svg>',
+  "info-makanan":'<svg viewBox="0 0 24 24"><path d="M3.5 11h17a8.5 8.5 0 0 1-17 0z"/><path d="M9 7.5c0-1.4 1.4-2 1.4-3.5M14 7.5c0-1.4 1.4-2 1.4-3.5"/></svg>',
   "cek-hamil":'<svg viewBox="0 0 24 24"><circle cx="9.5" cy="4.5" r="2"/><path d="M9 8.5c-1.6.4-2.4 1.8-2.4 3.5V20M9 8.5c3 0 6 2 6 6a5 5 0 0 1-3.2 4.6V20"/></svg>',
   "olahraga":'<svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>',
   "stopwatch":'<svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M9.5 3h5M12 3v3"/></svg>',
@@ -881,7 +889,7 @@ const ICONS = {
   "acak-nama":'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>',
   "keuangan":'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.3" fill="currentColor"/></svg>'
 };
-const BADGE = {"cek-watak":{id:"Baru", en:"New"}, "cek-jodoh":{id:"Baru", en:"New"}, "cek-bmi":{id:"Baru", en:"New"}, "cek-hamil":{id:"Baru", en:"New"}, "versus":{id:"Baru", en:"New"}, "acak-nama":{id:"Baru", en:"New"}, "keuangan":{id:"Baru", en:"New"}, "stopwatch":{id:"Baru", en:"New"}};
+const BADGE = {"cek-watak":{id:"Baru", en:"New"}, "cek-jodoh":{id:"Baru", en:"New"}, "cek-bmi":{id:"Baru", en:"New"}, "cek-hamil":{id:"Baru", en:"New"}, "versus":{id:"Baru", en:"New"}, "acak-nama":{id:"Baru", en:"New"}, "keuangan":{id:"Baru", en:"New"}, "stopwatch":{id:"Baru", en:"New"}, "info-makanan":{id:"Baru", en:"New"}};
 /* Label "Baru" hilang otomatis 14 hari.
    - 4 menu awal: dihitung dari tanggal rilis 10 November 2026 (hilang 24 November 2026).
    - Menu yang ditambahkan kemudian: otomatis berlabel "Baru" selama 14 hari sejak pertama kali muncul di perangkat ini
@@ -1159,6 +1167,8 @@ function writeKeys(s){
   w("an_fx", j(s.sound)); w("an_lang", s.lang); w("an_anim", j(s.anim));
   /* Olahraga (awalan ol_; hanya mengikuti bahasa) */
   w("ol_lang", s.lang);
+  /* Kandungan Makanan (awalan mk_; hanya mengikuti bahasa) */
+  w("mk_lang", s.lang);
   /* Keuangan (awalan kg_; hanya mengikuti bahasa) */
   w("kg_lang", s.lang);
   /* Stopwatch (awalan sw_; hanya mengikuti bahasa) */
@@ -1175,13 +1185,14 @@ const TOG = {
   "cek-hamil": {soundBtn:s => s.sound && s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
   "turnamen": {fxBtn:s => s.sound, readBtn:s => s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
   "olahraga": {},
+  "info-makanan": {},
   "stopwatch": {},
   "tebak-inisial": {},
   "versus": {},
   "acak-nama": {},
   "keuangan": {}
 };
-const RNG = {"th-analytics":{mvol:"volRange", aivol:"aiVolRange"}, "cek-khodam":{mvol:"mvol", aivol:"vol"}, "hari-hoki":{mvol:"mvol", aivol:"vol"}, "cek-watak":{mvol:"mvol", aivol:"vol"}, "cek-jodoh":{mvol:"mvol", aivol:"vol"}, "cek-bmi":{mvol:"mvol", aivol:"vol"}, "cek-hamil":{mvol:"mvol", aivol:"vol"}, "turnamen":{mvol:"mvol", aivol:"vol"}, "olahraga":{}, "stopwatch":{}, "tebak-inisial":{}};
+const RNG = {"th-analytics":{mvol:"volRange", aivol:"aiVolRange"}, "cek-khodam":{mvol:"mvol", aivol:"vol"}, "hari-hoki":{mvol:"mvol", aivol:"vol"}, "cek-watak":{mvol:"mvol", aivol:"vol"}, "cek-jodoh":{mvol:"mvol", aivol:"vol"}, "cek-bmi":{mvol:"mvol", aivol:"vol"}, "cek-hamil":{mvol:"mvol", aivol:"vol"}, "turnamen":{mvol:"mvol", aivol:"vol"}, "olahraga":{}, "info-makanan":{}, "stopwatch":{}, "tebak-inisial":{}};
 /* Keadaan ASLI menu dibaca langsung dari bingkainya (bukan ditebak dari pengaturan sebelumnya),
    sehingga tombol panel tidak terbalik bila menu mengubah pengaturannya sendiri (mis. tombol Stop auto-next di Cek Khodam). */
 function frameDoc(){
@@ -1580,42 +1591,48 @@ $("abBack").addEventListener("click", closeAbout);
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("about").hidden) closeAbout(); });
 /* ===== Kebijakan Privasi: halaman penuh seperti Tentang, dibuka dari tulisan di kaki beranda ===== */
 const PV = {
-  id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 19 November 2026", back:"‹ Beranda", secs:[
+  id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 20 November 2026", back:"‹ Beranda", secs:[
     {h:"1. Pendahuluan", p:["Satu Titik adalah aplikasi yang dikembangkan oleh Aurenza27 (“kami”). Kebijakan ini menjelaskan data apa yang diproses, untuk apa, dan pilihan yang kamu miliki saat memakai aplikasi ini. Dengan memakai aplikasi, kamu menyetujui kebijakan ini."]},
     {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, data turnamen, serta aktivitas olahraga beserta rute GPS yang kamu rekam di menu Olahraga) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google."]},
     {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, termasuk ketika layar terkunci atau aplikasi berada di latar belakang (notifikasi tampil selama merekam), dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Jumlah langkah dibaca dari sensor langkah HP (izin Aktivitas Fisik) hanya saat merekam di aplikasi Android, dan hanya dipakai untuk memeriksa kewajaran jarak. Angkanya tidak ditampilkan atau disimpan di riwayat aktivitas.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif."]},
     {p:["Keuangan dan Arisan:"], l:["Catatan keuangan (uang masuk dan keluar, dompet, jatah belanja, tabungan) dan data Arisan (nama peserta, pemenang, status pembayaran) disimpan di perangkatmu. Bila kamu masuk dengan Google, data ini ikut tersalin ke akunmu.","Kunci menu: PIN dan kode pemulihan hanya disimpan di perangkat dalam bentuk hash (bukan teks asli), tidak dikirim ke server, dan tidak ikut tersalin ke akun. Sidik jari dan PIN/pola layar HP diperiksa oleh sistem Android; aplikasi tidak menerima atau menyimpan data sidik jarimu.","Ruangan Arisan online: nama host dan peserta, daftar nama kocokan, hasil, dan chat ruangan disimpan di server selama ruangan ada dan dihapus saat host menutup ruangan. Chat juga ditandai kedaluwarsa setelah 24 jam.","File cadangan: fitur Cadangkan di menu Keuangan dan Arisan membuat file di perangkatmu atas permintaanmu, lalu kamu sendiri yang memilih tempat menyimpannya. File ini tidak dienkripsi dan tidak berisi PIN atau kode pemulihan, jadi simpan di tempat aman."]},
-    {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, rute GPS olahraga, serta data Keuangan dan Arisan) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, dan nama (username) admin, moderator, atau pengikut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online yang dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, dan dihapus saat pertemanan dihapus."]},
-    {p:["Blokir dan laporan:"], l:["Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.","Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan. Laporan hanya dibaca pengelola untuk meninjau pelanggaran."]},
-    {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif."]},
+    {p:["Ringkasan per menu (data di perangkat):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, dan Jodoh: nama, tanggal lahir, dan isian lain yang kamu ketik, riwayat, papan skor, serta pengaturan suara dan musik. Fitur bacaan suara memakai mesin suara bawaan perangkatmu.","BMI & Kalori, Kehamilan, dan Kandungan Makanan: data tubuh dan kehamilan yang kamu isi (misalnya usia, jenis kelamin, berat, dan tinggi badan), profil AKG (termasuk status hamil atau menyusui), dan isi Piringku. Ini data kesehatan, jadi jaga perangkatmu.","Stopwatch: hanya pengaturan tampilan. Alarm dan notifikasi stopwatch dibuat di perangkatmu (notifikasi lokal), tanpa server.","Tebak Inisial, Puzzle Arena, dan Versus: bila dimainkan di satu perangkat, datanya hanya di perangkat. Ruangan online dijelaskan di bawah.","Turnamen, Olahraga, Keuangan, dan Arisan: dijelaskan di bagian lain di kebijakan ini.","Semua data di atas ikut tersalin ke akunmu bila kamu masuk dengan Google dan sinkronisasi aktif, kecuali PIN dan kode pemulihan kunci menu."]},
+    {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir. Nama dan foto profilmu dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui ID Akunmu (misalnya saat mereka menambah teman); di aplikasi, foto itu hanya bisa dibuka oleh temanmu. Status online dan waktu terakhir aktifmu hanya bisa dilihat temanmu. Alamat emailmu tidak terlihat pengguna lain.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, rute GPS olahraga, serta data Keuangan dan Arisan) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, nama (username) admin, moderator, atau pengikut, serta suara dan komentar yang kamu kirim (isi komentar, username, ID Akun, dan waktu) yang dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui kode turnamen tersebut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online; hanya bisa dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, ditandai kedaluwarsa setelah 30 hari, dan dihapus saat pertemanan dihapus.","Tanda dibaca: waktu terakhir kamu membuka chat dengan temanmu. Hanya bisa dilihat temanmu (untuk menandai pesan sudah dibaca) dan dihapus saat pertemanan dihapus."]},
+    {p:["Ruangan game online (Main bersama lewat kode ruang):"], l:["Hanya untuk pengguna yang masuk dengan Google. Pada Tebak Inisial dan Puzzle Arena, kode ruang, nama host dan pemain, jawaban, skor atau hasil permainan (serta chat ruangan di Tebak Inisial) disimpan di server selama ruangan dipakai dan dihapus saat host menutup ruangan. Chat ditandai kedaluwarsa setelah 24 jam. Ruangan yang tidak ditutup dengan benar (misalnya aplikasi dihentikan paksa) dapat tersimpan lebih lama. Siapa pun yang sudah masuk akun dan mengetahui kode ruangan dapat melihat isi ruangan, termasuk chatnya."]},
+    {p:["Notifikasi push (hanya aplikasi Android, setelah masuk dengan Google):"], l:["Aplikasi menyimpan token perangkat dari Firebase Cloud Messaging bersama ID penggunamu, jenis platform, dan waktu, supaya notifikasi tetap muncul walau aplikasi ditutup. Izin notifikasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Notifikasi dikirim untuk pesan teman, permintaan dan persetujuan pertemanan, serta undangan (moderator turnamen, pengikut turnamen, atau ruangan permainan) beserta balasannya. Saat kejadian itu terjadi, aplikasi mengirim jenis kejadian dan pengenal terkait ke server pengirim notifikasi (Cloudflare Workers) bersama token masuk akunmu untuk verifikasi. Server memeriksa kejadian itu, membaca data yang dibutuhkan dari akun (nama pengirim dan, untuk pesan teman, 100 huruf pertama isi pesan), lalu meneruskannya sebagai isi notifikasi lewat Firebase Cloud Messaging milik Google. Isi notifikasi dapat tampil di layar kunci sesuai pengaturan notifikasi HP-mu; matikan notifikasi aplikasi bila kamu tidak menghendakinya.","Token perangkat dihapus saat kamu keluar dari akun (perangkat itu) atau menghapus akun (semua perangkat)."]},
+    {p:["Blokir dan laporan:"], l:["Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.","Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan dan catatan tambahan (bila kamu menulisnya). Laporan hanya dibaca pengelola untuk meninjau pelanggaran."]},
+    {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan Web3Forms. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif. Bila sedang offline, pesan disimpan sementara di perangkatmu sampai berhasil terkirim."]},
     {p:["Pengecekan koneksi dan waktu:"], l:["Aplikasi mengirim permintaan sederhana ke server publik (Google, Cloudflare, dan WorldTimeAPI) untuk mengecek koneksi internet dan jam. Permintaan ini tidak berisi data pribadimu, tetapi seperti permintaan internet lainnya, alamat IP perangkat terlihat oleh server tersebut."]},
     {p:["Iklan (hanya pada versi aplikasi yang menampilkan iklan):"], l:["Versi aplikasi tertentu, misalnya versi APK, dapat menampilkan iklan dari jaringan iklan pihak ketiga seperti Google AdMob.","Jaringan iklan dapat memproses ID iklan perangkat, alamat IP, jenis perangkat, dan interaksi dengan iklan untuk menampilkan serta mengukur iklan. Pada wilayah yang mewajibkan, kamu akan diminta persetujuan terlebih dahulu.","Kamu dapat mengatur atau mereset ID iklan, dan membatasi personalisasi iklan, lewat pengaturan perangkat."]},
     {h:"3. Untuk apa data dipakai", l:["Menjalankan fitur aplikasi dan menampilkan hasil menu.","Memungkinkan masuk akun, sinkronisasi data, dan fitur turnamen online (undangan moderator memakai ID Akun).","Menampilkan profilmu, serta menerima dan membaca saran dari pengguna.","Menampilkan iklan pada versi aplikasi yang memuat iklan, sebagai sumber pendanaan pengembangan."], p:["Kami tidak menjual data pribadimu. Kami juga tidak membagikan data akun, username, atau hasil menumu kepada pengiklan."]},
-    {h:"4. Layanan pihak ketiga", l:["Google Firebase (Authentication dan Cloud Firestore): untuk masuk akun dan menyimpan data akun.","Web3Forms: untuk mengirim pesan dari Kotak Saran.",...(SHOW_DUKUNG ? ["Saweria: tautan Dukung Kami (hanya di versi web) membuka halaman eksternal yang punya kebijakan privasinya sendiri."] : []),"Google, Cloudflare, dan WorldTimeAPI: untuk pengecekan koneksi dan waktu.","Jaringan iklan (misalnya Google AdMob): hanya pada versi yang menampilkan iklan."], p:["Layanan-layanan ini punya kebijakan privasi sendiri yang berlaku saat data diproses oleh mereka."]},
-    {h:"5. Penyimpanan dan keamanan", p:["Data lokal tersimpan di perangkatmu dan hilang bila data aplikasi atau browser dihapus. Data akun disimpan di layanan Google Firebase dan dikirim lewat koneksi terenkripsi (HTTPS). Tidak ada metode penyimpanan atau pengiriman data yang sepenuhnya bebas risiko, jadi kami tidak dapat menjamin keamanan mutlak. Kunci menu (PIN dan sidik jari) hanya mengunci tampilan, bukan enkripsi: data di perangkat dan di akunmu tidak dienkripsi tambahan oleh aplikasi."]},
-    {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk dengan Google, data di server ikut dihapus).","Reset semua catatan keuangan dan hapus arisan meminta verifikasi (sidik jari, PIN/pola layar HP, atau PIN menu) dan tidak bisa dibatalkan. Bila kamu masuk dengan Google, salinan di akun ikut terhapus saat sinkronisasi berjalan. Bila lupa PIN dan tidak punya kode pemulihan, satu-satunya jalan adalah menghapus data Keuangan atau Arisan di perangkat itu.","Hapus akun dan data cloud kapan saja lewat Pengaturan > Akun > Lihat profil > Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri.","Penghapusan akun menghapus ID Akun, username, foto profil, daftar teman dan pesan pribadi, salinan data yang tersinkron, serta turnamen online yang kamu buat. Laporan yang pernah kamu kirim dapat tetap disimpan pengelola untuk keperluan keamanan.","Tanpa memasang aplikasi: buka https://aurenza27.github.io di browser, masuk dengan Google, lalu pilih Hapus akun di halaman Profil. Bila tidak bisa masuk, kirim permintaan penghapusan lewat Kotak Saran di halaman yang sama dengan menyebut ID Akunmu (ST-xxxxxx)."]},
+    {h:"4. Layanan pihak ketiga", l:["Google Firebase (Authentication dan Cloud Firestore): untuk masuk akun dan menyimpan data akun.","Web3Forms: untuk mengirim pesan dari Kotak Saran.","Firebase Cloud Messaging (Google) dan Cloudflare Workers: untuk mengirim notifikasi push (hanya aplikasi Android).",...(SHOW_DUKUNG ? ["Saweria: tautan Dukung Kami (hanya di versi web) membuka halaman eksternal yang punya kebijakan privasinya sendiri."] : []),"Google, Cloudflare, dan WorldTimeAPI: untuk pengecekan koneksi dan waktu.","Jaringan iklan (misalnya Google AdMob): hanya pada versi yang menampilkan iklan."], p:["Layanan-layanan ini punya kebijakan privasi sendiri yang berlaku saat data diproses oleh mereka."]},
+    {h:"5. Penyimpanan dan keamanan", p:["Data lokal tersimpan di perangkatmu dan hilang bila data aplikasi atau browser dihapus. Data akun disimpan di layanan Google Firebase dan dikirim lewat koneksi terenkripsi (HTTPS). Tidak ada metode penyimpanan atau pengiriman data yang sepenuhnya bebas risiko, jadi kami tidak dapat menjamin keamanan mutlak. Kunci menu (PIN dan sidik jari) hanya mengunci tampilan, bukan enkripsi: data di perangkat dan di akunmu tidak dienkripsi tambahan oleh aplikasi. Lama penyimpanan: pesan pribadi 30 hari; chat ruangan online 24 jam (ditandai kedaluwarsa, lalu dihapus otomatis oleh server, yang bisa memerlukan waktu); data ruangan sampai host menutupnya; laporan selama diperlukan untuk keamanan; data akun sampai kamu menghapus akunmu. Di aplikasi Android, cadangan otomatis Android dinonaktifkan (data lokal tidak ikut cadangan Google) dan pratinjau aplikasi di Recent apps dikosongkan."]},
+    {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk dengan Google, data di server ikut dihapus).","Reset semua catatan keuangan dan hapus arisan meminta verifikasi (sidik jari, PIN/pola layar HP, atau PIN menu) dan tidak bisa dibatalkan. Bila kamu masuk dengan Google, salinan di akun ikut terhapus saat sinkronisasi berjalan. Bila lupa PIN dan tidak punya kode pemulihan, satu-satunya jalan adalah menghapus data Keuangan atau Arisan di perangkat itu.","Minta akses, koreksi, atau penghapusan data pribadimu lewat email di bagian Kontak.","Hapus akun dan data cloud kapan saja lewat Pengaturan > Akun > Lihat profil > Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri.","Penghapusan akun menghapus ID Akun, username, foto profil, daftar teman dan pesan pribadi, token notifikasi di semua perangkat, salinan data yang tersinkron, serta turnamen online yang kamu buat. Laporan yang pernah kamu kirim dapat tetap disimpan pengelola untuk keperluan keamanan. Komentar yang kamu tulis di turnamen milik orang lain dianonimkan (nama diganti “Pengguna dihapus” dan ID Akun dilepas) tetapi isinya tetap tampil, dan balasan orang lain yang menyebut namamu dapat tetap menampilkannya. Data ruangan online hilang saat ruangan ditutup. Ruangan yang kamu buat sebagai host dan belum ditutup tidak ikut terhapus otomatis saat akun dihapus, jadi tutup ruangannya lebih dulu; bila akun sudah terhapus, minta penghapusannya lewat email di bagian Kontak. Minta penghapusan komentar lewat email di bagian Kontak.","Tanpa memasang aplikasi: buka https://aurenza27.github.io di browser, masuk dengan Google, lalu pilih Hapus akun di halaman Profil. Bila tidak bisa masuk, kirim permintaan penghapusan lewat Kotak Saran di halaman yang sama dengan menyebut ID Akunmu (ST-xxxxxxxx)."]},
     {h:"7. Anak-anak", p:["Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun, dan kami tidak dengan sengaja mengumpulkan data mereka. Bila kamu orang tua dan menemukan data anak di aplikasi ini, hubungi kami lewat Kotak Saran."]},
-    {h:"8. Hasil menu", p:["Hasil menu primbon, ramalan, dan hiburan hanya untuk hiburan dan kepercayaan tradisional, bukan kepastian atau dasar untuk keputusan penting. Hasil BMI, kalori, dan kehamilan adalah informasi umum, bukan diagnosis, nasihat medis, atau pengganti pemeriksaan tenaga kesehatan; konsultasikan kondisimu dengan dokter atau bidan."]},
-    {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini."]},
+    {h:"8. Hasil menu", p:["Hasil menu primbon, ramalan, dan hiburan hanya untuk hiburan dan kepercayaan tradisional, bukan kepastian atau dasar untuk keputusan penting. Hasil BMI, kalori, kehamilan, kandungan gizi makanan, kalkulator AKG, dan data olahraga adalah informasi umum, bukan diagnosis, nasihat medis atau gizi, atau pengganti pemeriksaan tenaga kesehatan; konsultasikan kondisimu dengan dokter, bidan, atau ahli gizi."]},
+    {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Perubahan penting akan diumumkan di aplikasi."]},
     {h:"10. Kontak", p:["Pertanyaan tentang privasi, permintaan penghapusan data, atau pengaduan dapat dikirim ke email di bawah ini atau lewat Kotak Saran di Pengaturan."]}
   ]},
-  en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 19 November 2026", back:"‹ Home", secs:[
+  en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 20 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. By using the app, you agree to this policy."]},
     {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, tournament data, and the sports activities and GPS routes you record in the Sports menu) are stored on your own device.","This data is not sent to our servers unless you sign in with a Google account."]},
     {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, including while the screen is locked or the app is in the background (a notification shows while recording), and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","The step count is read from your phone's step sensor (Physical activity permission) only while recording in the Android app, and is used only to check that the distance is plausible. It is not shown or stored in the activity history.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on."]},
     {p:["Finance and Arisan:"], l:["Financial records (money in and out, wallets, spending limits, savings) and Arisan data (participant names, winners, payment status) are stored on your device. If you sign in with Google, this data is also copied to your account.","Menu lock: the PIN and recovery code are stored only on your device as a hash (not the original text), are not sent to a server, and are not copied to your account. Your fingerprint and the phone's screen PIN/pattern are checked by the Android system; the app does not receive or store your fingerprint data.","Online Arisan rooms: the names of the host and participants, the draw name list, results, and the room chat are stored on a server while the room exists and are deleted when the host closes the room. Chat is also marked to expire after 24 hours.","Backup file: the Back up feature in the Finance and Arisan menus creates a file on your device at your request, and you choose where to save it. This file is not encrypted and does not contain the PIN or recovery code, so keep it somewhere safe."]},
-    {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time.","A copy of your app data (settings, history, menu results, sports GPS routes, and Finance and Arisan data) so it can sync across devices.","For online tournaments: tournament data, tournament codes, and the names (usernames) of admins, moderators, and followers.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light your friends see).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, and are deleted when the friendship is removed."]},
-    {p:["Blocking and reports:"], l:["The list of users you block is stored in your account so blocking applies on all your devices.","When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, and a copy of the reported text. Reports are read only by the maintainer to review violations."]},
-    {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data."]},
+    {p:["Summary by menu (data on your device):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, and Jodoh: names, birth dates, and other text you type, history, scoreboards, and sound and music settings. The read-aloud feature uses your device’s built-in speech engine.","BMI & Kalori, Kehamilan, and Kandungan Makanan: the body and pregnancy data you enter (for example age, sex, weight, and height), the RDA (AKG) profile (including pregnant or breastfeeding status), and the contents of My Plate (Piringku). This is health data, so keep your device secure.","Stopwatch: display settings only. Stopwatch alarms and notifications are created on your device (local notifications), without a server.","Tebak Inisial, Puzzle Arena, and Versus: when played on a single device, the data stays on the device. Online rooms are described below.","Tournaments, Sports, Finance, and Arisan: described elsewhere in this policy.","All of the above is also copied to your account if you sign in with Google and sync is on, except the PIN and recovery code of the menu lock."]},
+    {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time. Your name and profile photo can be seen by other signed-in users who know your Account ID (for example when they add a friend); in the app, the photo can only be opened by your friends. Your online status and last-active time can only be seen by your friends. Your email address is not visible to other users.","A copy of your app data (settings, history, menu results, sports GPS routes, and Finance and Arisan data) so it can sync across devices.","For online tournaments: tournament data, tournament codes, the names (usernames) of admins, moderators, and followers, and the votes and comments you submit (comment text, username, Account ID, and time), which can be seen by other signed-in users who know that tournament’s code.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light; visible only to your friends).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, are marked to expire after 30 days, and are deleted when the friendship is removed.","Read receipts: the time you last opened the chat with your friend. Only your friend can see it (to mark messages as read), and it is deleted when the friendship is removed."]},
+    {p:["Online game rooms (Play together via room code):"], l:["Only for users signed in with Google. In Tebak Inisial and Puzzle Arena, the room code, host and player names, answers, scores or game results (and the room chat in Tebak Inisial) are stored on a server while the room is in use and deleted when the host closes the room. Chat is marked to expire after 24 hours. A room that is not closed properly (for example if the app is force-stopped) may be kept longer. Anyone signed in who knows the room code can see the room contents, including the chat."]},
+    {p:["Push notifications (Android app only, after signing in with Google):"], l:["The app stores a device token from Firebase Cloud Messaging together with your user ID, the platform type, and a timestamp, so notifications still appear when the app is closed. Notification permission is requested by your device and you can revoke it at any time.","Notifications are sent for friend messages, friend requests and acceptances, and invitations (tournament moderator, tournament follower, or game room) and their replies. When such an event happens, the app sends the event type and related identifiers to the notification server (Cloudflare Workers) together with your sign-in token for verification. The server checks the event, reads the data it needs from your account (the sender’s name and, for friend messages, the first 100 characters of the message), and passes it on as the notification text through Google’s Firebase Cloud Messaging. The notification text may appear on your lock screen depending on your phone’s notification settings; turn off the app’s notifications if you do not want this.","The device token is deleted when you sign out (that device) or delete your account (all devices)."]},
+    {p:["Blocking and reports:"], l:["The list of users you block is stored in your account so blocking applies on all your devices.","When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, a copy of the reported text, and your optional note. Reports are read only by the maintainer to review violations."]},
+    {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through the Web3Forms service. You do not need to sign in, and you should avoid writing sensitive personal data. While offline, the message is kept temporarily on your device until it is sent."]},
     {p:["Connection and time checks:"], l:["The app sends simple requests to public servers (Google, Cloudflare, and WorldTimeAPI) to check your internet connection and the time. These requests do not contain your personal data, but as with any internet request, your device’s IP address is visible to those servers."]},
     {p:["Ads (only in app versions that show ads):"], l:["Certain app versions, such as the APK version, may show ads from third-party ad networks such as Google AdMob.","Ad networks may process the device advertising ID, IP address, device type, and your interactions with ads to serve and measure ads. Where required, you will be asked for consent first.","You can reset your advertising ID, and limit ad personalization, in your device settings."]},
     {h:"3. How data is used", l:["To run the app’s features and show menu results.","To enable sign-in, data sync, and online tournaments (moderator invitations use the Account ID).","To show your profile, and to receive and read user suggestions.","To show ads in app versions that contain ads, as a way to fund development."], p:["We do not sell your personal data. We also do not share your account data, username, or menu results with advertisers."]},
-    {h:"4. Third-party services", l:["Google Firebase (Authentication and Cloud Firestore): for sign-in and storing account data.","Web3Forms: to deliver messages from the Suggestion Box.",...(SHOW_DUKUNG ? ["Saweria: the Support Us link (web version only) opens an external page with its own privacy policy."] : []),"Google, Cloudflare, and WorldTimeAPI: for connection and time checks.","Ad networks (for example Google AdMob): only in versions that show ads."], p:["These services have their own privacy policies, which apply when they process data."]},
-    {h:"5. Storage and security", p:["Local data stays on your device and is lost if you clear the app or browser data. Account data is stored in Google Firebase and sent over encrypted connections (HTTPS). No method of storage or transmission is completely risk-free, so we cannot guarantee absolute security. The menu lock (PIN and fingerprint) only locks the screen and is not encryption: data on your device and in your account is not additionally encrypted by the app."]},
-    {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in with Google, server data is deleted too).","Resetting all financial records and deleting an arisan ask for verification (fingerprint, the phone's screen PIN/pattern, or the menu PIN) and cannot be undone. If you are signed in with Google, the copy in your account is deleted too once sync runs. If you forget the PIN and have no recovery code, the only way is to delete the Finance or Arisan data on that device.","Delete your account and cloud data at any time via Settings > Account > View profile > Delete account. Data on this device stays until you delete it yourself.","Deleting your account removes the Account ID, username, profile photo, friend list and private messages, synced data, and the online tournaments you created. Reports you submitted may still be kept by the administrators for safety purposes.","Without installing the app: open https://aurenza27.github.io in a browser, sign in with Google, and choose Delete account on the Profile page. If you cannot sign in, send a deletion request through the Suggestion Box on the same page, stating your Account ID (ST-xxxxxx)."]},
+    {h:"4. Third-party services", l:["Google Firebase (Authentication and Cloud Firestore): for sign-in and storing account data.","Web3Forms: to deliver messages from the Suggestion Box.","Firebase Cloud Messaging (Google) and Cloudflare Workers: to deliver push notifications (Android app only).",...(SHOW_DUKUNG ? ["Saweria: the Support Us link (web version only) opens an external page with its own privacy policy."] : []),"Google, Cloudflare, and WorldTimeAPI: for connection and time checks.","Ad networks (for example Google AdMob): only in versions that show ads."], p:["These services have their own privacy policies, which apply when they process data."]},
+    {h:"5. Storage and security", p:["Local data stays on your device and is lost if you clear the app or browser data. Account data is stored in Google Firebase and sent over encrypted connections (HTTPS). No method of storage or transmission is completely risk-free, so we cannot guarantee absolute security. The menu lock (PIN and fingerprint) only locks the screen and is not encryption: data on your device and in your account is not additionally encrypted by the app. Retention: private messages 30 days; online room chat 24 hours (marked to expire, then deleted automatically by the server, which can take some time); room data until the host closes the room; reports as long as needed for safety; account data until you delete your account. In the Android app, Android automatic backup is disabled (local data is not included in Google backups) and the app preview in Recent apps is blanked."]},
+    {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in with Google, server data is deleted too).","Resetting all financial records and deleting an arisan ask for verification (fingerprint, the phone's screen PIN/pattern, or the menu PIN) and cannot be undone. If you are signed in with Google, the copy in your account is deleted too once sync runs. If you forget the PIN and have no recovery code, the only way is to delete the Finance or Arisan data on that device.","Request access, correction, or deletion of your personal data via the email in the Contact section.","Delete your account and cloud data at any time via Settings > Account > View profile > Delete account. Data on this device stays until you delete it yourself.","Deleting your account removes the Account ID, username, profile photo, friend list and private messages, push tokens on all devices, synced data, and the online tournaments you created. Reports you submitted may still be kept by the administrators for safety purposes. Comments you wrote in other people’s tournaments are anonymized (the name is replaced with “Pengguna dihapus” and the Account ID is detached) but their text stays visible, and other people’s replies that mention your name may still show it. Online room data disappears when the room is closed. Rooms you created as host and have not closed are not deleted automatically when the account is deleted, so close them first; if your account is already deleted, request their removal via the email in the Contact section. Request deletion of comments via the email in the Contact section.","Without installing the app: open https://aurenza27.github.io in a browser, sign in with Google, and choose Delete account on the Profile page. If you cannot sign in, send a deletion request through the Suggestion Box on the same page, stating your Account ID (ST-xxxxxxxx)."]},
     {h:"7. Children", p:["This app is not intended for children under 13, and we do not knowingly collect their data. If you are a parent and find a child’s data in this app, contact us through the Suggestion Box."]},
-    {h:"8. Menu results", p:["Primbon, fortune, and entertainment menu results are for entertainment and traditional belief only, not a certainty or a basis for important decisions. BMI, calorie, and pregnancy results are general information, not a diagnosis, medical advice, or a substitute for an examination by a health professional; consult a doctor or midwife about your condition."]},
-    {h:"9. Changes to this policy", p:["This policy may be updated. The date of the latest update is shown at the top of this page."]},
+    {h:"8. Menu results", p:["Primbon, fortune, and entertainment menu results are for entertainment and traditional belief only, not a certainty or a basis for important decisions. BMI, calorie, pregnancy, food nutrition, RDA calculator, and exercise results are general information, not a diagnosis, medical or nutritional advice, or a substitute for an examination by a health professional; consult a doctor, midwife, or dietitian about your condition."]},
+    {h:"9. Changes to this policy", p:["This policy may be updated. The date of the latest update is shown at the top of this page. Important changes will be announced in the app."]},
     {h:"10. Contact", p:["Privacy questions, data deletion requests, or complaints can be sent to the email below or through the Suggestion Box in Settings."]}
   ]}
 };
@@ -1773,7 +1790,10 @@ async function wipeServer(A, joined){
   /* 2c) daftar blokir milik pengguna */
   await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "blocks"), m.where("by", "==", uid))); await Promise.all(sn.docs.map(d => soft(() => m.deleteDoc(d.ref)))); });
   /* 3) keluar dari turnamen orang lain: moderator, pengikut, suara */
-  if(acc) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "tournaments"), m.where("modIds", "array-contains", acc))); await Promise.all(sn.docs.filter(d => d.data().owner !== uid).map(d => soft(() => m.updateDoc(d.ref, { modIds: m.arrayRemove(acc) })))); });
+  const cmtOids = new Set(joined);
+  if(acc) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "tournaments"), m.where("modIds", "array-contains", acc))); await Promise.all(sn.docs.filter(d => d.data().owner !== uid).map(d => { cmtOids.add(d.id); return soft(() => m.updateDoc(d.ref, { modIds: m.arrayRemove(acc) })); })); });
+  /* 3b) komentar yang kamu tulis di turnamen orang lain dianonimkan (isi tetap, nama dan ID Akun dilepas) */
+  for(const oid of cmtOids) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "tournaments", oid, "comments"), m.where("u", "==", uid))); await Promise.all(sn.docs.map(d => soft(() => m.updateDoc(d.ref, { u: "", a: "", n: "Pengguna dihapus" })))); });
   for(const oid of joined){ await soft(() => m.deleteDoc(m.doc(db, "tournaments", oid, "followers", uid))); await soft(() => m.deleteDoc(m.doc(db, "tournaments", oid, "votes", uid))); }
   /* 4) salinan sinkron data aplikasi */
   await wipeKv(A);
@@ -10699,6 +10719,852 @@ resetForm();text();build();syncSnd();tick();setInterval(tick,250);
 </body>
 </html></script>
 
+<script type="text/plain" id="src-info-makanan"><!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INFO KANDUNGAN MAKANAN</title>
+<style>
+:root{--bg:#0b0d12;--bg2:#141821;--card:#161a23;--line:#2a3040;--text:#ece7da;--muted:#8d93a3;--gold:#d4a94f;--gold2:#f0cf86;--ok:#4cc38a;--warn:#e8904a;--bad:#e2644f;--blue:#5fa8ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#1c2230 0%,var(--bg) 60%) fixed,var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif;display:flex;justify-content:center}
+.app{width:100%;max-width:420px;padding:18px 16px calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.brand{text-align:center;margin-top:4px}.brand .icon{font-size:42px;filter:drop-shadow(0 0 18px rgba(212,169,79,.35))}.brand h1{margin:4px 0 0;font-size:22px;letter-spacing:.08em}
+.sub{color:var(--muted);font-style:italic;text-align:center;font-size:14px;line-height:1.45;margin:0}
+.panel{background:linear-gradient(180deg,var(--bg2),var(--card));border:1px solid var(--line);border-radius:16px;padding:16px}
+.label{display:block;font-size:12px;letter-spacing:.2em;color:var(--gold);margin:0 0 10px;text-transform:uppercase}
+.hint{font-size:12.5px;line-height:1.5;color:var(--muted);margin:10px 0 0}
+button{font:inherit;cursor:pointer;color:inherit}
+.btn{width:100%;min-height:50px;font-weight:700;letter-spacing:.1em;color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0;border-radius:12px}
+.btn.ghost{background:transparent;color:var(--gold2);border:1px solid var(--line);font-weight:600;letter-spacing:.06em}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid var(--line);font-weight:600;letter-spacing:.06em}
+.btn.sm{width:auto;min-height:36px;padding:0 14px;font-size:13px;border-radius:10px}
+.tabs{display:flex;gap:6px;padding:4px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03)}
+.tab{flex:1;min-width:0;min-height:40px;padding:0 4px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:12.5px;letter-spacing:.02em}
+.tab.on{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font-weight:700}
+.sbox{position:relative}
+.sbox input{width:100%;min-height:48px;padding:0 44px 0 14px;font:inherit;font-size:16px;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px}
+.sbox input:focus{outline:2px solid var(--gold2);outline-offset:1px}
+.sbox .x{position:absolute;right:4px;top:4px;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:16px}
+.cats{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--text);font-size:13px;white-space:nowrap}
+.chip.on{border-color:var(--gold);color:var(--gold2);background:rgba(212,169,79,.12)}
+.fi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;margin:0 0 8px;background:linear-gradient(180deg,var(--bg2),var(--card));border:1px solid var(--line);border-radius:14px}
+.fi:active{background:rgba(255,255,255,.06)}
+.fi .em{font-size:26px;flex:none;width:34px;text-align:center}
+.fi .nb{flex:1;min-width:0}.fi .nb b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi .nb small{display:block;margin-top:2px;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi .kc{flex:none;text-align:right;font-size:18px;font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}.fi .kc small{display:block;font-size:10px;color:var(--muted);font-weight:400;letter-spacing:.06em}
+.dh{display:flex;align-items:center;gap:12px}.dh .em{font-size:40px}.dh h2{margin:0;font-size:19px;line-height:1.25}.dh small{color:var(--muted);font-size:12px}
+.row2{display:flex;gap:8px;flex-wrap:wrap}
+.gin{display:flex;gap:8px;align-items:center;margin-top:12px}
+.gin input{flex:1;min-width:0;min-height:46px;padding:0 14px;font:inherit;font-size:17px;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px}
+.gin input:focus{outline:2px solid var(--gold2);outline-offset:1px}.gin span{color:var(--muted);font-size:14px}
+.big{text-align:center;font-size:54px;font-weight:700;line-height:1.05;color:var(--gold2);font-variant-numeric:tabular-nums}.big small{display:block;margin-top:4px;font-size:12px;letter-spacing:.18em;color:var(--muted);font-weight:400}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.tile{padding:10px 4px;text-align:center;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);min-width:0}
+.tile small{display:block;font-size:10px;letter-spacing:.1em;color:var(--muted)}.tile b{display:block;font-size:19px;margin-top:3px;font-variant-numeric:tabular-nums}.tile em{font-style:normal;font-size:11px;color:var(--muted)}
+.split{display:flex;height:10px;border-radius:99px;overflow:hidden;margin-top:14px;background:var(--line)}.split i{display:block;height:100%}
+.leg{display:flex;justify-content:space-between;gap:6px;margin-top:6px;font-size:11px;color:var(--muted)}.leg b{font-weight:400}
+.leg .p::before,.leg .f::before,.leg .c::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.leg .p::before{background:var(--ok)}.leg .f::before{background:var(--gold)}.leg .c::before{background:var(--blue)}
+.nr{margin-top:12px}.nr .h{display:flex;justify-content:space-between;font-size:13.5px}.nr .h b{font-variant-numeric:tabular-nums}.nr .h em{font-style:normal;color:var(--muted);font-size:12px;margin-left:6px}
+.nr .bar{height:7px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:5px}.nr .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}.nr .bar i.lim{background:linear-gradient(90deg,#d9803a,var(--warn))}.nr .bar i.hi{background:var(--bad)}
+.flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.flag{padding:5px 11px;border-radius:999px;font-size:12px;border:1px solid var(--line)}.flag.bad{color:var(--warn);border-color:rgba(232,144,74,.5);background:rgba(232,144,74,.1)}.flag.good{color:var(--ok);border-color:rgba(76,195,138,.5);background:rgba(76,195,138,.1)}
+.pi{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}.pi:first-of-type{border-top:0}
+.pi .em{font-size:24px}.pi .nb{flex:1;min-width:0}.pi .nb b{display:block;font-size:14.5px}.pi .nb small{color:var(--muted);font-size:12px}
+.pi .st{display:flex;align-items:center;gap:4px}.pi .st button{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:transparent;font-size:16px}
+.pi .st .rm{color:var(--bad)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--gold);color:#1a1405;font-weight:700;font-size:14px;padding:10px 18px;border-radius:999px;transition:.25s;z-index:20;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.flab{display:block;font-size:12px;letter-spacing:.06em;color:var(--muted);margin:14px 0 6px}
+.sel{width:100%;min-height:46px;padding:0 12px;font:inherit;font-size:16px;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px}.sel:focus{outline:2px solid var(--gold2);outline-offset:1px}.sel option{background:#161a23;color:#ece7da}
+.mut{display:block;color:var(--muted);font-size:11.5px;line-height:1.45;margin-top:4px}
+.dt{border:1px solid var(--line);border-radius:14px;margin-top:10px;background:rgba(255,255,255,.03)}.dt summary{padding:13px 14px;cursor:pointer;color:var(--gold2);font-size:14px;letter-spacing:.04em}
+.dg{display:grid;grid-template-columns:1fr auto;gap:7px 12px;padding:0 14px 14px;font-size:13px}.dg span{color:var(--muted)}.dg b{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.sec{margin:16px 0 0;font-size:12px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase}
+.tiny{color:var(--muted);font-size:11.5px;line-height:1.5;margin:0;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="brand"><div class="icon">🥗</div><h1 id="t"></h1></div>
+<p class="sub" id="sub"></p>
+<nav class="tabs" id="tabs"></nav>
+<section id="vList">
+<div class="sbox"><input id="q" type="search" autocomplete="off" spellcheck="false" maxlength="40" enterkeyhint="search"><button class="x" id="qx" type="button" hidden aria-label="clear">✕</button></div>
+<div class="cats" id="cats" style="margin-top:10px"></div>
+<div id="list"></div>
+<p class="hint" id="cnt" style="text-align:center"></p>
+</section>
+<section id="vDet" hidden></section>
+<section id="vPlate" hidden></section>
+<section id="vAkg" hidden></section>
+<p class="tiny" id="note"></p>
+<div class="toast" id="toast" role="status"></div>
+</div>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const LS = k => "mk_" + k;
+function load(k, d){ try{ const v = localStorage.getItem(LS(k)); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }
+function save(k, v){ try{ localStorage.setItem(LS(k), JSON.stringify(v)); return true; }catch(e){ return false; } }
+const readLang = () => { try{ return String(localStorage.getItem("mk_lang") || "id").replace(/"/g, "") === "en" ? "en" : "id"; }catch(e){ return "id"; } };
+let lang = readLang();
+const L = (i, e) => lang === "en" ? e : i;
+const el = (t, c, x) => { const e = document.createElement(t); if(c) e.className = c; if(x !== undefined) e.textContent = x; return e; };
+const btn = (txt, cls, fn) => { const b = el("button", cls, txt); b.type = "button"; b.onclick = fn; return b; };
+const fx = (n, d) => { const t = (+n).toFixed(d); return lang === "en" ? t : t.replace(".", ","); };
+let tt = 0;
+function toast(m, ms){ const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), ms || 2200); }
+
+/* ===== data =====
+   Nilai PERKIRAAN rata-rata per 100 g (acuan: TKPI Kemenkes dan USDA FoodData Central), dibulatkan. Bisa berbeda menurut merek, resep, dan cara masak.
+   Kolom: kategori, emoji, nama ID, nama EN, kkal, protein g, lemak g, karbohidrat g, serat g, gula g (null = tidak diketahui), natrium mg (null = tidak diketahui), porsi umum [ID, EN, gram], basis (u = bahan/produk baku, acuan USDA FoodData Central dan TKPI; e = estimasi resep umum; kosong = data awal) */
+const RAW = [
+["kar","🍚","Nasi putih","White rice",130,2.7,0.3,28,0.4,0.1,1,[["1 centong","1 scoop",100],["1 piring","1 plate",200]]],
+["kar","🍚","Nasi merah","Brown rice",123,2.7,1,25.6,1.6,0.2,4,[["1 centong","1 scoop",100],["1 piring","1 plate",200]]],
+["kar","🥣","Bubur nasi polos","Plain rice porridge",50,1,0.1,11,0.2,0,60,[["1 mangkuk","1 bowl",250]]],
+["kar","🍜","Mi instan (kering + bumbu)","Instant noodles (dry + seasoning)",460,9,19,62,2,2,1700,[["1 bungkus","1 pack",75]]],
+["kar","🍜","Mi telur (matang)","Egg noodles (cooked)",138,4.5,2.1,25,1.2,0.5,10,[["1 porsi","1 serving",200]]],
+["kar","🍝","Pasta (matang)","Pasta (cooked)",158,5.8,0.9,31,1.8,0.6,1,[["1 porsi","1 serving",180]]],
+["kar","🍞","Roti tawar","White bread",266,8.9,3.3,49,2.7,5.7,491,[["1 lembar","1 slice",30],["2 lembar","2 slices",60]]],
+["kar","🥔","Kentang rebus","Boiled potato",87,1.9,0.1,20,1.8,0.9,5,[["1 buah sedang","1 medium",130]]],
+["kar","🍠","Ubi jalar rebus","Boiled sweet potato",76,1.4,0.1,17.7,2.5,5.7,27,[["1 buah sedang","1 medium",150]]],
+["kar","🥔","Singkong rebus","Boiled cassava",146,1,0.3,34.7,1.4,1.7,10,[["1 potong","1 piece",100]]],
+["kar","🌽","Jagung rebus","Boiled corn",96,3.4,1.5,21,2.4,4.5,15,[["1 tongkol","1 cob",100]]],
+["kar","🥣","Oatmeal (matang)","Oatmeal (cooked)",71,2.5,1.5,12,1.7,0.3,4,[["1 mangkuk","1 bowl",200]]],
+["kar","🍚","Nasi uduk","Coconut-milk rice (nasi uduk)",175,3,6.5,26,0.6,0.3,250,[["1 piring","1 plate",200],["1 centong","1 scoop",100]],"e"],
+["kar","🍚","Nasi kuning","Turmeric rice (nasi kuning)",180,3.3,5.5,30,0.7,0.3,240,[["1 piring","1 plate",200],["1 centong","1 scoop",100]],"e"],
+["kar","🍙","Lontong","Compressed rice cake (lontong)",97,2.1,0.2,21.9,0.5,0,null,[["1 potong","1 piece",100],["2 potong","2 pieces",200]],"e"],
+["kar","🍙","Ketupat","Ketupat (rice cake)",115,2.5,0.3,26,0.5,0,null,[["1 buah","1 piece",150]],"e"],
+["kar","🍚","Ketan putih (kukus)","Glutinous rice (steamed)",97,2,0.2,21.1,0.9,0,5,[["1 porsi","1 serving",150]],"u"],
+["kar","🍜","Bihun (matang)","Rice vermicelli (cooked)",109,0.9,0.2,25,1,0,10,[["1 mangkuk","1 bowl",150]],"u"],
+["kar","🍜","Soun (matang)","Glass noodles (cooked)",86,0.1,0,21,0.5,0,5,[["1 mangkuk","1 bowl",150]],"u"],
+["kar","🍜","Kwetiau (matang)","Flat rice noodles (cooked)",108,0.9,0.2,24.9,1,0,10,[["1 porsi","1 serving",180]],"u"],
+["kar","🍜","Mi kuning basah","Fresh yellow noodles",125,3.5,1.2,25,1,0.5,15,[["1 porsi","1 serving",150]],"e"],
+["kar","🍞","Roti gandum utuh","Whole wheat bread",252,12.5,3.5,42.7,6,6,450,[["1 lembar","1 slice",30],["2 lembar","2 slices",60]],"u"],
+["kar","🍞","Roti manis isi","Sweet filled bun",300,7.5,6,54,2,18,300,[["1 buah","1 bun",60]],"e"],
+["kar","🍔","Roti burger (bun)","Burger bun",270,9,4,49,2.5,5,490,[["1 buah","1 bun",55]],"u"],
+["kar","🥐","Croissant","Croissant",406,8.2,21,46,2.4,11,400,[["1 buah","1 croissant",60]],"u"],
+["kar","🥯","Bagel","Bagel",250,10,1.5,49,2.3,5,440,[["1 buah","1 bagel",95]],"u"],
+["kar","🫓","Roti pita","Pita bread",275,9.1,1.2,55.7,2.2,1.3,536,[["1 buah","1 piece",60]],"u"],
+["kar","🌯","Tortilla gandum","Flour tortilla",306,8.3,7.7,51.4,3,3,600,[["1 lembar","1 piece",45]],"u"],
+["kar","🥞","Pancake","Pancake",227,6.4,10,28,0.9,5,440,[["1 buah","1 pancake",40],["3 buah","3 pancakes",120]],"u"],
+["kar","🧇","Wafel","Waffle",291,7.9,14,33,1.7,7,510,[["1 buah","1 waffle",75]],"u"],
+["kar","🥣","Cornflakes","Cornflakes",357,7.5,0.4,84,3.3,10,730,[["1 mangkuk","1 bowl",30]],"u"],
+["kar","🥣","Granola","Granola",471,10,20,64,6,24,26,[["1 mangkuk kecil","1 small bowl",40]],"u"],
+["kar","🥣","Oat (kering, mentah)","Rolled oats (dry)",389,16.9,6.9,66.3,10.6,0,2,[["5 sdm","5 tbsp",40]],"u"],
+["kar","🍚","Quinoa (matang)","Quinoa (cooked)",120,4.4,1.9,21.3,2.8,0.9,7,[["1 mangkuk","1 bowl",185]],"u"],
+["kar","🍚","Couscous (matang)","Couscous (cooked)",112,3.8,0.2,23.2,1.4,0.1,5,[["1 mangkuk","1 bowl",160]],"u"],
+["kar","🍚","Bulgur (matang)","Bulgur (cooked)",83,3.1,0.2,18.6,4.5,0.1,5,[["1 mangkuk","1 bowl",180]],"u"],
+["kar","🍚","Beras putih (mentah)","White rice (raw)",365,7.1,0.7,80,1.3,0.1,5,[["1 cup","1 cup",185],["1 gelas takar","1 measuring cup",160]],"u"],
+["kar","🍚","Beras merah (mentah)","Brown rice (raw)",370,7.9,2.9,77.2,3.5,0.7,7,[["1 cup","1 cup",185]],"u"],
+["kar","🍝","Pasta gandum utuh (matang)","Whole wheat pasta (cooked)",124,5.3,0.5,26.5,3.9,0.6,3,[["1 porsi","1 serving",180]],"u"],
+["kar","🥔","Kentang panggang","Baked potato",93,2.5,0.1,21.2,2.2,1.2,10,[["1 buah sedang","1 medium",170]],"u"],
+["kar","🥔","Kentang tumbuk","Mashed potato",113,2,4.2,16.9,1.5,1.3,330,[["1 porsi","1 serving",210]],"u"],
+["kar","🍠","Ubi jalar panggang","Baked sweet potato",90,2,0.2,20.7,3.3,6.5,36,[["1 buah sedang","1 medium",130]],"u"],
+["kar","🥔","Talas rebus","Boiled taro",142,0.5,0.1,34.6,5.1,0.5,11,[["1 potong","1 piece",100]],"u"],
+
+["hew","🍗","Ayam goreng (dengan kulit)","Fried chicken (with skin)",270,25,17,5,0.2,0,330,[["1 potong","1 piece",100]]],
+["hew","🍗","Dada ayam rebus (tanpa kulit)","Boiled chicken breast (skinless)",165,31,3.6,0,0,0,74,[["1 potong","1 piece",120]]],
+["hew","🥩","Daging sapi (dimasak)","Beef (cooked)",250,26,15,0,0,0,72,[["1 potong","1 piece",85]]],
+["hew","🌭","Sosis","Sausage",290,12,25,3.5,0,2,950,[["1 buah","1 piece",40]]],
+["hew","🍗","Ayam panggang (dengan kulit)","Roasted chicken (with skin)",239,27.3,13.6,0,0,0,82,[["1 potong","1 piece",100]],"u"],
+["hew","🍗","Paha atas ayam (tanpa kulit)","Chicken thigh (skinless, roasted)",179,24.8,8.2,0,0,0,95,[["1 potong","1 piece",90]],"u"],
+["hew","🍗","Paha bawah ayam (tanpa kulit)","Chicken drumstick (skinless, roasted)",155,24.2,5.7,0,0,0,100,[["1 potong","1 piece",70]],"u"],
+["hew","🍗","Sayap ayam goreng","Fried chicken wing",300,25,20,3,0.1,0,300,[["1 buah","1 wing",40],["3 buah","3 wings",120]],"e"],
+["hew","🍗","Ayam goreng tepung (fast food)","Breaded fried chicken (fast food)",290,20,18,13,0.5,0.4,620,[["1 potong","1 piece",110]],"e"],
+["hew","🍖","Hati ayam (rebus)","Chicken liver (boiled)",167,24.5,6.5,0.9,0,0,71,[["1 buah","1 piece",30],["3 buah","3 pieces",90]],"u"],
+["hew","🍖","Ampela ayam (rebus)","Chicken gizzard (boiled)",154,30.4,2.7,0,0,0,69,[["1 buah","1 piece",30],["3 buah","3 pieces",90]],"u"],
+["hew","🍗","Nugget ayam","Chicken nuggets",296,15,18,18,0.9,1,560,[["1 buah","1 nugget",20],["5 buah","5 nuggets",100]],"u"],
+["hew","🥩","Steak sirloin sapi (panggang)","Sirloin steak (grilled)",206,29.5,9,0,0,0,55,[["1 potong","1 steak",150]],"u"],
+["hew","🥩","Hati sapi (goreng)","Beef liver (pan-fried)",175,26.5,4.7,3.6,0,0,77,[["1 potong","1 piece",60]],"u"],
+["hew","🥩","Daging kambing (dimasak)","Goat meat (cooked)",143,27.1,3,0,0,0,86,[["1 potong","1 piece",85]],"u"],
+["hew","🦆","Daging bebek (tanpa kulit, panggang)","Duck meat (skinless, roasted)",201,23.5,11.2,0,0,0,65,[["1 potong","1 piece",100]],"u"],
+["hew","🦃","Dada kalkun (panggang)","Turkey breast (roasted)",135,30,0.7,0,0,0,55,[["1 potong","1 slice",85]],"u"],
+["hew","🥫","Kornet sapi (kaleng)","Canned corned beef",251,26.9,15.9,0,0,0,950,[["1 sdm","1 tbsp",15],["3 sdm","3 tbsp",45]],"u"],
+["hew","🍖","Abon sapi/ayam","Meat floss (abon)",430,25,18,42,1,26,null,[["1 sdm","1 tbsp",8],["3 sdm","3 tbsp",24]],"e"],
+
+["ikn","🐟","Ikan lele goreng","Fried catfish",230,19,16,3,0,0,200,[["1 ekor","1 fish",100]]],
+["ikn","🐟","Salmon panggang","Baked salmon",206,22,12,0,0,0,61,[["1 potong","1 fillet",120]]],
+["ikn","🐟","Tuna kaleng (dalam air)","Canned tuna (in water)",116,26,0.8,0,0,0,247,[["1 kaleng kecil","1 small can",110]]],
+["ikn","🍤","Udang rebus","Boiled shrimp",99,24,0.3,0.2,0,0,111,[["5 ekor","5 pieces",50],["1 porsi","1 serving",100]]],
+["ikn","🐟","Ikan nila (panggang/kukus)","Tilapia (baked/steamed)",128,26,2.7,0,0,0,56,[["1 ekor sedang","1 medium fish",150],["1 potong","1 fillet",100]],"u"],
+["ikn","🐟","Ikan nila goreng","Fried tilapia",190,22,10,3,0,0,170,[["1 ekor sedang","1 medium fish",150]],"e"],
+["ikn","🐟","Ikan kembung goreng","Fried mackerel (kembung)",215,24,13,0.5,0,0,150,[["1 ekor","1 fish",70]],"e"],
+["ikn","🐟","Ikan tongkol/cakalang (rebus)","Skipjack tuna (boiled)",130,28.5,1.4,0,0,0,50,[["1 potong","1 piece",80]],"u"],
+["ikn","🐟","Ikan bandeng (goreng/bakar)","Milkfish (fried/grilled)",185,26,8,0,0,0,80,[["1 potong","1 piece",100]],"u"],
+["ikn","🐟","Ikan gurame goreng","Fried gourami",200,24,11,2,0,0,100,[["1 potong","1 piece",100]],"e"],
+["ikn","🐟","Ikan mas (dimasak)","Carp (cooked)",162,22.8,7.2,0,0,0,67,[["1 potong","1 piece",100]],"u"],
+["ikn","🐟","Ikan patin/dori (dimasak)","Pangasius/basa (cooked)",118,18,4.8,0,0,0,100,[["1 potong","1 fillet",100]],"e"],
+["ikn","🐟","Ikan kakap (kukus)","Snapper (steamed)",128,26.2,1.7,0,0,0,64,[["1 potong","1 fillet",120]],"u"],
+["ikn","🐟","Ikan kerapu (kukus)","Grouper (steamed)",118,24.8,1.3,0,0,0,53,[["1 potong","1 fillet",120]],"u"],
+["ikn","🐟","Ikan lele (panggang/kukus)","Catfish (baked/steamed)",152,18.5,8.2,0,0,0,63,[["1 ekor","1 fish",100]],"u"],
+["ikn","🐟","Ikan gabus (segar)","Snakehead fish (fresh)",74,16.2,0.4,0,0,0,null,[["1 potong","1 piece",100]],"u"],
+["ikn","🐟","Salmon mentah","Raw salmon",208,20.4,13.4,0,0,0,59,[["1 potong","1 fillet",120]],"u"],
+["ikn","🐟","Tuna segar (dimasak)","Fresh tuna (cooked)",139,29.1,1.3,0,0,0,45,[["1 potong","1 steak",120]],"u"],
+["ikn","🥫","Tuna kaleng (dalam minyak)","Canned tuna (in oil)",198,29.1,8.2,0,0,0,354,[["1 kaleng kecil","1 small can",110]],"u"],
+["ikn","🥫","Sarden kaleng (dalam minyak)","Canned sardines (in oil)",208,24.6,11.5,0,0,0,307,[["1 kaleng kecil","1 small can",90]],"u"],
+["ikn","🥫","Sarden kaleng (saus tomat)","Canned sardines (tomato sauce)",170,15,10,4,0,2,400,[["1 kaleng","1 can",155]],"e"],
+["ikn","🐟","Ikan teri kering","Dried anchovies (teri)",170,33,3.2,0,0,0,null,[["1 sdm","1 tbsp",10],["1 genggam","1 handful",30]],"u"],
+["ikn","🐟","Ikan asin kering (acuan cod asin)","Dried salted fish (salted cod basis)",290,62.8,2.4,0,0,0,7027,[["1 potong","1 piece",30]],"u"],
+["ikn","🦑","Cumi-cumi (segar)","Squid (fresh)",92,15.6,1.4,3.1,0,0,44,[["1 ekor","1 squid",100]],"u"],
+["gor","🦑","Cumi goreng tepung","Fried breaded squid (calamari)",175,17.9,7.5,7.8,0.1,0,260,[["1 porsi","1 serving",100]],"u"],
+["ikn","🦪","Kerang (dimasak)","Clams (cooked)",148,25.5,2,5.1,0,0,112,[["1 porsi","1 serving",100]],"u"],
+["ikn","🦪","Kerang hijau (kukus)","Green mussels (steamed)",172,23.8,4.5,7.4,0,0,369,[["1 porsi","1 serving",100]],"u"],
+["ikn","🦀","Kepiting (dimasak)","Crab (cooked)",87,18.1,1.1,0,0,0,293,[["1 porsi","1 serving",100]],"u"],
+["ikn","🦞","Lobster (kukus)","Lobster (steamed)",98,20.5,0.6,1.3,0,0,486,[["1 ekor kecil","1 small lobster",150]],"u"],
+["ikn","🐙","Gurita (dimasak)","Octopus (cooked)",164,29.8,2.1,4.4,0,0,230,[["1 porsi","1 serving",100]],"u"],
+["gor","🍤","Udang goreng tepung","Breaded fried shrimp",242,17,12,15,0.5,0.5,500,[["5 ekor","5 pieces",100]],"e"],
+["ikn","🍤","Udang kering (ebi)","Dried shrimp (ebi)",290,60,3,2,0,0,null,[["1 sdm","1 tbsp",8]],"e"],
+["ikn","🍢","Bakso ikan","Fish balls",117,10,2.5,13,0.3,1,500,[["1 butir","1 ball",25],["5 butir","5 balls",125]],"e"],
+["ikn","🦀","Kepiting tiruan (surimi)","Imitation crab (surimi)",95,7.6,0.5,15,0,null,841,[["1 batang","1 stick",15],["5 batang","5 sticks",75]],"u"],
+
+["tel","🥚","Telur rebus","Boiled egg",155,13,11,1.1,0,1.1,124,[["1 butir","1 egg",50],["2 butir","2 eggs",100]]],
+["tel","🍳","Telur ceplok","Fried egg",196,13.6,14.8,0.8,0,0.4,207,[["1 butir","1 egg",46]]],
+["tel","🍳","Telur dadar","Omelette",190,12,14.5,1.5,0.2,0.8,230,[["1 porsi (2 telur)","1 serving (2 eggs)",100]]],
+["tel","🥚","Telur ayam mentah","Raw egg",143,12.6,9.5,0.7,0,0.4,142,[["1 butir","1 egg",50]],"u"],
+["tel","🥚","Kuning telur (mentah)","Egg yolk (raw)",322,15.9,26.5,3.6,0,0.6,48,[["1 butir","1 yolk",17]],"u"],
+["tel","🥚","Putih telur (mentah)","Egg white (raw)",52,10.9,0.2,0.7,0,0.7,166,[["1 butir","1 white",33],["3 butir","3 whites",99]],"u"],
+["tel","🍳","Telur orak-arik","Scrambled eggs",149,10,11,1.6,0,1.4,145,[["1 porsi (2 telur)","1 serving (2 eggs)",100]],"u"],
+["tel","🥚","Telur asin","Salted duck egg",180,13,13.5,1,0,0,null,[["1 butir","1 egg",60]],"e"],
+["tel","🥚","Telur bebek (rebus)","Boiled duck egg",185,12.8,13.8,1.5,0,0.9,146,[["1 butir","1 egg",70]],"u"],
+["tel","🥚","Telur puyuh (rebus)","Boiled quail eggs",158,13,11.1,0.4,0,0.4,141,[["1 butir","1 egg",9],["5 butir","5 eggs",45]],"u"],
+
+["nab","⬜","Tahu putih","Plain tofu",80,8,4.8,1.9,0.3,0.6,7,[["1 potong","1 piece",60]]],
+["gor","🟨","Tahu goreng","Fried tofu",270,17,20,9,3.9,0.7,35,[["1 potong","1 piece",40]]],
+["gor","🟫","Tempe goreng","Fried tempeh",330,19,22,15,6,0,10,[["1 potong","1 piece",30],["3 potong","3 pieces",90]]],
+["nab","🟫","Tempe kukus","Steamed tempeh",192,20,11,8,5,0,9,[["1 potong","1 piece",50]]],
+["nab","🫘","Kacang hijau rebus","Boiled mung beans",105,7,0.4,19,7.6,2,2,[["1 mangkuk kecil","1 small bowl",150]]],
+["nab","🫘","Kedelai rebus","Boiled soybeans",173,16.6,9,9.9,6,3,1,[["1 mangkuk kecil","1 small bowl",150]],"u"],
+["nab","🫛","Edamame (rebus)","Edamame (boiled)",121,11.9,5.2,8.9,5.2,2.2,6,[["1 mangkuk kecil","1 small bowl",100]],"u"],
+["nab","🟫","Natto","Natto",212,17.7,11,14.4,5.4,4.9,7,[["1 bungkus","1 pack",45]],"u"],
+["nab","🫘","Kacang merah (rebus)","Kidney beans (boiled)",127,8.7,0.5,22.8,6.4,0.3,1,[["1 mangkuk kecil","1 small bowl",150]],"u"],
+["nab","🫛","Kacang polong (rebus)","Green peas (boiled)",84,5.4,0.2,15.6,5.5,5.9,3,[["1 mangkuk kecil","1 small bowl",100]],"u"],
+["nab","🫘","Kacang arab/chickpea (rebus)","Chickpeas (boiled)",164,8.9,2.6,27.4,7.6,4.8,7,[["1 mangkuk kecil","1 small bowl",150]],"u"],
+["nab","🫘","Kacang hitam (rebus)","Black beans (boiled)",132,8.9,0.5,23.7,8.7,0.3,1,[["1 mangkuk kecil","1 small bowl",150]],"u"],
+["nab","🫘","Kacang tolo (rebus)","Cowpeas (boiled)",116,7.7,0.5,20.8,6.5,3.3,4,[["1 mangkuk kecil","1 small bowl",150]],"u"],
+["nab","🫘","Lentil (rebus)","Lentils (boiled)",116,9,0.4,20.1,7.9,1.8,2,[["1 mangkuk kecil","1 small bowl",150]],"u"],
+["nab","🥣","Hummus","Hummus",166,7.9,9.6,14.3,6,0.3,379,[["2 sdm","2 tbsp",30]],"u"],
+
+["kac","🥜","Kacang tanah sangrai","Roasted peanuts",585,24,50,21,8,4.2,6,[["1 genggam","1 handful",30]]],
+["kac","🥜","Kacang tanah (mentah)","Raw peanuts",567,25.8,49.2,16.1,8.5,4.7,18,[["1 genggam","1 handful",30]],"u"],
+["kac","🌰","Kacang almond","Almonds",579,21.2,49.9,21.6,12.5,4.4,1,[["1 genggam","1 handful",28],["10 butir","10 pieces",12]],"u"],
+["kac","🌰","Kacang mete (mentah)","Raw cashews",553,18.2,43.9,30.2,3.3,5.9,12,[["1 genggam","1 handful",28]],"u"],
+["kac","🌰","Kacang mete sangrai asin","Dry-roasted salted cashews",574,15.3,46.4,32.7,3,5,640,[["1 genggam","1 handful",28]],"u"],
+["kac","🌰","Kacang kenari (walnut)","Walnuts",654,15.2,65.2,13.7,6.7,2.6,2,[["1 genggam","1 handful",28]],"u"],
+["kac","🥜","Kacang pistachio","Pistachios",560,20.2,45.3,27.2,10.6,7.7,1,[["1 genggam","1 handful",28]],"u"],
+["kac","🌰","Kacang hazelnut","Hazelnuts",628,15,60.8,16.7,9.7,4.3,0,[["1 genggam","1 handful",28]],"u"],
+["kac","🌰","Kacang pecan","Pecans",691,9.2,72,13.9,9.6,4,0,[["1 genggam","1 handful",28]],"u"],
+["kac","🌰","Kacang macadamia","Macadamia nuts",718,7.9,75.8,13.8,8.6,4.6,5,[["1 genggam","1 handful",28]],"u"],
+["kac","🌻","Biji bunga matahari (kuaci mentah)","Sunflower seeds (raw)",584,20.8,51.5,20,8.6,2.6,9,[["1 sdm","1 tbsp",9],["1 genggam","1 handful",30]],"u"],
+["kac","🎃","Biji labu","Pumpkin seeds",559,30.2,49,10.7,6,1.4,7,[["1 sdm","1 tbsp",9],["1 genggam","1 handful",30]],"u"],
+["kac","🌱","Biji wijen","Sesame seeds",573,17.7,49.7,23.4,11.8,0.3,11,[["1 sdm","1 tbsp",9]],"u"],
+["kac","🌱","Biji chia","Chia seeds",486,16.5,30.7,42.1,34.4,0,16,[["1 sdm","1 tbsp",12]],"u"],
+["kac","🌱","Biji rami (flaxseed)","Flaxseed",534,18.3,42.2,28.9,27.3,1.6,30,[["1 sdm","1 tbsp",10]],"u"],
+["kac","🥣","Tahini (pasta wijen)","Tahini (sesame paste)",595,17,53.8,21.2,9.3,0.5,115,[["1 sdm","1 tbsp",15]],"u"],
+
+["say","🥬","Bayam rebus","Boiled spinach",23,3,0.3,3.8,2.4,0.4,70,[["1 mangkuk","1 bowl",100]]],
+["say","🥦","Brokoli rebus","Boiled broccoli",35,2.4,0.4,7.2,3.3,1.4,41,[["1 mangkuk","1 bowl",100]]],
+["say","🥕","Wortel rebus","Boiled carrot",35,0.8,0.2,8.2,3,3.5,58,[["1 buah sedang","1 medium",80]]],
+["say","🥬","Kangkung rebus","Boiled water spinach",22,2.5,0.3,3.5,2.1,0.5,45,[["1 mangkuk","1 bowl",100]]],
+["say","🥬","Sawi hijau rebus","Boiled mustard greens",20,2.2,0.3,3,1.8,0.8,25,[["1 mangkuk","1 bowl",100]]],
+["say","🥬","Kubis rebus","Boiled cabbage",23,1.3,0.1,5.5,1.4,2.8,8,[["1 mangkuk","1 bowl",100]]],
+["say","🥒","Timun","Cucumber",15,0.7,0.1,3.6,0.5,1.7,2,[["1 buah sedang","1 medium",100]]],
+["say","🍅","Tomat","Tomato",18,0.9,0.2,3.9,1.2,2.6,5,[["1 buah sedang","1 medium",100]]],
+["say","🥬","Bayam mentah","Raw spinach",23,2.9,0.4,3.6,2.2,0.4,79,[["1 mangkuk","1 bowl",30],["1 ikat","1 bunch",250]],"u"],
+["say","🥬","Pakcoy/sawi putih (rebus)","Bok choy (boiled)",12,1.6,0.2,1.8,1,0.8,34,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🥬","Selada","Lettuce",15,1.4,0.2,2.9,1.3,0.8,28,[["1 mangkuk","1 bowl",50]],"u"],
+["say","🥦","Kembang kol (rebus)","Cauliflower (boiled)",23,1.8,0.5,4.1,2.3,2.1,15,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🍆","Terong (rebus)","Eggplant (boiled)",35,0.8,0.2,8.7,2.5,3.2,1,[["1 buah sedang","1 medium",100]],"u"],
+["say","🥒","Labu siam (rebus)","Chayote (boiled)",24,0.8,0.5,4.5,2.8,1.7,2,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🎃","Labu kuning (rebus)","Pumpkin (boiled)",20,0.7,0.1,4.9,1.1,2.4,1,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🫛","Kacang panjang (rebus)","Yardlong beans (boiled)",47,2.5,0.4,8.4,3,null,4,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🫛","Buncis (rebus)","Green beans (boiled)",35,1.9,0.3,7.9,3.2,1.4,1,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🥬","Pare (rebus)","Bitter gourd (boiled)",19,0.8,0.2,4.3,2,1,6,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🥒","Oyong/gambas (rebus)","Luffa (boiled)",20,1,0.2,4.4,1.1,null,2,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🍄","Jamur kancing","Button mushrooms",22,3.1,0.3,3.3,1,2,5,[["1 mangkuk","1 bowl",70]],"u"],
+["say","🍄","Jamur tiram","Oyster mushrooms",33,3.3,0.4,6.1,2.3,1.1,18,[["1 mangkuk","1 bowl",70]],"u"],
+["say","🍄","Jamur shiitake (dimasak)","Shiitake (cooked)",56,1.6,0.2,14.4,2.1,3.8,4,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🍄","Jamur enoki","Enoki mushrooms",37,2.7,0.3,7.8,2.7,0.2,3,[["1 bungkus","1 pack",100]],"u"],
+["say","🌱","Tauge (mentah)","Bean sprouts (raw)",30,3,0.2,5.9,1.8,4.1,6,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🥬","Seledri","Celery",16,0.7,0.2,3,1.6,1.8,80,[["1 batang","1 stalk",40]],"u"],
+["say","🧅","Bawang bombay","Onion",40,1.1,0.1,9.3,1.7,4.2,4,[["1 buah sedang","1 medium",110]],"u"],
+["say","🧅","Bawang merah","Shallot",72,2.5,0.1,16.8,3.2,7.9,12,[["1 siung","1 clove",10],["5 siung","5 cloves",50]],"u"],
+["say","🧄","Bawang putih","Garlic",149,6.4,0.5,33,2.1,1,17,[["1 siung","1 clove",3]],"u"],
+["say","🌶️","Cabai merah/rawit","Red chili",40,1.9,0.4,8.8,1.5,5.3,9,[["1 buah","1 chili",10],["5 buah","5 chilies",50]],"u"],
+["say","🫑","Paprika merah","Red bell pepper",31,1,0.3,6,2.1,4.2,4,[["1 buah sedang","1 medium",120]],"u"],
+["say","🥒","Zukini","Zucchini",17,1.2,0.3,3.1,1,2.5,8,[["1 buah sedang","1 medium",200]],"u"],
+["say","🌱","Asparagus (rebus)","Asparagus (boiled)",22,2.4,0.2,4.1,2,1.3,14,[["5 batang","5 spears",80]],"u"],
+["say","🥕","Lobak putih","Daikon radish",18,0.6,0.1,4.1,1.6,2.5,21,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🥕","Wortel mentah","Raw carrot",41,0.9,0.2,9.6,2.8,4.7,69,[["1 buah sedang","1 medium",60]],"u"],
+["say","🥬","Bit (rebus)","Beetroot (boiled)",44,1.7,0.2,10,2,8,77,[["1 buah sedang","1 medium",100]],"u"],
+["say","🧅","Daun bawang","Spring onion",32,1.8,0.2,7.3,2.6,2.3,16,[["1 batang","1 stalk",15]],"u"],
+["say","🥬","Kubis merah","Red cabbage",31,1.4,0.2,7.4,2.1,3.8,27,[["1 mangkuk","1 bowl",70]],"u"],
+["say","🥬","Okra (rebus)","Okra (boiled)",22,1.9,0.2,4.5,2.5,1.5,8,[["5 buah","5 pods",50]],"u"],
+["say","🎍","Rebung (rebus)","Bamboo shoots (boiled)",12,1.5,0.2,1.9,1.4,null,4,[["1 mangkuk","1 bowl",100]],"u"],
+["say","🌿","Rumput laut wakame","Wakame seaweed",45,3,0.6,9.1,0.5,0.7,872,[["1 mangkuk","1 bowl",50]],"u"],
+
+["bua","🍌","Pisang","Banana",89,1.1,0.3,22.8,2.6,12.2,1,[["1 buah","1 banana",100]]],
+["bua","🍎","Apel","Apple",52,0.3,0.2,13.8,2.4,10.4,1,[["1 buah sedang","1 medium",150]]],
+["bua","🍊","Jeruk","Orange",47,0.9,0.1,11.8,2.4,9.4,0,[["1 buah","1 orange",130]]],
+["bua","🥭","Mangga","Mango",60,0.8,0.4,15,1.6,13.7,1,[["1 buah (daging)","1 mango (flesh)",200]]],
+["bua","🍈","Pepaya","Papaya",43,0.5,0.3,10.8,1.7,7.8,8,[["1 potong","1 slice",150]]],
+["bua","🍉","Semangka","Watermelon",30,0.6,0.2,7.6,0.4,6.2,1,[["1 potong","1 slice",200]]],
+["bua","🍇","Anggur","Grapes",69,0.7,0.2,18,0.9,15.5,2,[["1 genggam","1 handful",80]]],
+["bua","🥑","Alpukat","Avocado",160,2,14.7,8.5,6.7,0.7,7,[["1/2 buah","1/2 avocado",100]]],
+["bua","🍍","Nanas","Pineapple",50,0.5,0.1,13,1.4,9.9,1,[["1 potong","1 slice",100]]],
+["bua","🍈","Durian","Durian",147,1.5,5.3,27,3.8,null,2,[["1 biji","1 pod",40]]],
+["bua","🍈","Salak","Snake fruit (salak)",77,0.4,0,20.9,2,null,null,[["1 buah","1 fruit",35]]],
+["bua","🍐","Jambu biji","Guava",68,2.6,1,14,5.4,8.9,2,[["1 buah","1 fruit",100]]],
+["bua","🍊","Jeruk bali","Pomelo",38,0.8,0,9.6,1,null,1,[["1 siung besar","1 large segment",100]],"u"],
+["bua","🍋","Jeruk nipis","Lime",30,0.7,0.2,10.5,2.8,1.7,2,[["1 buah","1 lime",45]],"u"],
+["bua","🍋","Lemon","Lemon",29,1.1,0.3,9.3,2.8,2.5,2,[["1 buah","1 lemon",60]],"u"],
+["bua","🍓","Stroberi","Strawberry",32,0.7,0.3,7.7,2,4.9,1,[["5 buah","5 berries",75],["1 mangkuk","1 bowl",150]],"u"],
+["bua","🫐","Blueberry","Blueberries",57,0.7,0.3,14.5,2.4,10,1,[["1 genggam","1 handful",75]],"u"],
+["bua","🍓","Raspberry","Raspberries",52,1.2,0.7,11.9,6.5,4.4,1,[["1 genggam","1 handful",75]],"u"],
+["bua","🥝","Kiwi","Kiwi",61,1.1,0.5,14.7,3,9,3,[["1 buah","1 kiwi",75]],"u"],
+["bua","🍐","Pir","Pear",57,0.4,0.1,15.2,3.1,9.8,1,[["1 buah sedang","1 medium",180]],"u"],
+["bua","🍑","Persik","Peach",39,0.9,0.3,9.5,1.5,8.4,0,[["1 buah","1 peach",150]],"u"],
+["bua","🍑","Plum","Plum",46,0.7,0.3,11.4,1.4,9.9,0,[["1 buah","1 plum",65]],"u"],
+["bua","🍒","Ceri","Cherries",63,1.1,0.2,16,2.1,12.8,0,[["1 genggam","1 handful",80]],"u"],
+["bua","🍈","Melon","Cantaloupe",34,0.8,0.2,8.2,0.9,7.9,16,[["1 potong","1 slice",150]],"u"],
+["bua","🍈","Melon honeydew","Honeydew melon",36,0.5,0.1,9.1,0.8,8.1,18,[["1 potong","1 slice",150]],"u"],
+["bua","🍒","Rambutan","Rambutan",82,0.7,0.2,20.9,0.9,null,11,[["5 buah","5 fruits",75]],"u"],
+["bua","🍈","Lengkeng","Longan",60,1.3,0.1,15.1,1.1,null,0,[["10 buah","10 fruits",80]],"u"],
+["bua","🍒","Leci","Lychee",66,0.8,0.4,16.5,1.3,15.2,1,[["5 buah","5 fruits",50]],"u"],
+["bua","🍇","Manggis","Mangosteen",73,0.4,0.6,18,1.8,null,7,[["3 buah","3 fruits",70]],"u"],
+["bua","🍈","Sirsak","Soursop",66,1,0.3,16.8,3.3,13.5,14,[["1 mangkuk","1 bowl",150]],"u"],
+["bua","🍈","Markisa","Passion fruit",97,2.2,0.7,23.4,10.4,11.2,28,[["1 buah","1 fruit",18]],"u"],
+["bua","🐉","Buah naga","Dragon fruit",60,1.2,0,13,2.9,8,null,[["1 buah","1 fruit",250]],"u"],
+["bua","🍈","Sawo","Sapodilla",83,0.4,1.1,20,5.3,null,12,[["1 buah","1 fruit",100]],"u"],
+["bua","⭐","Belimbing","Starfruit",31,1,0.3,6.7,2.8,4,2,[["1 buah","1 fruit",130]],"u"],
+["bua","🍐","Jambu air","Rose apple (jambu air)",25,0.6,0.3,5.7,1,null,null,[["1 buah","1 fruit",50],["3 buah","3 fruits",150]],"u"],
+["bua","🍈","Nangka","Jackfruit",95,1.7,0.6,23.3,1.5,19.1,2,[["3 biji","3 pods",60]],"u"],
+["bua","🥥","Kelapa (daging, mentah)","Coconut meat (raw)",354,3.3,33.5,15.2,9,6.2,20,[["1 potong","1 piece",45]],"u"],
+["bua","🌴","Kurma kering","Dried dates",282,2.5,0.4,75,8,63.4,2,[["3 buah","3 dates",24]],"u"],
+["bua","🍇","Kismis","Raisins",299,3.1,0.5,79.2,3.7,59.2,11,[["1 genggam","1 handful",30]],"u"],
+["bua","🍇","Prune (plum kering)","Prunes (dried plums)",240,2.2,0.4,63.9,7.1,38.1,2,[["5 buah","5 prunes",40]],"u"],
+["bua","🍑","Aprikot kering","Dried apricots",241,3.4,0.5,62.6,7.3,53.4,10,[["5 buah","5 pieces",40]],"u"],
+["bua","🍎","Delima","Pomegranate",83,1.7,1.2,18.7,4,13.7,3,[["1/2 buah","1/2 fruit",140]],"u"],
+["bua","🍊","Jeruk keprok/mandarin","Mandarin orange",53,0.8,0.3,13.3,1.8,10.6,2,[["1 buah","1 fruit",90]],"u"],
+["bua","🍊","Kesemek","Persimmon",70,0.6,0.2,18.6,3.6,12.5,1,[["1 buah","1 fruit",170]],"u"],
+["bua","🍈","Buah ara (segar)","Fresh figs",74,0.8,0.3,19.2,2.9,16.3,1,[["2 buah","2 figs",100]],"u"],
+
+["jadi","🍛","Nasi goreng","Fried rice",190,4.5,8,23,1,1,450,[["1 piring","1 plate",250]]],
+["jadi","🍲","Soto ayam (dengan kuah)","Chicken soto (with broth)",70,5,3,6,0.5,1,400,[["1 mangkuk","1 bowl",350]]],
+["jadi","🥣","Bubur ayam","Chicken porridge",100,4,3,14,0.5,0.5,300,[["1 mangkuk","1 bowl",300]]],
+["jadi","🥗","Gado-gado","Gado-gado (veg. with peanut sauce)",150,6,8,14,3.5,4,330,[["1 porsi","1 serving",250]]],
+["jadi","🍢","Bakso sapi","Beef meatballs",180,11,10,11,0.4,0.8,520,[["1 butir","1 ball",25],["5 butir","5 balls",125]]],
+["jadi","🍢","Sate ayam + bumbu kacang","Chicken satay + peanut sauce",200,21,10,6,0.8,4,380,[["10 tusuk","10 sticks",150]]],
+["jadi","🍖","Rendang daging","Beef rendang",220,21,14,3,1,1,400,[["1 potong","1 piece",50]]],
+["jadi","🍕","Pizza keju","Cheese pizza",266,11,10,33,2.3,3.6,598,[["1 slice","1 slice",107]]],
+["gor","🍟","Kentang goreng","French fries",312,3.4,15,41,3.8,0.3,210,[["1 porsi sedang","1 medium serving",117]]],
+["jadi","🍜","Mi ayam","Chicken noodles (mi ayam)",140,6,5,18,1,1,380,[["1 mangkuk","1 bowl",300]],"e"],
+["jadi","🍝","Mi goreng","Fried noodles",190,5,8,24,1.5,1.5,550,[["1 piring","1 plate",250]],"e"],
+["jadi","🍝","Kwetiau goreng","Fried flat noodles",180,5,8,22,1,1.5,500,[["1 piring","1 plate",250]],"e"],
+["jadi","🍝","Bihun goreng","Fried vermicelli",175,4,7,25,1,1,420,[["1 piring","1 plate",200]],"e"],
+["jadi","🍜","Mi instan (matang dengan kuah)","Instant noodles (cooked with broth)",77,1.7,3.2,10.6,0.4,0.3,285,[["1 mangkuk","1 bowl",450]],"e"],
+["jadi","🥘","Capcay","Chap chay (mixed stir-fry)",70,4,3,7,2,2,300,[["1 porsi","1 serving",200]],"e"],
+["jadi","🥗","Pecel sayur (bumbu kacang)","Pecel (vegetables + peanut sauce)",130,5.5,7,11,3.5,3,300,[["1 porsi","1 serving",250]],"e"],
+["jadi","🍲","Lontong sayur","Lontong sayur (rice cake in veg. curry)",95,3,4.5,11,1.2,1,300,[["1 porsi","1 serving",300]],"e"],
+["jadi","🍲","Soto betawi","Soto betawi",110,6,8,4,0.3,1,350,[["1 mangkuk","1 bowl",350]],"e"],
+["jadi","🍲","Rawon","Rawon (black beef soup)",75,7,4,3,0.5,0.5,350,[["1 mangkuk","1 bowl",350]],"e"],
+["jadi","🍲","Sop ayam","Chicken soup",40,4,1.5,3,0.5,1,300,[["1 mangkuk","1 bowl",300]],"e"],
+["jadi","🍗","Opor ayam","Opor ayam (chicken in coconut milk)",170,13,12,3,0.5,1,350,[["1 potong + kuah","1 piece + sauce",150]],"e"],
+["jadi","🍗","Gulai ayam","Chicken gulai",160,12,11,3,0.5,1,400,[["1 potong + kuah","1 piece + sauce",150]],"e"],
+["jadi","🍖","Semur daging","Beef semur (sweet soy stew)",140,12,7,7,0.5,4,450,[["1 porsi","1 serving",120]],"e"],
+["jadi","🍗","Ayam bakar bumbu kecap","Grilled chicken (sweet soy)",200,24,9,6,0.5,4,450,[["1 potong","1 piece",100]],"e"],
+["jadi","🐟","Pepes ikan","Pepes ikan (steamed fish in banana leaf)",140,15,7,4,1,1,350,[["1 bungkus","1 pack",100]],"e"],
+["jadi","🥬","Tumis kangkung","Stir-fried water spinach",80,2.5,5,6,2,2,350,[["1 porsi","1 serving",100]],"e"],
+["jadi","🍲","Sayur asem","Sayur asem (tamarind veg. soup)",25,1,0.5,5,1.5,2,250,[["1 mangkuk","1 bowl",250]],"e"],
+["jadi","🍲","Sayur lodeh","Sayur lodeh (veg. in coconut milk)",70,2,5,5,1.5,1.5,300,[["1 mangkuk","1 bowl",250]],"e"],
+["jadi","🍲","Sayur sop","Vegetable soup (sayur sop)",25,1.5,1,3,1,1.5,250,[["1 mangkuk","1 bowl",250]],"e"],
+["jadi","🥗","Urap sayur","Urap (veg. with grated coconut)",130,4,8,10,3,3,200,[["1 porsi","1 serving",100]],"e"],
+["gor","🥔","Perkedel kentang","Potato fritter (perkedel)",190,4,11,19,1.5,1,300,[["1 buah","1 piece",40]],"e"],
+["jadi","🥟","Siomay (bumbu kacang)","Siomay with peanut sauce",160,9,6,17,1.5,3,400,[["1 porsi","1 serving",200]],"e"],
+["gor","🍢","Batagor","Batagor (fried fish dumpling)",240,10,14,18,0.8,2,450,[["1 porsi","1 serving",150]],"e"],
+["jadi","🍢","Pempek (tanpa cuko)","Pempek (without cuko sauce)",180,7,3,32,0.5,1,600,[["1 buah","1 piece",80]],"e"],
+["jadi","🍳","Martabak telur","Savory egg martabak",235,10,14,17,1,1,400,[["1 potong","1 piece",100]],"e"],
+["jadi","🥚","Telur balado","Telur balado (egg in chili sauce)",180,10,14,5,1,3,350,[["1 butir","1 egg",70]],"e"],
+["jadi","🟫","Tempe orek","Tempe orek (sweet stir-fried tempeh)",220,12,12,17,3,10,500,[["1 porsi","1 serving",50]],"e"],
+["jadi","🍛","Gudeg","Gudeg (young jackfruit stew)",145,2.5,7,18,3,10,350,[["1 porsi","1 serving",150]],"e"],
+["jadi","🍛","Kari ayam (kuah santan)","Chicken curry (coconut milk)",140,10,10,3,0.7,1,350,[["1 porsi","1 serving",200]],"e"],
+["jadi","🥣","Bubur kacang hijau (manis)","Sweet mung bean porridge",130,3.5,3,22,3,12,30,[["1 mangkuk","1 bowl",200]],"e"],
+["jadi","🍔","Hamburger sapi","Beef hamburger",250,12.5,9,30,1.4,6,480,[["1 buah","1 burger",110]],"u"],
+["jadi","🍔","Cheeseburger","Cheeseburger",295,15,14,29,1.5,7,670,[["1 buah","1 burger",120]],"u"],
+["jadi","🌭","Hot dog","Hot dog",247,10.4,14.2,19,1,4,670,[["1 buah","1 hot dog",100]],"u"],
+["jadi","🌯","Kebab (isi daging)","Kebab (meat wrap)",215,11,10,20,1.5,2,500,[["1 buah","1 kebab",150]],"e"],
+["jadi","🍝","Spaghetti bolognese","Spaghetti bolognese",140,6.5,5,17,1.5,3,320,[["1 piring","1 plate",250]],"e"],
+["jadi","🍝","Lasagna","Lasagna",135,8.3,6,12,1,2,400,[["1 potong","1 piece",200]],"e"],
+["jadi","🧀","Makaroni keju (mac & cheese)","Macaroni and cheese",164,6.2,7.6,18.2,0.8,3,380,[["1 porsi","1 serving",200]],"e"],
+["jadi","🥟","Dimsum ayam (kukus)","Chicken dim sum (steamed)",180,9,8,17,1,1,450,[["1 buah","1 piece",25],["4 buah","4 pieces",100]],"e"],
+
+["gor","🍘","Bakwan / ote-ote","Vegetable fritter (bakwan)",240,4,14,25,2,1,400,[["1 buah","1 piece",50]]],
+["gor","🍌","Pisang goreng","Fried banana fritter",240,2,11,34,2,14,60,[["1 buah","1 piece",60]]],
+["gor","🍩","Donat glasir","Glazed donut",430,5,24,49,1.5,20,350,[["1 buah","1 donut",55]]],
+["jaj","🍫","Cokelat susu","Milk chocolate",535,7.7,29.7,59.4,3.4,51.5,79,[["1 batang kecil","1 small bar",40]]],
+["jaj","🍦","Es krim vanila","Vanilla ice cream",207,3.5,11,24,0.7,21,80,[["1 scoop","1 scoop",70]]],
+["jaj","🍪","Biskuit","Biscuits",450,6.5,19,65,2,22,380,[["3 keping","3 pieces",25]]],
+["gor","🥟","Risoles ragout","Risoles (ragout-filled roll)",220,6,12,22,1,2,300,[["1 buah","1 piece",60]],"e"],
+["gor","🥟","Lumpia goreng","Fried spring roll (lumpia)",235,5,12,26,1.5,2,350,[["1 buah","1 piece",50]],"e"],
+["jaj","🍙","Lemper ayam","Lemper (sticky rice roll with chicken)",160,5,5,24,0.8,0.5,200,[["1 buah","1 piece",50]],"e"],
+["gor","🥟","Pastel goreng","Fried pastel",270,6,15,28,1.5,2,350,[["1 buah","1 piece",60]],"e"],
+["jaj","🍡","Klepon","Klepon (palm sugar rice balls)",180,2,4.5,34,1.5,15,10,[["3 buah","3 pieces",60]],"e"],
+["gor","🍘","Onde-onde","Onde-onde (sesame balls)",300,6,14,38,2,12,50,[["1 buah","1 piece",40]],"e"],
+["jaj","🍰","Kue lapis","Kue lapis (layer cake)",190,2,3,38,0.5,20,60,[["1 potong","1 piece",50]],"e"],
+["jaj","🍥","Kue putu","Kue putu",190,2.5,3.5,38,1,14,40,[["3 buah","3 pieces",60]],"e"],
+["jaj","🥞","Serabi","Serabi (rice pancake)",160,3,5,26,0.5,9,100,[["1 buah","1 piece",50]],"e"],
+["jaj","🌯","Dadar gulung","Dadar gulung (coconut crepe)",210,3,7,34,1,18,60,[["1 buah","1 piece",50]],"e"],
+["jaj","🍠","Getuk singkong","Getuk (cassava cake)",190,0.8,2,42,1.5,20,10,[["1 potong","1 piece",60]],"e"],
+["jaj","🍃","Nagasari","Nagasari (banana rice flour cake)",140,1.5,3,27,1,10,30,[["1 buah","1 piece",60]],"e"],
+["jaj","🧁","Pukis","Pukis (coconut cake)",240,5,9,35,0.8,15,200,[["1 buah","1 piece",40]],"e"],
+["jaj","🧁","Kue lumpur","Kue lumpur",220,4,9,31,0.7,14,150,[["1 buah","1 piece",50]],"e"],
+["jaj","🧁","Kue cubit","Kue cubit (mini pancake)",270,5,10,40,0.7,22,250,[["5 buah","5 pieces",50]],"e"],
+["gor","🥔","Singkong goreng","Fried cassava",210,1,9,32,2,1,200,[["1 potong","1 piece",50]],"e"],
+["gor","🟨","Tahu isi","Stuffed fried tofu",190,6,12,15,2,1,300,[["1 buah","1 piece",50]],"e"],
+["jaj","🍢","Cilok","Cilok (tapioca balls)",150,3,1,32,0.5,0.5,200,[["5 butir","5 balls",100]],"e"],
+["gor","🍘","Cireng","Cireng (fried tapioca)",270,3,12,38,0.5,0.5,300,[["1 buah","1 piece",30],["5 buah","5 pieces",150]],"e"],
+["jaj","🥞","Martabak manis","Sweet martabak",330,6,13,48,1,25,200,[["1 potong","1 slice",80]],"e"],
+["jaj","🍌","Kolak pisang","Banana kolak (sweet coconut soup)",130,0.8,3,26,1.5,16,30,[["1 mangkuk","1 bowl",200]],"e"],
+["jaj","🍫","Brownies","Brownie",466,5,26,56,2,40,300,[["1 potong","1 piece",50]],"u"],
+["jaj","🍰","Bolu (sponge cake)","Sponge cake",297,5.4,3,61,0.5,36,300,[["1 potong","1 slice",50]],"u"],
+["jaj","🍰","Cheesecake","Cheesecake",321,5.5,22.5,25.5,0.4,21,250,[["1 potong","1 slice",100]],"u"],
+["jaj","🥧","Pai apel","Apple pie",237,1.9,11,34,1.6,13,190,[["1 potong","1 slice",125]],"u"],
+["jaj","🍪","Cookies cokelat chip","Chocolate chip cookies",488,5.7,24,63,3,35,430,[["1 keping","1 cookie",20],["3 keping","3 cookies",60]],"u"],
+["jaj","🧇","Wafer krim","Cream wafer",510,5,28,59,1,35,150,[["1 bungkus","1 pack",25]],"e"],
+["jaj","🍫","Cokelat hitam (70-85%)","Dark chocolate (70-85%)",598,7.8,42.6,45.9,10.9,24,20,[["1 kotak kecil","1 small square",10],["3 kotak","3 squares",30]],"u"],
+["jaj","🍫","Cokelat putih","White chocolate",539,5.9,32.1,59.2,0.2,59,90,[["1 batang kecil","1 small bar",40]],"u"],
+["jaj","🍦","Es krim cokelat","Chocolate ice cream",216,3.8,11,28,1.2,22,76,[["1 scoop","1 scoop",70]],"u"],
+["jaj","🍬","Permen jelly (gummy)","Gummy candy",343,6.9,0.2,77,0,46,57,[["1 genggam","1 handful",30]],"u"],
+["jaj","🍬","Dodol","Dodol (sweet sticky candy)",350,1.5,6,72,1,50,20,[["1 potong","1 piece",25]],"e"],
+["jaj","🍪","Kue nastar","Nastar (pineapple tart)",420,5,19,57,1,25,120,[["1 buah","1 piece",20],["3 buah","3 pieces",60]],"e"],
+["jaj","🍫","Granola bar","Granola bar",471,10,20,64,5,30,270,[["1 batang","1 bar",40]],"u"],
+["jaj","🍮","Puding susu/cokelat","Milk/chocolate pudding",125,3,3.5,20,0,17,90,[["1 cup","1 cup",100]],"e"],
+
+["kri","🍘","Kerupuk (goreng)","Crackers (kerupuk, fried)",520,4,28,62,1,1,800,[["3 keping","3 pieces",30]]],
+["kri","🥔","Keripik kentang","Potato chips",536,7,34.6,52.9,4.8,0.3,525,[["1 bungkus kecil","1 small bag",30]]],
+["kri","🥔","Keripik singkong (asin)","Cassava chips (salted)",520,1.5,30,62,3,1,600,[["1 bungkus kecil","1 small bag",30]],"e"],
+["kri","🍌","Keripik pisang","Banana chips",519,2.3,33.6,58.4,7.7,35.3,6,[["1 bungkus kecil","1 small bag",30]],"u"],
+["kri","🟫","Keripik tempe","Tempeh chips",500,15,30,42,5,1,500,[["1 bungkus kecil","1 small bag",30]],"e"],
+["kri","🍠","Keripik ubi jalar","Sweet potato chips",510,2,30,58,5,10,400,[["1 bungkus kecil","1 small bag",30]],"e"],
+["kri","🌽","Keripik jagung (tortilla chips)","Corn/tortilla chips",489,7,23,63,5,1,400,[["1 genggam","1 handful",30]],"u"],
+["kri","🧀","Snack jagung puff keju","Cheese puffs",538,6.7,35.7,52,1.5,1,1000,[["1 bungkus kecil","1 small bag",25]],"u"],
+["kri","🍿","Popcorn tawar (tanpa minyak)","Air-popped popcorn",387,12.9,4.5,77.8,14.5,0.9,8,[["1 mangkuk besar","1 large bowl",30]],"u"],
+["kri","🍿","Popcorn asin berminyak","Oil-popped salted popcorn",500,8,30,55,9,0.5,800,[["1 mangkuk","1 bowl",40]],"e"],
+["kri","🥨","Pretzel asin","Salted pretzels",380,10,3,80,3,3,1360,[["1 genggam","1 handful",30]],"u"],
+["kri","🍘","Crackers asin (saltine)","Saltine crackers",421,9.5,10,74,3,1.5,1100,[["5 keping","5 crackers",15]],"u"],
+["gor","🍘","Rempeyek kacang","Rempeyek (peanut crackers)",470,13,29,40,3,1,400,[["1 keping","1 piece",15],["3 keping","3 pieces",45]],"e"],
+["kri","🍘","Rengginang","Rengginang (rice crackers)",430,5,18,62,1,1,500,[["1 keping","1 piece",20]],"e"],
+["kri","🍘","Emping melinjo (goreng)","Emping (fried melinjo crackers)",480,9,24,59,2.5,1,null,[["1 genggam","1 handful",25]],"e"],
+["kri","🥜","Kacang tanah goreng asin","Dry-roasted salted peanuts",587,23.7,49.7,21.5,8,4.8,813,[["1 genggam","1 handful",30]],"u"],
+["kri","🌻","Kuaci sangrai asin","Roasted salted sunflower seeds",582,19.3,49.8,24.1,11.1,2.7,411,[["1 genggam","1 handful",30]],"u"],
+["kri","🍜","Snack mi remes (mi goreng kering)","Crunchy instant noodle snack",480,8,22,62,2,5,1000,[["1 bungkus kecil","1 small pack",20]],"e"],
+
+["min","🥛","Susu sapi (full cream)","Whole milk",61,3.2,3.3,4.8,0,5.1,43,[["1 gelas","1 glass",240]]],
+["min","🥛","Susu skim","Skim milk",34,3.4,0.1,5,0,5,42,[["1 gelas","1 glass",240]]],
+["min","🥛","Yogurt plain","Plain yogurt",61,3.5,3.3,4.7,0,4.7,46,[["1 cup","1 cup",125]]],
+["min","🧀","Keju cheddar","Cheddar cheese",403,25,33,1.3,0,0.5,621,[["1 slice","1 slice",20]]],
+["min","🍵","Teh manis","Sweet tea",25,0,0,6.3,0,6.3,1,[["1 gelas","1 glass",250]]],
+["min","☕","Kopi hitam tanpa gula","Black coffee, no sugar",1,0.1,0,0,0,0,2,[["1 cangkir","1 cup",240]]],
+["min","🧋","Kopi susu gula aren","Palm-sugar milk coffee",62,1.4,1.8,10,0,9.5,25,[["1 gelas (300 ml)","1 cup (300 ml)",300]]],
+["min","🥤","Minuman cola","Cola",42,0,0,10.6,0,10.6,4,[["1 kaleng","1 can",330]]],
+["jus","🧃","Jus jeruk","Orange juice",45,0.7,0.2,10.4,0.2,8.4,1,[["1 gelas","1 glass",250]]],
+["min","🥥","Air kelapa","Coconut water",19,0.7,0.2,3.7,1.1,2.6,105,[["1 gelas","1 glass",250]]],
+["min","💧","Air putih","Water",0,0,0,0,0,0,0,[["1 gelas","1 glass",250]],"u"],
+["min","🍵","Teh tawar","Plain tea (unsweetened)",1,0,0,0.3,0,0,3,[["1 gelas","1 glass",250]],"u"],
+["min","🍵","Teh hijau (tanpa gula)","Green tea (unsweetened)",1,0.2,0,0,0,0,1,[["1 cangkir","1 cup",240]],"u"],
+["min","🥛","Susu kental manis","Sweetened condensed milk",321,7.9,8.7,54.4,0,54.4,127,[["1 sdm","1 tbsp",20]],"u"],
+["min","🥛","Susu bubuk full cream","Whole milk powder",496,26.3,26.7,38.4,0,38.4,371,[["1 sdm","1 tbsp",7],["4 sdm","4 tbsp",28]],"u"],
+["min","🥛","Susu cokelat","Chocolate milk",83,3.2,3.4,10.4,0.8,9.5,60,[["1 kotak","1 carton",200]],"u"],
+["min","🥛","Susu kedelai (tanpa gula)","Soy milk (unsweetened)",33,2.9,1.6,1.7,0.4,0.4,12,[["1 gelas","1 glass",240]],"u"],
+["min","🥛","Susu almond (tanpa gula)","Almond milk (unsweetened)",15,0.6,1.2,0.3,0.2,0,67,[["1 gelas","1 glass",240]],"u"],
+["min","🥛","Susu oat","Oat milk",48,1,1.5,7.5,0.8,3.6,40,[["1 gelas","1 glass",240]],"u"],
+["min","🥣","Yogurt Greek plain","Plain Greek yogurt",97,9,5,4,0,3.6,35,[["1 cup","1 cup",150]],"u"],
+["min","🥤","Yogurt minum (berasa buah)","Drinking yogurt (fruit)",70,2.5,1.5,12,0,11,50,[["1 botol","1 bottle",200]],"e"],
+["min","🥛","Kefir","Kefir",41,3.8,1,4.5,0,4.5,40,[["1 gelas","1 glass",240]],"u"],
+["min","🧀","Keju mozzarella","Mozzarella cheese",254,24.3,15.9,2.8,0,1.1,619,[["1 slice","1 slice",28]],"u"],
+["min","🧀","Keju parmesan","Parmesan cheese",431,38,28.6,4.1,0,0.9,1529,[["1 sdm parut","1 tbsp grated",5]],"u"],
+["min","🧀","Keju slice (olahan)","Processed cheese slice",330,19,25,4.5,0,3.5,1200,[["1 lembar","1 slice",20]],"e"],
+["min","🧀","Keju cottage","Cottage cheese",98,11.1,4.3,3.4,0,2.7,364,[["1/2 cup","1/2 cup",110]],"u"],
+["min","🧀","Cream cheese","Cream cheese",342,5.9,34.4,4.1,0,3.2,321,[["1 sdm","1 tbsp",15]],"u"],
+["min","🥛","Krim kental (whipping cream)","Whipping cream",340,2.1,36,2.8,0,2.9,38,[["1 sdm","1 tbsp",15]],"u"],
+["min","🧋","Teh susu boba","Boba milk tea",80,0.8,1.5,16,0,12,30,[["1 gelas (500 ml)","1 cup (500 ml)",500]],"e"],
+["min","☕","Kopi susu (latte)","Latte",50,3,2,5,0,4.5,40,[["1 gelas","1 cup",240]],"e"],
+["min","☕","Kopi 3-in-1 (diseduh)","3-in-1 instant coffee (prepared)",45,0.4,1,8.5,0,6,15,[["1 gelas","1 cup",150]],"e"],
+["jus","🥑","Jus alpukat (susu & gula)","Avocado juice (milk & sugar)",120,1.5,6,16,2,13,20,[["1 gelas","1 glass",250]],"e"],
+["jus","🧃","Jus apel","Apple juice",46,0.1,0.1,11.4,0.2,9.6,4,[["1 gelas","1 glass",250]],"u"],
+["jus","🧃","Jus anggur","Grape juice",60,0.4,0.1,14.8,0.2,14.2,5,[["1 gelas","1 glass",250]],"u"],
+["jus","🧃","Jus nanas","Pineapple juice",53,0.4,0.1,12.9,0.2,10,2,[["1 gelas","1 glass",250]],"u"],
+["min","🥤","Minuman isotonik","Sports drink",26,0,0,6.4,0,5.7,41,[["1 botol","1 bottle",500]],"u"],
+["min","⚡","Minuman energi","Energy drink",45,0,0,11,0,11,38,[["1 kaleng","1 can",250]],"u"],
+["min","🥤","Soda lemon-lime","Lemon-lime soda",40,0,0,10,0,9.6,11,[["1 kaleng","1 can",330]],"u"],
+["min","🧋","Teh kemasan manis","Bottled sweet tea",35,0,0,8.7,0,8.5,10,[["1 botol","1 bottle",350]],"e"],
+["min","🧃","Sirup (pekat)","Syrup (concentrate)",280,0,0,70,0,70,5,[["1 sdm","1 tbsp",15]],"e"],
+
+["bum","🍶","Kecap manis","Sweet soy sauce (kecap manis)",190,2,0.1,44,0,36,2500,[["1 sdm","1 tbsp",15]],"e"],
+["bum","🍶","Kecap asin","Soy sauce",53,8.1,0.6,4.9,0.8,0.4,5493,[["1 sdm","1 tbsp",16]],"u"],
+["bum","🍅","Saus tomat","Ketchup",101,1,0.1,25.8,0.4,21.3,907,[["1 sdm","1 tbsp",17]],"u"],
+["bum","🌶️","Saus sambal botolan","Bottled chili sauce",80,1.5,0.5,18,1.5,12,1500,[["1 sdm","1 tbsp",15]],"e"],
+["bum","🥚","Mayones","Mayonnaise",680,1,75,0.6,0,0.6,635,[["1 sdm","1 tbsp",14]],"u"],
+["bum","🌶️","Sambal terasi","Sambal terasi (shrimp paste chili)",55,2,2,8,3,4,1000,[["1 sdm","1 tbsp",15]],"e"],
+["bum","🥜","Bumbu kacang (pecel/sate)","Peanut sauce (pecel/satay)",250,10,17,15,3,5,500,[["2 sdm","2 tbsp",30]],"e"],
+["bum","🦪","Saus tiram","Oyster sauce",51,1.4,0.3,11,0.2,6,2733,[["1 sdm","1 tbsp",16]],"u"],
+["bum","🍓","Selai buah","Fruit jam",278,0.4,0.1,68.9,1.1,48.5,32,[["1 sdm","1 tbsp",20]],"u"],
+["bum","🍫","Selai cokelat hazelnut","Chocolate hazelnut spread",539,6.3,30.9,57.5,3.4,56.3,42,[["1 sdm","1 tbsp",20]],"u"],
+["bum","🥜","Selai kacang","Peanut butter",588,25.1,50.4,20,6,9.2,426,[["1 sdm","1 tbsp",16],["2 sdm","2 tbsp",32]],"u"],
+["bum","🫚","Jahe segar","Fresh ginger",80,1.8,0.8,17.8,2,1.7,13,[["1 ruas","1 thumb",10]],"u"],
+["bum","🌭","Mustard","Mustard",66,4,4,5.8,4,0.9,1135,[["1 sdm","1 tbsp",15]],"u"],
+["bum","🍲","Miso","Miso",199,11.7,6,26,5.4,6.2,3728,[["1 sdm","1 tbsp",17]],"u"],
+
+["lain","🛢️","Minyak goreng","Cooking oil",884,0,100,0,0,0,0,[["1 sendok makan","1 tbsp",14]]],
+["lain","🧈","Mentega","Butter",717,0.9,81,0.1,0,0.1,643,[["1 sendok makan","1 tbsp",14]]],
+["lain","🍬","Gula pasir","Sugar",387,0,0,100,0,100,1,[["1 sendok teh","1 tsp",4],["1 sendok makan","1 tbsp",12]]],
+["lain","🍯","Madu","Honey",304,0.3,0,82,0.2,82,4,[["1 sendok makan","1 tbsp",21]]],
+["lain","🥥","Santan kental","Coconut milk",197,2,21,2.8,0,2,13,[["100 ml","100 ml",100]]],
+["lain","🧈","Margarin","Margarine",717,0.2,80.5,0.9,0,0,751,[["1 sdm","1 tbsp",14]],"u"],
+["lain","🫒","Minyak zaitun","Olive oil",884,0,100,0,0,0,2,[["1 sdm","1 tbsp",14]],"u"],
+["lain","🥥","Minyak kelapa","Coconut oil",862,0,100,0,0,0,0,[["1 sdm","1 tbsp",14]],"u"],
+["lain","🧂","Garam dapur","Table salt",0,0,0,0,0,0,38758,[["1 sdt","1 tsp",6]],"u"],
+["lain","🍶","Cuka","Vinegar",18,0,0,0,0,0,2,[["1 sdm","1 tbsp",15]],"u"],
+["lain","🍯","Gula merah/gula aren","Palm/jaggery sugar",380,1,0.1,95,0,88,30,[["1 sdm","1 tbsp",12]],"e"],
+["lain","🌾","Tepung terigu","Wheat flour",364,10.3,1,76.3,2.7,0.3,2,[["1 sdm","1 tbsp",8],["1 cup","1 cup",125]],"u"],
+["lain","🌾","Tepung beras","Rice flour",366,6,1.4,80,2.4,0.1,0,[["1 sdm","1 tbsp",9]],"u"],
+["lain","🌽","Tepung maizena","Cornstarch",381,0.3,0.1,91.3,0.9,0,9,[["1 sdm","1 tbsp",8]],"u"],
+["lain","🌾","Tepung tapioka","Tapioca starch",358,0.2,0,88.7,0.9,3.4,1,[["1 sdm","1 tbsp",9]],"u"],
+["lain","💪","Whey protein (bubuk)","Whey protein powder",400,80,6,7,0,4,300,[["1 scoop","1 scoop",30]],"e"],
+/* ===== tambahan: jus murni (tanpa gula, tanpa susu, per 100 g/ml; porsi 1 gelas 250 ml) dan gorengan (estimasi resep umum, porsi per buah) ===== */
+["jus","🥭","Jus mangga murni","Pure mango juice",58,0.6,0.3,14,1.0,12.5,2,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🍈","Jus jambu biji murni","Pure guava juice",50,0.4,0.1,12.5,1.0,9.5,4,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🍉","Jus semangka murni","Pure watermelon juice",30,0.6,0.2,7.6,0.4,6.2,1,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"u"],
+["jus","🍈","Jus melon murni","Pure melon juice",32,0.7,0.2,7.8,0.4,7.4,12,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🍅","Jus tomat murni","Pure tomato juice",17,0.9,0.3,3.5,0.4,2.6,10,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🥕","Jus wortel murni","Pure carrot juice",40,0.9,0.2,9.3,0.8,3.9,66,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"u"],
+["jus","🍊","Jus jeruk bali murni","Pure grapefruit juice",39,0.5,0.1,9.2,0.1,8,1,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🍊","Jus jeruk keprok murni","Pure mandarin juice",43,0.5,0.2,10.1,0.2,8,1,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🍋","Jus lemon murni","Pure lemon juice",22,0.4,0.2,6.9,0.3,2.5,1,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"u"],
+["jus","🍋","Jus jeruk nipis murni","Pure lime juice",25,0.4,0.1,8.4,0.4,1.7,2,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"u"],
+["jus","🧃","Jus belimbing murni","Pure starfruit juice",28,0.6,0.2,6.5,0.8,4.5,2,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🧃","Jus sirsak murni","Pure soursop juice",55,0.8,0.2,13.5,1,11,10,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🧃","Jus markisa murni","Pure passion fruit juice",51,0.4,0.1,13.6,0.2,11.2,13,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🧃","Jus pepaya murni","Pure papaya juice",40,0.4,0.2,10,0.9,7.2,8,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🍌","Jus pisang murni","Pure banana juice",60,0.7,0.2,15,1.2,8.5,1,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🍓","Jus stroberi murni","Pure strawberry juice",30,0.5,0.2,7.2,0.8,5,1,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🧃","Jus buah naga murni","Pure dragon fruit juice",45,0.8,0.3,10.5,1,8,2,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🧃","Jus bit murni","Pure beetroot juice",40,1,0.1,9,0.3,7.5,75,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🥒","Jus timun murni","Pure cucumber juice",14,0.5,0.1,3.2,0.2,1.7,3,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🥬","Jus sayur hijau murni (bayam, selada, timun)","Pure green vegetable juice (spinach, lettuce, cucumber)",20,1.2,0.2,3.8,0.8,1.8,40,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🧃","Jus delima murni","Pure pomegranate juice",54,0.2,0.3,13.1,0.1,12.7,9,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"u"],
+["jus","🫐","Jus cranberry murni (tanpa gula)","Pure cranberry juice (unsweetened)",46,0.4,0.1,12.2,0.1,12.1,2,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"u"],
+["jus","🫐","Jus blueberry murni","Pure blueberry juice",45,0.5,0.2,11,0.6,9,2,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🧃","Jus prune murni","Pure prune juice",71,0.6,0,17.5,1.2,16.4,4,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"u"],
+["jus","🍐","Jus pir murni","Pure pear juice",46,0.1,0.1,11.2,0.2,9.7,2,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🧃","Jus leci murni","Pure lychee juice",55,0.4,0.1,13.8,0.2,12.5,1,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🥝","Jus kiwi murni","Pure kiwi juice",52,0.8,0.4,12,1.5,9,3,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🥑","Jus alpukat murni (tanpa susu & gula)","Pure avocado juice (no milk or sugar)",85,1,7.5,4.5,3,0.3,4,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🧃","Jus buah campur murni","Pure mixed fruit juice",50,0.6,0.2,12,0.7,9.5,3,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["jus","🎋","Sari tebu murni","Pure sugarcane juice",70,0.2,0.4,17,0,16.5,15,[["1 gelas (250 ml)","1 glass (250 ml)",250]],"e"],
+["gor","🟨","Tahu crispy (tahu goreng tepung)","Crispy fried tofu (battered)",250,10,16,15,1,0.5,300,[["1 buah","1 piece",30],["5 buah","5 pieces",150]],"e"],
+["gor","🟨","Tahu Sumedang goreng","Fried Sumedang tofu",260,12,19,10,1.5,0.5,150,[["1 buah","1 piece",30],["3 buah","3 pieces",90]],"e"],
+["gor","🟫","Tempe mendoan","Tempe mendoan (battered, half-fried)",230,10,14,16,3,0.5,350,[["1 buah","1 piece",40],["3 buah","3 pieces",120]],"e"],
+["gor","🟫","Tempe goreng tepung","Battered fried tempeh",280,11,18,19,3,0.5,350,[["1 buah","1 piece",35]],"e"],
+["gor","🟫","Oncom goreng","Fried oncom",280,14,18,17,5,0.5,15,[["1 potong","1 piece",30]],"e"],
+["gor","🍘","Combro","Combro (fried cassava with oncom)",235,3,11,31,2,1,300,[["1 buah","1 piece",50]],"e"],
+["gor","🍘","Misro","Misro (fried cassava with palm sugar)",225,1.5,7,39,2,12,100,[["1 buah","1 piece",50]],"e"],
+["gor","🍠","Ubi goreng","Fried sweet potato",210,1.5,9,32,2.5,8,60,[["1 potong","1 piece",50]],"e"],
+["gor","🥔","Talas goreng","Fried taro",230,1,11,32,3,0.5,60,[["1 potong","1 piece",50]],"e"],
+["gor","🌳","Sukun goreng","Fried breadfruit",190,1.5,8,30,3,6,50,[["1 potong","1 piece",50]],"e"],
+["gor","🍌","Pisang molen","Banana molen (fried pastry)",270,3,12,38,1.5,14,120,[["1 buah","1 piece",60]],"e"],
+["gor","🍌","Pisang aroma (lumpia pisang)","Fried banana spring roll",290,3,14,38,1.5,14,120,[["1 buah","1 piece",50]],"e"],
+["gor","🥟","Kroket","Croquette",230,6,13,23,1.5,1,380,[["1 buah","1 piece",60]],"e"],
+["gor","🌽","Perkedel jagung (bakwan jagung)","Corn fritter",230,5,13,24,2,3,380,[["1 buah","1 piece",35]],"e"],
+["gor","🍤","Bakwan udang","Shrimp fritter",260,8,15,24,1.5,1,450,[["1 buah","1 piece",40]],"e"],
+["gor","🍤","Tempura udang","Shrimp tempura",250,10,13,24,0.5,1,450,[["1 ekor","1 piece",40],["3 ekor","3 pieces",120]],"e"],
+["gor","🌭","Sosis goreng","Fried sausage",300,10,25,8,0.3,1,800,[["1 buah","1 piece",30]],"e"],
+["gor","🍡","Bakso goreng","Fried meatball",260,10,17,16,0.5,1,500,[["1 buah","1 piece",20],["5 buah","5 pieces",100]],"e"],
+["gor","🥟","Pangsit goreng","Fried wonton",330,7,20,30,1,1,400,[["1 buah","1 piece",15],["5 buah","5 pieces",75]],"e"],
+["gor","🥖","Cakwe","Cakwe (fried dough stick)",380,8,18,47,1.5,2,350,[["1 buah","1 piece",40]],"e"],
+["gor","🍄","Jamur crispy","Crispy fried mushrooms",290,5,18,28,2,1,400,[["1 porsi","1 serving",80]],"e"],
+["gor","🥞","Kue cucur","Kue cucur (fried palm sugar cake)",300,3,12,45,1,22,60,[["1 buah","1 piece",40]],"e"],
+["gor","🍞","Roti goreng","Fried bread",300,6,13,40,1.5,6,300,[["1 buah","1 piece",60]],"e"],
+["gor","🍥","Getuk goreng","Fried getuk (cassava cake)",230,1,8,38,1.5,12,40,[["1 potong","1 piece",60]],"e"],
+["gor","🍥","Pempek kapal selam goreng","Fried pempek kapal selam",210,9,8,26,0.5,1,600,[["1 buah","1 piece",100]],"e"],
+["gor","🍗","Ayam goreng kremes","Fried chicken with crispy flakes (kremes)",300,22,20,8,0.3,0.5,450,[["1 potong","1 piece",100]],"e"],
+];
+const FOODS = RAW.map(r => ({key:r[2], cat:r[0], em:r[1], n:[r[2], r[3]], kcal:r[4], p:r[5], f:r[6], c:r[7], fi:r[8], su:r[9], na:r[10], por:r[11].map(x => ({n:[x[0], x[1]], g:x[2]})), src:r[12] || ""}));
+const byKey = {}; FOODS.forEach(f => { byKey[f.key] = f; });
+const CATS = [["all","Semua","All"],["kar","Karbohidrat","Carbs"],["hew","Daging & unggas","Meat & poultry"],["ikn","Ikan & seafood","Fish & seafood"],["tel","Telur","Eggs"],["nab","Tahu, tempe & kacang","Tofu, tempeh & legumes"],["kac","Kacang & biji","Nuts & seeds"],["say","Sayur","Vegetables"],["bua","Buah","Fruit"],["jus","Jus (buah & sayur)","Juices"],["gor","Gorengan","Fried snacks"],["jadi","Makanan jadi","Dishes"],["jaj","Jajanan & kue","Snacks & sweets"],["kri","Keripik & cemilan asin","Chips & salty snacks"],["min","Susu, keju & minuman","Dairy & drinks"],["bum","Bumbu & saus","Sauces & spreads"],["lain","Lainnya","Other"]];
+/* acuan harian: Acuan Label Gizi (ALG) 2150 kkal; gula mengikuti batas anjuran 50 g */
+const REF = {kcal:2150, p:60, f:67, c:325, fi:30, su:50, na:2000};
+const NUT = [["p","Protein","Protein","g",1,false],["f","Lemak","Fat","g",1,true],["c","Karbohidrat","Carbohydrate","g",1,false],["fi","Serat","Fiber","g",1,false],["su","Gula","Sugar","g",1,true],["na","Natrium","Sodium","mg",0,true]];
+
+/* ===== Kalkulator AKG =====
+   Sumber: Peraturan Menteri Kesehatan RI Nomor 28 Tahun 2019 tentang Angka Kecukupan Gizi yang Dianjurkan untuk Masyarakat Indonesia, Lampiran I (Tabel 1 energi, protein, lemak, karbohidrat, serat, air; Tabel 2 vitamin; Tabel 3 mineral), per orang per hari.
+   g = kelompok umur (s: "" bayi/anak, "m" laki-laki, "f" perempuan); a = tambahan hamil (h1-h3) dan menyusui (s1-s2), dijumlahkan dengan kelompok perempuan.
+   t = [energi kkal, protein g, lemak g, omega-3 g, omega-6 g, karbohidrat g, serat g, air ml]
+   v = [vit A (mcg RE), D, E, K, B1, B2, B3, B5, B6, folat, B12, biotin, kolin, C]
+   m = [kalsium, fosfor, magnesium, besi, iodium, seng, selenium, mangan, fluor, kromium, kalium, natrium, klor, tembaga] */
+const AKG = {"g":[{"k":"0-5b","s":"","a":"0–5 bulan","e":"0–5 months","bb":6,"tb":60,"t":[550,9,31,0.5,4.4,59,0,700],"v":[375,10,4,5,0.2,0.3,2,1.7,0.1,80,0.4,5,125,40],"m":[200,100,30,0.3,90,1.1,7,0.003,0.01,0.2,400,120,180,200]},{"k":"6-11b","s":"","a":"6–11 bulan","e":"6–11 months","bb":9,"tb":72,"t":[800,15,35,0.5,4.4,105,11,900],"v":[400,10,5,10,0.3,0.4,4,1.8,0.3,80,1.5,6,150,50],"m":[270,275,55,11,120,3,10,0.7,0.5,6,700,370,570,220]},{"k":"1-3","s":"","a":"1–3 tahun","e":"1–3 years","bb":13,"tb":92,"t":[1350,20,45,0.7,7,215,19,1150],"v":[400,15,6,15,0.5,0.5,6,2,0.5,160,1.5,8,200,40],"m":[650,460,65,7,90,3,18,1.2,0.7,14,2600,800,1200,340]},{"k":"4-6","s":"","a":"4–6 tahun","e":"4–6 years","bb":19,"tb":113,"t":[1400,25,50,0.9,10,220,20,1450],"v":[450,15,7,20,0.6,0.6,8,3,0.6,200,1.5,12,250,45],"m":[1000,500,95,10,120,5,21,1.5,1,16,2700,900,1300,440]},{"k":"7-9","s":"","a":"7–9 tahun","e":"7–9 years","bb":27,"tb":130,"t":[1650,40,55,0.9,10,250,23,1650],"v":[500,15,8,25,0.9,0.9,10,4,1,300,2,12,375,45],"m":[1000,500,135,10,120,5,22,1.7,1.4,21,3200,1000,1500,570]},{"k":"10-12","s":"m","a":"10–12 tahun","e":"10–12 years","bb":36,"tb":145,"t":[2000,50,65,1.2,12,300,28,1850],"v":[600,15,11,35,1.1,1.3,12,5,1.3,400,3.5,20,375,50],"m":[1200,1250,160,8,120,8,22,1.9,1.8,28,3900,1300,1900,700]},{"k":"13-15","s":"m","a":"13–15 tahun","e":"13–15 years","bb":50,"tb":163,"t":[2400,70,80,1.6,16,350,34,2100],"v":[600,15,15,55,1.2,1.3,16,5,1.3,400,4,25,550,75],"m":[1200,1250,225,11,150,11,30,2.2,2.5,36,4800,1500,2300,795]},{"k":"16-18","s":"m","a":"16–18 tahun","e":"16–18 years","bb":60,"tb":168,"t":[2650,75,85,1.6,16,400,37,2300],"v":[700,15,15,55,1.2,1.3,16,5,1.3,400,4,30,550,90],"m":[1200,1250,270,11,150,11,36,2.3,4,41,5300,1700,2500,890]},{"k":"19-29","s":"m","a":"19–29 tahun","e":"19–29 years","bb":60,"tb":168,"t":[2650,65,75,1.6,17,430,37,2500],"v":[650,15,15,65,1.2,1.3,16,5,1.3,400,4,30,550,90],"m":[1000,700,360,9,150,11,30,2.3,4,36,4700,1500,2250,900]},{"k":"30-49","s":"m","a":"30–49 tahun","e":"30–49 years","bb":60,"tb":166,"t":[2550,65,70,1.6,17,415,36,2500],"v":[650,15,15,65,1.2,1.3,16,5,1.3,400,4,30,550,90],"m":[1000,700,360,9,150,11,30,2.3,4,34,4700,1500,2250,900]},{"k":"50-64","s":"m","a":"50–64 tahun","e":"50–64 years","bb":60,"tb":166,"t":[2150,65,60,1.6,14,340,30,2500],"v":[650,15,15,65,1.2,1.3,16,5,1.7,400,4,30,550,90],"m":[1200,700,360,9,150,11,30,2.3,4,29,4700,1300,2100,900]},{"k":"65-80","s":"m","a":"65–80 tahun","e":"65–80 years","bb":58,"tb":164,"t":[1800,64,50,1.6,14,275,25,1800],"v":[650,20,15,65,1.2,1.3,16,5,1.7,400,4,30,550,90],"m":[1200,700,350,9,150,11,29,2.3,4,24,4700,1100,1900,900]},{"k":"80+","s":"m","a":"80+ tahun","e":"80+ years","bb":58,"tb":164,"t":[1600,64,45,1.6,14,235,22,1600],"v":[650,20,15,65,1.2,1.3,16,5,1.7,400,4,30,550,90],"m":[1200,700,350,9,150,11,29,2.3,4,21,4700,1000,1600,900]},{"k":"10-12","s":"f","a":"10–12 tahun","e":"10–12 years","bb":38,"tb":147,"t":[1900,55,65,1.0,10,280,27,1850],"v":[600,15,15,35,1,1,12,5,1.2,400,3.5,20,375,50],"m":[1200,1250,170,8,120,8,19,1.6,1.9,26,4400,1400,2100,700]},{"k":"13-15","s":"f","a":"13–15 tahun","e":"13–15 years","bb":48,"tb":156,"t":[2050,65,70,1.1,11,300,29,2100],"v":[600,15,15,55,1.1,1,14,5,1.2,400,4,25,400,65],"m":[1200,1250,220,15,150,9,24,1.6,2.4,27,4800,1500,2300,795]},{"k":"16-18","s":"f","a":"16–18 tahun","e":"16–18 years","bb":52,"tb":159,"t":[2100,65,70,1.1,11,300,29,2150],"v":[600,15,15,55,1.1,1,14,5,1.2,400,4,30,425,75],"m":[1200,1250,230,15,150,9,26,1.8,3,29,5000,1600,2400,890]},{"k":"19-29","s":"f","a":"19–29 tahun","e":"19–29 years","bb":55,"tb":159,"t":[2250,60,65,1.1,12,360,32,2350],"v":[600,15,15,55,1.1,1.1,14,5,1.3,400,4,30,425,75],"m":[1000,700,330,18,150,8,24,1.8,3,30,4700,1500,2250,900]},{"k":"30-49","s":"f","a":"30–49 tahun","e":"30–49 years","bb":56,"tb":158,"t":[2150,60,60,1.1,12,340,30,2350],"v":[600,15,15,55,1.1,1.1,14,5,1.3,400,4,30,425,75],"m":[1000,700,340,18,150,8,25,1.8,3,29,4700,1500,2250,900]},{"k":"50-64","s":"f","a":"50–64 tahun","e":"50–64 years","bb":56,"tb":158,"t":[1800,60,50,1.1,11,280,25,2350],"v":[600,15,15,55,1.1,1.1,14,5,1.5,400,4,30,425,75],"m":[1200,700,340,8,150,8,25,1.8,3,24,4700,1400,2100,900]},{"k":"65-80","s":"f","a":"65–80 tahun","e":"65–80 years","bb":53,"tb":157,"t":[1550,58,45,1.1,11,230,22,1550],"v":[600,20,20,55,1.1,1.1,14,5,1.5,400,4,30,425,75],"m":[1200,700,320,8,150,8,24,1.8,3,21,4700,1200,1900,900]},{"k":"80+","s":"f","a":"80+ tahun","e":"80+ years","bb":53,"tb":157,"t":[1400,58,40,1.1,11,200,20,1400],"v":[600,20,20,55,1.1,1.1,14,5,1.5,400,4,30,425,75],"m":[1200,700,320,8,150,8,24,1.8,3,19,4700,1000,1600,900]}],"a":[{"k":"h1","a":"Hamil trimester 1","e":"Pregnant, trimester 1","t":[180,1,2.3,0.3,2,25,3,300],"v":[300,0,0,0,0.3,0.3,4,1,0.6,200,0.5,0,25,10],"m":[200,0,0,0,70,2,5,0.2,0,5,0,0,0,100]},{"k":"h2","a":"Hamil trimester 2","e":"Pregnant, trimester 2","t":[300,10,2.3,0.3,2,40,4,300],"v":[300,0,0,0,0.3,0.3,4,1,0.6,200,0.5,0,25,10],"m":[200,0,0,9,70,4,5,0.2,0,5,0,0,0,100]},{"k":"h3","a":"Hamil trimester 3","e":"Pregnant, trimester 3","t":[300,30,2.3,0.3,2,40,4,300],"v":[300,0,0,0,0.3,0.3,4,1,0.6,200,0.5,0,25,10],"m":[200,0,0,9,70,4,5,0.2,0,5,0,0,0,100]},{"k":"s1","a":"Menyusui 6 bulan pertama","e":"Breastfeeding, first 6 months","t":[330,20,2.2,0.2,2,45,5,800],"v":[350,0,4,0,0.4,0.5,3,2,0.6,100,1,5,125,45],"m":[200,0,0,0,140,5,10,0.8,0,20,400,0,0,400]},{"k":"s2","a":"Menyusui 6 bulan kedua","e":"Breastfeeding, second 6 months","t":[400,15,2.2,0.2,2,55,6,650],"v":[350,0,4,0,0.4,0.5,3,2,0.6,100,1,5,125,45],"m":[200,0,0,0,140,5,10,0.8,0,20,400,0,0,400]}]};
+const AKG_V = [["Vitamin A","Vitamin A","mcg RE"],["Vitamin D","Vitamin D","mcg"],["Vitamin E","Vitamin E","mg"],["Vitamin K","Vitamin K","mcg"],["Vitamin B1 (tiamin)","Vitamin B1 (thiamin)","mg"],["Vitamin B2 (riboflavin)","Vitamin B2 (riboflavin)","mg"],["Vitamin B3 (niasin)","Vitamin B3 (niacin)","mg"],["Vitamin B5 (pantotenat)","Vitamin B5 (pantothenic acid)","mg"],["Vitamin B6","Vitamin B6","mg"],["Folat","Folate","mcg"],["Vitamin B12","Vitamin B12","mcg"],["Biotin","Biotin","mcg"],["Kolin","Choline","mg"],["Vitamin C","Vitamin C","mg"]];
+const AKG_M = [["Kalsium","Calcium","mg"],["Fosfor","Phosphorus","mg"],["Magnesium","Magnesium","mg"],["Besi","Iron","mg"],["Iodium","Iodine","mcg"],["Seng","Zinc","mg"],["Selenium","Selenium","mcg"],["Mangan","Manganese","mg"],["Fluor","Fluoride","mg"],["Kromium","Chromium","mcg"],["Kalium","Potassium","mg"],["Natrium","Sodium","mg"],["Klorida","Chloride","mg"],["Tembaga","Copper","mcg"]];
+const AKG_PREG_OK = ["13-15","16-18","19-29","30-49"];
+let akgSt = (() => { const a = load("akg", null) || {}; return {k:AKG.g.some(x => x.k === a.k) ? a.k : "19-29", s:a.s === "f" ? "f" : "m", st:["n","h1","h2","h3","s1","s2"].indexOf(a.st) >= 0 ? a.st : "n", use:a.use === true}; })();
+const saveAkg = () => { if(!save("akg", akgSt)) toast(L("Penyimpanan penuh, pilihan tidak tersimpan.", "Storage is full, your choice was not saved.")); };
+const akgKid = k => AKG.g.some(x => x.k === k && x.s === "");
+function akgNow(){
+  const kid = akgKid(akgSt.k), s = kid ? "" : akgSt.s;
+  const g = AKG.g.find(x => x.k === akgSt.k && x.s === s) || AKG.g[0];
+  const ad = (!kid && s === "f" && AKG_PREG_OK.indexOf(akgSt.k) >= 0 && akgSt.st !== "n") ? AKG.a.find(x => x.k === akgSt.st) : null;
+  const sum = (a, b) => a.map((v, i) => Math.round((v + (b ? b[i] : 0)) * 1000) / 1000);
+  return {g:g, ad:ad, t:sum(g.t, ad && ad.t), v:sum(g.v, ad && ad.v), m:sum(g.m, ad && ad.m)};
+}
+function akgLabel(r){
+  const sx = r.g.s === "" ? "" : r.g.s === "m" ? L("Laki-laki ", "Male ") : L("Perempuan ", "Female ");
+  return sx + (lang === "en" ? r.g.e : r.g.a) + (r.ad ? " + " + (lang === "en" ? r.ad.e : r.ad.a).toLowerCase() : "");
+}
+/* acuan harian untuk persen di seluruh menu: bawaan (label gizi 2150 kkal) atau AKG pilihan pengguna */
+function applyRef(){
+  REF.kcal = 2150; REF.p = 60; REF.f = 67; REF.c = 325; REF.fi = 30;
+  if(akgSt.use){ const r = akgNow(); REF.kcal = r.t[0] || 2150; REF.p = r.t[1] || 60; REF.f = r.t[2] || 67; REF.c = r.t[5] || 325; REF.fi = r.t[6] || 30; }
+}
+const refTxt = () => akgSt.use ? L("AKG " + akgLabel(akgNow()) + " (" + fx(REF.kcal, 0) + " kkal)", "the RDA for " + akgLabel(akgNow()) + " (" + fx(REF.kcal, 0) + " kcal)") : L("acuan harian label gizi (2150 kkal)", "the daily label reference (2,150 kcal)");
+const enNote = t => { const pc = Math.round(t.kcal / REF.kcal * 100); return akgSt.use ? L("= " + pc + "% dari kebutuhan energi AKG (" + fx(REF.kcal, 0) + " kkal).", "= " + pc + "% of the RDA energy (" + fx(REF.kcal, 0) + " kcal).") : L("= " + pc + "% dari acuan energi harian (2150 kkal).", "= " + pc + "% of the daily energy reference (2,150 kcal)."); };
+const nm = f => f.n[lang === "en" ? 1 : 0];
+const catName = k => { const c = CATS.find(x => x[0] === k); return c ? c[lang === "en" ? 2 : 1] : ""; };
+const num = (v, d) => v === null || v === undefined ? "–" : fx(v, d);
+
+/* ===== keadaan ===== */
+let view = "list", q = "", cat = "all", sel = null, grams = 100;
+let plate = (() => { const a = load("plate", []); return Array.isArray(a) ? a.filter(x => x && byKey[x.k] && +x.g > 0).slice(0, 40).map(x => ({k:x.k, g:Math.min(5000, +x.g)})) : []; })();
+const savePlate = () => { if(!save("plate", plate)) toast(L("Penyimpanan penuh, perubahan tidak tersimpan.", "Storage is full, the change was not saved.")); };
+
+/* hitung total: items = [{f, g}]; nilai tidak diketahui tidak dihitung dan ditandai di unk */
+function calc(items){
+  const t = {kcal:0, p:0, f:0, c:0, fi:0, su:0, na:0, unk:{su:false, na:false}};
+  items.forEach(it => { const k = it.g / 100; t.kcal += it.f.kcal * k; t.p += it.f.p * k; t.f += it.f.f * k; t.c += it.f.c * k; t.fi += it.f.fi * k;
+    ["su", "na"].forEach(x => { if(it.f[x] === null) t.unk[x] = true; else t[x] += it.f[x] * k; }); });
+  return t;
+}
+function nutRows(t){
+  const w = el("div");
+  NUT.forEach(n => {
+    const v = t[n[0]], unk = t.unk && t.unk[n[0]], pct = REF[n[0]] ? v / REF[n[0]] * 100 : 0;
+    const r = el("div", "nr"), h = el("div", "h"), a = el("span", "", L(n[1], n[2])), b = el("b", "", (unk && !v ? "–" : fx(v, n[4]) + (unk ? "+" : "")) + " " + n[3]);
+    b.append(el("em", "", unk && !v ? "" : Math.round(pct) + "%"));
+    h.append(a, b); const bar = el("div", "bar"), i = el("i"); i.style.width = Math.min(100, pct) + "%";
+    if(n[5]) i.className = pct >= 60 ? "hi" : pct >= 30 ? "lim" : ""; bar.append(i); r.append(h, bar); w.append(r);
+  });
+  w.append(el("p", "hint", L("Persen terhadap " + refTxt() + ". Tanda + berarti ada bahan yang nilainya belum diketahui.", "Percent of " + refTxt() + ". A + means some items have unknown values.")));
+  return w;
+}
+function energySplit(t){
+  const pk = t.p * 4, fk = t.f * 9, ck = t.c * 4, s = pk + fk + ck; if(s <= 0) return null;
+  const w = el("div"), bar = el("div", "split");
+  [[pk, "var(--ok)"], [fk, "var(--gold)"], [ck, "var(--blue)"]].forEach(x => { const i = el("i"); i.style.width = (x[0] / s * 100) + "%"; i.style.background = x[1]; bar.append(i); });
+  const lg = el("div", "leg"), pc = v => Math.round(v / s * 100) + "%";
+  lg.append(el("span", "p", L("Protein ", "Protein ") + pc(pk)), el("span", "f", L("Lemak ", "Fat ") + pc(fk)), el("span", "c", L("Karbo ", "Carbs ") + pc(ck)));
+  w.append(bar, lg); return w;
+}
+function flagsFor(t){
+  const w = el("div", "flags"), add = (txt, c) => w.append(el("span", "flag " + c, txt));
+  if(t.na / REF.na >= .3) add(L("Tinggi natrium", "High sodium"), "bad");
+  if(t.su / REF.su >= .3) add(L("Tinggi gula", "High sugar"), "bad");
+  if(t.f / REF.f >= .3) add(L("Tinggi lemak", "High fat"), "bad");
+  if(t.p / REF.p >= .3) add(L("Tinggi protein", "High protein"), "good");
+  if(t.fi / REF.fi >= .2) add(L("Tinggi serat", "High fiber"), "good");
+  return w.children.length ? w : null;
+}
+
+/* ===== tampilan ===== */
+function go(v){ view = v; $("vList").hidden = v !== "list"; $("vDet").hidden = v !== "det"; $("vPlate").hidden = v !== "plate"; $("vAkg").hidden = v !== "akg"; paintTabs(); if(v === "det") paintDetail(); if(v === "plate") paintPlate(); if(v === "akg") paintAkg(); try{ window.scrollTo(0, 0); }catch(e){} }
+function paintTabs(){
+  const n = $("tabs"); n.textContent = "";
+  [["list", L("Cari makanan", "Find food")], ["plate", L("Piringku", "My plate") + (plate.length ? " (" + plate.length + ")" : "")], ["akg", L("Kalkulator AKG", "RDA calculator")]].forEach(t => {
+    const on = view === t[0] || (t[0] === "list" && view === "det");
+    n.append(btn(t[1], "tab" + (on ? " on" : ""), () => go(t[0])));
+  });
+}
+function paintCats(){
+  const n = $("cats"); n.textContent = "";
+  CATS.forEach(c => n.append(btn(c[lang === "en" ? 2 : 1], "chip" + (cat === c[0] ? " on" : ""), () => { cat = c[0]; paintCats(); paintList(); })));
+}
+function paintList(){
+  const box = $("list"); box.textContent = "";
+  const toks = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const a = FOODS.filter(f => (cat === "all" || f.cat === cat) && toks.every(t => (f.n[0] + " " + f.n[1]).toLowerCase().includes(t)));
+  a.sort((x, y) => nm(x).localeCompare(nm(y), lang === "en" ? "en" : "id"));
+  if(toks.length) a.sort((x, y) => (nm(y).toLowerCase().startsWith(toks[0]) ? 1 : 0) - (nm(x).toLowerCase().startsWith(toks[0]) ? 1 : 0));
+  a.forEach(f => {
+    const r = el("button", "fi"); r.type = "button";
+    const nb = el("div", "nb"); nb.append(el("b", "", nm(f)), el("small", "", catName(f.cat) + " · P " + num(f.p, 1) + " · " + L("L ", "F ") + num(f.f, 1) + " · K " + num(f.c, 1)));
+    const kc = el("div", "kc", String(Math.round(f.kcal))); kc.append(el("small", "", L("kkal/100 g", "kcal/100 g")));
+    r.append(el("span", "em", f.em), nb, kc); r.onclick = () => openDetail(f); box.append(r);
+  });
+  $("cnt").textContent = a.length ? L(a.length + " makanan · nilai per 100 g", a.length + " foods · values per 100 g") : L("Tidak ditemukan. Coba kata lain atau kategori Semua.", "Nothing found. Try another word or the All category.");
+}
+function openDetail(f){ sel = f; grams = f.por[0].g; go("det"); }
+function paintDetail(){
+  const f = sel, d = $("vDet"); d.textContent = ""; if(!f){ go("list"); return; }
+  d.append(btn("← " + L("Kembali", "Back"), "btn ghost sm", () => go("list")));
+  const p1 = el("div", "panel"); p1.style.marginTop = "12px";
+  const dh = el("div", "dh"), tx = el("div"); tx.append(el("h2", "", nm(f)), el("small", "", catName(f.cat) + " · " + L("per 100 g: ", "per 100 g: ") + Math.round(f.kcal) + " " + L("kkal", "kcal")));
+  dh.append(el("span", "em", f.em), tx); p1.append(dh);
+  if(f.src) p1.append(el("p", "hint", f.src === "e" ? L("Dasar nilai: estimasi resep umum; bisa berbeda jauh menurut penjual dan resep.", "Basis: estimate for a typical recipe; can differ a lot by seller and recipe.") : L("Dasar nilai: acuan USDA FoodData Central dan TKPI Kemenkes.", "Basis: USDA FoodData Central and Indonesian TKPI references.")));
+  p1.append(el("span", "label", "")); p1.lastChild.style.marginTop = "14px"; p1.lastChild.textContent = L("Porsi", "Portion");
+  const chips = el("div", "row2"), mkChip = (txt, g) => { const b = btn(txt, "chip" + (grams === g ? " on" : ""), () => { grams = g; $("gIn").value = g; paintChipsOn(); paintRes(); }); b.dataset.g = g; return b; };
+  f.por.forEach(p => chips.append(mkChip(p.n[lang === "en" ? 1 : 0] + " (" + p.g + " g)", p.g)));
+  if(!f.por.some(p => p.g === 100)) chips.append(mkChip("100 g", 100));
+  chips.id = "pChips"; p1.append(chips);
+  const gin = el("div", "gin"), inp = el("input"); inp.id = "gIn"; inp.type = "number"; inp.inputMode = "decimal"; inp.min = "1"; inp.max = "5000"; inp.step = "any"; inp.value = grams; inp.setAttribute("aria-label", L("Jumlah dalam gram", "Amount in grams"));
+  inp.addEventListener("input", () => { const v = parseFloat(String(inp.value).replace(",", ".")); if(isFinite(v) && v > 0 && v <= 5000){ grams = v; paintChipsOn(); paintRes(); } });
+  gin.append(inp, el("span", "", L("gram", "grams"))); p1.append(gin); d.append(p1);
+  const res = el("div", "panel"); res.id = "dRes"; d.append(res);
+  const add = btn("＋ " + L("TAMBAH KE PIRINGKU", "ADD TO MY PLATE"), "btn", () => { addPlate(f, grams); });
+  d.append(add);
+  paintRes();
+}
+function paintChipsOn(){ const c = $("pChips"); if(!c) return; [...c.children].forEach(b => b.classList.toggle("on", +b.dataset.g === grams)); }
+function paintRes(){
+  const r = $("dRes"); if(!r || !sel) return; r.textContent = "";
+  const t = calc([{f:sel, g:grams}]);
+  const big = el("div", "big", fx(Math.round(t.kcal), 0)); big.append(el("small", "", L("KKAL · ", "KCAL · ") + fx(grams, grams % 1 ? 1 : 0) + " g")); r.append(big);
+  r.append(el("p", "hint", enNote(t)));
+  const tl = el("div", "tiles");
+  [[L("PROTEIN", "PROTEIN"), t.p], [L("LEMAK", "FAT"), t.f], [L("KARBO", "CARBS"), t.c]].forEach(x => { const c = el("div", "tile"); c.append(el("small", "", x[0]), el("b", "", fx(x[1], 1)), el("em", "", "g")); tl.append(c); });
+  r.append(tl); const es = energySplit(t); if(es) r.append(es);
+  const fl = flagsFor(t); if(fl) r.append(fl);
+  r.append(nutRows(t));
+}
+function addPlate(f, g){
+  const g2 = Math.round(g * 10) / 10, ex = plate.find(x => x.k === f.key);
+  if(ex) ex.g = Math.min(5000, Math.round((ex.g + g2) * 10) / 10);
+  else if(plate.length >= 40){ toast(L("Piringku penuh (maks. 40 item).", "Plate is full (max 40 items).")); return; }
+  else plate.push({k:f.key, g:g2});
+  savePlate(); paintTabs(); toast(L("Ditambahkan ke Piringku.", "Added to My plate."));
+}
+function paintPlate(){
+  const d = $("vPlate"); d.textContent = "";
+  if(!plate.length){
+    const p = el("div", "panel"); p.append(el("span", "label", L("Piringku", "My plate")), el("p", "hint", L("Belum ada makanan. Pilih makanan, atur porsinya, lalu ketuk Tambah ke Piringku untuk menjumlah kalori dan gizi satu hari atau satu kali makan.", "No food yet. Pick a food, set the portion, then tap Add to My plate to total calories and nutrients for a day or a meal.")));
+    p.firstChild.nextSibling.style.marginTop = "0"; d.append(p, btn(L("CARI MAKANAN", "FIND FOOD"), "btn", () => go("list"))); return;
+  }
+  const items = plate.map(x => ({f:byKey[x.k], g:x.g, x}));
+  const p1 = el("div", "panel"); p1.append(el("span", "label", L("Isi piring", "On the plate")));
+  items.forEach(it => {
+    const row = el("div", "pi"), nb = el("div", "nb"), kc = Math.round(it.f.kcal * it.g / 100);
+    nb.append(el("b", "", nm(it.f)), el("small", "", fx(it.g, it.g % 1 ? 1 : 0) + " g · " + kc + " " + L("kkal", "kcal")));
+    const st = el("div", "st");
+    const step = (dlt) => { it.x.g = Math.max(10, Math.min(5000, Math.round((it.x.g + dlt) * 10) / 10)); savePlate(); paintPlate(); };
+    st.append(btn("−", "", () => step(-10)), btn("+", "", () => step(10)), btn("✕", "rm", () => { plate = plate.filter(y => y !== it.x); savePlate(); paintTabs(); paintPlate(); }));
+    row.append(el("span", "em", it.f.em), nb, st); p1.append(row);
+  });
+  d.append(p1);
+  const t = calc(items), p2 = el("div", "panel");
+  const big = el("div", "big", fx(Math.round(t.kcal), 0)); big.append(el("small", "", L("TOTAL KKAL", "TOTAL KCAL"))); p2.append(big);
+  p2.append(el("p", "hint", enNote(t)));
+  const es = energySplit(t); if(es) p2.append(es);
+  const fl = flagsFor(t); if(fl) p2.append(fl);
+  p2.append(nutRows(t)); d.append(p2);
+  const clr = btn(L("KOSONGKAN PIRING", "CLEAR PLATE"), "btn danger", () => { if(!clr.dataset.sure){ clr.dataset.sure = "1"; clr.textContent = L("KETUK LAGI UNTUK MENGHAPUS", "TAP AGAIN TO CLEAR"); setTimeout(() => { if(clr.isConnected){ delete clr.dataset.sure; clr.textContent = L("KOSONGKAN PIRING", "CLEAR PLATE"); } }, 3000); return; } plate = []; savePlate(); paintTabs(); paintPlate(); });
+  d.append(clr);
+}
+
+/* ===== tampilan kalkulator AKG ===== */
+function aRow(name, target, unit, dec, val, lim, note){
+  const r = el("div", "nr"), h = el("div", "h"), b = el("b", "", fx(target, dec) + " " + unit), has = val !== null && target > 0, pct = has ? val / target * 100 : 0;
+  if(has) b.append(el("em", "", Math.round(pct) + "%"));
+  h.append(el("span", "", name), b); r.append(h);
+  if(has){ const bar = el("div", "bar"), i = el("i"); i.style.width = Math.min(100, pct) + "%"; i.className = lim ? (pct > 100 ? "hi" : pct >= 80 ? "lim" : "") : (pct > 130 ? "lim" : ""); bar.append(i); r.append(bar, el("small", "mut", L("Piringku: ", "My plate: ") + fx(val, dec) + " " + unit)); }
+  if(note) r.append(el("small", "mut", note));
+  return r;
+}
+function akgList(title, names, vals, dec){
+  const d = el("details", "dt"); d.append(el("summary", "", title));
+  const g = el("div", "dg");
+  names.forEach((n, i) => { const v = vals[i]; g.append(el("span", "", n[lang === "en" ? 1 : 0]), el("b", "", fx(v, v < 1 && v > 0 ? (v < 0.01 ? 3 : 2) : (v % 1 ? 1 : 0)) + " " + n[2])); });
+  d.append(g); return d;
+}
+function paintAkg(){
+  const d = $("vAkg"); d.textContent = "";
+  const kid = akgKid(akgSt.k), p1 = el("div", "panel");
+  p1.append(el("span", "label", L("Profil Anda", "Your profile")));
+  const l1 = el("label", "flab", L("Kelompok umur", "Age group")); l1.htmlFor = "akgAge"; l1.style.marginTop = "0";
+  const sel = el("select", "sel"); sel.id = "akgAge";
+  const seen = []; AKG.g.forEach(x => { if(seen.indexOf(x.k) < 0){ seen.push(x.k); const o = el("option", "", lang === "en" ? x.e : x.a); o.value = x.k; o.selected = x.k === akgSt.k; sel.append(o); } });
+  sel.onchange = () => { akgSt.k = sel.value; if(AKG_PREG_OK.indexOf(akgSt.k) < 0) akgSt.st = "n"; saveAkg(); applyRef(); paintAkg(); paintTabs(); };
+  p1.append(l1, sel);
+  if(!kid){
+    p1.append(el("span", "flab", L("Jenis kelamin", "Sex")));
+    const row = el("div", "row2");
+    [["m", L("Laki-laki", "Male")], ["f", L("Perempuan", "Female")]].forEach(x => row.append(btn(x[1], "chip" + (akgSt.s === x[0] ? " on" : ""), () => { akgSt.s = x[0]; if(x[0] !== "f") akgSt.st = "n"; saveAkg(); applyRef(); paintAkg(); })));
+    p1.append(row);
+    if(akgSt.s === "f" && AKG_PREG_OK.indexOf(akgSt.k) >= 0){
+      const l2 = el("label", "flab", L("Kondisi", "Condition")); l2.htmlFor = "akgSt";
+      const s2 = el("select", "sel"); s2.id = "akgSt";
+      [["n", L("Tidak hamil / tidak menyusui", "Not pregnant / not breastfeeding")]].concat(AKG.a.map(a => [a.k, lang === "en" ? a.e : a.a])).forEach(x => { const o = el("option", "", x[1]); o.value = x[0]; o.selected = x[0] === akgSt.st; s2.append(o); });
+      s2.onchange = () => { akgSt.st = s2.value; saveAkg(); applyRef(); paintAkg(); };
+      p1.append(l2, s2);
+    }
+  }
+  d.append(p1);
+
+  const r = akgNow(), t = plate.length ? calc(plate.map(x => ({f:byKey[x.k], g:x.g}))) : null;
+  const p2 = el("div", "panel");
+  p2.append(el("span", "label", L("Kebutuhan gizi harian (AKG)", "Daily nutrient needs (RDA)")));
+  p2.append(el("div", "dh")); p2.lastChild.append(el("h2", "", akgLabel(r)));
+  if(r.g.bb) p2.lastChild.append(el("small", "", L("Acuan: berat " + r.g.bb + " kg, tinggi " + r.g.tb + " cm", "Reference: " + r.g.bb + " kg, " + r.g.tb + " cm")));
+  const big = el("div", "big", fx(Math.round(r.t[0]), 0)); big.append(el("small", "", L("KKAL PER HARI", "KCAL PER DAY"))); big.style.marginTop = "12px"; p2.append(big);
+  if(r.ad) p2.append(el("p", "hint", L("Sudah termasuk tambahan untuk kondisi ini sesuai Permenkes.", "Includes the extra amounts for this condition as set by the regulation.")));
+  const tl = el("div", "tiles");
+  [[L("PROTEIN", "PROTEIN"), r.t[1]], [L("LEMAK", "FAT"), r.t[2]], [L("KARBO", "CARBS"), r.t[5]]].forEach(x => { const c = el("div", "tile"); c.append(el("small", "", x[0]), el("b", "", fx(x[1], x[1] % 1 ? 1 : 0)), el("em", "", "g")); tl.append(c); });
+  p2.append(tl);
+  p2.append(el("p", "sec", t ? L("Dibanding isi Piringku", "Compared with My plate") : L("Target harian", "Daily targets")));
+  const pl = t ? t : null;
+  p2.append(aRow(L("Energi", "Energy"), r.t[0], L("kkal", "kcal"), 0, pl ? pl.kcal : null, false));
+  p2.append(aRow(L("Protein", "Protein"), r.t[1], "g", 0, pl ? pl.p : null, false));
+  p2.append(aRow(L("Lemak total", "Total fat"), r.t[2], "g", 0, pl ? pl.f : null, true));
+  p2.append(aRow(L("Karbohidrat", "Carbohydrate"), r.t[5], "g", 0, pl ? pl.c : null, false));
+  p2.append(aRow(L("Serat", "Fiber"), r.t[6], "g", 0, pl ? pl.fi : null, false));
+  p2.append(aRow(L("Air", "Water"), r.t[7], "ml", 0, null, false, L("Termasuk air dari makanan dan minuman.", "Includes water from food and drinks.")));
+  p2.append(aRow(L("Natrium", "Sodium"), r.m[11], "mg", 0, pl ? pl.na : null, true, pl && pl.unk.na ? L("Ada makanan yang natriumnya belum diketahui.", "Some foods have unknown sodium.") : ""));
+  p2.append(aRow(L("Gula (batas anjuran)", "Sugar (recommended limit)"), 50, "g", 0, pl ? pl.su : null, true, L("Bukan bagian AKG; batas anjuran Kemenkes (Permenkes 30/2013) 50 g, setara 4 sendok makan.", "Not part of the RDA; Indonesian MoH recommended limit (Permenkes 30/2013) of 50 g, about 4 tablespoons.") + (pl && pl.unk.su ? " " + L("Ada makanan yang gulanya belum diketahui.", "Some foods have unknown sugar.") : "")));
+  if(!t) p2.append(el("p", "hint", L("Tambahkan makanan ke Piringku untuk membandingkan asupan Anda dengan angka di atas.", "Add foods to My plate to compare your intake with the numbers above.")));
+  d.append(p2);
+  if(!t) d.append(btn(L("CARI MAKANAN", "FIND FOOD"), "btn ghost", () => go("list")));
+
+  const p3 = el("div", "panel");
+  p3.append(el("span", "label", L("Lemak esensial, vitamin, dan mineral", "Essential fats, vitamins, and minerals")));
+  p3.append(el("p", "hint", L("Omega-3: " + fx(r.t[3], 1) + " g · Omega-6: " + fx(r.t[4], 1) + " g per hari.", "Omega-3: " + fx(r.t[3], 1) + " g · Omega-6: " + fx(r.t[4], 1) + " g per day.")));
+  p3.lastChild.style.marginTop = "0";
+  p3.append(akgList(L("Vitamin", "Vitamins"), AKG_V, r.v), akgList(L("Mineral", "Minerals"), AKG_M, r.m));
+  p3.append(el("p", "hint", L("Angka vitamin dan mineral adalah acuan kebutuhan. Aplikasi ini belum menghitung kandungannya dari makanan.", "Vitamin and mineral figures are reference needs. This app does not yet calculate them from foods.")));
+  d.append(p3);
+
+  d.append(btn(akgSt.use ? "✓ " + L("DIPAKAI SEBAGAI ACUAN HARIAN", "USED AS DAILY REFERENCE") : L("PAKAI SEBAGAI ACUAN HARIAN", "USE AS DAILY REFERENCE"), akgSt.use ? "btn" : "btn ghost", () => { akgSt.use = !akgSt.use; saveAkg(); applyRef(); paintAkg(); toast(akgSt.use ? L("Persen di menu ini kini mengikuti AKG Anda.", "Percentages in this menu now follow your RDA.") : L("Kembali ke acuan label gizi 2150 kkal.", "Back to the 2,150 kcal label reference.")); }));
+  d.append(el("p", "hint", L("Bila dipakai, persen pada detail makanan dan Piringku memakai AKG di atas (gula tetap batas 50 g, natrium tetap batas 2000 mg untuk penanda “tinggi”).", "When on, percentages in food details and My plate use the RDA above (sugar stays at 50 g and sodium at 2,000 mg for the “high” flags).")));
+  d.append(el("p", "tiny", L("Sumber: Permenkes RI No. 28 Tahun 2019 tentang Angka Kecukupan Gizi yang Dianjurkan untuk Masyarakat Indonesia (Lampiran I). AKG adalah angka rata-rata untuk orang sehat menurut kelompok umur, jenis kelamin, dan berat serta tinggi acuan; kebutuhan pribadi dapat berbeda menurut aktivitas dan kondisi kesehatan. Untuk perkiraan pribadi, gunakan menu BMI & KALORI. Bukan pengganti saran dokter atau ahli gizi.", "Source: Indonesian Ministry of Health Regulation No. 28 of 2019 on the Recommended Dietary Allowances (Annex I). RDAs are averages for healthy people by age group, sex, and reference weight and height; personal needs vary with activity and health. For a personal estimate use the BMI & CALORIES menu. Not a substitute for medical or dietitian advice.")));
+}
+function paint(){
+  document.documentElement.lang = lang;
+  $("t").textContent = L("INFO KANDUNGAN MAKANAN", "FOOD NUTRITION INFO");
+  $("sub").textContent = L("Kalori dan gizi makanan sehari-hari, per porsi, plus kalkulator AKG.", "Calories and nutrients of everyday foods, per portion, plus an RDA calculator.");
+  $("q").placeholder = L("Cari makanan (mis. nasi, jus mangga, tempe)", "Search food (e.g. rice, mango juice, tempeh)");
+  $("note").textContent = L("Nilai perkiraan rata-rata (acuan TKPI Kemenkes dan USDA); bisa berbeda menurut merek, resep, dan cara masak. Bukan pengganti saran dokter atau ahli gizi.", "Approximate average values (TKPI Indonesia and USDA references); they vary by brand, recipe, and cooking method. Not a substitute for medical or dietitian advice.");
+  paintTabs(); paintCats(); paintList();
+  if(view === "det") paintDetail(); if(view === "plate") paintPlate(); if(view === "akg") paintAkg();
+}
+$("q").addEventListener("input", () => { q = $("q").value.slice(0, 40); $("qx").hidden = !q; paintList(); });
+$("qx").addEventListener("click", () => { $("q").value = ""; q = ""; $("qx").hidden = true; paintList(); $("q").focus(); });
+/* bahasa mengikuti Pengaturan beranda (kunci mk_lang) */
+window.addEventListener("storage", e => { if(!e.key || e.key === "mk_lang"){ const l = readLang(); if(l !== lang){ lang = l; paint(); } } });
+applyRef();
+paint();
+</scr@@ipt>
+</body>
+</html>
+</script>
 <script type="text/plain" id="src-olahraga"><!DOCTYPE html>
 <html lang="id">
 <head>
@@ -16780,6 +17646,7 @@ A.deleteAccount = async () => {
   /* token push: lepas perangkat ini dan semua perangkat lain milik akun (lewat Worker) selagi masih login */
   await soft(() => window.stPushOff ? window.stPushOff(true) : null);
   if(acc) await soft(() => m.deleteDoc(m.doc(db, "accountIds", acc)));
+  await soft(() => m.deleteDoc(m.doc(db, "presence", uid)));
   await soft(() => m.deleteDoc(m.doc(db, "users", uid)));
   /* 3) hapus akun dari Firebase Authentication */
   try{ await auth.deleteUser(u); }
@@ -16790,12 +17657,12 @@ A.deleteAccount = async () => {
   A.error = null; emit();
 };
 /* ===== ID AKUN (dibuat sistem) =====
-   Setiap akun Google yang masuk pertama kali dibuatkan ID sendiri oleh sistem, berurutan dan tidak pernah sama: ST-000001, ST-000002, dst.
-   Disimpan di users/{uid}.accountId; nomor urut diambil lewat transaksi dari meta/counter, jadi dua orang tidak mungkin dapat ID yang sama.
+   Setiap akun Google yang masuk pertama kali dibuatkan ID sendiri oleh sistem, acak 8 digit dan tidak pernah sama (mis. ST-48273915); akun lama tetap memakai ID 6 digit berurutan.
+   Disimpan di users/{uid}.accountId; dokumen users dan accountIds ditulis satu batch; bila ID bentrok, aturan Firestore menolak dan dicoba ID lain.
    ID yang sudah terbentuk tidak berubah lagi (login ulang / ganti perangkat memakai ID yang sama). */
 const PROF = (() => {
   const key = u => "st_sync_acc_" + u;
-  const fmt = n => "ST-" + String(n).padStart(6, "0");
+  const newAccountId = () => { let n; try{ const a = new Uint32Array(1); crypto.getRandomValues(a); n = 10000000 + (a[0] % 90000000); }catch(e){ n = 10000000 + Math.floor(Math.random() * 90000000); } return "ST-" + n; };
   const unKey = u => "st_sync_un_" + u, phKey = u => "st_sync_ph_" + u;
   let doing = null, doingUid = null;
   async function ensure(u){
@@ -16808,21 +17675,32 @@ const PROF = (() => {
     doing = (async () => {
       try{
         const { m, db } = await A.getDb();
-        const uref = m.doc(db, "users", u.uid), cref = m.doc(db, "meta", "counter");
-        const res = await m.runTransaction(db, async tx => {
-          const us = await tx.get(uref);
-          const cur = us.exists() ? us.data().accountId : null;
-          const unm = us.exists() && us.data().username ? String(us.data().username) : "";
-          const phv = us.exists() && us.data().photo ? String(us.data().photo) : "";
-          const base = { email: String(u.email || ""), name: String(u.displayName || ""), lastLogin: Date.now() };
-          if(cur){ tx.set(uref, base, { merge: true }); return { id: cur, fresh: false, un: unm, ph: phv }; }
-          const cs = await tx.get(cref);
-          const n = (cs.exists() ? (+cs.data().n || 0) : 0) + 1;
-          const nid = fmt(n);
-          tx.set(cref, { n });
-          tx.set(uref, Object.assign({ accountId: nid, accountNo: n, createdAt: Date.now() }, base), { merge: true });
-          return { id: nid, fresh: true, un: unm, ph: phv };
-        });
+        const uref = m.doc(db, "users", u.uid);
+        const us0 = await m.getDoc(uref);
+        const cur0 = us0.exists() ? us0.data().accountId : null;
+        const unm = us0.exists() && us0.data().username ? String(us0.data().username) : "";
+        const phv = us0.exists() && us0.data().photo ? String(us0.data().photo) : "";
+        const base = { email: String(u.email || ""), name: String(u.displayName || ""), lastLogin: Date.now() };
+        let res;
+        if(cur0){
+          await m.setDoc(uref, base, { merge: true });
+          res = { id: cur0, fresh: false, un: unm, ph: phv };
+        }else{
+          /* ID baru: ST- + 8 digit acak. Dokumen users dan accountIds ditulis dalam satu batch (syarat aturan Firestore).
+             Bila ID kebetulan sudah dipakai orang lain, batch ditolak, lalu dicoba lagi dengan ID lain. */
+          let made = null, lastErr = null;
+          for(let t = 0; t < 8 && !made; t++){
+            const nid = newAccountId();
+            try{
+              const bt = m.writeBatch(db);
+              bt.set(uref, Object.assign({ accountId: nid, createdAt: Date.now() }, base), { merge: true });
+              bt.set(m.doc(db, "accountIds", nid), { uid: u.uid, name: String(unm || u.displayName || ""), photo: String(phv || u.photoURL || ""), at: Date.now() });
+              await bt.commit(); made = nid;
+            }catch(e){ lastErr = e; if(!/permission|already|aborted/i.test(String((e && (e.code || e.message)) || ""))) throw e; }
+          }
+          if(!made) throw lastErr || new Error("id");
+          res = { id: made, fresh: true, un: unm, ph: phv };
+        }
         const id = res.id;
         try{ await m.setDoc(m.doc(db, "accountIds", id), { uid: u.uid, name: String(res.un || u.displayName || ""), photo: String(res.ph || u.photoURL || ""), at: Date.now() }, { merge: true }); }catch(e){ console.warn("direktori id gagal:", e && (e.code || e.message)); }
         try{ localStorage.setItem(key(u.uid), id); }catch(e){}
@@ -16841,7 +17719,7 @@ const PROF = (() => {
 })();
 A.accountId = null;
 /* ===== USERNAME AKUN =====
-   Username boleh diubah pemilik akun (3 sampai 20 karakter: huruf, angka, spasi, titik, garis bawah, strip). ID Akun (ST-xxxxxx) tidak bisa diubah dari aplikasi.
+   Username boleh diubah pemilik akun (3 sampai 20 karakter: huruf, angka, spasi, titik, garis bawah, strip). ID Akun (ST-xxxxxxxx) tidak bisa diubah dari aplikasi.
    Disimpan di users/{uid}.username dan disalin ke direktori accountIds/{ID}.name supaya admin turnamen melihat nama yang sama. */
 A.username = null; A.usernameUid = null; A.photo = null; A.photoUid = null;
 A.cleanUsername = v => String(v == null ? "" : v).replace(/\s+/g, " ").trim();
@@ -17502,24 +18380,24 @@ if(navigator.onLine !== false) init().catch(() => {});
   const $ = id => document.getElementById(id);
   const lang = () => (typeof S !== "undefined" && S && S.lang === "en") ? "en" : "id";
   const T = {
-    id:{ ttl:"Teman", sub0:"Daftar teman dan permintaan", add:"TAMBAH TEMAN", addS:"Tambah teman", stOn:"Online", stOff:"Offline", lastOn:"Terakhir online {t}", lastUnk:"Terakhir online belum diketahui", agoNow:"baru saja", agoM:"{n} menit lalu", agoH:"{n} jam lalu", agoD:"{n} hari lalu", agoMo:"lebih dari sebulan lalu", addH:"Masukkan ID Akun temanmu, misalnya ST-000004.", mine:"ID Akunmu: ", ph:"ST-000000", send:"Kirim permintaan", busy:"Mohon tunggu…",
+    id:{ ttl:"Teman", sub0:"Daftar teman dan permintaan", add:"TAMBAH TEMAN", addS:"Tambah teman", stOn:"Online", stOff:"Offline", lastOn:"Terakhir online {t}", lastUnk:"Terakhir online belum diketahui", agoNow:"baru saja", agoM:"{n} menit lalu", agoH:"{n} jam lalu", agoD:"{n} hari lalu", agoMo:"lebih dari sebulan lalu", addH:"Masukkan ID Akun temanmu, misalnya ST-000004.", mine:"ID Akunmu: ", ph:"ST-000000", send:"Kirim permintaan", busy:"Mohon tunggu…", srch:"Cari", cfmQ:"Kirim permintaan pertemanan ke akun ini?", cfmNo:"Bukan dia",
       inc:"PERMINTAAN MASUK", out:"PERMINTAAN TERKIRIM", fr:"TEMAN", none:"Belum ada teman. Tambah lewat ID Akun.", acc:"Terima", dec:"Tolak", cancel:"Batalkan", rm:"Hapus", pf:"📷 Lihat foto profil", nopf:"Belum ada foto profil", rmf:"🗑 Hapus teman", cl:"Tutup", mnuH:"Pilih tindakan untuk teman ini:", pm:"💬 Pesan", back:"Kembali", msgPh:"Tulis pesan…", msgNone:"Belum ada pesan. Sapa temanmu!", msgDel:"Hapus pesan", msgGone:"Pesan telah dihapus", msgSend:"Kirim", blk:"🚫 Blokir pengguna", ublk:"✅ Buka blokir", rpt:"⚠ Laporkan pengguna", rptm:"⚠ Laporkan", blkd:"Kamu memblokir pengguna ini. Dia tidak bisa mengirim pesan kepadamu.", blkOk:"Pengguna diblokir.", ublkOk:"Blokir dibuka.", e_nosend:"Pesan tidak dapat dikirim ke pengguna ini.", e_noreq:"Permintaan tidak dapat dikirim ke pengguna ini.", sure:"Hapus teman ini?", yes:"Ya, hapus", no:"Batal",
       sent:"Permintaan terkirim.", acd:"Kalian sekarang berteman.", rmd:"Teman dihapus.", decd:"Permintaan ditolak.", cand:"Permintaan dibatalkan.",
-      e_fmt:"Format ID Akun: ST-000000.", e_self:"Itu ID Akunmu sendiri.", e_nf:"ID Akun tidak ditemukan.", e_already:"Kalian sudah berteman.", e_pending:"Permintaan sudah terkirim. Tunggu temanmu menerimanya.",
+      e_fmt:"Format ID Akun: ST-00000000 (akun lama: ST-000000).", e_self:"Itu ID Akunmu sendiri.", e_nf:"ID Akun tidak ditemukan.", e_already:"Kalian sudah berteman.", e_pending:"Permintaan sudah terkirim. Tunggu temanmu menerimanya.",
       e_noacc:"ID Akunmu belum siap. Coba lagi sebentar lagi.", e_perm:"Izin ditolak oleh server. Pastikan aturan Firestore sudah diperbarui.", e_off:"Tidak ada koneksi internet.", e_fail:"Gagal. Coba lagi.", login:"Masuk dengan Google untuk memakai fitur teman.",
-      rqT:"Permintaan pertemanan", rqB:"{n} ({a}) ingin berteman denganmu.", okT:"Pertemanan diterima", okB:"{n} ({a}) menerima permintaan pertemananmu.", nFr:"{n} teman", nRq:"{n} permintaan baru",
-      acT:"Pertemanan diterima", acB:"Kamu sekarang berteman dengan {n} ({a}).", dnT:"Permintaan ditolak", dnB:"Kamu menolak permintaan pertemanan {n} ({a}).", cnT:"Permintaan dibatalkan", cnB:"{n} ({a}) membatalkan permintaan pertemanannya.", rjT:"Permintaan pertemanan ditolak", rjB:"{n} ({a}) menolak permintaan pertemananmu.",
+      rqT:"Permintaan pertemanan", rqB:"{n} ingin berteman denganmu.", okT:"Pertemanan diterima", okB:"{n} ({a}) menerima permintaan pertemananmu.", nFr:"{n} teman", nRq:"{n} permintaan baru",
+      acT:"Pertemanan diterima", acB:"Kamu sekarang berteman dengan {n} ({a}).", dnT:"Permintaan ditolak", dnB:"Kamu menolak permintaan pertemanan {n}.", cnT:"Permintaan dibatalkan", cnB:"{n} membatalkan permintaan pertemanannya.", rjT:"Permintaan pertemanan ditolak", rjB:"{n} menolak permintaan pertemananmu.",
       invH:"Undang ke turnamen “{n}”:", invM:"Jadikan moderator", invF:"Undang pengikut", invW:"Menunggu…", invMem:"Moderator ✓", invFd:"Undang lagi", invMd:"Undang lagi (moderator)", invMok:"Undangan moderator terkirim.", invFok:"Undangan pengikut terkirim.",
       e_max:"Daftar temanmu sudah penuh (maksimal 20 teman, termasuk permintaan terkirim).",
       e_invp:"Undangan masih menunggu jawaban.", e_banned:"Akun ini tidak bisa bergabung kembali ke ruangan ini karena sudah dikeluarkan pemilik ruangan.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
       invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invAH:"Undang ke arisan “{n}” (ruang online):", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
-    en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addS:"Add friend", stOn:"Online", stOff:"Offline", lastOn:"Last online {t}", lastUnk:"Last online unknown", agoNow:"just now", agoM:"{n} min ago", agoH:"{n} h ago", agoD:"{n} d ago", agoMo:"over a month ago", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…",
+    en:{ ttl:"Friends", sub0:"Friend list and requests", add:"ADD A FRIEND", addS:"Add friend", stOn:"Online", stOff:"Offline", lastOn:"Last online {t}", lastUnk:"Last online unknown", agoNow:"just now", agoM:"{n} min ago", agoH:"{n} h ago", agoD:"{n} d ago", agoMo:"over a month ago", addH:"Enter your friend’s Account ID, for example ST-000004.", mine:"Your Account ID: ", ph:"ST-000000", send:"Send request", busy:"Please wait…", srch:"Search", cfmQ:"Send a friend request to this account?", cfmNo:"Not them",
       inc:"INCOMING REQUESTS", out:"SENT REQUESTS", fr:"FRIENDS", none:"No friends yet. Add one with an Account ID.", acc:"Accept", dec:"Decline", cancel:"Cancel request", rm:"Remove", pf:"📷 View profile photo", nopf:"No profile photo yet", rmf:"🗑 Remove friend", cl:"Close", mnuH:"Choose an action for this friend:", pm:"💬 Message", back:"Back", msgPh:"Write a message…", msgNone:"No messages yet. Say hi!", msgDel:"Delete message", msgGone:"This message was deleted", msgSend:"Send", blk:"🚫 Block user", ublk:"✅ Unblock", rpt:"⚠ Report user", rptm:"⚠ Report", blkd:"You blocked this user. They cannot send you messages.", blkOk:"User blocked.", ublkOk:"User unblocked.", e_nosend:"The message could not be sent to this user.", e_noreq:"The request could not be sent to this user.", sure:"Remove this friend?", yes:"Yes, remove", no:"Cancel",
       sent:"Request sent.", acd:"You are now friends.", rmd:"Friend removed.", decd:"Request declined.", cand:"Request cancelled.",
-      e_fmt:"Account ID format: ST-000000.", e_self:"That is your own Account ID.", e_nf:"Account ID not found.", e_already:"You are already friends.", e_pending:"The request is already sent. Wait for your friend to accept.",
+      e_fmt:"Account ID format: ST-00000000 (older accounts: ST-000000).", e_self:"That is your own Account ID.", e_nf:"Account ID not found.", e_already:"You are already friends.", e_pending:"The request is already sent. Wait for your friend to accept.",
       e_noacc:"Your Account ID is not ready yet. Try again in a moment.", e_perm:"Permission denied by the server. Make sure the Firestore rules are updated.", e_off:"No internet connection.", e_fail:"Failed. Please try again.", login:"Sign in with Google to use friends.",
-      rqT:"Friend request", rqB:"{n} ({a}) wants to be your friend.", okT:"Friend request accepted", okB:"{n} ({a}) accepted your friend request.", nFr:"{n} friends", nRq:"{n} new requests",
-      acT:"Friend request accepted", acB:"You are now friends with {n} ({a}).", dnT:"Request declined", dnB:"You declined the friend request from {n} ({a}).", cnT:"Request cancelled", cnB:"{n} ({a}) cancelled their friend request.", rjT:"Friend request declined", rjB:"{n} ({a}) declined your friend request.",
+      rqT:"Friend request", rqB:"{n} wants to be your friend.", okT:"Friend request accepted", okB:"{n} ({a}) accepted your friend request.", nFr:"{n} friends", nRq:"{n} new requests",
+      acT:"Friend request accepted", acB:"You are now friends with {n} ({a}).", dnT:"Request declined", dnB:"You declined the friend request from {n}.", cnT:"Request cancelled", cnB:"{n} cancelled their friend request.", rjT:"Friend request declined", rjB:"{n} declined your friend request.",
       invH:"Invite to tournament “{n}”:", invM:"Make moderator", invF:"Invite follower", invW:"Pending…", invMem:"Moderator ✓", invFd:"Invite again", invMd:"Invite again (moderator)", invMok:"Moderator invite sent.", invFok:"Follower invite sent.",
       e_max:"Your friend list is full (maximum 20 friends, including sent requests).",
       e_invp:"The invite is still pending.", e_banned:"This account cannot rejoin this room because it was removed by the room owner.", e_invmem:"They are already a moderator.", e_invmax:"At most 20 moderators.", e_noctx:"Open an online tournament’s detail (as admin) first.", e_invself:"That is your own account.",
@@ -17532,15 +18410,15 @@ if(navigator.onLine !== false) init().catch(() => {});
   let lastSig = "", sigTimer = 0;
   let invOut = {}, unsubI = null;
   let rows = [], dir = {}, unsub = null, curUid = "", msg = "", msgOk = true, working = false, confirmId = "", menuId = "", inVal = "";
-  let addOpen = false, pw = {}, pwT = 0, pm = {}, pmT = 0, lastM = {}, unread = {}, chatId = "", chatUnsub = null, chatMsgs = [], chatLoaded = false, chatErr = "", delId = "", repId = "", lastSend = 0;
+  let addOpen = false, pres = {}, ppw = {}, cand = null, migDone = false, pw = {}, pwT = 0, pm = {}, pmT = 0, lastM = {}, unread = {}, chatId = "", chatUnsub = null, chatMsgs = [], chatLoaded = false, chatErr = "", delId = "", repId = "", lastSend = 0;
   const subs = new Set(), selfDel = new Set();
   const emit = () => { subs.forEach(f => { try{ f(); }catch(e){} }); try{ refresh(); }catch(e){} };
   const nameOf = acc => (dir[acc] && dir[acc].name) || acc;
-  /* online bila detak terakhir (accountIds/{ID}.seen) kurang dari 400 detik lalu; aplikasi mengirim detak tiap 150 detik (hemat penulisan Firestore) */
-  const isOn = acc => { const v = dir[acc] && dir[acc].seen; return !!v && Math.abs(Date.now() - v) < 400000; };
+  /* online bila detak terakhir (presence/{uid}.seen, hanya terbaca oleh teman) kurang dari 400 detik lalu; aplikasi mengirim detak tiap 150 detik (hemat penulisan Firestore) */
+  const isOn = acc => { const v = pres[acc] && pres[acc].seen; return !!v && Math.abs(Date.now() - v) < 400000; };
   /* teks "Terakhir online ..." untuk teman yang sedang offline */
   const lastText = acc => {
-    const t = T[lang()], v = dir[acc] && Math.max(dir[acc].last || 0, dir[acc].seen || 0);
+    const t = T[lang()], v = pres[acc] && Math.max(pres[acc].last || 0, pres[acc].seen || 0);
     if(!v) return t.lastUnk;
     const mnt = Math.max(0, Math.floor((Date.now() - v) / 60000)), f = (k, n) => t[k].replace("{n}", n);
     const w = mnt < 1 ? t.agoNow : mnt < 60 ? f("agoM", mnt) : mnt < 1440 ? f("agoH", Math.floor(mnt / 60)) : mnt < 43200 ? f("agoD", Math.floor(mnt / 1440)) : t.agoMo;
@@ -17556,7 +18434,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     const need = [...new Set(accs.filter(x => x && !dir[x]))]; if(!need.length) return;
     try{
       const { m, db } = await a.getDb();
-      await Promise.all(need.map(async id => { try{ const s = await m.getDoc(m.doc(db, "accountIds", id)); const d = s.exists() ? s.data() : {}; dir[id] = { name: String(d.name || ""), photo: String(d.photo || ""), seen: +d.seen || 0, last: +d.last || 0 }; }catch(e){} }));
+      await Promise.all(need.map(async id => { try{ const s = await m.getDoc(m.doc(db, "accountIds", id)); const d = s.exists() ? s.data() : {}; dir[id] = { name: String(d.name || ""), photo: String(d.photo || "") }; }catch(e){} }));
     }catch(e){}
   }
   /* teks notifikasi pertemanan menurut status: req (menunggu), ok (diterima), dn (ditolak olehku), cn (dibatalkan pengirim), rj (ditolak temanku) */
@@ -17580,7 +18458,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     N.patch(nid, { inv: { status: st }, title: x.title, body: x.body });
   }
   /* pantau dokumen direktori tiap teman (maks 20) agar lampu online berubah langsung */
-  function unwatchPres(){ Object.keys(pw).forEach(k => { try{ pw[k](); }catch(e){} }); pw = {}; Object.keys(pm).forEach(k => { try{ pm[k](); }catch(e){} }); pm = {}; lastM = {}; unread = {}; }
+  function unwatchPres(){ Object.keys(ppw).forEach(k => { try{ ppw[k](); }catch(e){} }); ppw = {}; pres = {}; Object.keys(pw).forEach(k => { try{ pw[k](); }catch(e){} }); pw = {}; Object.keys(pm).forEach(k => { try{ pm[k](); }catch(e){} }); pm = {}; lastM = {}; unread = {}; }
   function watchPres(){
     const a = A(); if(!a || !a.getDb) return;
     const want = new Set(accepted().map(r => r.acc));
@@ -17589,8 +18467,22 @@ if(navigator.onLine !== false) init().catch(() => {});
     a.getDb().then(({ m, db }) => need.forEach(acc => {
       if(pw[acc] || !want.has(acc)) return;
       try{ pw[acc] = m.onSnapshot(m.doc(db, "accountIds", acc), sn => {
-        const d = sn.exists() ? sn.data() : {}, o = dir[acc], n = { name: String(d.name || ""), photo: String(d.photo || ""), seen: +d.seen || 0, last: +d.last || 0 };
-        if(!o || o.name !== n.name || o.photo !== n.photo || o.seen !== n.seen || o.last !== n.last){ dir[acc] = n; clearTimeout(pwT); pwT = setTimeout(() => { try{ refresh(); }catch(e){} }, 300); }
+        const d = sn.exists() ? sn.data() : {}, o = dir[acc], n = { name: String(d.name || ""), photo: String(d.photo || "") };
+        if(!o || o.name !== n.name || o.photo !== n.photo){ dir[acc] = n; clearTimeout(pwT); pwT = setTimeout(() => { try{ refresh(); }catch(e){} }, 300); }
+      }, () => {}); }catch(e){}
+    })).catch(() => {});
+  }
+  /* status online tiap teman: presence/{uid} hanya bisa dibaca teman yang sudah diterima (aturan Firestore) */
+  function watchPresence(){
+    const a = A(); if(!a || !a.getDb) return;
+    const want = new Map(accepted().map(r => [r.acc, r.uid]));
+    Object.keys(ppw).forEach(k => { if(!want.has(k)){ try{ ppw[k](); }catch(e){} delete ppw[k]; delete pres[k]; } });
+    const need = [...want.keys()].filter(k => !ppw[k]); if(!need.length) return;
+    a.getDb().then(({ m, db }) => need.forEach(acc => {
+      const puid = want.get(acc); if(ppw[acc] || !want.has(acc) || !puid) return;
+      try{ ppw[acc] = m.onSnapshot(m.doc(db, "presence", puid), sn => {
+        const d = sn.exists() ? sn.data() : {}, o = pres[acc], n = { seen: +d.seen || 0, last: +d.last || 0 };
+        if(!o || o.seen !== n.seen || o.last !== n.last){ pres[acc] = n; clearTimeout(pwT); pwT = setTimeout(() => { try{ refresh(); }catch(e){} }, 300); }
       }, () => {}); }catch(e){}
     })).catch(() => {});
   }
@@ -17613,7 +18505,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   function beat(off){
     const a = A(), me = myAcc(); if(!a || !a.user || !me || !a.getDb) return;
     if(!off && (navigator.onLine === false || document.visibilityState === "hidden")) return;
-    a.getDb().then(({ m, db }) => m.setDoc(m.doc(db, "accountIds", me), { seen: off ? 0 : Date.now(), last: Date.now() }, { merge: true })).catch(() => {});
+    a.getDb().then(({ m, db }) => { const w = m.setDoc(m.doc(db, "presence", a.user.uid), { seen: off ? 0 : Date.now(), last: Date.now() }, { merge: true }); if(!migDone){ migDone = true; try{ m.setDoc(m.doc(db, "accountIds", me), { seen: m.deleteField(), last: m.deleteField() }, { merge: true }).catch(() => {}); }catch(e){} } return w; }).catch(() => {});
   }
   setInterval(() => beat(), 150000);
   document.addEventListener("visibilitychange", () => beat(document.visibilityState === "hidden"));
@@ -17624,7 +18516,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   async function start(u){
     if(unsub){ try{ unsub(); }catch(e){} unsub = null; }
     if(unsubI){ try{ unsubI(); }catch(e){} unsubI = null; }
-    unwatchPres(); invOut = {}; rows = []; emit();
+    unwatchPres(); invOut = {}; rows = []; cand = null; migDone = false; emit();
     if(!u) return;
     setTimeout(() => beat(), 2500);
     const a = A(); if(!a || !a.getDb) return;
@@ -17645,7 +18537,7 @@ if(navigator.onLine !== false) init().catch(() => {});
             if(!r.mine) nPatch(r, "cancelled");               /* pengirim membatalkan */
             else if(!selfDel.has(r.id)) ev.push([r, "rj"]);   /* temanku menolak */
           } });
-        emit(); try{ watchPres(); }catch(e){} try{ watchPm(); }catch(e){}
+        emit(); try{ watchPres(); }catch(e){} try{ watchPresence(); }catch(e){} try{ watchPm(); }catch(e){}
         fetchDir(rows.map(r => r.acc)).then(() => { emit(); ev.forEach(x => notify(x[0], x[1])); });
       }, e => { console.warn("[teman] pendengar gagal:", e && (e.code || e.message)); });
     }catch(e){ console.warn("[teman] gagal mulai:", e && (e.code || e.message)); }
@@ -17657,11 +18549,35 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(/unavailable|network|offline/i.test(c)) return "e_off";
     return "e_fail";
   };
+  /* langkah 1 tambah teman: cari ID, hanya mengembalikan nama dan foto untuk pratinjau */
+  async function lookup(raw){
+    const a = A(), u = a && a.user; if(!u) throw new Error("e_fail");
+    let id = String(raw || "").trim().toUpperCase().replace(/\s+/g, "");
+    if(/^\d{1,8}$/.test(id)) id = "ST-" + id.padStart(id.length > 6 ? 8 : 6, "0");
+    if(!/^ST-(\d{6}|\d{8})$/.test(id)) throw new Error("e_fmt");
+    const me = myAcc(); if(!me) throw new Error("e_noacc");
+    if(id === me) throw new Error("e_self");
+    if(rows.some(r => r.acc === id && r.st === "ok")) throw new Error("e_already");
+    if(rows.some(r => r.acc === id && r.st === "pending" && r.mine)) throw new Error("e_pending");
+    if(accepted().length + outgoing().length >= MAX_FRIENDS) throw new Error("e_max");
+    if(navigator.onLine === false) throw new Error("e_off");
+    const { m, db } = await a.getDb();
+    const ds = await m.getDoc(m.doc(db, "accountIds", id));
+    if(!ds.exists() || !ds.data().uid) throw new Error("e_nf");
+    const d = ds.data(); if(String(d.uid) === u.uid) throw new Error("e_self");
+    return { id, name: String(d.name || ""), photo: String(d.photo || "") };
+  }
+  /* foto pratinjau: tidak bisa diketuk, diseret, atau ditekan lama */
+  function candAv(c){
+    const nm = String(c.name || c.id).trim();
+    if(c.photo){ const im = mk("img", "fav nopick"); im.alt = ""; im.draggable = false; im.referrerPolicy = "no-referrer"; im.src = c.photo; im.addEventListener("contextmenu", e => e.preventDefault()); return im; }
+    const d = mk("div", "fav fal nopick", nm.charAt(0).toUpperCase() || "?"); d.setAttribute("aria-hidden", "true"); return d;
+  }
   async function request(raw){
     const a = A(), u = a && a.user; if(!u) throw new Error("e_fail");
     let id = String(raw || "").trim().toUpperCase().replace(/\s+/g, "");
-    if(/^\d{1,6}$/.test(id)) id = "ST-" + id.padStart(6, "0");
-    if(!/^ST-\d{6}$/.test(id)) throw new Error("e_fmt");
+    if(/^\d{1,8}$/.test(id)) id = "ST-" + id.padStart(id.length > 6 ? 8 : 6, "0");
+    if(!/^ST-(\d{6}|\d{8})$/.test(id)) throw new Error("e_fmt");
     const me = myAcc(); if(!me) throw new Error("e_noacc");
     if(id === me) throw new Error("e_self");
     if(accepted().length + outgoing().length >= MAX_FRIENDS) throw new Error("e_max");
@@ -17727,7 +18643,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(onTap){ li.tabIndex = 0; li.setAttribute("role", "button"); li.setAttribute("aria-expanded", String(!!open)); li.addEventListener("click", onTap); li.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); onTap(); } }); }
     const w = mk("div", "frwho"), nmp = mk("p", "frnm");
     if(r.st === "ok"){ const on = isOn(r.acc), tt = T[lang()], dt = mk("span", "frdot" + (on ? " on" : "")); dt.setAttribute("role", "img"); dt.setAttribute("aria-label", on ? tt.stOn : tt.stOff); dt.title = on ? tt.stOn : tt.stOff; nmp.appendChild(dt); }
-    nmp.appendChild(document.createTextNode(nameOf(r.acc))); w.appendChild(nmp); w.appendChild(mk("p", "frid", r.acc));
+    nmp.appendChild(document.createTextNode(nameOf(r.acc))); w.appendChild(nmp); if(r.st === "ok") w.appendChild(mk("p", "frid", r.acc));
     if(isBlk) w.appendChild(mk("span", "frbadge", lang() === "en" ? "🚫 Blocked" : "🚫 Diblokir"));
     if(r.st === "ok"){ const lo = isOn(r.acc); w.appendChild(mk("p", "frls" + (lo ? " on" : ""), lo ? T[lang()].stOn : lastText(r.acc))); }
     li.appendChild(w);
@@ -17948,16 +18864,24 @@ if(navigator.onLine !== false) init().catch(() => {});
     pv.textContent = "";
     if(!u){ pv.appendChild(mk("p", "frh", t.login)); return; }
     const box = mk("div", "frbox"), me = myAcc(), hd = mk("div", "fraddhd");
-    const tg = btn((addOpen ? "− " : "＋ ") + t.addS, "fraddbtn", () => { addOpen = !addOpen; paint(); if(addOpen){ const i0 = $("spFrIn"); if(i0) i0.focus(); } });
+    const tg = btn((addOpen ? "− " : "＋ ") + t.addS, "fraddbtn", () => { addOpen = !addOpen; cand = null; paint(); if(addOpen){ const i0 = $("spFrIn"); if(i0) i0.focus(); } });
     tg.setAttribute("aria-expanded", String(addOpen)); hd.appendChild(tg);
     if(me){ const ie = mk("span", "frmeid", me); ie.title = t.mine + me; hd.appendChild(ie); }
     box.appendChild(hd);
-    if(addOpen){ box.appendChild(mk("p", "frh", t.addH));
+    if(addOpen){ if(!cand) box.appendChild(mk("p", "frh", t.addH));
     const inp = mk("input"); inp.id = "spFrIn"; inp.type = "text"; inp.placeholder = t.ph; inp.maxLength = 12; inp.autocomplete = "off"; inp.autocapitalize = "characters"; inp.spellcheck = false; inp.value = inVal; inp.disabled = working;
     inp.addEventListener("input", () => { inVal = inp.value; });
-    const go = () => { const v = inp.value; run("sent", async () => { const k = await request(v); inVal = ""; addOpen = false; return k; }); };
+    const go = () => { const v = inp.value; run("", async () => { cand = await lookup(v); }); };
     inp.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); go(); } });
-    const er = mk("div", "erow"); er.appendChild(btn(working ? t.busy : t.send, "ok", go)); box.append(inp, er);
+    const er = mk("div", "erow"); er.appendChild(btn(working ? t.busy : t.srch, "ok", go));
+      if(cand){
+        box.appendChild(mk("p", "frh", t.cfmQ));
+        const cd = mk("div", "frcand"), cw = mk("div", "frcandw"); cw.appendChild(mk("p", "frnm", cand.name || "?")); cd.append(candAv(cand), cw); box.appendChild(cd);
+        const r2 = mk("div", "erow");
+        r2.appendChild(btn(working ? t.busy : t.send, "ok", () => run("sent", async () => { const k = await request(cand.id); cand = null; inVal = ""; addOpen = false; return k; })));
+        r2.appendChild(btn(t.cfmNo, "", () => { cand = null; paint(); }));
+        box.appendChild(r2);
+      } else box.append(inp, er);
     }
     if(msg) box.appendChild(mk("p", msgOk ? "frok" : "frerr", msg));
     pv.appendChild(box);
@@ -18359,7 +19283,7 @@ if(navigator.onLine !== false) init().catch(() => {});
   const en = () => (typeof S !== "undefined" && S && S.lang === "en");
   const tr = (i, e) => en() ? e : i;
   const A = () => window.satuTitikAuth || null;
-  const TERMS_V = "1";
+  const TERMS_V = "2";
   const mk = (tag, cls, txt) => { const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; };
 
   /* ---------- gaya ---------- */
@@ -18481,35 +19405,39 @@ if(navigator.onLine !== false) init().catch(() => {});
 
   /* ---------- Syarat Penggunaan (halaman penuh) ---------- */
   const TM = {
-    id:{ t:"Syarat Penggunaan", sub:"Satu Titik", upd:"Terakhir diperbarui: 19 November 2026", back:"‹ Kembali", secs:[
-      {h:"1. Penerimaan", p:["Dengan masuk dan memakai fitur sosial Satu Titik (teman, pesan pribadi, komentar turnamen, dan ruangan game), kamu menyetujui Syarat Penggunaan ini beserta Kebijakan Privasi. Bila tidak setuju, jangan masuk akun. Menu yang tidak membutuhkan akun tetap bisa dipakai."]},
+    id:{ t:"Syarat Penggunaan", sub:"Satu Titik", upd:"Terakhir diperbarui: 20 November 2026", back:"‹ Kembali", secs:[
+      {h:"1. Penerimaan", p:["Dengan masuk dan memakai fitur sosial Satu Titik (teman, pesan pribadi, komentar turnamen, ruangan game dan arisan online, serta chat ruangan), kamu menyetujui Syarat Penggunaan ini beserta Kebijakan Privasi. Bila tidak setuju, jangan masuk akun. Menu yang tidak membutuhkan akun tetap bisa dipakai."]},
       {h:"2. Akunmu", l:["Pakai akunmu sendiri dan jaga keamanannya.","Jangan menyamar sebagai orang lain.","Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun."]},
       {h:"3. Perilaku dan konten yang dilarang", p:["Saat membuat konten (pesan, komentar, nama, atau foto profil), kamu dilarang:"], l:["Melecehkan, merundung, mengancam, atau menakut-nakuti orang lain.","Menyebarkan ujaran kebencian atau merendahkan orang berdasarkan suku, agama, ras, antargolongan, gender, disabilitas, atau orientasi seksual.","Membuat atau membagikan konten seksual, pornografi, atau vulgar, termasuk apa pun yang mengeksploitasi anak.","Mendorong kekerasan, melukai diri sendiri, atau kegiatan yang melanggar hukum.","Melakukan penipuan, spam, atau membagikan tautan berbahaya.","Membagikan data pribadi orang lain tanpa izin.","Mengganggu atau menyalahgunakan cara kerja aplikasi."]},
       {h:"4. Tanggung jawab atas kontenmu", p:["Kamu bertanggung jawab atas konten yang kamu buat. Kami tidak memantau semua konten secara langsung, jadi kami mengandalkan laporan pengguna."]},
-      {h:"5. Melapor dan memblokir", l:["Di chat pribadi: ketuk pesan temanmu lalu pilih Laporkan. Di menu teman, kamu juga bisa memilih Blokir atau Laporkan pengguna.","Di komentar turnamen: pilih Laporkan di bawah komentar.","Pengguna yang kamu blokir tidak bisa mengirim pesan atau permintaan pertemanan kepadamu. Kamu bisa membuka blokir kapan saja lewat menu teman.","Laporan berisi alasan, ID akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan. Laporan hanya dibaca pengelola."]},
+      {h:"5. Melapor dan memblokir", l:["Di chat pribadi: ketuk pesan temanmu lalu pilih Laporkan. Di menu teman, kamu juga bisa memilih Blokir atau Laporkan pengguna.","Di komentar turnamen: pilih Laporkan di bawah komentar.","Pengguna yang kamu blokir tidak bisa mengirim pesan atau permintaan pertemanan kepadamu. Kamu bisa membuka blokir kapan saja lewat menu teman.","Laporan berisi alasan, ID akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan dan catatan tambahan (bila kamu menulisnya). Laporan hanya dibaca pengelola."]},
       {h:"6. Tindakan kami", p:["Kami meninjau laporan dan dapat menghapus konten, membatasi fitur, atau menutup akun yang melanggar syarat ini, termasuk tanpa pemberitahuan lebih dulu untuk pelanggaran berat. Kami dapat menyerahkan data kepada pihak berwenang bila diwajibkan oleh hukum."]},
-      {h:"7. Pesan pribadi", p:["Pesan pribadi hanya antar teman dan disimpan paling lama 30 hari. Jangan memakainya untuk data yang sangat rahasia."]},
+      {h:"7. Pesan pribadi", p:["Pesan pribadi hanya antar teman dan ditandai kedaluwarsa setelah 30 hari; chat ruangan online ditandai kedaluwarsa setelah 24 jam. Data yang kedaluwarsa dihapus otomatis oleh server, yang bisa memerlukan waktu. Jangan memakainya untuk data yang sangat rahasia."]},
       {h:"8. Hasil menu", p:["Ketentuan tentang hasil menu ada di Kebijakan Privasi bagian 8."]},
       {h:"9. Iklan", p:["Versi aplikasi tertentu menampilkan iklan dari pihak ketiga. Rinciannya ada di Kebijakan Privasi."]},
-      {h:"10. Menghapus akun", p:["Kamu bisa menghapus akunmu lewat halaman Profil di Pengaturan. Data akun dan pesan terkait ikut dihapus."]},
+      {h:"10. Menghapus akun", p:["Kamu bisa menghapus akunmu lewat halaman Profil di Pengaturan. Data akun, daftar teman, dan pesan pribadi ikut dihapus. Komentar di turnamen milik orang lain dianonimkan (isinya tetap tampil), dan laporan yang pernah kamu kirim dapat tetap tersimpan. Ruangan online yang kamu buat dan belum ditutup tidak ikut terhapus, jadi tutup ruangannya sebelum menghapus akun; rinciannya ada di Kebijakan Privasi bagian 6."]},
       {h:"11. Kunci menu dan penghapusan data", p:["Kamu bertanggung jawab menjaga PIN dan kode pemulihan menu Keuangan dan Arisan. Kami tidak bisa memulihkannya. Data yang sudah dihapus lewat reset atau hapus arisan tidak bisa dikembalikan. Kunci menu hanya mengunci tampilan dan bukan enkripsi."]},
-      {h:"12. Perubahan syarat", p:["Syarat ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Bila ada perubahan penting, kamu akan diminta menyetujui lagi."]},
-      {h:"13. Kontak", p:["Pertanyaan tentang syarat ini dapat dikirim lewat Kotak Saran di Pengaturan."]}
+      {h:"12. Layanan apa adanya", p:["Satu Titik diberikan apa adanya. Kami berusaha menjaganya tetap berjalan, tetapi tidak menjamin layanan selalu tersedia, bebas gangguan, atau bebas kesalahan. Kami dapat mengubah, membatasi, atau menghentikan fitur kapan saja. Sejauh diizinkan hukum, kami tidak bertanggung jawab atas kerugian tidak langsung, kehilangan data akibat perangkat, penghapusan data aplikasi, atau reset yang kamu lakukan, maupun keputusan yang kamu ambil berdasarkan hasil menu."]},
+      {h:"13. Hukum yang berlaku", p:["Syarat ini tunduk pada hukum Republik Indonesia."]},
+      {h:"14. Perubahan syarat", p:["Syarat ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Bila ada perubahan penting, kamu akan diminta menyetujui lagi."]},
+      {h:"15. Kontak", p:["Pertanyaan tentang syarat ini dapat dikirim lewat Kotak Saran di Pengaturan atau ke email titikhilangs27@gmail.com."]}
     ]},
-    en:{ t:"Terms of Use", sub:"Satu Titik", upd:"Last updated: 19 November 2026", back:"‹ Back", secs:[
-      {h:"1. Acceptance", p:["By signing in and using Satu Titik’s social features (friends, private messages, tournament comments, and game rooms), you agree to these Terms of Use and the Privacy Policy. If you do not agree, do not sign in. Menus that do not need an account remain available."]},
+    en:{ t:"Terms of Use", sub:"Satu Titik", upd:"Last updated: 20 November 2026", back:"‹ Back", secs:[
+      {h:"1. Acceptance", p:["By signing in and using Satu Titik’s social features (friends, private messages, tournament comments, online game and arisan rooms, and room chat), you agree to these Terms of Use and the Privacy Policy. If you do not agree, do not sign in. Menus that do not need an account remain available."]},
       {h:"2. Your account", l:["Use your own account and keep it secure.","Do not impersonate anyone.","This app is not intended for children under 13."]},
       {h:"3. Prohibited behavior and content", p:["When you create content (messages, comments, names, or profile photos), you must not:"], l:["Harass, bully, threaten, or intimidate others.","Spread hate speech or demean people based on ethnicity, religion, race, group identity, gender, disability, or sexual orientation.","Create or share sexual, pornographic, or vulgar content, including anything that exploits children.","Encourage violence, self-harm, or illegal activity.","Commit fraud, send spam, or share harmful links.","Share other people’s personal data without permission.","Disrupt or abuse how the app works."]},
       {h:"4. Responsibility for your content", p:["You are responsible for the content you create. We do not watch all content in real time, so we rely on user reports."]},
-      {h:"5. Reporting and blocking", l:["In private chat: tap your friend’s message and choose Report. In the friend menu you can also choose Block or Report user.","In tournament comments: choose Report under the comment.","A user you block cannot send you messages or friend requests. You can unblock at any time from the friend menu.","A report contains the reason, the Account IDs of the reporter and the reported user, the time, and a copy of the reported text. Reports are read only by the maintainer."]},
+      {h:"5. Reporting and blocking", l:["In private chat: tap your friend’s message and choose Report. In the friend menu you can also choose Block or Report user.","In tournament comments: choose Report under the comment.","A user you block cannot send you messages or friend requests. You can unblock at any time from the friend menu.","A report contains the reason, the Account IDs of the reporter and the reported user, the time, a copy of the reported text, and your optional note. Reports are read only by the maintainer."]},
       {h:"6. Our actions", p:["We review reports and may remove content, restrict features, or close accounts that break these terms, including without prior notice for serious violations. We may hand over data to the authorities when required by law."]},
-      {h:"7. Private messages", p:["Private messages are only between friends and are kept for at most 30 days. Do not use them for highly confidential data."]},
+      {h:"7. Private messages", p:["Private messages are only between friends and are marked to expire after 30 days; online room chat is marked to expire after 24 hours. Expired data is deleted automatically by the server, which can take some time. Do not use them for highly confidential data."]},
       {h:"8. Menu results", p:["Terms about menu results are in section 8 of the Privacy Policy."]},
       {h:"9. Ads", p:["Certain app versions show third-party ads. Details are in the Privacy Policy."]},
-      {h:"10. Deleting your account", p:["You can delete your account from the Profile page in Settings. Account data and related messages are deleted as well."]},
+      {h:"10. Deleting your account", p:["You can delete your account from the Profile page in Settings. Account data, your friend list, and private messages are deleted as well. Comments in other people’s tournaments are anonymized (the text stays visible), and reports you submitted may still be kept. Online rooms you created and have not closed are not deleted, so close them before deleting your account; details are in section 6 of the Privacy Policy."]},
       {h:"11. Menu lock and data deletion", p:["You are responsible for keeping the PIN and recovery code of the Finance and Arisan menus safe. We cannot recover them. Data deleted through reset or by deleting an arisan cannot be restored. The menu lock only locks the screen and is not encryption."]},
-      {h:"12. Changes to these terms", p:["These terms may be updated. The date of the latest update is shown at the top of this page. For important changes you will be asked to agree again."]},
-      {h:"13. Contact", p:["Questions about these terms can be sent through the Suggestion Box in Settings."]}
+      {h:"12. Service as is", p:["Satu Titik is provided as is. We try to keep it running but do not guarantee that the service will always be available, uninterrupted, or error-free. We may change, restrict, or discontinue features at any time. To the extent permitted by law, we are not liable for indirect losses, for data lost through your device, clearing app data, or resets you perform, or for decisions you make based on menu results."]},
+      {h:"13. Governing law", p:["These terms are governed by the laws of the Republic of Indonesia."]},
+      {h:"14. Changes to these terms", p:["These terms may be updated. The date of the latest update is shown at the top of this page. For important changes you will be asked to agree again."]},
+      {h:"15. Contact", p:["Questions about these terms can be sent through the Suggestion Box in Settings or to titikhilangs27@gmail.com."]}
     ]}
   };
   let tmFrom = null;
