@@ -793,6 +793,7 @@ const MENUS = [
   { id:"cek-bmi", cat:"medis", icon:"⚖️", title:"BMI & KALORI", desc:"Hitung IMT, target berat badan, dan kebutuhan kalori harian.", descEn:"Calculate BMI, target weight, and daily calorie needs.", src:"src-cek-bmi" },
   { id:"cek-hamil", cat:"medis", icon:"🤰", title:"KEHAMILAN", desc:"Hitung usia kehamilan, HPL, jadwal periksa, dan kenaikan berat badan.", descEn:"Calculate gestational age, due date (EDD), checkup schedule, and weight gain.", src:"src-cek-hamil" },
   { id:"olahraga", cat:"medis", icon:"🏃", title:"OLAHRAGA", desc:"Catat lari, jalan, bersepeda, dan hiking dengan GPS: rute, pace, riwayat, dan statistik.", descEn:"Track runs, walks, rides, and hikes with GPS: route, pace, splits, history, and stats.", src:"src-olahraga" },
+  { id:"stopwatch", cat:"manajemen", icon:"⏱️", title:"STOPWATCH", desc:"Atur beberapa jam mulai dan jam selesai sekaligus dalam satu daftar, nama bisa diganti. Alarm tiap stopwatch berbunyi otomatis, bahkan saat aplikasi ditutup (aplikasi Android).", descEn:"Set several start and end times in one list, with renamable names. Each alarm rings automatically, even when the app is closed (Android app).", src:"src-stopwatch" },
   { id:"turnamen", cat:"manajemen", icon:"🏆", title:"TURNAMEN", desc:"Kelola turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor.", descEn:"Manage sports or eSports tournaments: fixtures, scores, standings, knockout brackets, and top scorers.", src:"src-turnamen" },
   { id:"tebak-inisial", cat:"hiburan", icon:"🔤", title:"TEBAK INISIAL", desc:"Acak huruf A–Z dan kategori untuk permainan tebak-tebakan anak.", descEn:"Randomize a letter (A–Z) and category for kids' guessing games.", src:"src-tebak-inisial" },
   { id:"versus", cat:"hiburan", icon:"⚔️", title:"VERSUS", desc:"Adu dua nama apa pun: menang, kalah, atau seri.", descEn:"Pit any two names against each other: win, lose, or draw.", src:"src-versus" },
@@ -810,6 +811,7 @@ const MTITLE = {
   "cek-hamil":["KEHAMILAN","PREGNANCY","CEK KEHAMILAN","PREGNANCY CHECK"],
   "turnamen":["TURNAMEN","TOURNAMENT","TURNAMEN","TOURNAMENT"],
   "olahraga":["OLAHRAGA","EXERCISE","CATAT OLAHRAGA","EXERCISE LOG"],
+  "stopwatch":["STOPWATCH","STOPWATCH","STOPWATCH","STOPWATCH"],
   "tebak-inisial":["TEBAK INISIAL","GUESS THE INITIAL","TEBAK INISIAL","GUESS THE INITIAL"],
   "versus":["VERSUS","VERSUS","VERSUS","VERSUS"],
   "acak-nama":["ARISAN","ARISAN","ARISAN","ARISAN"],
@@ -847,6 +849,7 @@ const HOME_SHORT = {
   "cek-bmi":["IMT, berat ideal, kalori harian.","BMI, target weight, calories."],
   "cek-hamil":["Usia hamil, HPL, jadwal periksa.","Gestation, due date, checkups."],
   "olahraga":["Rekam lari, jalan, sepeda dengan GPS.","Track runs and rides with GPS."],
+  "stopwatch":["Beberapa stopwatch sekaligus, alarm otomatis.","Several stopwatches, automatic alarms."],
   "turnamen":["Jadwal, skor, klasemen, bagan.","Fixtures, scores, standings."],
   "tebak-inisial":["Acak huruf dan kategori tebak-tebakan.","Random letter and category game."],
   "versus":["Adu dua nama: menang, kalah, seri.","Pit two names against each other."],
@@ -863,13 +866,14 @@ const ICONS = {
   "cek-bmi":'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.5 10a4.5 4.5 0 0 1 7 0"/><path d="M12 13.5l2.2-3"/></svg>',
   "cek-hamil":'<svg viewBox="0 0 24 24"><circle cx="9.5" cy="4.5" r="2"/><path d="M9 8.5c-1.6.4-2.4 1.8-2.4 3.5V20M9 8.5c3 0 6 2 6 6a5 5 0 0 1-3.2 4.6V20"/></svg>',
   "olahraga":'<svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>',
+  "stopwatch":'<svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M9.5 3h5M12 3v3"/></svg>',
   "turnamen":'<svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7M10 17h4"/></svg>',
   "tebak-inisial":'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M9 16l3-8 3 8M10.2 13.4h3.6"/></svg>',
   "versus":'<svg viewBox="0 0 24 24"><path d="M5 19 15 9M15 9l1-4 4-1-1 4-4 1zM19 19 9 9M9 9 8 5 4 4l1 4 4 1z"/></svg>',
   "acak-nama":'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>',
   "keuangan":'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.3" fill="currentColor"/></svg>'
 };
-const BADGE = {"cek-watak":{id:"Baru", en:"New"}, "cek-jodoh":{id:"Baru", en:"New"}, "cek-bmi":{id:"Baru", en:"New"}, "cek-hamil":{id:"Baru", en:"New"}, "versus":{id:"Baru", en:"New"}, "acak-nama":{id:"Baru", en:"New"}, "keuangan":{id:"Baru", en:"New"}};
+const BADGE = {"cek-watak":{id:"Baru", en:"New"}, "cek-jodoh":{id:"Baru", en:"New"}, "cek-bmi":{id:"Baru", en:"New"}, "cek-hamil":{id:"Baru", en:"New"}, "versus":{id:"Baru", en:"New"}, "acak-nama":{id:"Baru", en:"New"}, "keuangan":{id:"Baru", en:"New"}, "stopwatch":{id:"Baru", en:"New"}};
 /* Label "Baru" hilang otomatis 14 hari.
    - 4 menu awal: dihitung dari tanggal rilis 10 November 2026 (hilang 24 November 2026).
    - Menu yang ditambahkan kemudian: otomatis berlabel "Baru" selama 14 hari sejak pertama kali muncul di perangkat ini
@@ -1122,6 +1126,8 @@ function writeKeys(s){
   w("ol_lang", s.lang);
   /* Keuangan (awalan kg_; hanya mengikuti bahasa) */
   w("kg_lang", s.lang);
+  /* Stopwatch (awalan sw_; hanya mengikuti bahasa) */
+  w("sw_lang", s.lang);
   w("tt_gap", j(gi)); w("tt_lang", j(s.lang)); w("tt_follow", j(s.scroll)); w("tt_anim", j(s.anim)); w("tt_vol", j(s.aivol / 100)); w("tt_mvol", j(s.mvol / 100));
 }
 const TOG = {
@@ -1134,12 +1140,13 @@ const TOG = {
   "cek-hamil": {soundBtn:s => s.sound && s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
   "turnamen": {fxBtn:s => s.sound, readBtn:s => s.read, musicBtn:s => s.music, autoBtn:s => s.auto},
   "olahraga": {},
+  "stopwatch": {},
   "tebak-inisial": {},
   "versus": {},
   "acak-nama": {},
   "keuangan": {}
 };
-const RNG = {"th-analytics":{mvol:"volRange", aivol:"aiVolRange"}, "cek-khodam":{mvol:"mvol", aivol:"vol"}, "hari-hoki":{mvol:"mvol", aivol:"vol"}, "cek-watak":{mvol:"mvol", aivol:"vol"}, "cek-jodoh":{mvol:"mvol", aivol:"vol"}, "cek-bmi":{mvol:"mvol", aivol:"vol"}, "cek-hamil":{mvol:"mvol", aivol:"vol"}, "turnamen":{mvol:"mvol", aivol:"vol"}, "olahraga":{}, "tebak-inisial":{}};
+const RNG = {"th-analytics":{mvol:"volRange", aivol:"aiVolRange"}, "cek-khodam":{mvol:"mvol", aivol:"vol"}, "hari-hoki":{mvol:"mvol", aivol:"vol"}, "cek-watak":{mvol:"mvol", aivol:"vol"}, "cek-jodoh":{mvol:"mvol", aivol:"vol"}, "cek-bmi":{mvol:"mvol", aivol:"vol"}, "cek-hamil":{mvol:"mvol", aivol:"vol"}, "turnamen":{mvol:"mvol", aivol:"vol"}, "olahraga":{}, "stopwatch":{}, "tebak-inisial":{}};
 /* Keadaan ASLI menu dibaca langsung dari bingkainya (bukan ditebak dari pengaturan sebelumnya),
    sehingga tombol panel tidak terbalik bila menu mengubah pengaturannya sendiri (mis. tombol Stop auto-next di Cek Khodam). */
 function frameDoc(){
@@ -2084,6 +2091,39 @@ window.stNativeGps = (function(){
   };
   return api;
 })();
+/* Alarm Stopwatch: dijadwalkan ke sistem Android lewat plugin @capacitor/local-notifications (AlarmManager),
+   jadi tetap berbunyi walau aplikasi ditutup atau layar terkunci. Di web/PWA available() = false dan menu memakai alarm di dalam halaman. */
+window.stNativeAlarm = (function(){
+  var CH = "st_stopwatch";
+  function plug(){
+    try{
+      var C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return null;
+      return (C.Plugins && C.Plugins.LocalNotifications) || (C.registerPlugin ? C.registerPlugin("LocalNotifications") : null);
+    }catch(e){ return null; }
+  }
+  function one(id){ return {notifications:[{id:id}]}; }
+  return {
+    available: function(){ return !!plug(); },
+    /* id = nomor notifikasi unik per stopwatch; menjadwalkan ulang id yang sama otomatis menggantikan yang lama (dipakai saat rename) */
+    schedule: async function(id, at, title, body){
+      var P = plug(); if(!P) return false;
+      try{
+        var p = await P.checkPermissions();
+        if(p.display !== "granted"){ p = await P.requestPermissions(); if(p.display !== "granted") return false; }
+        try{ await P.createChannel({id:CH, name:"Alarm Stopwatch", description:"Alarm saat waktu stopwatch habis", importance:5, visibility:1, vibration:true}); }catch(e){}
+        try{ var ex = await P.checkExactNotificationSetting(); if(ex && ex.exact_alarm === "denied") await P.changeExactNotificationSetting(); }catch(e){}
+        await P.cancel(one(id));
+        await P.schedule({notifications:[{id:id, title:title, body:body, channelId:CH, schedule:{at:new Date(at), allowWhileIdle:true}, autoCancel:true}]});
+        return true;
+      }catch(e){ return false; }
+    },
+    cancel: async function(id){
+      var P = plug(); if(!P) return;
+      try{ await P.cancel(one(id)); }catch(e){}
+      try{ await P.removeDeliveredNotifications(one(id)); }catch(e){}
+    }
+  };
+})();
 /* Tombol "Bagikan gambar" di semua menu yang punya hasil (primbon, hiburan, kesehatan).
    Hasil yang tampil difoto jadi PNG lewat SVG foreignObject (tanpa library), lalu dibagikan atau diunduh.
    Turnamen tidak ikut karena sudah punya versi sendiri (klasemen). */
@@ -2242,7 +2282,7 @@ function stShareHelper(){
 }
 const ST_SHARE = "<scr" + "ipt>(" + stShareHelper.toString() + ")();<\/scr" + "ipt>";
 function menuSrc(m){
-  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}/* lebar isi menu mengikuti layar HP (tablet dibatasi 560px); panel bawah dan bilah otomatis ikut selebar isi */ body:not(.stage) .app{max-width:min(100%,560px)!important}#inPanel,.autobar,.quickadd{max-width:min(calc(100% - 24px),536px)!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK + (m.id === "turnamen" ? "" : ST_SHARE), i = s.indexOf("</head>");
+  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}/* lebar isi menu mengikuti layar HP (tablet dibatasi 560px); panel bawah dan bilah otomatis ikut selebar isi */ body:not(.stage) .app{max-width:min(100%,560px)!important}#inPanel,.autobar,.quickadd{max-width:min(calc(100% - 24px),536px)!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK + (m.id === "turnamen" || m.id === "stopwatch" ? "" : ST_SHARE), i = s.indexOf("</head>");
   return i < 0 ? css + s : s.slice(0, i) + css + s.slice(i);
 }
 writeKeys(S); paintPanel();
@@ -10163,6 +10203,354 @@ try{ startOnline(); }catch(e){}
 </body>
 </html>
 </script>
+<script type="text/plain" id="src-stopwatch"><!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>STOPWATCH</title>
+<style>
+:root{--bg:#0e1015;--card:#171a22;--line:#262b38;--text:#eceae4;--muted:#8a90a0;--gold:#d4a94f;--gold2:#f0cf86;--red:#e0453a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center}
+.app{width:100%;max-width:420px;padding:16px 16px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.06em}
+.sub{color:var(--muted);font-size:13px;line-height:1.4;margin:0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.hint{font-size:12px;line-height:1.4;color:var(--muted);margin:8px 0 0}
+.ok{color:#7fd69b}.warn{color:#f0a35a}
+.seg{display:flex;gap:2px;padding:3px;background:var(--card);border:1px solid var(--line);border-radius:999px}
+.seg button{min-height:32px;padding:0 12px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);background:transparent;border:0;border-radius:999px;cursor:pointer}
+.seg button.on{color:#1a1405;background:var(--gold)}
+input.txt:focus{outline:2px solid var(--gold);outline-offset:1px}
+.pk{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.lb{display:block;margin:0 0 6px 2px;font-size:13px;color:var(--muted)}
+.tp{position:relative;display:flex;align-items:stretch;height:180px;background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.wl{flex:1;min-width:0;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none;-webkit-mask-image:linear-gradient(transparent,#000 28%,#000 72%,transparent);mask-image:linear-gradient(transparent,#000 28%,#000 72%,transparent)}
+.wl::-webkit-scrollbar{display:none}
+.sp{height:72px}
+.wi{height:36px;line-height:36px;text-align:center;font-size:17px;font-weight:600;color:var(--muted);scroll-snap-align:center;font-variant-numeric:tabular-nums;cursor:pointer;user-select:none;-webkit-user-select:none}
+.wi.sel{color:var(--text);font-size:20px}
+.tc{display:flex;align-items:center;font-size:18px;font-weight:700;color:var(--muted)}
+.band{position:absolute;left:6px;right:6px;top:72px;height:34px;margin-top:1px;border-radius:8px;background:rgba(212,169,79,.12);border:1px solid rgba(212,169,79,.4);pointer-events:none}
+.chips{display:flex;gap:6px;overflow-x:auto;margin:2px 0 10px;padding-bottom:2px}
+.chip{flex:0 0 auto;min-height:34px;padding:0 12px;font:inherit;font-size:13px;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:999px;cursor:pointer}
+.chip:active{background:rgba(212,169,79,.14)}
+input.txt{width:100%;min-height:44px;font:inherit;font-size:15px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0 12px;color-scheme:dark}
+.go{width:100%;min-height:48px;font:inherit;font-size:15px;font-weight:700;letter-spacing:.08em;color:#1a1405;background:var(--gold);border:0;border-radius:12px;cursor:pointer}
+.go:active{opacity:.85}
+.ghost{width:100%;min-height:44px;font:inherit;font-size:14px;font-weight:600;color:var(--gold2);background:transparent;border:1px dashed var(--line);border-radius:12px;cursor:pointer}
+.lnk{align-self:center;min-height:36px;padding:0 12px;font:inherit;font-size:13px;color:var(--muted);background:none;border:0;cursor:pointer;text-decoration:underline}
+#list{display:flex;flex-direction:column;gap:10px}
+.card{padding:12px 14px}
+.hd{display:flex;align-items:center;gap:4px}
+input.nm{flex:1;min-width:0;min-height:36px;font:inherit;font-size:16px;font-weight:600;color:var(--text);background:transparent;border:0;border-bottom:1px solid transparent;border-radius:0;padding:0;color-scheme:dark}
+input.nm:focus{outline:0;border-bottom-color:var(--gold)}
+.ic{flex:0 0 auto;width:36px;height:36px;font:inherit;font-size:15px;color:var(--muted);background:none;border:0;border-radius:8px;cursor:pointer}
+.ic:active{background:rgba(255,255,255,.08)}
+.sl{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.big{font-size:clamp(32px,10vw,40px);font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums;line-height:1.1;margin:8px 0 10px}
+.fin .big{color:var(--muted)}
+.bar{height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--gold)}
+.meta{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+#ring{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:rgba(14,16,21,.96)}
+#ring .bell{font-size:72px;animation:sh .5s ease-in-out infinite}
+@keyframes sh{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
+#ring h2{margin:0;font-size:26px;color:var(--gold2)}
+#ring p{margin:0;color:var(--muted)}
+#ring .go{max-width:320px;min-height:56px;background:var(--red);color:#fff}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);max-width:86%;padding:10px 16px;border-radius:12px;background:rgba(20,20,24,.95);color:#fff;font:600 14px system-ui,sans-serif;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <h1>⏱️ <span id="t">STOPWATCH</span></h1>
+    <div class="seg" id="fmtBox"><button type="button" data-f="12" id="fB12"></button><button type="button" data-f="24" id="fB24"></button></div>
+  </div>
+  <p class="sub" id="sub"></p>
+
+  <div id="list" hidden></div>
+  <button class="ghost" id="addBtn" type="button" hidden></button>
+
+  <div class="panel" id="setup">
+    <div class="pk">
+      <div><span class="lb" id="lbS"></span><div class="tp" id="ts"></div></div>
+      <div><span class="lb" id="lbE"></span><div class="tp" id="te"></div></div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <input class="txt" type="text" id="lb" maxlength="40">
+    <p class="hint" id="dur"></p>
+    <button class="go" id="go" type="button" style="margin-top:10px"></button>
+  </div>
+
+  <button class="lnk" id="clr" type="button" hidden></button>
+  <p class="hint" id="env" style="text-align:center;margin:0"></p>
+</div>
+
+<div id="ring" hidden>
+  <div class="bell">⏰</div>
+  <h2 id="ringT"></h2>
+  <p id="ringS"></p>
+  <button class="go" id="ringB" type="button"></button>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var lang="id",KEY="sw_list",OLD="sw_state",MAX=20,D={seq:0,items:[]},R={},Q=[],ac=null,rt=0,tt=0,ringStop=0,open=false,fmt="12",TS,TE;
+function rl(){try{lang=String(localStorage.getItem("sw_lang")||"id").replace(/"/g,"")==="en"?"en":"id"}catch(e){lang="id"}}
+function L(a,b){return lang==="en"?b:a}
+function p2(n){return n<10?"0"+n:""+n}
+function hm(ms){var d=new Date(ms),h=d.getHours(),sep=lang==="en"?":":".";return fmt==="24"?p2(h)+sep+p2(d.getMinutes()):p2(h%12||12)+sep+p2(d.getMinutes())+" "+(h<12?"AM":"PM")}
+function rf(){try{fmt=String(localStorage.getItem("sw_fmt")||"12").replace(/"/g,"")==="24"?"24":"12"}catch(e){fmt="12"}}
+function fmtUi(){var b=$("fmtBox").querySelectorAll("button"),i;for(i=0;i<b.length;i++)b[i].className=b[i].getAttribute("data-f")===fmt?"on":""}
+function setFmt(f){fmt=f;try{localStorage.setItem("sw_fmt",f)}catch(e){}TS.refresh();TE.refresh();fmtUi();preview();paint()}
+function mkWheel(n,lab,on){
+  var H=36,w=document.createElement("div"),els=[],cur=0,want=0,dirty=false,mark=-1,tm=0,sp=document.createElement("div"),k;
+  w.className="wl";sp.className="sp";w.appendChild(sp);
+  function add(k){var d=document.createElement("div");d.className="wi";d.textContent=lab(k);d.onclick=function(){try{w.scrollTo({top:k*H,behavior:"smooth"})}catch(e){w.scrollTop=k*H}};els.push(d);w.appendChild(d)}
+  for(k=0;k<n;k++)add(k);
+  w.appendChild(sp.cloneNode());
+  function idx(){return Math.max(0,Math.min(n-1,Math.round(w.scrollTop/H)))}
+  function hi(i){if(i!==mark){if(els[mark])els[mark].className="wi";els[i].className="wi sel";mark=i}}
+  function settle(){var i=idx();hi(i);if(i!==cur){cur=i;on(i)}}
+  w.addEventListener("scroll",function(){dirty=false;hi(idx());clearTimeout(tm);tm=setTimeout(settle,110)});
+  return{
+    el:w,
+    set:function(k){if(els[mark])els[mark].className="wi";cur=k;want=k;mark=-1;hi(k);w.scrollTop=k*H;dirty=!(w.clientHeight>0)},
+    sync:function(){if(dirty&&w.clientHeight>0){dirty=false;w.scrollTop=want*H}}
+  }
+}
+function mkPicker(el,cb){
+  var h=0,m=0,Wh,Wm,Wa,ws=[];
+  function ch(){if(cb)cb()}
+  function draw(){
+    var is24=fmt==="24",c=document.createElement("div"),bd=document.createElement("div");
+    el.innerHTML="";Wa=null;
+    Wh=mkWheel(is24?24:12,function(k){return p2(is24?k:k+1)},function(k){var v=is24?k:k+1;h=is24?v:(v%12)+(h>=12?12:0);ch()});
+    Wm=mkWheel(60,p2,function(k){m=k;ch()});
+    c.className="tc";c.textContent=":";bd.className="band";
+    el.appendChild(Wh.el);el.appendChild(c);el.appendChild(Wm.el);ws=[Wh,Wm];
+    if(!is24){Wa=mkWheel(2,function(k){return k?"PM":"AM"},function(k){h=(h%12)+(k?12:0);ch()});el.appendChild(Wa.el);ws.push(Wa)}
+    el.appendChild(bd);show()
+  }
+  function show(){
+    Wh.set(fmt==="24"?h:(h%12||12)-1);Wm.set(m);if(Wa)Wa.set(h>=12?1:0)
+  }
+  var ob={refresh:draw,sync:function(){ws.forEach(function(x){x.sync()})}};
+  Object.defineProperty(ob,"value",{get:function(){return p2(h)+":"+p2(m)},set:function(v){var x=String(v||"").split(":");h=Math.min(23,Math.max(0,+x[0]||0));m=Math.min(59,Math.max(0,+x[1]||0));show()}});
+  draw();return ob
+}
+function hm24(ms){var d=new Date(ms);return p2(d.getHours())+":"+p2(d.getMinutes())}
+function dur(ms){ms=Math.max(0,Math.floor(ms/1000));return p2(Math.floor(ms/3600))+":"+p2(Math.floor(ms%3600/60))+":"+p2(ms%60)}
+function words(ms){var m=Math.round(ms/60000),h=Math.floor(m/60);m=m%60;return (h?h+L(" jam"," hr")+" ":"")+(m||!h?m+L(" menit"," min"):"")}
+function nat(){try{var n=window.parent.stNativeAlarm;return n&&n.available()?n:null}catch(e){return null}}
+function toast(m){var e=$("toast");e.textContent=m;e.style.opacity="1";clearTimeout(tt);tt=setTimeout(function(){e.style.opacity="0"},2600)}
+function nowHM(add){return hm24(Date.now()+(add||0)*60000)}
+function addMin(v,n){var x=v.split(":"),m=((+x[0]*60+ +x[1]+n)%1440+1440)%1440;return p2(Math.floor(m/60))+":"+p2(m%60)}
+function nid(it){return 500000+(it.id%100000)}
+function byId(id){for(var i=0;i<D.items.length;i++)if(D.items[i].id===id)return D.items[i];return null}
+function sortItems(){D.items.sort(function(a,b){return a.st-b.st||a.id-b.id})}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
+function load(){
+  var j=null;
+  try{j=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+  D={seq:0,items:[]};
+  if(j&&j.items&&typeof j.items.filter==="function"){
+    D.items=j.items.filter(function(x){return x&&x.id&&x.st&&x.en});
+    D.seq=+j.seq||0;D.items.forEach(function(x){if(x.id>D.seq)D.seq=x.id})
+  }else{
+    try{
+      var o=JSON.parse(localStorage.getItem(OLD)||"null");
+      if(o&&o.st&&o.en){D.seq=1;D.items.push({id:1,st:o.st,en:o.en,name:o.label||"Stopwatch 1",n:!!o.n,done:!!o.done});save()}
+      localStorage.removeItem(OLD)
+    }catch(e){}
+  }
+  sortItems()
+}
+function dayTag(ms){
+  var a=new Date(ms),b=new Date(),x=new Date(a.getFullYear(),a.getMonth(),a.getDate()).getTime(),y=new Date(b.getFullYear(),b.getMonth(),b.getDate()).getTime(),k=Math.round((x-y)/864e5);
+  return k===1?L(" · besok"," · tomorrow"):k===-1?L(" · kemarin"," · yesterday"):""
+}
+function body(it){return hm(it.st)+" → "+hm(it.en)+L(" selesai."," finished.")}
+
+function calc(a,b){
+  var now=Date.now(),x=a.split(":"),y=b.split(":"),d=new Date(),D1=864e5;
+  var s0=new Date(d.getFullYear(),d.getMonth(),d.getDate(),+x[0],+x[1],0,0).getTime();
+  var e0=new Date(d.getFullYear(),d.getMonth(),d.getDate(),+y[0],+y[1],0,0).getTime();
+  if(e0<=s0)e0+=D1;
+  /* jam mulai = kemunculan berikutnya dari jam itu (hari ini bila belum lewat atau sedang berjalan); jam selesai yang lebih kecil berarti besok, tidak pernah mundur ke kemarin */
+  if(e0<=now){s0+=D1;e0+=D1}
+  return{st:s0,en:e0}
+}
+function preview(){
+  var a=TS.value,b=TE.value,e=$("dur");
+  if(!a||!b){e.textContent="";return}
+  var r=calc(a,b);e.textContent=r?L("Durasi: ","Duration: ")+words(r.en-r.st)+(new Date(r.en).getDate()!==new Date(r.st).getDate()?L(" · selesai besok"," · ends next day"):""):""
+}
+function resetForm(){TS.value=nowHM(0);TE.value=addMin(nowHM(0),60);$("lb").value="";preview()}
+function layout(){
+  var has=D.items.length>0;
+  $("setup").hidden=has&&!open;
+  $("addBtn").hidden=!has;
+  if(TS&&!$("setup").hidden){TS.sync();TE.sync()}
+  $("addBtn").textContent=open?L("Tutup","Close"):L("＋ Tambah stopwatch","＋ Add stopwatch")
+}
+function text(){
+  document.documentElement.lang=lang;
+  $("sub").textContent=L("Banyak stopwatch sekaligus. Alarm berbunyi saat jam selesai. Ketuk ✎ untuk ganti nama.","Several stopwatches at once. The alarm rings at the end time. Tap ✎ to rename.");
+  $("fB12").textContent=L("12 jam","12-hour");$("fB24").textContent=L("24 jam","24-hour");fmtUi();
+  $("lbS").textContent=L("Mulai","Start");$("lbE").textContent=L("Selesai","End");
+  $("lb").placeholder=L("Nama (opsional), mis. Belajar","Name (optional), e.g. Study");
+  $("go").textContent=L("TAMBAH","ADD");
+  $("clr").textContent=L("Hapus yang sudah selesai","Remove finished ones");
+  var c=$("chips");c.innerHTML="";
+  [[0,L("Mulai sekarang","Start now")],[15,"+15m"],[30,"+30m"],[60,"+1"+L("j","h")],[120,"+2"+L("j","h")]].forEach(function(o){
+    var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=o[1];
+    b.onclick=function(){
+      if(o[0]===0){var s=nowHM(0),dd=(TE.value&&TS.value)?calc(TS.value,TE.value):null;var len=dd?Math.round((dd.en-dd.st)/60000):60;TS.value=s;TE.value=addMin(s,len)}
+      else{TE.value=addMin(TS.value||nowHM(0),o[0])}
+      preview()};
+    c.appendChild(b)});
+  var n=nat();
+  $("env").textContent=n?L("Di aplikasi Android, alarm dijadwalkan ke sistem sehingga tetap berbunyi walau aplikasi ditutup atau layar terkunci.","In the Android app the alarm is scheduled with the system, so it still rings when the app is closed or the screen is locked."):L("Versi web: biarkan halaman ini tetap terbuka agar alarm berbunyi. Untuk alarm saat aplikasi ditutup, pakai aplikasi Android.","Web version: keep this page open for the alarm to ring. For alarms while closed, use the Android app.");
+  preview();layout();paint()
+}
+
+function initAudio(){try{var A=window.AudioContext||window.webkitAudioContext;if(A&&!ac)ac=new A();if(ac&&ac.state==="suspended")ac.resume()}catch(e){}}
+function beep(){
+  try{if(ac){if(ac.state==="suspended")ac.resume();var t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type="square";o.frequency.value=880;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.35,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.28);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.3)}}catch(e){}
+  try{if(navigator.vibrate)navigator.vibrate([200,100,200])}catch(e){}
+}
+function showRing(){
+  while(Q.length&&!byId(Q[0]))Q.shift();
+  if(!Q.length){stopRing();return}
+  var it=byId(Q[0]);
+  $("ringT").textContent=it.name||L("Waktu habis","Time is up");
+  $("ringS").textContent=hm(it.st)+" → "+hm(it.en)+(Q.length>1?"  ·  +"+(Q.length-1)+L(" lainnya"," more"):"");
+  $("ringB").textContent=L("MATIKAN ALARM","STOP ALARM");$("ring").hidden=false
+}
+function ringOn(id){
+  Q.push(id);initAudio();showRing();
+  if(!rt){beep();rt=setInterval(beep,900)}
+  clearTimeout(ringStop);ringStop=setTimeout(stopRing,300000)
+}
+function stopRing(){clearInterval(rt);rt=0;clearTimeout(ringStop);Q=[];$("ring").hidden=true;try{if(navigator.vibrate)navigator.vibrate(0)}catch(e){}}
+
+function rename(it,inp){
+  var v=inp.value.trim().slice(0,40)||("Stopwatch "+it.id);
+  inp.value=v;if(v===it.name)return;
+  it.name=v;save();
+  var n=nat();
+  if(n&&!it.done&&it.en>Date.now()){
+    try{n.schedule(nid(it),it.en,it.name,body(it)).then(function(ok){it.n=!!ok;save()}).catch(function(){})}catch(e){}
+  }
+}
+function del(it){
+  var n=nat();if(n){try{n.cancel(nid(it))}catch(e){}}
+  Q=Q.filter(function(x){return x!==it.id});
+  D.items=D.items.filter(function(x){return x!==it});
+  save();
+  if(!$("ring").hidden)showRing();
+  build()
+}
+function clearDone(){
+  var now=Date.now(),n=nat();
+  D.items=D.items.filter(function(it){
+    if(now>=it.en){if(n){try{n.cancel(nid(it))}catch(e){}}return false}
+    return true});
+  save();showRing();if(!Q.length)stopRing();build()
+}
+function build(){
+  var box=$("list");box.innerHTML="";R={};
+  D.items.forEach(function(it){
+    var c=document.createElement("div");c.className="panel card";
+    c.innerHTML='<div class="hd"><input class="nm" type="text" maxlength="40"><button class="ic pen" type="button">✎</button><button class="ic dl" type="button">✕</button></div><div class="sl"></div><div class="big">00:00:00</div><div class="bar"><i></i></div><div class="meta"><span class="el"></span><span class="pc"></span></div><p class="hint warn nt" hidden></p>';
+    var q=function(s){return c.querySelector(s)};
+    var r={root:c,nm:q(".nm"),pen:q(".pen"),sl:q(".sl"),big:q(".big"),bar:q(".bar i"),el:q(".el"),pc:q(".pc"),nt:q(".nt"),dl:q(".dl")};
+    r.nm.value=it.name;
+    r.nm.onchange=function(){rename(it,r.nm)};
+    r.nm.onkeydown=function(e){if(e.key==="Enter")r.nm.blur()};
+    r.pen.onclick=function(){r.nm.focus();try{r.nm.select()}catch(e){}};
+    r.dl.onclick=function(){del(it)};
+    box.appendChild(c);R[it.id]=r
+  });
+  box.hidden=!D.items.length;
+  layout();paint()
+}
+function paint(){
+  var now=Date.now(),any=false;
+  D.items.forEach(function(it){
+    var r=R[it.id];if(!r)return;
+    var wait=now<it.st,done=now>=it.en,tot=it.en-it.st,p=done?1:wait?0:(now-it.st)/tot;
+    if(done)any=true;
+    r.root.className="panel card"+(done?" fin":"");
+    r.sl.textContent=(it.n&&!done?"🔔 ":"")+(done?L("Selesai","Finished"):wait?L("Menunggu mulai","Waiting to start"):L("Sedang berjalan","Running"))+" · "+L("pukul ","at ")+hm(it.st)+" - "+hm(it.en)+(new Date(it.en).getDate()!==new Date(it.st).getDate()?" (+1)":"")+dayTag(it.st);
+    r.big.textContent=dur(done?0:wait?it.st-now:it.en-now);
+    r.bar.style.width=(p*100).toFixed(1)+"%";
+    r.el.textContent=done?L("Selesai ","Ended ")+words(Math.max(now-it.en,0))+L(" yang lalu"," ago"):wait?L("Mulai dalam ","Starts in ")+words(it.st-now):L("Berjalan ","Elapsed ")+dur(now-it.st);
+    r.pc.textContent=Math.round(p*100)+"%";
+    var w=!done&&!it.n&&!!nat();
+    r.nt.hidden=!w;
+    if(w)r.nt.textContent=L("Izin notifikasi belum aktif, alarm hanya bunyi saat aplikasi terbuka. Aktifkan izin notifikasi lalu tambah ulang.","Notification permission is off, so the alarm only rings while the app is open. Enable it and add it again.");
+    r.dl.title=done?L("Hapus","Remove"):L("Batalkan","Cancel");
+    r.pen.title=L("Ganti nama","Rename")
+  });
+  $("clr").hidden=!any
+}
+function tick(){
+  var now=Date.now(),ch=false;
+  if(TS){TS.sync();TE.sync()}
+  D.items.forEach(function(it){
+    if(now>=it.en&&!it.done){
+      it.done=true;ch=true;
+      if(now-it.en<120000){ringOn(it.id);var n=nat();if(n){try{n.cancel(nid(it))}catch(e){}}}
+    }
+  });
+  if(ch)save();
+  paint()
+}
+async function go(){
+  var a=TS.value,b=TE.value;
+  if(!a||!b){toast(L("Isi jam mulai dan jam selesai.","Enter a start and end time."));return}
+  if(a===b){toast(L("Jam mulai dan selesai tidak boleh sama.","Start and end must differ."));return}
+  if(D.items.length>=MAX){toast(L("Maksimal "+MAX+" stopwatch. Hapus yang sudah selesai dulu.","Max "+MAX+" stopwatches. Remove finished ones first."));return}
+  initAudio();var r=calc(a,b);if(!r)return;
+  var id=++D.seq,nm=$("lb").value.trim().slice(0,40)||("Stopwatch "+id);
+  var it={id:id,st:r.st,en:r.en,name:nm,n:false,done:false};
+  D.items.push(it);sortItems();save();
+  open=false;build();
+  TS.value=hm24(r.en);TE.value=addMin(hm24(r.en),60);$("lb").value="";preview();
+  var n=nat();
+  if(n){
+    try{it.n=await n.schedule(nid(it),it.en,it.name,body(it))}catch(e){it.n=false}
+    save();paint();
+    if(!it.n)toast(L("Izin notifikasi ditolak.","Notification permission denied."))
+  }
+}
+$("go").onclick=go;
+$("clr").onclick=clearDone;
+$("addBtn").onclick=function(){open=!open;layout();if(open){resetForm();try{$("setup").scrollIntoView({behavior:"smooth",block:"center"})}catch(e){}}};
+$("ringB").onclick=function(){Q.shift();if(Q.length)showRing();else stopRing();paint()};
+window.addEventListener("storage",function(e){
+  if(!e.key||e.key==="sw_lang"){rl();text()}
+  if(!e.key||e.key==="sw_fmt"){rf();if(TS){TS.refresh();TE.refresh();fmtUi();preview()}}
+  if(!e.key||e.key===KEY){load();build()}
+});
+document.addEventListener("visibilitychange",function(){if(!document.hidden)tick()});
+rl();rf();load();TS=mkPicker($("ts"),preview);TE=mkPicker($("te"),preview);
+$("fmtBox").onclick=function(e){var f=e.target&&e.target.getAttribute&&e.target.getAttribute("data-f");if(f&&f!==fmt)setFmt(f)};
+resetForm();text();build();tick();setInterval(tick,250);
+})();
+</scr@@ipt>
+</body>
+</html></script>
+
 <script type="text/plain" id="src-olahraga"><!DOCTYPE html>
 <html lang="id">
 <head>
