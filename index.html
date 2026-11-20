@@ -434,6 +434,9 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 .sg{min-height:40px;padding:0 8px;font:inherit;font-size:13px;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:10px;cursor:pointer}
 .sg[aria-pressed="true"]{border-color:var(--gold);color:var(--gold2)}
 .seg[data-k="theme"] .sg:last-child:nth-child(odd){grid-column:1/-1}
+.sa{min-height:40px;padding:0 8px;font:inherit;font-size:13px;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.sa[aria-pressed="true"]{border-color:var(--gold);color:var(--gold2)}
+#alSeg .sa:last-child:nth-child(odd){grid-column:1/-1}
 #bgVid,#bgShade{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
 #bgVid{opacity:.9;transform:translateZ(0);animation:vidIn 2.4s ease both}
 #bgShade{background:radial-gradient(ellipse 85% 70% at 50% 42%,rgba(3,5,10,.18),rgba(3,5,10,.72) 100%),linear-gradient(180deg,rgba(3,5,10,.55),rgba(3,5,10,0) 24%,rgba(3,5,10,0) 66%,rgba(3,5,10,.7))}
@@ -717,6 +720,8 @@ h1{font-size:26px;line-height:1.15}
     <div class="rl" id="rlMusic"><div class="rlw"><div class="rlc"><span class="rlt" id="spML"></span><input type="range" id="spM" min="0" max="100" step="5"></div></div></div>
     <button class="sc" id="sbVibe" type="button"></button>
     <div class="rl" id="rlVibe"><div class="rlw"><div class="rlc"><div class="seg s3" data-k="vlevel"><button class="sg" data-v="low" type="button"></button><button class="sg" data-v="mid" type="button"></button><button class="sg" data-v="high" type="button"></button></div></div></div></div>
+    <button class="sc" id="sbAlarm" type="button"></button>
+    <div class="rl" id="rlAlarm"><div class="rlw"><div class="rlc"><div class="seg" id="alSeg"><button class="sa" data-v="classic" type="button"></button><button class="sa" data-v="beep" type="button"></button><button class="sa" data-v="bell" type="button"></button><button class="sa" data-v="melody" type="button"></button><button class="sa" data-v="siren" type="button"></button></div><span class="rlt" id="alVL" style="margin-top:10px"></span><input type="range" id="alV" min="10" max="100" step="5"><p class="abp" id="alNote" style="margin:8px 0 0"></p></div></div></div>
   </div>
   <div id="svPlay" hidden>
     <button class="sc" id="sbAuto" type="button"></button>
@@ -797,6 +802,7 @@ const MENUS = [
   { id:"turnamen", cat:"manajemen", icon:"🏆", title:"TURNAMEN", desc:"Kelola turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor.", descEn:"Manage sports or eSports tournaments: fixtures, scores, standings, knockout brackets, and top scorers.", src:"src-turnamen" },
   { id:"tebak-inisial", cat:"hiburan", icon:"🔤", title:"TEBAK INISIAL", desc:"Acak huruf A–Z dan kategori untuk permainan tebak-tebakan anak.", descEn:"Randomize a letter (A–Z) and category for kids' guessing games.", src:"src-tebak-inisial" },
   { id:"versus", cat:"hiburan", icon:"⚔️", title:"VERSUS", desc:"Adu dua nama apa pun: menang, kalah, atau seri.", descEn:"Pit any two names against each other: win, lose, or draw.", src:"src-versus" },
+  { id:"duel-puzzle", cat:"hiburan", icon:"🧩", title:"DUEL PUZZLE", desc:"Puzzle match-3 online: balap 100%, skor tertinggi 90 detik, atau serang balik dengan batu.", descEn:"Online match-3 puzzle: race to 100%, highest score in 90s, or counter-attack with rocks.", src:"src-duel-puzzle" },
   { id:"acak-nama", cat:"manajemen", icon:"🎲", title:"ARISAN", desc:"Arisan: manajemen arisan kamu agar lebih akurat, bisa offline atau online (ditonton real-time), plus catatan keuangan arisan.", descEn:"Arisan: manage your arisan more neatly, offline or online (watchable in real time), plus arisan finance tracking.", src:"src-acak-nama" },
   { id:"keuangan", cat:"manajemen", icon:"💰", title:"KEUANGAN", desc:"Catat uang masuk dan keluar, atur jatah belanja, dan kumpulkan tabungan.", descEn:"Record income and expenses, set spending limits, and build savings.", src:"src-keuangan" }
 ];
@@ -814,6 +820,7 @@ const MTITLE = {
   "stopwatch":["STOPWATCH","STOPWATCH","STOPWATCH","STOPWATCH"],
   "tebak-inisial":["TEBAK INISIAL","GUESS THE INITIAL","TEBAK INISIAL","GUESS THE INITIAL"],
   "versus":["VERSUS","VERSUS","VERSUS","VERSUS"],
+  "duel-puzzle":["DUEL PUZZLE","PUZZLE DUEL","DUEL PUZZLE","PUZZLE DUEL"],
   "acak-nama":["ARISAN","ARISAN","ARISAN","ARISAN"],
   "keuangan":["KEUANGAN","FINANCE","KEUANGAN","FINANCE"]
 };
@@ -853,6 +860,7 @@ const HOME_SHORT = {
   "turnamen":["Jadwal, skor, klasemen, bagan.","Fixtures, scores, standings."],
   "tebak-inisial":["Acak huruf dan kategori tebak-tebakan.","Random letter and category game."],
   "versus":["Adu dua nama: menang, kalah, seri.","Pit two names against each other."],
+  "duel-puzzle":["Puzzle match-3 online lawan teman.","Online match-3 duel with friends."],
   "acak-nama":["Kelola arisan offline atau online.","Manage arisan offline or online."],
   "keuangan":["Catat uang masuk, keluar, tabungan.","Track income, spending, savings."]
 };
@@ -1079,7 +1087,7 @@ const unesc = s => s.split("</scr@@" + "ipt").join("</scr" + "ipt").split("<!@@"
    Disimpan di satu kunci, lalu ditulis ke kunci tiap menu sebelum menu dibuka dan diterapkan langsung bila menu sedang terbuka.
    Panel ⚙️ di dalam tiap menu disembunyikan. Menu baru: tambahkan kunci & id tombolnya di writeKeys, TOG, dan RNG. */
 const SKEY = "titikhilangs_settings", GAPS = [3, 5, 8, 12, 20, 30];
-const DEF = {sound:true, music:true, read:true, auto:false, scroll:true, mvol:70, aivol:100, gap:8, lang:"id", theme:"navy", fsize:100, fmode:"serif", anim:true, vibe:true, vlevel:"mid"};
+const DEF = {sound:true, music:true, read:true, auto:false, scroll:true, mvol:70, aivol:100, gap:8, lang:"id", theme:"navy", fsize:100, fmode:"serif", anim:true, vibe:true, vlevel:"mid", alsnd:"classic", alvol:100, alarm:true};
 let S = Object.assign({}, DEF), curMenu = null;
 try{ Object.assign(S, JSON.parse(localStorage.getItem(SKEY) || "{}")); }catch(e){}
 if(!GAPS.includes(S.gap)) S.gap = 8;
@@ -1089,6 +1097,32 @@ S.fsize = [90,100,115].includes(+S.fsize) ? +S.fsize : 100;
 if(S.fmode !== "sans") S.fmode = "serif";
 S.anim = S.anim !== false; S.vibe = S.vibe !== false; if(!["low","mid","high"].includes(S.vlevel)) S.vlevel = "mid";
 S.mvol = Math.min(100, Math.max(0, +S.mvol || 0)); S.aivol = Math.min(100, Math.max(0, +S.aivol || 0));
+/* ===== Alarm Stopwatch: pilihan suara + volume (dipakai panel Pengaturan, menu Stopwatch, dan alarm native Android) ===== */
+const ALARMS = [["classic","Sirene dua nada","Two-tone siren"],["beep","Bip-bip-bip","Triple beep"],["bell","Lonceng","Bell"],["melody","Nada naik","Rising notes"],["siren","Darurat (sapuan)","Emergency sweep"]];
+if(!ALARMS.some(a => a[0] === S.alsnd)) S.alsnd = "classic";
+S.alvol = Math.min(100, Math.max(10, Math.round(+S.alvol || 100))); S.alarm = S.alarm !== false;
+window.stAlarmList = ALARMS;
+window.stAlarmCfg = () => ({snd:S.alarm ? S.alsnd : "off", vol:S.alvol, on:S.alarm});
+/* satu putaran bunyi (~0,9 dtk) digambar ke node "out" mulai waktu t; dipakai menu Stopwatch (di iframe) dan tombol Coba suara */
+window.stAlarmSynth = function(ac, out, key, t){
+  const tone = (at, f, d, type, pk, f2) => {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, at); if(f2) o.frequency.linearRampToValueAtTime(f2, at + d);
+    g.gain.setValueAtTime(.0001, at); g.gain.exponentialRampToValueAtTime(pk, at + .01); g.gain.setValueAtTime(pk, at + d - .04); g.gain.exponentialRampToValueAtTime(.0001, at + d);
+    o.connect(g); g.connect(out); o.start(at); o.stop(at + d + .02);
+  };
+  const bell = (at, f) => [[1,.6],[2,.3],[3,.15]].forEach(h => {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = "sine"; o.frequency.value = f * h[0];
+    g.gain.setValueAtTime(h[1], at); g.gain.exponentialRampToValueAtTime(.0001, at + .5);
+    o.connect(g); g.connect(out); o.start(at); o.stop(at + .52);
+  });
+  if(key === "beep"){ for(let k = 0; k < 3; k++) tone(t + k * .18, 1760, .1, "square", 1); }
+  else if(key === "bell"){ bell(t, 880); bell(t + .45, 880); }
+  else if(key === "melody"){ [1047,1319,1568,2093].forEach((f, k) => tone(t + k * .2, f, .18, "triangle", 1)); }
+  else if(key === "siren"){ tone(t, 700, .44, "sawtooth", .9, 1500); tone(t + .45, 700, .44, "sawtooth", .9, 1500); }
+  else { for(let k = 0; k < 4; k++) tone(t + k * .2, k % 2 ? 1568 : 1047, .18, "square", 1); }
+};
 function writeKeys(s){
   const w = (k, v) => { try{ localStorage.setItem(k, v); }catch(e){} }, j = JSON.stringify, b = x => x ? "1" : "0", gi = GAPS.indexOf(s.gap);
   w(SKEY, j(s));
@@ -1120,6 +1154,7 @@ function writeKeys(s){
   w("ti_fx", j(s.sound)); w("ti_lang", s.lang); w("ti_anim", j(s.anim));
   /* Versus (awalan vs_; ikut Mode suara, bahasa, dan animasi) */
   w("vs_fx", j(s.sound)); w("vs_lang", s.lang); w("vs_anim", j(s.anim));
+  w("dp_fx", j(s.sound)); w("dp_lang", s.lang); w("dp_anim", j(s.anim));
   /* Arisan (awalan an_; ikut Mode suara, bahasa, dan animasi) */
   w("an_fx", j(s.sound)); w("an_lang", s.lang); w("an_anim", j(s.anim));
   /* Olahraga (awalan ol_; hanya mengikuti bahasa) */
@@ -1442,9 +1477,37 @@ function paintPanel(){
     $("spML").textContent = t.mv.replace("{n}", S.mvol).replace(/^[^\p{L}\p{N}]+/u, "");
     /* volume musik dan kekuatan getar menggulung turun otomatis saat tombolnya aktif, dan naik lagi saat diam */
     [["rlMusic", "sbMusic", S.music], ["rlVibe", "sbVibe", S.vibe]].forEach(([r, bt, on]) => { const e = $(r); e.classList.toggle("open", !!on); e.inert = !on; $(bt).classList.toggle("rlon", !!on); }); }
+  { const L = ALT[S.lang];
+    pb("sbAlarm", "sound", S.alarm, L.on);
+    $("alVL").textContent = L.vol.replace("{n}", S.alvol); $("alV").value = S.alvol; $("alNote").textContent = L.note;
+    document.querySelectorAll("#alSeg .sa").forEach(b => { const a = ALARMS.find(x => x[0] === b.dataset.v); b.textContent = a[S.lang === "en" ? 2 : 1]; b.setAttribute("aria-pressed", String(S.alsnd === a[0])); });
+    const e = $("rlAlarm"); e.classList.toggle("open", !!S.alarm); e.inert = !S.alarm; $("sbAlarm").classList.toggle("rlon", !!S.alarm); }
   paintAp();
   paintHome();
 }
+const ALT = {
+  id:{on:["⏰ Alarm Stopwatch: aktif","⏰ Alarm Stopwatch: diam"], vol:"Volume alarm: {n}%", note:"Di aplikasi Android, volume ini mengatur volume alarm di HP-mu. Perubahan suara berlaku juga untuk stopwatch yang sudah berjalan."},
+  en:{on:["⏰ Stopwatch alarm: active","⏰ Stopwatch alarm: silent"], vol:"Alarm volume: {n}%", note:"In the Android app, this sets your phone's alarm volume. A new sound also applies to stopwatches already running."}
+};
+let alPac = null;
+function alWebPreview(){
+  try{
+    const A = window.AudioContext || window.webkitAudioContext; if(!A) return;
+    if(!alPac) alPac = new A(); if(alPac.state === "suspended") alPac.resume();
+    const cp = alPac.createDynamicsCompressor(), m = alPac.createGain(); m.gain.value = S.alvol / 100; cp.connect(m); m.connect(alPac.destination);
+    const t = alPac.currentTime + .05; window.stAlarmSynth(alPac, cp, S.alsnd, t); window.stAlarmSynth(alPac, cp, S.alsnd, t + .9);
+  }catch(e){}
+}
+async function alPreview(){
+  if(!S.alarm) return;
+  const N = window.stNativeAlarm;
+  if(N && N.available && N.available() && N.preview){ if(await N.preview(S.alsnd)) return; }
+  alWebPreview();
+}
+$("alSeg").addEventListener("click", e => { const b = e.target.closest(".sa"); if(!b) return; setS({alsnd:b.dataset.v}); alPreview(); });
+$("sbAlarm").addEventListener("click", () => { setS({alarm:!S.alarm}); if(S.alarm) alPreview(); });
+$("alV").addEventListener("input", e => setS({alvol:+e.target.value}));
+$("alV").addEventListener("change", () => { const N = window.stNativeAlarm; try{ if(N && N.setVolume) N.setVolume(); }catch(e){} alPreview(); });
 /* teks beranda ikut bahasa pengaturan */
 const HT = {
   id:{sub:"Pilih menu untuk mulai.", back:"‹ Beranda", gear:"Pengaturan", close:"Tutup", lang:"id", priv:"Kebijakan Privasi", about:"Tentang", abt:"Satu Titik adalah kumpulan menu primbon dan kesehatan.\n\n👻 Cek Khodam: khodam yang menemanimu.\n🍀 Tri Hoki: hari baik, angka hoki, dan warna hoki (Jawa, Tionghoa, numerologi).\n🔮 Cek Watak: watak berdasarkan numerologi dan wuku.\n💞 Cek Jodoh: kecocokan dua orang.\n⚖️ Cek BMI & Kalori: IMT dan kebutuhan kalori harian (standar Kemenkes dan WHO).\n🤰 Cek Kehamilan: usia kehamilan, perkiraan lahir (HPL), jadwal periksa, dan kenaikan berat badan.\n🏆 Turnamen: kelola turnamen olahraga atau eSports (jadwal, skor, klasemen, bagan gugur).\n🏃 Olahraga: catat lari, jalan, bersepeda, dan hiking dengan GPS (rute, pace, split, statistik).", ver:"Versi 1.0", fol:"Ikuti kami: Titik Hilangs", ab:{title:"Satu Titik", sub:"Sebuah produk digital dari Aurenza27", h1:"Tentang Aplikasi", p1:"Satu Titik merupakan aplikasi digital yang dikembangkan sebagai bagian dari proyek Aurenza27. Aplikasi ini hadir untuk memberikan pengalaman dan kemudahan bagi penggunanya melalui teknologi digital.", brand:"AURENZA27", tag:"Independent Digital Creator", desc:"Aurenza27 merupakan identitas pengembang independen yang menaungi berbagai proyek digital, termasuk pengembangan aplikasi dan media kreatif.", h2:"Proyek Kami", n1:"Titik Hilangs", b1:"Media Project", d1:"Misteri, tragedi, sejarah dan dokumenter", n2:"Satu Titik", b2:"App Project", d2:"Produk aplikasi digital", ft:"© 2026 Aurenza27. All Rights Reserved."}},
@@ -2094,26 +2157,36 @@ window.stNativeGps = (function(){
 /* Alarm Stopwatch: dijadwalkan ke sistem Android lewat plugin @capacitor/local-notifications (AlarmManager),
    jadi tetap berbunyi walau aplikasi ditutup atau layar terkunci. Di web/PWA available() = false dan menu memakai alarm di dalam halaman. */
 window.stNativeAlarm = (function(){
-  var CH = "st_stopwatch";
-  function plug(){
-    try{
-      var C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return null;
-      return (C.Plugins && C.Plugins.LocalNotifications) || (C.registerPlugin ? C.registerPlugin("LocalNotifications") : null);
-    }catch(e){ return null; }
-  }
+  function cap(){ try{ var C = window.Capacitor; return (C && C.isNativePlatform && C.isNativePlatform()) ? C : null; }catch(e){ return null; } }
+  function plug(){ var C = cap(); if(!C) return null; return (C.Plugins && C.Plugins.LocalNotifications) || (C.registerPlugin ? C.registerPlugin("LocalNotifications") : null); }
+  function vplug(){ var C = cap(); if(!C) return null; return (C.Plugins && C.Plugins.AlarmVolume) || (C.registerPlugin ? C.registerPlugin("AlarmVolume") : null); }
   function one(id){ return {notifications:[{id:id}]}; }
+  function cfg(){ try{ return window.stAlarmCfg(); }catch(e){ return {snd:"classic", vol:100}; } }
+  function label(key){ if(key === "off") return "Senyap"; try{ var l = window.stAlarmList; for(var i = 0; i < l.length; i++) if(l[i][0] === key) return l[i][1]; }catch(e){} return key; }
+  async function setVol(){ var V = vplug(); if(!V) return; try{ await V.set({percent:cfg().vol}); }catch(e){} }
+  /* kanal notifikasi per suara (suara kanal tidak bisa diubah setelah dibuat, jadi tiap suara punya kanal sendiri) */
+  async function chan(P, key){
+    var id = "st_sw_" + key, V = vplug();
+    if(V){ try{ await V.channel({key:key, name:"Alarm Stopwatch - " + label(key)}); return id; }catch(e){} }
+    try{ await P.createChannel({id:id, name:"Alarm Stopwatch - " + label(key), description:"Alarm saat waktu stopwatch habis", importance:5, visibility:1, vibration:true, sound:(key === "off" ? undefined : "alarm_" + key + ".wav")}); }catch(e){}
+    return id;
+  }
   return {
     available: function(){ return !!plug(); },
-    /* id = nomor notifikasi unik per stopwatch; menjadwalkan ulang id yang sama otomatis menggantikan yang lama (dipakai saat rename) */
+    setVolume: setVol,
+    preview: async function(key){ var V = vplug(); if(!V) return false; try{ await setVol(); await V.preview({sound:"alarm_" + key}); return true; }catch(e){ return false; } },
+    stopPreview: async function(){ var V = vplug(); if(V){ try{ await V.stop(); }catch(e){} } },
+    /* id = nomor notifikasi unik per stopwatch; menjadwalkan ulang id yang sama otomatis menggantikan yang lama (dipakai saat rename / ganti suara) */
     schedule: async function(id, at, title, body){
       var P = plug(); if(!P) return false;
       try{
         var p = await P.checkPermissions();
         if(p.display !== "granted"){ p = await P.requestPermissions(); if(p.display !== "granted") return false; }
-        try{ await P.createChannel({id:CH, name:"Alarm Stopwatch", description:"Alarm saat waktu stopwatch habis", importance:5, visibility:1, vibration:true}); }catch(e){}
+        var key = cfg().snd, ch = await chan(P, key);
+        await setVol();
         try{ var ex = await P.checkExactNotificationSetting(); if(ex && ex.exact_alarm === "denied") await P.changeExactNotificationSetting(); }catch(e){}
         await P.cancel(one(id));
-        await P.schedule({notifications:[{id:id, title:title, body:body, channelId:CH, schedule:{at:new Date(at), allowWhileIdle:true}, autoCancel:true}]});
+        await P.schedule({notifications:[{id:id, title:title, body:body, channelId:ch, schedule:{at:new Date(at), allowWhileIdle:true}, autoCancel:true}].map(function(n){ if(key !== "off") n.sound = "alarm_" + key + ".wav"; return n; })});
         return true;
       }catch(e){ return false; }
     },
@@ -10288,6 +10361,7 @@ input.nm:focus{outline:0;border-bottom-color:var(--gold)}
   </div>
 
   <button class="lnk" id="clr" type="button" hidden></button>
+  <button class="lnk" id="rst" type="button" style="color:#ff6b6b" hidden></button>
   <p class="hint" id="env" style="text-align:center;margin:0"></p>
 </div>
 
@@ -10398,6 +10472,7 @@ function layout(){
   var has=D.items.length>0;
   $("setup").hidden=has&&!open;
   $("addBtn").hidden=!has;
+  $("rst").hidden=!has;
   if(TS&&!$("setup").hidden){TS.sync();TE.sync()}
   $("addBtn").textContent=open?L("Tutup","Close"):L("＋ Tambah stopwatch","＋ Add stopwatch")
 }
@@ -10408,7 +10483,7 @@ function text(){
   $("lbS").textContent=L("Mulai","Start");$("lbE").textContent=L("Selesai","End");
   $("lb").placeholder=L("Nama (opsional), mis. Belajar","Name (optional), e.g. Study");
   $("go").textContent=L("TAMBAH","ADD");
-  $("clr").textContent=L("Hapus yang sudah selesai","Remove finished ones");
+  $("clr").textContent=L("Hapus yang sudah selesai","Remove finished ones");rstLabel();
   var c=$("chips");c.innerHTML="";
   [[0,L("Mulai sekarang","Start now")],[15,"+15m"],[30,"+30m"],[60,"+1"+L("j","h")],[120,"+2"+L("j","h")]].forEach(function(o){
     var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=o[1];
@@ -10423,9 +10498,28 @@ function text(){
 }
 
 function initAudio(){try{var A=window.AudioContext||window.webkitAudioContext;if(A&&!ac)ac=new A();if(ac&&ac.state==="suspended")ac.resume()}catch(e){}}
+function curCfg(){try{return window.parent.stAlarmCfg()}catch(e){return {snd:"classic",vol:100}}}
+function curSnd(){return curCfg().snd}
 function beep(){
-  try{if(ac){if(ac.state==="suspended")ac.resume();var t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type="square";o.frequency.value=880;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.35,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.28);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.3)}}catch(e){}
-  try{if(navigator.vibrate)navigator.vibrate([200,100,200])}catch(e){}
+  try{
+    if(ac){
+      if(ac.state==="suspended")ac.resume();
+      var c=curCfg(),t=ac.currentTime+.02,cp=ac.createDynamicsCompressor(),m=ac.createGain(),P=null;
+      try{P=window.parent}catch(e){}
+      m.gain.value=Math.max(.05,Math.min(1,c.vol/100));cp.connect(m);m.connect(ac.destination);
+      if(c.snd==="off"){}
+      else if(P&&P.stAlarmSynth){P.stAlarmSynth(ac,cp,c.snd,t)}
+      else{
+        for(var k=0;k<4;k++){
+          var a=t+k*.2,o=ac.createOscillator(),g=ac.createGain();
+          o.type="square";o.frequency.value=(k%2?1568:1047);
+          g.gain.setValueAtTime(.0001,a);g.gain.exponentialRampToValueAtTime(1,a+.01);g.gain.setValueAtTime(1,a+.14);g.gain.exponentialRampToValueAtTime(.0001,a+.18);
+          o.connect(g);g.connect(cp);o.start(a);o.stop(a+.2)
+        }
+      }
+    }
+  }catch(e){}
+  try{if(navigator.vibrate)navigator.vibrate([400,150,400,150,400])}catch(e){}
 }
 function showRing(){
   while(Q.length&&!byId(Q[0]))Q.shift();
@@ -10448,6 +10542,7 @@ function rename(it,inp){
   it.name=v;save();
   var n=nat();
   if(n&&!it.done&&it.en>Date.now()){
+    it.snd=curSnd();
     try{n.schedule(nid(it),it.en,it.name,body(it)).then(function(ok){it.n=!!ok;save()}).catch(function(){})}catch(e){}
   }
 }
@@ -10458,6 +10553,27 @@ function del(it){
   save();
   if(!$("ring").hidden)showRing();
   build()
+}
+var rstT=0;
+function rstLabel(){$("rst").textContent=rstT?L("Yakin? Ketuk lagi untuk hapus semua","Sure? Tap again to delete all"):L("Reset (hapus semua stopwatch)","Reset (delete all stopwatches)")}
+function resetAll(){
+  if(!rstT){rstT=setTimeout(function(){rstT=0;rstLabel()},3500);rstLabel();return}
+  clearTimeout(rstT);rstT=0;
+  var n=nat();
+  D.items.forEach(function(it){if(n){try{n.cancel(nid(it))}catch(e){}}});
+  D={seq:0,items:[]};R={};save();stopRing();build();rstLabel();
+  toast(L("Semua stopwatch dihapus.","All stopwatches deleted."))
+}
+function syncSnd(){
+  var n=nat();if(!n)return;
+  var k=curSnd(),now=Date.now(),ch=false;
+  D.items.forEach(function(it){
+    if(!it.done&&it.n&&it.en>now&&it.snd!==k){
+      it.snd=k;ch=true;
+      try{n.schedule(nid(it),it.en,it.name,body(it)).then(function(ok){it.n=!!ok;save()}).catch(function(){})}catch(e){}
+    }
+  });
+  if(ch)save()
 }
 function clearDone(){
   var now=Date.now(),n=nat();
@@ -10522,7 +10638,7 @@ async function go(){
   if(D.items.length>=MAX){toast(L("Maksimal "+MAX+" stopwatch. Hapus yang sudah selesai dulu.","Max "+MAX+" stopwatches. Remove finished ones first."));return}
   initAudio();var r=calc(a,b);if(!r)return;
   var id=++D.seq,nm=$("lb").value.trim().slice(0,40)||("Stopwatch "+id);
-  var it={id:id,st:r.st,en:r.en,name:nm,n:false,done:false};
+  var it={id:id,st:r.st,en:r.en,name:nm,n:false,done:false,snd:curSnd()};
   D.items.push(it);sortItems();save();
   open=false;build();
   TS.value=hm24(r.en);TE.value=addMin(hm24(r.en),60);$("lb").value="";preview();
@@ -10535,17 +10651,19 @@ async function go(){
 }
 $("go").onclick=go;
 $("clr").onclick=clearDone;
+$("rst").onclick=resetAll;
 $("addBtn").onclick=function(){open=!open;layout();if(open){resetForm();try{$("setup").scrollIntoView({behavior:"smooth",block:"center"})}catch(e){}}};
 $("ringB").onclick=function(){Q.shift();if(Q.length)showRing();else stopRing();paint()};
 window.addEventListener("storage",function(e){
   if(!e.key||e.key==="sw_lang"){rl();text()}
   if(!e.key||e.key==="sw_fmt"){rf();if(TS){TS.refresh();TE.refresh();fmtUi();preview()}}
   if(!e.key||e.key===KEY){load();build()}
+  if(!e.key||e.key==="titikhilangs_settings"){syncSnd()}
 });
 document.addEventListener("visibilitychange",function(){if(!document.hidden)tick()});
 rl();rf();load();TS=mkPicker($("ts"),preview);TE=mkPicker($("te"),preview);
 $("fmtBox").onclick=function(e){var f=e.target&&e.target.getAttribute&&e.target.getAttribute("data-f");if(f&&f!==fmt)setFmt(f)};
-resetForm();text();build();tick();setInterval(tick,250);
+resetForm();text();build();syncSnd();tick();setInterval(tick,250);
 })();
 </scr@@ipt>
 </body>
@@ -14307,6 +14425,192 @@ paint();
 </scr@@ipt>
 </body>
 </html>
+</script>
+
+<script type="text/plain" id="src-duel-puzzle"><!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>DUEL PUZZLE</title>
+<style>
+:root{--bg:#0b0d12;--card:#161a23;--line:#2a3040;--text:#ece7da;--muted:#8d93a3;--gold:#d4a94f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:Georgia,serif;display:flex;justify-content:center}
+.app{width:100%;max-width:420px;padding:16px 14px calc(30px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+h1{text-align:center;font-size:22px;letter-spacing:.1em;margin:4px 0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+button{font:inherit;color:var(--text);background:#202636;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+button.on,button.go{background:var(--gold);color:#111;border-color:var(--gold);font-weight:bold}
+button:disabled{opacity:.4}
+input{font:inherit;background:#0f1219;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;text-transform:uppercase;width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
+.muted{color:var(--muted);font-size:13px;text-align:center;margin:0}
+#msg{color:#f0cf86;text-align:center;min-height:18px;font-size:14px}
+.code{font-size:32px;letter-spacing:.3em;text-align:center;color:var(--gold)}
+.pl{display:flex;justify-content:space-between;gap:8px;font-size:14px;align-items:center}
+.bar{height:8px;background:#0f1219;border-radius:6px;overflow:hidden;flex:1}.bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .3s}
+#bd{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;touch-action:manipulation}
+.c{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,6vw,26px);transition:transform .15s,opacity .18s}
+.c.sel{outline:3px solid #fff;transform:scale(.88)}.c.pop{opacity:0;transform:scale(.3)}.c.bm{box-shadow:inset 0 0 0 3px #fff}
+.c.rk{background:#4a4f5c!important}
+.noanim *{transition:none!important}
+</style></head><body><div class="app">
+<h1>🧩 DUEL PUZZLE</h1><div id="msg"></div>
+<div id="sM" class="panel">
+  <p class="muted">Pecahkan permen 3+ sama. Main bersama teman lewat kode ruang (maks. 8 pemain).</p>
+  <button class="go" id="bMk">Buat ruang</button>
+  <div class="row"><input id="iC" placeholder="KODE" maxlength="5"><button id="bJn">Gabung</button></div>
+</div>
+<div id="sL" class="panel" hidden>
+  <div class="muted">KODE RUANG</div><div class="code" id="lC"></div>
+  <div id="lP"></div>
+  <div id="lMd" class="row"></div><p class="muted" id="lH"></p>
+  <button class="go" id="bSt">▶ MULAI</button>
+  <button id="bLv">Keluar</button>
+</div>
+<div id="sG" hidden>
+  <div class="panel" style="padding:10px;gap:6px"><div class="pl"><b id="gT"></b><b id="gS"></b></div><div class="pl"><div class="bar"><i id="gB"></i></div></div><div id="gO"></div></div>
+  <div id="bd" style="margin-top:8px"></div>
+  <div id="gR" class="panel" hidden style="margin-top:8px"></div>
+</div>
+</div>
+<script>
+(function(){
+var CO=["#e0453a","#c9a227","#8a5cc7","#3fae82","#3b7bd1"],EM=["🍓","🍋","🍇","🍏","🫐"],ROCK=99,MAXR=20,MODES={race:"🏁 Balap 100%",score:"⏱️ Skor 90 dtk",duel:"⚔️ Serang Balik"};
+var HINT={race:"Pertama yang mencapai 100% menang.",score:"Skor tertinggi dalam 90 detik menang.",duel:"Combo & bom mengirim batu ke lawan. Batu hancur bila permen di sebelahnya pecah. 20 batu = kalah."};
+function $(i){return document.getElementById(i)}
+function ls(k,d){try{var v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}}
+if(ls("dp_anim","true")==="false")document.body.className="noanim";
+function auth(){try{return parent.satuTitikAuth||null}catch(e){return null}}
+function me(){var a=auth();return a&&a.user||null}
+function nm(){var a=auth(),u=me();if(!u)return"";var n=(a.username&&a.usernameUid===u.uid)?a.username:(u.displayName||"");return String(n).replace(/\s+/g," ").trim().slice(0,20)||"Pemain"}
+var FB=null;function lib(){if(FB)return Promise.resolve(FB);var a=auth();if(!a||!a.getDb)return Promise.reject(new Error("nofb"));return a.getDb().then(function(x){return FB=x})}
+function po(o){var P=parent;if(Array.isArray(o)){var a=new P.Array();o.forEach(function(x){a.push(po(x))});return a}if(o&&typeof o==="object"&&Object.getPrototypeOf(o)===Object.prototype){var r=new P.Object();for(var k in o)r[k]=po(o[k]);return r}return o}
+function flash(t){$("msg").textContent=t;setTimeout(function(){if($("msg").textContent===t)$("msg").textContent=""},3500)}
+function show(s){["sM","sL","sG"].forEach(function(i){$(i).hidden=i!==s})}
+function ms(t){return t&&t.toMillis?t.toMillis():Date.now()}
+function mkr(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+var R={code:"",d:null,ps:{},uR:null,uP:null,mode:"race"},G=null,TM=null;
+function isHost(){var u=me();return !!(u&&R.d&&R.d.host===u.uid)}
+function plist(){return Object.keys(R.ps).map(function(k){var p=R.ps[k];p.u=k;return p})}
+function rf(db,m,sub,id){return sub?m.doc(db,"dp_rooms",R.code,sub,id):m.doc(db,"dp_rooms",R.code)}
+function needLogin(){if(!me()){flash("Masuk dengan Google di Beranda untuk bermain online.");return true}return false}
+
+/* ===== ruang ===== */
+async function listen(code){
+  var f=await lib(),m=f.m,db=f.db;R.code=code;R.ps={};
+  R.uR=m.onSnapshot(m.doc(db,"dp_rooms",code),function(s){
+    if(!s.exists()){if(R.code){flash("Ruang ditutup.");reset()}return}
+    R.d=s.data();if(R.d.st==="lobby"||R.d.st===undefined){if(G){G.over=true;clearInterval(TM)}G=null;R.mode=R.d.mode||"race";paintL();show("sL")}
+    else if(R.d.st==="play"&&(!G||G.rd!==R.d.rd))startGame();
+  },function(e){flash("Gagal: "+(e&&e.code||e))});
+  R.uP=m.onSnapshot(m.collection(db,"dp_rooms",code,"p"),function(s){
+    R.ps={};s.forEach(function(x){R.ps[x.id]=x.data()});
+    if(!G)paintL();else{paintOpp();incoming();check()}
+  });
+}
+function reset(){try{R.uR&&R.uR();R.uP&&R.uP()}catch(e){}R.uR=R.uP=null;R.code="";R.d=null;R.ps={};G=null;clearInterval(TM);show("sM")}
+async function me0(){var f=await lib();return po({n:nm(),j:Date.now(),s:0,pr:0,ro:0,as:0,at:"",lo:false,rd:0,exp:f.m.Timestamp.fromMillis(Date.now()+86400000)})}
+$("bMk").onclick=async function(){
+  if(needLogin())return;
+  try{var f=await lib(),m=f.m,db=f.db,A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",c="",ok=false;
+    for(var t=0;t<5&&!ok;t++){c="";for(var i=0;i<5;i++)c+=A[Math.floor(Math.random()*A.length)];
+      try{await m.setDoc(m.doc(db,"dp_rooms",c),po({host:me().uid,hn:nm(),st:"lobby",mode:"race",seed:0,rd:0,dur:90,exp:m.Timestamp.fromMillis(Date.now()+86400000)}));ok=true}catch(e){if(t===4)throw e}}
+    await m.setDoc(m.doc(db,"dp_rooms",c,"p",me().uid),await me0());await listen(c)
+  }catch(e){flash("Gagal membuat ruang.")}
+};
+$("bJn").onclick=async function(){
+  if(needLogin())return;var c=$("iC").value.trim().toUpperCase();if(!c)return;
+  try{var f=await lib(),m=f.m,db=f.db,r=await m.getDoc(m.doc(db,"dp_rooms",c));
+    if(!r.exists())return flash("Kode ruang tidak ditemukan.");
+    var ps=await m.getDocs(m.collection(db,"dp_rooms",c,"p")),mine=false;ps.forEach(function(x){if(x.id===me().uid)mine=true});
+    if(!mine&&ps.size>=8)return flash("Ruang penuh (maks. 8).");
+    if((r.data().kk||[]).indexOf(me().uid)>=0)return flash("Kamu dikeluarkan dari ruang ini.");
+    await m.setDoc(m.doc(db,"dp_rooms",c,"p",me().uid),await me0());await listen(c)
+  }catch(e){flash("Gagal bergabung.")}
+};
+$("bLv").onclick=async function(){
+  try{var f=await lib(),m=f.m,db=f.db,u=me().uid;
+    if(isHost()){var ps=await m.getDocs(m.collection(db,"dp_rooms",R.code,"p"));await Promise.all(ps.docs.map(function(x){return m.deleteDoc(x.ref)}));await m.deleteDoc(m.doc(db,"dp_rooms",R.code))}
+    else await m.deleteDoc(m.doc(db,"dp_rooms",R.code,"p",u))}catch(e){}
+  reset()
+};
+function paintL(){
+  var h=isHost();$("lC").textContent=R.code;var d=R.d||{};
+  $("lP").innerHTML="";plist().sort(function(a,b){return a.j-b.j}).forEach(function(p){var e=document.createElement("div");e.className="pl";e.textContent=p.n+(p.u===d.host?" 👑":"")+(p.u===me().uid?" (kamu)":"");$("lP").appendChild(e)});
+  var md=$("lMd");md.innerHTML="";Object.keys(MODES).forEach(function(k){var b=document.createElement("button");b.textContent=MODES[k];b.className=(d.mode||"race")===k?"on":"";b.disabled=!h;b.onclick=async function(){var f=await lib();f.m.updateDoc(rf(f.db,f.m),po({mode:k}))};md.appendChild(b)});
+  $("lH").textContent=HINT[d.mode||"race"]+(h?"":" Menunggu pemilik ruang…");
+  $("bSt").hidden=!h;$("bSt").disabled=plist().length<2;$("bSt").textContent=plist().length<2?"Butuh min. 2 pemain":"▶ MULAI"
+}
+$("bSt").onclick=async function(){var f=await lib(),m=f.m,d=R.d;
+  m.updateDoc(rf(f.db,m),po({st:"play",rd:(d.rd||0)+1,seed:1+Math.floor(Math.random()*1e9),dur:d.mode==="duel"?150:90,ts:m.serverTimestamp()})).catch(function(){flash("Gagal memulai.")})};
+
+/* ===== papan ===== */
+function col(t){return t===ROCK?-1:t%10}
+function rnd(){return Math.floor(G.rng()*5)}
+function fresh(){var b=[];for(var i=0;i<64;i++){var c;do{c=rnd()}while((i%8>=2&&col(b[i-1])===c&&col(b[i-2])===c)||(i>=16&&col(b[i-8])===c&&col(b[i-16])===c));b.push(c)}return b}
+function finds(b){var s={},big={},i,j,k,x,c;
+  for(i=0;i<8;i++){for(j=0;j<6;){c=col(b[i*8+j]);if(c<0){j++;continue}for(k=j+1;k<8&&col(b[i*8+k])===c;k++);if(k-j>=3){for(x=j;x<k;x++)s[i*8+x]=1;if(k-j>=4)big[i*8+j+1]=1}j=k}}
+  for(i=0;i<8;i++){for(j=0;j<6;){c=col(b[j*8+i]);if(c<0){j++;continue}for(k=j+1;k<8&&col(b[k*8+i])===c;k++);if(k-j>=3){for(x=j;x<k;x++)s[x*8+i]=1;if(k-j>=4)big[(j+1)*8+i]=1}j=k}}
+  return{s:s,big:big}}
+function hasMove(b){for(var i=0;i<64;i++){[1,8].forEach(function(d){var j=i+d;if(d===1&&i%8===7||j>63||b[i]===ROCK||b[j]===ROCK)return;var t=b[i];b[i]=b[j];b[j]=t;if(Object.keys(finds(b).s).length)hasMove.ok=1;t=b[i];b[i]=b[j];b[j]=t})}var r=!!hasMove.ok;hasMove.ok=0;return r}
+function expand(b,s){var q=Object.keys(s).map(Number),d={};while(q.length){var k=q.pop();if(d[k])continue;d[k]=1;if(b[k]>=10&&b[k]!==ROCK){var x0=k%8,y0=k/8|0;for(var y=y0-1;y<=y0+1;y++)for(var x=x0-1;x<=x0+1;x++)if(x>=0&&x<8&&y>=0&&y<8){var t=y*8+x;if(b[t]!==ROCK&&!s[t]){s[t]=1;q.push(t)}}}}}
+function drop(){for(var x=0;x<8;x++){var a=[];for(var y=7;y>=0;y--)if(G.b[y*8+x]>=0)a.push(G.b[y*8+x]);for(y=7;y>=0;y--)G.b[y*8+x]=a.length?a.shift():rnd()}}
+function draw(){var bd=$("bd");if(!bd.children.length){for(var i=0;i<64;i++){var e=document.createElement("div");e.onclick=(function(i){return function(){tap(i)}})(i);bd.appendChild(e)}}
+  for(i=0;i<64;i++){var t=G.b[i],e=bd.children[i],c=col(t);e.className="c"+(t===ROCK?" rk":"")+(t>=10&&t!==ROCK?" bm":"")+(G.sel===i?" sel":"");e.style.background=c<0?"":CO[c];e.textContent=c<0?"🪨":EM[c]}}
+function sw(a,b){var t=G.b[a];G.b[a]=G.b[b];G.b[b]=t}
+function tap(i){if(!G||G.busy||G.over||G.b[i]===ROCK)return;
+  if(G.sel==null){G.sel=i;draw();return}
+  var a=G.sel;G.sel=null;var d=Math.abs(a-i);
+  if(!((d===1&&(a/8|0)===(i/8|0))||d===8)){G.sel=i;draw();return}
+  sw(a,i);if(!Object.keys(finds(G.b).s).length){sw(a,i);draw();return}
+  G.busy=true;G.mv=0;draw();setTimeout(function(){casc(1)},100)}
+function casc(lv){
+  var f=finds(G.b),ks=Object.keys(f.s);if(!ks.length){settle();return}
+  Object.keys(f.big).forEach(function(k){if(f.s[k]){delete f.s[k];G.b[k]=col(G.b[k])+10}});
+  expand(G.b,f.s);var all=Object.keys(f.s).map(Number),rr={},ch=$("bd").children;
+  all.forEach(function(k){f.s[k]&&ch[k]&&(ch[k].className+=" pop");[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(v){var x=k%8+v[0],y=(k/8|0)+v[1];if(x>=0&&x<8&&y>=0&&y<8&&G.b[y*8+x]===ROCK)rr[y*8+x]=1})});
+  Object.keys(rr).forEach(function(k){ch[k].className+=" pop"});
+  var n=all.length;G.score+=n*10*lv;G.mv+=Math.max(0,n-2)+(lv>1?lv-1:0)+(all.some(function(k){return G.b[k]>=10})?2:0);
+  setTimeout(function(){all.forEach(function(k){G.b[k]=-1});Object.keys(rr).forEach(function(k){G.b[k]=-1;G.rocks--});drop();draw();setTimeout(function(){casc(lv+1)},180)},190)}
+function settle(){
+  var d=R.d,duel=d.mode==="duel";
+  if(duel){var send=Math.floor(G.mv/2),off=Math.min(send,G.pend);G.pend-=off;send-=off;
+    if(send>0){var tg=plist().filter(function(p){return p.u!==me().uid&&p.rd===d.rd&&!p.lo}).sort(function(a,b){return b.ro-a.ro})[0];if(tg){G.as+=send;G.at=tg.u}}
+    while(G.pend>0){var x=Math.floor(G.rng()*8),y=0;while(y<7&&G.b[y*8+x]===ROCK)y++;if(G.b[y*8+x]!==ROCK){G.b[y*8+x]=ROCK;G.rocks++}G.pend--}
+    if(G.rocks>=MAXR){G.dead=true}}
+  if(!hasMove(G.b)){for(var t=0;t<30;t++){var a=[];G.b.forEach(function(v,i){if(v!==ROCK)a.push(i)});var v=a.map(function(i){return G.b[i]});for(var i=v.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),q=v[i];v[i]=v[j];v[j]=q}a.forEach(function(k,i){G.b[k]=v[i]});if(!Object.keys(finds(G.b).s).length&&hasMove(G.b))break}}
+  G.busy=false;draw();push();hud();check()}
+async function push(){try{var f=await lib(),m=f.m,u=me().uid,o={n:nm(),j:R.ps[u]&&R.ps[u].j||Date.now(),s:G.score,pr:Math.min(100,Math.floor(G.score/30)),ro:G.rocks,as:G.as,at:G.at,lo:!!G.dead,rd:G.rd,exp:m.Timestamp.fromMillis(Date.now()+86400000)};
+  if(o.pr>=100&&d0().mode==="race"&&!G.ft){G.ft=1;o.ft=m.serverTimestamp()}else if(G.ft&&R.ps[u]&&R.ps[u].ft)o.ft=R.ps[u].ft;
+  await m.setDoc(m.doc(f.db,"dp_rooms",R.code,"p",u),po(o))}catch(e){}}
+function d0(){return R.d||{}}
+function incoming(){if(!G||G.over||G.dead)return;var u=me().uid;plist().forEach(function(p){if(p.u!==u&&p.rd===G.rd&&p.at===u){var seen=G.seen[p.u]||0;if(p.as>seen){G.pend+=p.as-seen;G.seen[p.u]=p.as}}});if(!G.busy&&G.pend>0)settle0()}
+function settle0(){G.busy=true;settle()}
+
+/* ===== jalannya permainan ===== */
+function startGame(){
+  var d=R.d;clearInterval(TM);
+  G={rd:d.rd,rng:mkr(d.seed),score:0,rocks:0,pend:0,as:0,at:"",seen:{},sel:null,busy:false,over:false,dead:false,ft:0,mv:0,end:Date.now()+d.dur*1000};
+  G.b=fresh();$("bd").innerHTML="";$("gR").hidden=true;show("sG");draw();hud();push();
+  TM=setInterval(function(){hud();check()},400)}
+function hud(){if(!G)return;var d=R.d,left=Math.max(0,Math.ceil((G.end-Date.now())/1000)),pr=Math.min(100,Math.floor(G.score/30));
+  $("gT").textContent=MODES[d.mode]+(d.mode==="race"?"":" · "+left+"s");$("gS").textContent=d.mode==="duel"?"🪨 "+G.rocks+"/"+MAXR+(G.pend?" (+"+G.pend+")":""):d.mode==="race"?pr+"%":G.score;
+  $("gB").style.width=(d.mode==="duel"?Math.min(100,G.rocks*100/MAXR):d.mode==="race"?pr:Math.min(100,left*100/d.dur))+"%";paintOpp()}
+function paintOpp(){if(!G)return;var d=R.d,o=$("gO");o.innerHTML="";plist().filter(function(p){return p.u!==me().uid}).forEach(function(p){
+  var e=document.createElement("div");e.className="pl";var v=p.rd!==G.rd?0:d.mode==="duel"?p.ro:d.mode==="race"?p.pr:p.s,t=d.mode==="duel"?"🪨"+v+(p.lo?" ☠":""):d.mode==="race"?v+"%":v;
+  e.innerHTML="<span></span><div class=bar><i></i></div><span></span>";e.children[0].textContent=p.n.slice(0,10);e.children[2].textContent=t;e.querySelector("i").style.width=(d.mode==="duel"?Math.min(100,v*5):d.mode==="race"?v:Math.min(100,v/30))+"%";o.appendChild(e)})}
+function check(){if(!G||G.over)return;var d=R.d,ps=plist().filter(function(p){return p.rd===G.rd}),r=null,timeUp=Date.now()>=G.end&&d.mode!=="race";
+  if(d.mode==="race"){var w=ps.filter(function(p){return p.pr>=100&&p.ft}).sort(function(a,b){return ms(a.ft)-ms(b.ft)});if(w.length)r=ps.slice().sort(function(a,b){return (b.ft?1:0)-(a.ft?1:0)||ms(a.ft)-ms(b.ft)||b.pr-a.pr})}
+  else if(d.mode==="score"){if(timeUp)r=ps.slice().sort(function(a,b){return b.s-a.s})}
+  else{var al=ps.filter(function(p){return !p.lo});if((ps.length>1&&al.length<=1)||timeUp||(G.dead&&!ps.length))r=ps.slice().sort(function(a,b){return (a.lo?1:0)-(b.lo?1:0)||a.ro-b.ro||b.s-a.s})}
+  if(r)end(r)}
+function end(r){G.over=true;clearInterval(TM);var d=R.d,win=r[0],box=$("gR");box.hidden=false;box.innerHTML="";
+  var h=document.createElement("div");h.className="code";h.style.fontSize="22px";h.letterSpacing="0";h.textContent=win&&win.u===me().uid?"🏆 Kamu menang!":"🏁 "+(win?win.n:"-")+" menang";box.appendChild(h);
+  r.forEach(function(p,i){var e=document.createElement("div");e.className="pl";e.textContent=(i+1)+". "+p.n+" — "+(d.mode==="race"?p.pr+"%":d.mode==="score"?p.s+" poin":(p.lo?"☠ ":"")+"🪨"+p.ro);box.appendChild(e)});
+  if(isHost()){var b=document.createElement("button");b.className="go";b.textContent="Main lagi (kembali ke ruang)";b.onclick=async function(){var f=await lib();f.m.updateDoc(rf(f.db,f.m),po({st:"lobby"}))};box.appendChild(b)}
+  else{var p=document.createElement("p");p.className="muted";p.textContent="Menunggu pemilik ruang…";box.appendChild(p)}
+  var l=document.createElement("button");l.textContent="Keluar";l.onclick=function(){$("bLv").onclick()};box.appendChild(l)}
+window.__dpInviteCtx=function(){return R.code?{g:"dp",code:R.code,pl:Object.keys(R.ps),n:Object.keys(R.ps).length}:null};
+})();
+</scr@@ipt></body></html>
 </script>
 
 <script type="text/plain" id="src-versus"><!DOCTYPE html>
