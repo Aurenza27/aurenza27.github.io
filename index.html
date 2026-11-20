@@ -15584,7 +15584,7 @@ input{background:rgba(0,0,0,.25);border-radius:10px}
 <script>
 (function(){
 var CO=["#e0453a","#c9a227","#8a5cc7","#3fae82","#3b7bd1"],EM=["🍓","🍋","🍇","🍏","🫐"],ROCK=99,MAXR=20,MODES={race:"🏁 Balap 100%",score:"⏱️ Skor 90 dtk",duel:"⚔️ Serang Balik"};
-var HINT={race:"Pertama yang mencapai 100% menang.",score:"Skor tertinggi dalam 90 detik menang.",duel:"Combo & bom mengirim batu ke lawan. Batu hancur bila permen di sebelahnya pecah. 20 batu = kalah."};
+var HINT={race:"Pertama yang mencapai 100% menang.",score:"Skor tertinggi dalam 90 detik menang.",duel:"Combo & batu spesial mengirim batu ke lawan. Batu hancur bila permen di sebelahnya pecah. 20 batu = kalah."};
 function $(i){return document.getElementById(i)}
 function ls(k,d){try{var v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}}
 if(ls("dp_anim","true")==="false")document.body.className="noanim";
@@ -15845,13 +15845,50 @@ function fx(all,rk,lv,gain){if(document.body.className==="noanim")return;var bw=
   setTimeout(function(){ps.forEach(function(p){p.remove()})},700)}
 function col(t){return t===ROCK?-1:t%10}
 function rnd(){return Math.floor(G.rng()*5)}
-function fresh(){var b=[];for(var i=0;i<64;i++){var c;do{c=rnd()}while((i%8>=2&&col(b[i-1])===c&&col(b[i-2])===c)||(i>=16&&col(b[i-8])===c&&col(b[i-16])===c));b.push(c)}return b}
-function finds(b){var s={},big={},i,j,k,x,c;
-  for(i=0;i<8;i++){for(j=0;j<6;){c=col(b[i*8+j]);if(c<0){j++;continue}for(k=j+1;k<8&&col(b[i*8+k])===c;k++);if(k-j>=3){for(x=j;x<k;x++)s[i*8+x]=1;if(k-j>=4)big[i*8+j+1]=1}j=k}}
-  for(i=0;i<8;i++){for(j=0;j<6;){c=col(b[j*8+i]);if(c<0){j++;continue}for(k=j+1;k<8&&col(b[k*8+i])===c;k++);if(k-j>=3){for(x=j;x<k;x++)s[x*8+i]=1;if(k-j>=4)big[(j+1)*8+i]=1}j=k}}
+function tp(t){return t>=10&&t!==ROCK?(t/10|0):0}
+var SPI=["","🔥","⚡","💎","🛡️"],QU=[];
+function fresh(){var b=[];for(var i=0;i<64;i++){var c;do{c=rnd()}while((i%8>=2&&col(b[i-1])===c&&col(b[i-2])===c)||(i>=16&&col(b[i-8])===c&&col(b[i-16])===c)||(i%8>=1&&i>=8&&col(b[i-1])===c&&col(b[i-8])===c&&col(b[i-9])===c));b.push(c)}return b}
+/* finds: s = sel yang pecah; big = {sel: tipe batu spesial yang lahir} (1 api, 2 petir, 3 kristal, 4 perisai).
+   Prioritas: 5 lurus > L/T > 4 lurus > kotak 2x2 */
+function finds(b,pf){
+  var s={},big={},hr=[],vr=[],sq=[],used={},dh=[],dv=[],i,j,k,x,c,cl;
+  for(i=0;i<8;i++){for(j=0;j<6;){c=col(b[i*8+j]);if(c<0){j++;continue}for(k=j+1;k<8&&col(b[i*8+k])===c;k++);if(k-j>=3){cl=[];for(x=j;x<k;x++){s[i*8+x]=1;cl.push(i*8+x)}hr.push(cl)}j=k}}
+  for(i=0;i<8;i++){for(j=0;j<6;){c=col(b[j*8+i]);if(c<0){j++;continue}for(k=j+1;k<8&&col(b[k*8+i])===c;k++);if(k-j>=3){cl=[];for(x=j;x<k;x++){s[x*8+i]=1;cl.push(x*8+i)}vr.push(cl)}j=k}}
+  for(i=0;i<7;i++)for(j=0;j<7;j++){var p=i*8+j;c=col(b[p]);if(c>=0&&col(b[p+1])===c&&col(b[p+8])===c&&col(b[p+9])===c){s[p]=s[p+1]=s[p+8]=s[p+9]=1;sq.push([p,p+1,p+8,p+9])}}
+  function put(cl,t,f){var o=[],q,m;if(f!=null)o.push(f);(pf||[]).forEach(function(z){if(cl.indexOf(z)>=0)o.push(z)});o.push(cl[(cl.length-1)>>1]);o=o.concat(cl);
+    for(q=0;q<o.length;q++){m=o[q];if(b[m]<10&&!used[m]){used[m]=1;big[m]=t;return}}}
+  hr.forEach(function(r,a){if(r.length>=5){put(r,2);dh[a]=1}});
+  vr.forEach(function(r,a){if(r.length>=5){put(r,2);dv[a]=1}});
+  hr.forEach(function(r,a){vr.forEach(function(v,e){if(dh[a]||dv[e])return;for(var q=0;q<r.length;q++)if(v.indexOf(r[q])>=0){put(r.concat(v),3,r[q]);dh[a]=dv[e]=1;return}})});
+  hr.forEach(function(r,a){if(!dh[a]&&r.length===4)put(r,1)});
+  vr.forEach(function(r,a){if(!dv[a]&&r.length===4)put(r,1)});
+  sq.forEach(function(q){put(q,4)});
   return{s:s,big:big}}
-function hasMove(b){for(var i=0;i<64;i++){[1,8].forEach(function(d){var j=i+d;if(d===1&&i%8===7||j>63||b[i]===ROCK||b[j]===ROCK)return;var t=b[i];b[i]=b[j];b[j]=t;if(Object.keys(finds(b).s).length)hasMove.ok=1;t=b[i];b[i]=b[j];b[j]=t})}var r=!!hasMove.ok;hasMove.ok=0;return r}
-function expand(b,s){var q=Object.keys(s).map(Number),d={};while(q.length){var k=q.pop();if(d[k])continue;d[k]=1;if(b[k]>=10&&b[k]!==ROCK){var x0=k%8,y0=k/8|0;for(var y=y0-1;y<=y0+1;y++)for(var x=x0-1;x<=x0+1;x++)if(x>=0&&x<8&&y>=0&&y<8){var t=y*8+x;if(b[t]!==ROCK&&!s[t]){s[t]=1;q.push(t)}}}}}
+function hasMove(b){for(var i=0;i<64;i++){for(var q=0;q<2;q++){var d=q?8:1,j=i+d;if(d===1&&i%8===7||j>63||b[i]===ROCK||b[j]===ROCK)continue;if(tp(b[i])||tp(b[j]))return true;var t=b[i];b[i]=b[j];b[j]=t;var ok=Object.keys(finds(b).s).length;t=b[i];b[i]=b[j];b[j]=t;if(ok)return true}}return false}
+/* ===== efek batu spesial ===== */
+function addc(s,z,rk,lt){var v=G.b[z];if(v===ROCK){if(lt)rk[z]=1;return 0}if(s[z]||(G.kp&&G.kp[z]))return 0;s[z]=1;QU.push(z);return 1}
+function area(t,k,c,s,rk){var x0=k%8,y0=k/8|0,n=0,x,y,z;
+  if(t===1){for(y=y0-1;y<=y0+1;y++)for(x=x0-1;x<=x0+1;x++)if(x>=0&&x<8&&y>=0&&y<8)n+=addc(s,y*8+x,rk,0)}
+  else if(t===2){for(y=0;y<8;y++)n+=addc(s,y*8+x0,rk,1)}
+  else if(t===3){for(z=0;z<64;z++)if(col(G.b[z])===c)n+=addc(s,z,rk,0)}
+  return n}
+/* expand: memicu semua batu spesial di s secara berantai. em = sumbangan serangan (maks 8 poin = +4 serangan per efek) */
+function expand(s,rk,tr){QU=Object.keys(s).map(Number);var ef=0,em=0,k,t,n;
+  while(QU.length){k=QU.pop();t=tp(G.b[k]);if(!t||tr[k])continue;tr[k]=1;ef++;
+    if(t===4){G.sh=(G.sh||0)+3;continue}
+    n=area(t,k,col(G.b[k]),s,rk);em+=Math.min(n,8)}
+  return{ef:ef,em:em}}
+/* gabungan dua batu spesial yang ditukar. Mengembalikan sumbangan serangan (maks 12 poin = +6 serangan) */
+function combo(a,i,s,rk,tr){var A=tp(G.b[a]),B=tp(G.b[i]),ca=col(G.b[a]),cb=col(G.b[i]),lo=Math.min(A,B),hi=Math.max(A,B),x=i%8,y=i/8|0,n=0,z,xx,yy,c=A===3?ca:cb;
+  tr[a]=tr[i]=1;s[a]=1;s[i]=1;if(A===4)G.sh=(G.sh||0)+3;if(B===4)G.sh=(G.sh||0)+3;
+  if(lo===4){if(hi!==4)n+=area(hi,A===4?i:a,A===4?cb:ca,s,rk);return Math.min(n,12)}
+  if(lo===1&&hi===1){for(yy=y-2;yy<=y+2;yy++)for(xx=x-2;xx<=x+2;xx++)if(xx>=0&&xx<8&&yy>=0&&yy<8)n+=addc(s,yy*8+xx,rk,0)}
+  else if(lo===1&&hi===2){for(xx=x-1;xx<=x+1;xx++)if(xx>=0&&xx<8)for(yy=0;yy<8;yy++)n+=addc(s,yy*8+xx,rk,1)}
+  else if(lo===2&&hi===2){for(yy=0;yy<8;yy++)n+=addc(s,yy*8+x,rk,1);for(xx=0;xx<8;xx++)n+=addc(s,y*8+xx,rk,1)}
+  else if(lo===1&&hi===3){for(z=0;z<64;z++)if(col(G.b[z])===c)n+=area(1,z,0,s,rk)}
+  else if(lo===2&&hi===3){for(z=0;z<64;z++)if(col(G.b[z])===c)n+=area(2,z,0,s,rk)}
+  else if(lo===3&&hi===3){for(z=0;z<64;z++)n+=addc(s,z,rk,0)}
+  return Math.min(n,12)}
 function drop(){G.fd={};for(var x=0;x<8;x++){var a=[],o=[],y;for(y=7;y>=0;y--)if(G.b[y*8+x]>=0){a.push(G.b[y*8+x]);o.push(y)}var nw=8-a.length;for(y=7;y>=0;y--){if(a.length){G.b[y*8+x]=a.shift();G.fd[y*8+x]=y-o.shift()}else{G.b[y*8+x]=rnd();G.fd[y*8+x]=nw}}}}
 function draw(){var bd=$("bd");if(!bd.children.length){for(var i=0;i<64;i++){var e=document.createElement("div");e.onclick=(function(i){return function(){tap(i)}})(i);bd.appendChild(e)}}
   for(i=0;i<64;i++){var t=G.b[i],e=bd.children[i],c=col(t);e.className="c"+(t===ROCK?" rk":"")+(t>=10&&t!==ROCK?" bm":"")+(G.sel===i?" sel":"");e.style.background=c<0?"":CO[c];e.textContent=c<0?"🪨":EM[c]}}
@@ -15860,19 +15897,26 @@ function tap(i){if(!G||G.busy||G.over||G.b[i]===ROCK)return;
   if(G.sel==null){G.sel=i;draw();return}
   var a=G.sel;G.sel=null;var d=Math.abs(a-i);
   if(!((d===1&&(a/8|0)===(i/8|0))||d===8)){G.sel=i;draw();return}
-  sw(a,i);if(!Object.keys(finds(G.b).s).length){sw(a,i);G.busy=true;nope(a,i);return}
-  G.busy=true;G.mv=0;swapAnim(a,i,function(){draw();setTimeout(function(){casc(1)},50)})}
+  sw(a,i);var ta=tp(G.b[a]),ti=tp(G.b[i]);
+  if(!Object.keys(finds(G.b).s).length&&!ta&&!ti){sw(a,i);G.busy=true;nope(a,i);return}
+  G.busy=true;G.mv=0;G.sx={go:!!(ta||ti),a:a,i:i,ta:ta,ti:ti,pf:[a,i]};swapAnim(a,i,function(){draw();setTimeout(function(){casc(1)},50)})}
 function casc(lv){
-  var f=finds(G.b),ks=Object.keys(f.s);if(!ks.length){settle();return}
-  Object.keys(f.big).forEach(function(k){if(f.s[k]){delete f.s[k];G.b[k]=col(G.b[k])+10;(G.bn=G.bn||{})[k]=1}});
-  expand(G.b,f.s);var all=Object.keys(f.s).map(Number),rr={},ch=$("bd").children;
-  all.forEach(function(k){f.s[k]&&ch[k]&&(ch[k].className+=" pop");[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(v){var x=k%8+v[0],y=(k/8|0)+v[1];if(x>=0&&x<8&&y>=0&&y<8&&G.b[y*8+x]===ROCK)rr[y*8+x]=1})});
-  Object.keys(rr).forEach(function(k){ch[k].className+=" pop"});
-  var n=all.length;toast(lv);fx(all,Object.keys(rr),lv,n*10*lv);G.score+=n*10*lv;paintT();G.mv+=Math.max(0,n-2)+(lv>1?lv-1:0)+(all.some(function(k){return G.b[k]>=10})?2:0);
+  var sx=G.sx;G.sx=null;
+  var f=finds(G.b,sx?sx.pf:null),s=f.s,big=f.big,pre=!!(sx&&sx.go);
+  if(!Object.keys(s).length&&!pre){settle();return}
+  Object.keys(big).forEach(function(k){if(s[k]){delete s[k];G.b[k]=big[k]*10+col(G.b[k]);(G.bn=G.bn||{})[k]=1}});
+  var tr={},rk={},cm=0,rr={},ch=$("bd").children;G.kp=big;
+  if(pre){if(sx.ta&&sx.ti)cm=combo(sx.a,sx.i,s,rk,tr);else s[sx.ta?sx.a:sx.i]=1}
+  var nb=Object.keys(s).length,r=expand(s,rk,tr),ef=r.ef+(cm?1:0),em=r.em+cm;G.kp=null;
+  var all=Object.keys(s).map(Number);
+  all.forEach(function(k){ch[k]&&(ch[k].className+=" pop");[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(v){var x=k%8+v[0],y=(k/8|0)+v[1];if(x>=0&&x<8&&y>=0&&y<8&&G.b[y*8+x]===ROCK)rr[y*8+x]=1})});
+  Object.keys(rk).forEach(function(k){rr[k]=1});
+  Object.keys(rr).forEach(function(k){ch[k]&&(ch[k].className+=" pop")});
+  var n=all.length;toast(lv);fx(all,Object.keys(rr),lv,n*10*lv);if(ef)fxb("shk2");G.score+=n*10*lv;paintT();G.mv+=Math.max(0,nb-2)+(lv>1?lv-1:0)+(ef?2:0)+em;
   setTimeout(function(){all.forEach(function(k){G.b[k]=-1});Object.keys(rr).forEach(function(k){G.b[k]=-1;G.rocks--});drop();draw();setTimeout(function(){casc(lv+1)},220)},200)}
 function settle(){
   var d=R.d,duel=d.mode==="duel";
-  if(duel){var send=Math.floor(G.mv/2),off=Math.min(send,G.pend);G.pend-=off;send-=off;
+  if(!duel)G.sh=0;if(duel){if(G.sh){G.pend=Math.max(0,G.pend-G.sh);G.sh=0}var send=Math.floor(G.mv/2),off=Math.min(send,G.pend);G.pend-=off;send-=off;
     if(send>0){var tg=plist().filter(function(p){return p.u!==me().uid&&p.rd===d.rd&&!p.lo}).sort(function(a,b){return b.ro-a.ro})[0];if(tg){G.as+=send;G.at=tg.u;G.urg=1}}
     while(G.pend>0){var x=Math.floor(G.rng()*8),y=0;while(y<7&&G.b[y*8+x]===ROCK)y++;if(G.b[y*8+x]!==ROCK){G.b[y*8+x]=ROCK;G.rocks++;(G.nr=G.nr||{})[y*8+x]=1;fxb("hit")}G.pend--}
     if(G.rocks>=MAXR){G.dead=true}}
@@ -15925,7 +15969,7 @@ function paintL(){var h=isHost(),d=R.d||{},md0=d.mode||"race",ps=plist().sort(fu
 function draw(){var bd=$("bd"),i,e,t,c;if(!bd.children.length){for(i=0;i<64;i++){e=document.createElement("div");e.dataset.i=i;bd.appendChild(e)}}
   for(i=0;i<64;i++){t=G.b[i];e=bd.children[i];c=col(t);var ex="",al=G.al?1:0,fd=G.fd&&G.fd[i];e.style.removeProperty("--f");e.style.removeProperty("--d");
     if(fd>0){ex=" fl"+al;e.style.setProperty("--f",fd)}else if(G.bn&&G.bn[i])ex=" bn"+al;else if(G.nr&&G.nr[i])ex=" rin"+al;else if(G.intro){ex=" in";e.style.setProperty("--d",((i%8)+(i>>3))*28+"ms")}
-    e.className="c "+(t===ROCK?"rk":"g"+c)+(t>=10&&t!==ROCK?" bm":"")+(G.sel===i?" sel":"")+ex;e.textContent=c<0?"🪨":EM[c]}G.al=G.al?0:1;G.fd=G.bn=G.nr=null;
+    e.className="c "+(t===ROCK?"rk":"g"+c)+(tp(t)?" bm sp"+tp(t):"")+(G.sel===i?" sel":"")+ex;e.textContent=c<0?"🪨":tp(t)?SPI[tp(t)]:EM[c]}G.al=G.al?0:1;G.fd=G.bn=G.nr=null;
   bd.classList.toggle("dg",G.rocks>=14)}
 function toast(lv){if(lv<2)return;var e=$("cb");e.textContent="COMBO ×"+lv;e.className="";void e.offsetWidth;e.className="show t"+Math.min(lv,5);fxb(lv>=4?"shk2":lv>=3?"shk":"pls")}
 function paintOpp(){if(!G)return;var d=R.d,o=$("gO");o.innerHTML="";plist().filter(function(p){return p.u!==me().uid}).forEach(function(p,i){
