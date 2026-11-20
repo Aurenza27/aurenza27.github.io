@@ -802,7 +802,7 @@ const MENUS = [
   { id:"turnamen", cat:"manajemen", icon:"🏆", title:"TURNAMEN", desc:"Kelola turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor.", descEn:"Manage sports or eSports tournaments: fixtures, scores, standings, knockout brackets, and top scorers.", src:"src-turnamen" },
   { id:"tebak-inisial", cat:"hiburan", icon:"🔤", title:"TEBAK INISIAL", desc:"Acak huruf A–Z dan kategori untuk permainan tebak-tebakan anak.", descEn:"Randomize a letter (A–Z) and category for kids' guessing games.", src:"src-tebak-inisial" },
   { id:"versus", cat:"hiburan", icon:"⚔️", title:"VERSUS", desc:"Adu dua nama apa pun: menang, kalah, atau seri.", descEn:"Pit any two names against each other: win, lose, or draw.", src:"src-versus" },
-  { id:"duel-puzzle", cat:"hiburan", icon:"🧩", title:"DUEL PUZZLE", desc:"Puzzle match-3 online: balap 100%, skor tertinggi 90 detik, atau serang balik dengan batu.", descEn:"Online match-3 puzzle: race to 100%, highest score in 90s, or counter-attack with rocks.", src:"src-duel-puzzle" },
+  { id:"duel-puzzle", cat:"hiburan", icon:"🧩", title:"PUZZLE ARENA", desc:"Puzzle match-3 online: balap 100%, skor tertinggi 90 detik, atau serang balik dengan batu.", descEn:"Online match-3 puzzle: race to 100%, highest score in 90s, or counter-attack with rocks.", src:"src-duel-puzzle" },
   { id:"acak-nama", cat:"manajemen", icon:"🎲", title:"ARISAN", desc:"Arisan: manajemen arisan kamu agar lebih akurat, bisa offline atau online (ditonton real-time), plus catatan keuangan arisan.", descEn:"Arisan: manage your arisan more neatly, offline or online (watchable in real time), plus arisan finance tracking.", src:"src-acak-nama" },
   { id:"keuangan", cat:"manajemen", icon:"💰", title:"KEUANGAN", desc:"Catat uang masuk dan keluar, atur jatah belanja, dan kumpulkan tabungan.", descEn:"Record income and expenses, set spending limits, and build savings.", src:"src-keuangan" }
 ];
@@ -820,7 +820,7 @@ const MTITLE = {
   "stopwatch":["STOPWATCH","STOPWATCH","STOPWATCH","STOPWATCH"],
   "tebak-inisial":["TEBAK INISIAL","GUESS THE INITIAL","TEBAK INISIAL","GUESS THE INITIAL"],
   "versus":["VERSUS","VERSUS","VERSUS","VERSUS"],
-  "duel-puzzle":["DUEL PUZZLE","PUZZLE DUEL","DUEL PUZZLE","PUZZLE DUEL"],
+  "duel-puzzle":["PUZZLE ARENA","PUZZLE ARENA","PUZZLE ARENA","PUZZLE ARENA"],
   "acak-nama":["ARISAN","ARISAN","ARISAN","ARISAN"],
   "keuangan":["KEUANGAN","FINANCE","KEUANGAN","FINANCE"]
 };
@@ -9479,6 +9479,36 @@ function paintOnline(box, t){
     p.append(row);
     const fc = el("p", "hint", L("Pengikut: ", "Followers: ") + (ON.counts[t.oid] === undefined ? "…" : ON.counts[t.oid])); p.append(fc);
     ON.lib().then(({m, db:f}) => m.getCountFromServer(m.collection(f, "tournaments", t.oid, "followers"))).then(c => { ON.counts[t.oid] = c.data().count; fc.textContent = L("Pengikut: ", "Followers: ") + ON.counts[t.oid]; }).catch(() => {});
+    { const fl = el("div", "stack"); fl.hidden = true;
+      const lblO = L("Kelola pengikut", "Manage followers"), lblC = L("Tutup daftar pengikut", "Hide followers");
+      const fb = mkBtn(lblO, "btn ghost sm", async () => {
+        if(!fl.hidden){ fl.hidden = true; fb.textContent = lblO; return; }
+        fl.hidden = false; fb.textContent = lblC; fl.textContent = ""; fl.append(el("p", "hint", L("Memuat…", "Loading…")));
+        try{
+          const { m, db: f } = await ON.lib(), sn = await m.getDocs(m.collection(f, "tournaments", t.oid, "followers"));
+          const rows = sn.docs.map(d => { const x = d.data() || {}; return { id: d.id, n: String(x.n || ""), t: +x.t || 0 }; }).sort((a, b) => a.t - b.t);
+          const paint = () => {
+            fl.textContent = "";
+            if(!rows.length){ fl.append(el("p", "hint", L("Belum ada pengikut.", "No followers yet."))); return; }
+            rows.forEach(r => {
+              const rw = el("div", "row"), w = el("div", "grow"); w.style.minWidth = "0";
+              w.append(el("p", "pn", r.n || L("Pengguna", "User")));
+              rw.append(mkAv({ name: r.n }), w, mkBtn(L("Hapus", "Remove"), "btn ghost sm danger", async () => {
+                if(!confirm(L("Hapus " + (r.n || "pengikut ini") + " dari pengikut turnamen?", "Remove " + (r.n || "this follower") + " from the followers?"))) return;
+                try{
+                  await m.deleteDoc(m.doc(f, "tournaments", t.oid, "followers", r.id));
+                  rows.splice(rows.indexOf(r), 1); ON.counts[t.oid] = rows.length;
+                  fc.textContent = L("Pengikut: ", "Followers: ") + rows.length; paint();
+                  toast(L("Pengikut dihapus.", "Follower removed."));
+                }catch(e){ toast(errTxt(e)); }
+              }));
+              fl.append(rw);
+            });
+          };
+          paint();
+        }catch(e){ fl.textContent = ""; fl.append(el("p", "hint", errTxt(e))); }
+      });
+      p.append(fb, fl); }
     box.append(p);
     const mp = el("div", "panel stack keep");
     mp.append(el("span", "label", L("MODERATOR", "MODERATORS")), el("p", "hint", L("Ketik ID pengguna (contoh ST-000123). Jika terdaftar, foto profilnya muncul dan kamu bisa mengirim undangan. Orang itu menjadi moderator setelah menerima undangan di tab notifikasinya. Kamu juga bisa mengundang dari daftar Teman (ikon teman di bagian atas): pilih jadikan moderator atau undang jadi pengikut.", "Type a user ID (e.g. ST-000123). If it is registered, their profile photo appears and you can send an invite. They become a moderator after accepting it in their notifications tab. You can also invite from your Friends list (friends icon at the top): make a moderator or invite as a follower.")));
@@ -14428,7 +14458,7 @@ paint();
 </script>
 
 <script type="text/plain" id="src-duel-puzzle"><!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>DUEL PUZZLE</title>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>PUZZLE ARENA</title>
 <style>
 :root{--bg:#0a0c14;--bg2:#161b30;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.1);--text:#f2eee3;--muted:#98a0b5;--gold:#f0b84a;--gold2:#ffd98a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
@@ -14471,9 +14501,12 @@ input{font:inherit;font-weight:700;letter-spacing:.2em;text-align:center;backgro
 #gR{position:fixed;inset:0;z-index:9;background:rgba(5,7,12,.82);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:18px}
 #gR .card{width:100%;max-width:380px;background:var(--bg2);animation:up .3s}@keyframes up{from{opacity:0;transform:translateY(20px)}}
 .tr{font-size:24px;font-weight:800;text-align:center;color:var(--gold2);padding:4px 0}.md{width:28px;text-align:center}
+.lv{display:flex;gap:8px}.lv button{flex:1;padding:10px 4px}
 .noanim *{transition:none!important;animation:none!important}
-</style></head><body><div class="app"><h1>🧩 DUEL PUZZLE</h1><div id="msg"></div>
-<div id="sM" class="panel"><p class="muted">Cocokkan 3+ permen sama. Geser atau ketuk untuk menukar. Main bareng teman lewat kode ruang.</p><button class="go" id="bMk">＋ Buat ruang</button><div class="or">atau gabung ke ruang teman</div><div class="row"><input id="iC" placeholder="KODE" maxlength="5"><button id="bJn">Gabung</button></div></div>
+.pr .kb{margin-left:auto;flex:none;width:auto;padding:4px 10px;font-size:13px;border-radius:10px;background:rgba(224,69,58,.18);border:1px solid rgba(224,69,58,.5);color:#ffb4ac;cursor:pointer}.pr.kq{flex-wrap:wrap}.pr .ka{width:100%;display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.pr .ka button{flex:1;min-width:84px;width:auto;padding:7px 8px;font-size:13px}
+</style></head><body><div class="app"><h1>🧩 PUZZLE ARENA</h1><div id="msg"></div>
+<div id="sM" class="panel"><p class="muted">Cocokkan 3+ permen sama. Geser atau ketuk untuk menukar. Main bareng teman lewat kode ruang.</p><button class="go" id="bMk">＋ Buat ruang</button><div class="or">atau gabung ke ruang teman</div><div class="row"><input id="iC" placeholder="KODE" maxlength="5"><button id="bJn">Gabung</button></div><div class="or">atau main sendiri</div><button id="bCpu">🤖 Lawan Komputer (offline)</button></div>
+<div id="sC" class="panel" hidden><div class="tr" style="font-size:18px">🤖 Lawan Komputer</div><p class="muted">Main offline, tanpa internet dan tanpa login.</p><div class="lt"><b>Mode</b></div><div id="cMd" class="col"></div><div class="lt"><b>Tingkat kesulitan</b></div><div class="lv" id="cLv"></div><button class="go" id="bGo">▶ MULAI</button><button id="bBk">Kembali</button></div>
 <div id="sL" class="panel" hidden><div class="muted">KODE RUANG · ketuk untuk menyalin</div><div class="code" id="lC"></div><div class="lt"><b>Pemain</b><span id="lN"></span></div><div id="lP" class="col"></div><div class="lt"><b>Mode</b></div><div id="lMd" class="col"></div><p class="muted" id="lH"></p><button class="go" id="bSt">▶ MULAI</button><button id="bLv">Keluar</button></div>
 <div id="sG" hidden><div class="panel"><div class="hud"><div id="gT"></div><div id="gS"></div></div><div class="bar"><i id="gB"></i></div><div id="gO" class="col"></div></div><div id="bw"><div id="bd"></div><div id="cb"></div></div><div id="gR" hidden></div></div></div>
 <script>
@@ -14484,15 +14517,15 @@ function $(i){return document.getElementById(i)}
 function ls(k,d){try{var v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}}
 if(ls("dp_anim","true")==="false")document.body.className="noanim";
 function auth(){try{return parent.satuTitikAuth||null}catch(e){return null}}
-function me(){var a=auth();return a&&a.user||null}
-function nm(){var a=auth(),u=me();if(!u)return"";var n=(a.username&&a.usernameUid===u.uid)?a.username:(u.displayName||"");return String(n).replace(/\s+/g," ").trim().slice(0,20)||"Pemain"}
+var OFF=false,BT=null;function me(){var a=auth();return a&&a.user||(OFF?{uid:"me"}:null)}
+function nm(){if(OFF)return"Kamu";var a=auth(),u=me();if(!u)return"";var n=(a.username&&a.usernameUid===u.uid)?a.username:(u.displayName||"");return String(n).replace(/\s+/g," ").trim().slice(0,20)||"Pemain"}
 var FB=null;function lib(){if(FB)return Promise.resolve(FB);var a=auth();if(!a||!a.getDb)return Promise.reject(new Error("nofb"));return a.getDb().then(function(x){return FB=x})}
 function po(o){var P=parent;if(Array.isArray(o)){var a=new P.Array();o.forEach(function(x){a.push(po(x))});return a}if(o&&typeof o==="object"&&Object.getPrototypeOf(o)===Object.prototype){var r=new P.Object();for(var k in o)r[k]=po(o[k]);return r}return o}
 function flash(t){$("msg").textContent=t;setTimeout(function(){if($("msg").textContent===t)$("msg").textContent=""},3500)}
-function show(s){["sM","sL","sG"].forEach(function(i){$(i).hidden=i!==s})}
+function show(s){["sM","sC","sL","sG"].forEach(function(i){$(i).hidden=i!==s})}
 function ms(t){return t&&t.toMillis?t.toMillis():Date.now()}
 function mkr(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-var R={code:"",d:null,ps:{},uR:null,uP:null,mode:"race"},G=null,TM=null;
+var R={code:"",d:null,ps:{},uR:null,uP:null,mode:"race"},G=null,TM=null,KQ="";
 function isHost(){var u=me();return !!(u&&R.d&&R.d.host===u.uid)}
 function plist(){return Object.keys(R.ps).map(function(k){var p=R.ps[k];p.u=k;return p})}
 function rf(db,m,sub,id){return sub?m.doc(db,"dp_rooms",R.code,sub,id):m.doc(db,"dp_rooms",R.code)}
@@ -14500,7 +14533,7 @@ function needLogin(){if(!me()){flash("Masuk dengan Google di Beranda untuk berma
 
 /* ===== ruang ===== */
 async function listen(code){
-  var f=await lib(),m=f.m,db=f.db;R.code=code;R.ps={};
+  var f=await lib(),m=f.m,db=f.db;R.code=code;R.ps={};R.seen=false;R.chk=false;R.leaving=false;
   R.uR=m.onSnapshot(m.doc(db,"dp_rooms",code),function(s){
     if(!s.exists()){if(R.code){flash("Ruang ditutup.");reset()}return}
     R.d=s.data();if(R.d.st==="lobby"||R.d.st===undefined){if(G){G.over=true;clearInterval(TM)}G=null;R.mode=R.d.mode||"race";paintL();show("sL")}
@@ -14508,10 +14541,11 @@ async function listen(code){
   },function(e){flash("Gagal: "+(e&&e.code||e))});
   R.uP=m.onSnapshot(m.collection(db,"dp_rooms",code,"p"),function(s){
     R.ps={};s.forEach(function(x){R.ps[x.id]=x.data()});
+    var mu=me();if(mu&&!OFF&&!R.leaving){if(R.ps[mu.uid])R.seen=true;else if(R.seen&&!R.chk){R.chk=true;gone(code)}}
     if(!G)paintL();else{paintOpp();incoming();check()}
   });
 }
-function reset(){try{R.uR&&R.uR();R.uP&&R.uP()}catch(e){}R.uR=R.uP=null;R.code="";R.d=null;R.ps={};G=null;clearInterval(TM);show("sM")}
+function reset(){try{R.uR&&R.uR();R.uP&&R.uP()}catch(e){}R.uR=R.uP=null;OFF=false;clearInterval(BT);R.seen=R.chk=R.leaving=false;KQ="";R.code="";R.d=null;R.ps={};G=null;clearInterval(TM);show("sM")}
 async function me0(){var f=await lib();return po({n:nm(),j:Date.now(),s:0,pr:0,ro:0,as:0,at:"",lo:false,rd:0,exp:f.m.Timestamp.fromMillis(Date.now()+86400000)})}
 $("bMk").onclick=async function(){
   if(needLogin())return;
@@ -14531,12 +14565,25 @@ $("bJn").onclick=async function(){
     await m.setDoc(m.doc(db,"dp_rooms",c,"p",me().uid),await me0());await listen(c)
   }catch(e){flash("Gagal bergabung.")}
 };
-$("bLv").onclick=async function(){
-  try{var f=await lib(),m=f.m,db=f.db,u=me().uid;
+$("bLv").onclick=async function(){if(OFF){reset();return}
+  R.leaving=true;try{var f=await lib(),m=f.m,db=f.db,u=me().uid;
     if(isHost()){var ps=await m.getDocs(m.collection(db,"dp_rooms",R.code,"p"));await Promise.all(ps.docs.map(function(x){return m.deleteDoc(x.ref)}));await m.deleteDoc(m.doc(db,"dp_rooms",R.code))}
     else await m.deleteDoc(m.doc(db,"dp_rooms",R.code,"p",u))}catch(e){}
   reset()
 };
+async function gone(code){
+  try{var f=await lib(),m=f.m,r=await m.getDoc(m.doc(f.db,"dp_rooms",code));
+    if(R.code!==code||R.leaving){R.chk=false;return}
+    if(!r.exists()){R.chk=false;return}
+    flash("Kamu dikeluarkan oleh pemilik ruang.");reset()
+  }catch(e){R.chk=false}}
+async function kick(u,ban,n){
+  if(!R.code||!u||!me()||u===me().uid||!isHost())return;
+  try{var f=await lib(),m=f.m,db=f.db,bo=true;
+    if(ban){try{await m.updateDoc(rf(db,m),po({kk:m.arrayUnion(u)}))}catch(e){bo=false}}
+    await m.deleteDoc(rf(db,m,"p",u));
+    flash((n||"Pemain")+" dikeluarkan."+(ban?(bo?" Tidak bisa gabung lagi.":" (Gagal memblokir.)"):""))
+  }catch(e){flash("Gagal mengeluarkan pemain.")}}
 function paintL(){
   var h=isHost();$("lC").textContent=R.code;var d=R.d||{};
   $("lP").innerHTML="";plist().sort(function(a,b){return a.j-b.j}).forEach(function(p){var e=document.createElement("div");e.className="pl";e.textContent=p.n+(p.u===d.host?" 👑":"")+(p.u===me().uid?" (kamu)":"");$("lP").appendChild(e)});
@@ -14583,9 +14630,9 @@ function settle(){
     if(G.rocks>=MAXR){G.dead=true}}
   if(!hasMove(G.b)){for(var t=0;t<30;t++){var a=[];G.b.forEach(function(v,i){if(v!==ROCK)a.push(i)});var v=a.map(function(i){return G.b[i]});for(var i=v.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),q=v[i];v[i]=v[j];v[j]=q}a.forEach(function(k,i){G.b[k]=v[i]});if(!Object.keys(finds(G.b).s).length&&hasMove(G.b))break}}
   G.busy=false;draw();push(G.dead||G.score>=3000||G.urg);G.urg=0;hud();check()}
-async function pushNow(){try{var f=await lib(),m=f.m,u=me().uid,o={n:nm(),j:R.ps[u]&&R.ps[u].j||Date.now(),s:G.score,pr:Math.min(100,Math.floor(G.score/30)),ro:G.rocks,as:G.as,at:G.at,lo:!!G.dead,rd:G.rd,exp:m.Timestamp.fromMillis(Date.now()+86400000)};
+async function pushNow(){try{var f=OFF?{m:{serverTimestamp:function(){var t=Date.now();return{toMillis:function(){return t}}}}}:await lib(),m=f.m,u=me().uid,o={n:nm(),j:R.ps[u]&&R.ps[u].j||Date.now(),s:G.score,pr:Math.min(100,Math.floor(G.score/30)),ro:G.rocks,as:G.as,at:G.at,lo:!!G.dead,rd:G.rd,exp:m.Timestamp.fromMillis(Date.now()+86400000)};
   if(o.pr>=100&&d0().mode==="race"&&!G.ft){G.ft=1;o.ft=m.serverTimestamp()}else if(G.ft&&R.ps[u]&&R.ps[u].ft)o.ft=R.ps[u].ft;
-  await m.setDoc(m.doc(f.db,"dp_rooms",R.code,"p",u),po(o))}catch(e){}}
+  if(OFF){R.ps[u]=o;check();return}await m.setDoc(m.doc(f.db,"dp_rooms",R.code,"p",u),po(o))}catch(e){}}
 function d0(){return R.d||{}}
 function push(urg){if(!G)return;var n=Date.now();if(urg||n-(G.lp||0)>=2500){G.lp=n;clearTimeout(G.pt);G.pt=0;return pushNow()}if(!G.pt)G.pt=setTimeout(function(){G.pt=0;if(G&&!G.over){G.lp=Date.now();pushNow()}},2500-(n-G.lp))}
 function incoming(){if(!G||G.over||G.dead)return;var u=me().uid;plist().forEach(function(p){if(p.u!==u&&p.rd===G.rd&&p.at===u){var seen=G.seen[p.u]||0;if(p.as>seen){G.pend+=p.as-seen;G.seen[p.u]=p.as}}});if(!G.busy&&G.pend>0)settle0()}
@@ -14598,12 +14645,12 @@ function startGame(){
   G.b=fresh();$("bd").innerHTML="";$("gR").hidden=true;show("sG");draw();hud();push(true);
   TM=setInterval(function(){hud();check()},400)}
 function hud(){if(!G)return;if(G.end<=Date.now()&&!G.fin&&R.d.mode!=="race"){G.fin=1;push(true)}var d=R.d,left=Math.max(0,Math.ceil((G.end-Date.now())/1000)),pr=Math.min(100,Math.floor(G.score/30));
-  $("gT").textContent=MODES[d.mode]+(d.mode==="race"?"":" · "+left+"s");$("gS").textContent=d.mode==="duel"?"🪨 "+G.rocks+"/"+MAXR+(G.pend?" (+"+G.pend+")":""):d.mode==="race"?pr+"%":G.score;
+  $("gT").textContent=d.mode==="race"?"Kamu":MODES[d.mode]+" · "+left+"s";$("gS").textContent=d.mode==="duel"?"🪨 "+G.rocks+"/"+MAXR+(G.pend?" (+"+G.pend+")":""):d.mode==="race"?pr+"%":G.score;
   $("gB").style.width=(d.mode==="duel"?Math.min(100,G.rocks*100/MAXR):d.mode==="race"?pr:Math.min(100,left*100/d.dur))+"%";paintOpp()}
 function paintOpp(){if(!G)return;var d=R.d,o=$("gO");o.innerHTML="";plist().filter(function(p){return p.u!==me().uid}).forEach(function(p){
   var e=document.createElement("div");e.className="pl";var v=p.rd!==G.rd?0:d.mode==="duel"?p.ro:d.mode==="race"?p.pr:p.s,t=d.mode==="duel"?"🪨"+v+(p.lo?" ☠":""):d.mode==="race"?v+"%":v;
   e.innerHTML="<span></span><div class=bar><i></i></div><span></span>";e.children[0].textContent=p.n.slice(0,10);e.children[2].textContent=t;e.querySelector("i").style.width=(d.mode==="duel"?Math.min(100,v*5):d.mode==="race"?v:Math.min(100,v/30))+"%";o.appendChild(e)})}
-function check(){if(!G||G.over)return;var d=R.d,ps=plist().filter(function(p){return p.rd===G.rd}),r=null,timeUp=Date.now()>=G.end+3000&&d.mode!=="race";
+function check(){if(!G||G.over)return;var d=R.d,ps=plist().filter(function(p){return p.rd===G.rd}),r=null,timeUp=Date.now()>=G.end+(OFF?0:3000)&&d.mode!=="race";
   if(d.mode==="race"){var w=ps.filter(function(p){return p.pr>=100&&p.ft}).sort(function(a,b){return ms(a.ft)-ms(b.ft)});if(w.length)r=ps.slice().sort(function(a,b){return (b.ft?1:0)-(a.ft?1:0)||ms(a.ft)-ms(b.ft)||b.pr-a.pr})}
   else if(d.mode==="score"){if(timeUp)r=ps.slice().sort(function(a,b){return b.s-a.s})}
   else{var al=ps.filter(function(p){return !p.lo});if((ps.length>1&&al.length<=1)||timeUp||(G.dead&&!ps.length))r=ps.slice().sort(function(a,b){return (a.lo?1:0)-(b.lo?1:0)||a.ro-b.ro||b.s-a.s})}
@@ -14620,7 +14667,10 @@ var MI={race:["🏁","Balap 100%","Pertama mencapai 100% menang · 2–5 pemain"
 function av(n,i){var a=document.createElement("span");a.className="av";a.style.background=CO[i%5];a.textContent=(n||"?").charAt(0).toUpperCase();return a}
 function paintL(){var h=isHost(),d=R.d||{},md0=d.mode||"race",ps=plist().sort(function(a,b){return a.j-b.j}),np=ps.length,cap=md0==="duel"?2:5,L=$("lP");
   $("lC").textContent=R.code;$("lC").onclick=function(){try{navigator.clipboard.writeText(R.code);flash("Kode disalin.")}catch(e){}};$("lN").textContent=np+"/"+cap;L.innerHTML="";
-  ps.forEach(function(p,i){var e=document.createElement("div");e.className="pr";var n=document.createElement("span");n.textContent=p.n+(p.u===me().uid?" (kamu)":"");var t=document.createElement("em");t.textContent=p.u===d.host?"👑":"";e.appendChild(av(p.n,i));e.appendChild(n);e.appendChild(t);L.appendChild(e)});
+  ps.forEach(function(p,i){var e=document.createElement("div");e.className="pr";var n=document.createElement("span");n.textContent=p.n+(p.u===me().uid?" (kamu)":"");var t=document.createElement("em");t.textContent=p.u===d.host?"👑":"";e.appendChild(av(p.n,i));e.appendChild(n);
+    if(h&&p.u!==me().uid){var kb=document.createElement("button");kb.className="kb";kb.textContent="✕ Keluarkan";kb.onclick=function(){KQ=KQ===p.u?"":p.u;paintL()};e.appendChild(kb);
+      if(KQ===p.u){e.classList.add("kq");var ka=document.createElement("div");ka.className="ka";[["Keluarkan",false],["Keluarkan & blokir",true],["Batal",null]].forEach(function(o){var b=document.createElement("button");b.textContent=o[0];b.onclick=function(ev){ev.stopPropagation();KQ="";if(o[1]===null){paintL();return}kick(p.u,o[1],p.n)};ka.appendChild(b)});e.appendChild(ka)}}
+    else e.appendChild(t);L.appendChild(e)});
   var md=$("lMd");md.innerHTML="";Object.keys(MI).forEach(function(k){var b=document.createElement("button");b.className="mc"+(k===md0?" on":"");b.disabled=!h||(k==="duel"&&np>2);b.innerHTML="<i></i><div><b></b><small></small></div>";b.querySelector("i").textContent=MI[k][0];b.querySelector("b").textContent=MI[k][1];b.querySelector("small").textContent=MI[k][2];b.onclick=async function(){var f=await lib();f.m.updateDoc(rf(f.db,f.m),po({mode:k}))};md.appendChild(b)});
   $("lH").textContent=HINT[md0]+(h?"":" Menunggu pemilik ruang…");
   var okp=md0==="duel"?np===2:(np>=2&&np<=5);$("bSt").hidden=!h;$("bSt").disabled=!okp;$("bSt").textContent=okp?"▶ MULAI":(md0==="duel"?"Serang Balik butuh tepat 2 pemain":(np<2?"Butuh min. 2 pemain":"Maks. 5 pemain"))}
@@ -14635,7 +14685,7 @@ function paintOpp(){if(!G)return;var d=R.d,o=$("gO");o.innerHTML="";plist().filt
 function end(r){G.over=true;clearInterval(TM);var d=R.d,win=r[0],box=$("gR"),c=document.createElement("div");box.hidden=false;box.innerHTML="";c.className="card panel";
   var h=document.createElement("div");h.className="tr";h.textContent=win&&win.u===me().uid?"🏆 Kamu menang!":"🏁 "+(win?win.n:"-")+" menang";c.appendChild(h);
   r.forEach(function(p,i){var e=document.createElement("div");e.className="pr";var m=document.createElement("span");m.className="md";m.textContent=["🥇","🥈","🥉"][i]||(i+1);var n=document.createElement("span");n.textContent=p.n+(p.u===me().uid?" (kamu)":"");var v=document.createElement("b");v.textContent=d.mode==="race"?p.pr+"%":d.mode==="score"?p.s:(p.lo?"☠ ":"")+"🪨"+p.ro;e.appendChild(m);e.appendChild(n);e.appendChild(v);c.appendChild(e)});
-  if(isHost()){var b=document.createElement("button");b.className="go";b.textContent="Main lagi";b.onclick=async function(){var f=await lib();f.m.updateDoc(rf(f.db,f.m),po({st:"lobby"}))};c.appendChild(b)}
+  if(isHost()){var b=document.createElement("button");b.className="go";b.textContent="Main lagi";b.onclick=OFF?function(){box.hidden=true;box.innerHTML="";startCpu(CP.mode,CP.lv)}:async function(){var f=await lib();f.m.updateDoc(rf(f.db,f.m),po({st:"lobby"}))};c.appendChild(b)}
   else{var p0=document.createElement("p");p0.className="muted";p0.textContent="Menunggu pemilik ruang…";c.appendChild(p0)}
   var l=document.createElement("button");l.textContent="Keluar";l.onclick=function(){$("bLv").onclick()};c.appendChild(l);box.appendChild(c)}
 (function(){var bd=$("bd"),sx=0,sy=0,si=-1;
@@ -14643,7 +14693,45 @@ function end(r){G.over=true;clearInterval(TM);var d=R.d,win=r[0],box=$("gR"),c=d
   bd.addEventListener("pointerup",function(e){if(si<0||!G)return;var dx=e.clientX-sx,dy=e.clientY-sy,a=si,hz=Math.abs(dx)>Math.abs(dy),b;si=-1;
     if(Math.abs(dx)<14&&Math.abs(dy)<14){tap(a);return}
     b=hz?a+(dx>0?1:-1):a+(dy>0?8:-8);if(b<0||b>63||(hz&&(b/8|0)!==(a/8|0)))return;G.sel=a;tap(b)})})();
-window.__dpInviteCtx=function(){return R.code?{g:"dp",code:R.code,pl:Object.keys(R.ps),n:Object.keys(R.ps).length}:null};
+
+/* ===== OFFLINE: lawan komputer ===== */
+var CP={mode:"race",lv:"m"},SK={e:[3200,.7,.25],m:[2400,1,.35],h:[1700,1.3,.5]};
+function paintC(){var md=$("cMd"),lv=$("cLv");md.innerHTML="";lv.innerHTML="";
+  Object.keys(MI).forEach(function(k){var b=document.createElement("button");b.className="mc"+(k===CP.mode?" on":"");b.innerHTML="<i></i><div><b></b><small></small></div>";b.querySelector("i").textContent=MI[k][0];b.querySelector("b").textContent=MI[k][1];b.querySelector("small").textContent=HINT[k];b.onclick=function(){CP.mode=k;paintC()};md.appendChild(b)});
+  [["e","😊 Mudah"],["m","😎 Sedang"],["h","🔥 Sulit"]].forEach(function(x){var b=document.createElement("button");b.textContent=x[1];b.className=CP.lv===x[0]?"go":"";b.onclick=function(){CP.lv=x[0];paintC()};lv.appendChild(b)})}
+function startCpu(mode,lv){clearInterval(BT);OFF=true;CP.mode=mode;CP.lv=lv;R.code="CPU";
+  R.d={host:"me",hn:"Kamu",st:"play",mode:mode,seed:1+Math.floor(Math.random()*1e9),rd:1,dur:mode==="duel"?150:90};
+  R.ps={cpu:{n:"Komputer",j:2,s:0,pr:0,ro:0,as:0,at:"",lo:false,rd:1},me:{n:"Kamu",j:1,s:0,pr:0,ro:0,as:0,at:"",lo:false,rd:1}};
+  startGame();var k=SK[lv],B=R.ps.cpu,seen=0;
+  BT=setInterval(function(){if(!G||G.over||B.lo)return;var d=R.d,m0=R.ps.me;
+    B.s+=Math.round((40+Math.random()*80)*k[1]);B.pr=Math.min(100,Math.floor(B.s/30));
+    if(d.mode==="race"&&B.pr>=100&&!B.ft){var t=Date.now();B.ft={toMillis:function(){return t}}}
+    if(d.mode==="duel"){
+      if(m0&&m0.at==="cpu"&&m0.as>seen){B.ro+=m0.as-seen;seen=m0.as}
+      if(Math.random()<.6)B.ro=Math.max(0,B.ro-Math.floor(Math.random()*3));
+      if(Math.random()<k[2]){B.as+=Math.random()<.3?2:1;B.at="me"}
+      if(B.ro>=MAXR)B.lo=true}
+    paintOpp();check()},k[0])}
+$("bCpu").onclick=function(){paintC();show("sC")};$("bBk").onclick=function(){show("sM")};$("bGo").onclick=function(){startCpu(CP.mode,CP.lv)};
+window.__dpInviteCtx=function(){try{if(OFF||!R.code||R.code==="CPU"||!R.d||!isHost())return null;if(R.d.st&&R.d.st!=="lobby")return null;var pl=Object.keys(R.ps);return{g:"dp",code:R.code,cap:R.d.mode==="duel"?2:5,pl:pl,n:pl.length}}catch(e){return null}};
+window.__dpJoin=async function(code){
+  code=String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,5);
+  if(code.length!==5)return "stop";
+  var nap=function(t){return new Promise(function(r){setTimeout(r,t)})},w;
+  for(w=0;w<20&&!me();w++)await nap(300);
+  if(!me())return false;
+  try{var f=await lib(),m=f.m,db=f.db,u=me().uid;
+    if(R.code===code&&!OFF&&(await m.getDoc(m.doc(db,"dp_rooms",code,"p",u))).exists())return true;
+    if(R.code){if(OFF)reset();else await $("bLv").onclick()}
+    var r=await m.getDoc(m.doc(db,"dp_rooms",code));
+    if(!r.exists()){flash("Ruangan sudah ditutup.");return "stop"}
+    var rm=r.data();
+    if((rm.kk||[]).indexOf(u)>=0){flash("Kamu dikeluarkan dari ruang ini.");return "stop"}
+    var ps=await m.getDocs(m.collection(db,"dp_rooms",code,"p")),mine=false;ps.forEach(function(x){if(x.id===u)mine=true});
+    if(!mine&&ps.size>=(rm.mode==="duel"?2:5)){flash("Ruang penuh.");return "stop"}
+    await m.setDoc(m.doc(db,"dp_rooms",code,"p",u),await me0());await listen(code);return true
+  }catch(e){return false}};
+(function pend(){try{var P=parent,v=P&&P.__dpPendingRoom;if(v&&v.code){if(Date.now()-(+v.at||0)>=90000)P.__dpPendingRoom=null;else if(document.readyState==="complete"&&me()){P.__dpPendingRoom=null;window.__dpJoin(v.code).then(function(ok){if(ok===false){try{P.__dpPendingRoom=v}catch(e){}}},function(){try{P.__dpPendingRoom=v}catch(e){}})}}}catch(e){}setTimeout(pend,700)})();
 })();
 </scr@@ipt></body></html>
 </script>
@@ -17059,7 +17147,7 @@ const NSRC = (() => {
           if(ch.type === "removed") return;
           const x = ch.doc.data() || {}, st = x.status; if(st !== "accepted" && st !== "declined") return;
           const who = String(x.toName || x.toAccountId || "Pengguna"), nm = String(x.tName || "Turnamen"), ts = +x.at || Date.now(), yes = st === "accepted", fl = x.kind === "follow", rm = x.kind === "room";
-          n.add({ id: "ir_" + ch.doc.id + "_" + st + "_" + ts, type: "invite", ts, read: ts < Date.now() - 14 * 864e5, act: { menu: rm ? (String(x.tName || "").indexOf("Arisan · ") === 0 ? "acak-nama" : "tebak-inisial") : "turnamen" },
+          n.add({ id: "ir_" + ch.doc.id + "_" + st + "_" + ts, type: "invite", ts, read: ts < Date.now() - 14 * 864e5, act: { menu: rm ? (String(x.tName || "").indexOf("Arisan · ") === 0 ? "acak-nama" : String(x.tName || "").indexOf("Puzzle Arena · ") === 0 ? "duel-puzzle" : "tebak-inisial") : "turnamen" },
             title: yes ? { id: "Undangan diterima", en: "Invitation accepted" } : { id: "Undangan ditolak", en: "Invitation declined" },
             body: rm ? (yes ? { id: who + " bergabung ke ruangan " + nm + ".", en: who + " joined the " + nm + " room." } : { id: who + " menolak ajakan ke ruangan " + nm + ".", en: who + " declined the invitation to the " + nm + " room." })
                 : yes ? { id: who + " menerima undangan " + (fl ? "mengikuti" : "moderator") + " turnamen \"" + nm + "\".", en: who + " accepted the " + (fl ? "follower" : "moderator") + " invitation for \"" + nm + "\"." }
@@ -17072,7 +17160,7 @@ const NSRC = (() => {
   const invTx = (x, st) => {
     const nm = String(x.tName || "Turnamen"), ow = String(x.ownerName || "Admin"), fl = x.kind === "follow";
     if(x.kind === "room"){
-      const cd = String(x.oid || ""), isAn = String(x.tName || "").indexOf("Arisan · ") === 0, rn = isAn ? "Arisan \"" + String(x.tName).slice(9) + "\" (" + cd + ")" : "Tebak Inisial (" + cd + ")";
+      const cd = String(x.oid || ""), isAn = String(x.tName || "").indexOf("Arisan · ") === 0, isDp = String(x.tName || "").indexOf("Puzzle Arena · ") === 0, rn = isAn ? "Arisan \"" + String(x.tName).slice(9) + "\" (" + cd + ")" : isDp ? "Puzzle Arena (" + cd + ")" : "Tebak Inisial (" + cd + ")";
       if(st === "accepted") return { title: { id: "Undangan diterima", en: "Invitation accepted" }, body: { id: "Kamu bergabung ke ruangan " + rn + ".", en: "You joined the " + rn + " room." } };
       if(st === "declined") return { title: { id: "Undangan ditolak", en: "Invitation declined" }, body: { id: "Kamu menolak ajakan ke ruangan " + rn + ".", en: "You declined the invitation to the " + rn + " room." } };
       if(st === "cancelled") return { title: { id: "Undangan dibatalkan", en: "Invitation cancelled" }, body: { id: ow + " membatalkan ajakan ke ruangan " + rn + ".", en: ow + " cancelled the invitation to the " + rn + " room." } };
@@ -17115,6 +17203,17 @@ const NSRC = (() => {
     window.__anPendingRoom = { code, at: Date.now() };
     location.hash = "acak-nama";
   };
+  window.satuTitikJoinPuzzle = function(code){
+    code = String(code || "");
+    try{ const f = document.getElementById("frame"), v = document.getElementById("view"), w = f && v && !v.hidden ? f.contentWindow : null;
+      if(w && typeof w.__dpJoin === "function"){
+        const keep = { code, at: Date.now() };
+        Promise.resolve(w.__dpJoin(code)).then(ok => { if(ok === false) window.__dpPendingRoom = keep; }, () => { window.__dpPendingRoom = keep; });
+        return;
+      } }catch(e){}
+    window.__dpPendingRoom = { code, at: Date.now() };
+    location.hash = "duel-puzzle";
+  };
   async function respond(n, accept){
     try{
       const u = A.user, acc = A.accountId;
@@ -17124,7 +17223,7 @@ const NSRC = (() => {
       const rm = n.inv.kind === "room";
       if(accept && !fl && !rm && !acc) return { ok: false, err: "id" };
       if(accept && rm){   /* ruangan harus masih ada */
-        const { m: m0, db: d0 } = await A.getDb(), rs = await m0.getDoc(m0.doc(d0, String(n.inv.tName || "").indexOf("Arisan · ") === 0 ? "an_rooms" : "ti_rooms", n.inv.oid));
+        const { m: m0, db: d0 } = await A.getDb(), rs = await m0.getDoc(m0.doc(d0, (function(t){ return t.indexOf("Arisan · ") === 0 ? "an_rooms" : t.indexOf("Puzzle Arena · ") === 0 ? "dp_rooms" : "ti_rooms"; })(String(n.inv.tName || "")), n.inv.oid));
         if(!rs.exists()) return { ok: false, err: "ruangan sudah ditutup" };
       }
       const { m, db } = await A.getDb(), b = m.writeBatch(db);
@@ -17137,7 +17236,7 @@ const NSRC = (() => {
       try{ window.stPush && window.stPush("invite_reply", { iid: n.inv.docId }); }catch(e){}
       if(accept && rm){
         try{ const bb = document.getElementById("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click(); }catch(e){}
-        try{ if(String(n.inv.tName || "").indexOf("Arisan · ") === 0) window.satuTitikJoinArisan(n.inv.oid); else window.satuTitikJoinRoom(n.inv.oid); }catch(e){}
+        try{ { const tn = String(n.inv.tName || ""); if(tn.indexOf("Arisan · ") === 0) window.satuTitikJoinArisan(n.inv.oid); else if(tn.indexOf("Puzzle Arena · ") === 0) window.satuTitikJoinPuzzle(n.inv.oid); else window.satuTitikJoinRoom(n.inv.oid); } }catch(e){}
       } else if(accept){
         try{ const bb = document.getElementById("bellBtn"); if(bb && bb.getAttribute("aria-expanded") === "true") bb.click(); }catch(e){}
         try{ window.satuTitikOpenTournaments(n.inv.oid); }catch(e){}
@@ -17658,6 +17757,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     try{ const f = $("frame"), v = $("view"); if(f && v && !v.hidden && f.contentWindow){
       if(typeof f.contentWindow.__tiInviteCtx === "function"){ const c = f.contentWindow.__tiInviteCtx(); if(c) return c; }
       if(typeof f.contentWindow.__anInviteCtx === "function") return f.contentWindow.__anInviteCtx();
+      if(typeof f.contentWindow.__dpInviteCtx === "function") return f.contentWindow.__dpInviteCtx();
     } }catch(e){}
     return null;
   }
@@ -17665,9 +17765,9 @@ if(navigator.onLine !== false) init().catch(() => {});
   async function inviteRoom(rc, r){
     const a = A(), u = a && a.user; if(!u) throw new Error("e_fail");
     if(r.acc === myAcc()) throw new Error("e_invself");
-    const { m, db } = await a.getDb(), id = (rc.g === "an" ? "an_" : "ti_") + rc.code + "_" + r.acc, ref = m.doc(db, "invites", id);
+    const { m, db } = await a.getDb(), id = (rc.g === "an" ? "an_" : rc.g === "dp" ? "dp_" : "ti_") + rc.code + "_" + r.acc, ref = m.doc(db, "invites", id);
     /* pemain yang dikeluarkan dengan opsi larang bergabung (daftar kk di dokumen ruangan) tidak bisa diundang lagi */
-    try{ const rs = await m.getDoc(m.doc(db, rc.g === "an" ? "an_rooms" : "ti_rooms", rc.code)), kk = rs.exists() ? (rs.data() || {}).kk : null; if(Array.isArray(kk) && kk.indexOf(r.uid) >= 0) throw new Error("e_banned"); }
+    try{ const rs = await m.getDoc(m.doc(db, rc.g === "an" ? "an_rooms" : rc.g === "dp" ? "dp_rooms" : "ti_rooms", rc.code)), kk = rs.exists() ? (rs.data() || {}).kk : null; if(Array.isArray(kk) && kk.indexOf(r.uid) >= 0) throw new Error("e_banned"); }
     catch(e){ if(e && e.message === "e_banned") throw e; }
     const ex = await m.getDoc(ref);
     if(ex.exists()){
@@ -17676,11 +17776,11 @@ if(navigator.onLine !== false) init().catch(() => {});
       await m.deleteDoc(ref);
     }
     const nm = String((a.username && a.usernameUid === u.uid ? a.username : "") || u.displayName || u.email || "");
-    await m.setDoc(ref, { oid: rc.code, kind: "room", tName: rc.g === "an" ? "Arisan · " + String(rc.name || rc.code).slice(0, 30) : "Tebak Inisial · " + rc.code, ownerUid: u.uid, ownerName: nm, toUid: r.uid, toAccountId: r.acc, toName: nameOf(r.acc), status: "pending", ts: Date.now() });
+    await m.setDoc(ref, { oid: rc.code, kind: "room", tName: rc.g === "an" ? "Arisan · " + String(rc.name || rc.code).slice(0, 30) : rc.g === "dp" ? "Puzzle Arena · " + rc.code : "Tebak Inisial · " + rc.code, ownerUid: u.uid, ownerName: nm, toUid: r.uid, toAccountId: r.acc, toName: nameOf(r.acc), status: "pending", ts: Date.now() });
     try{ window.stPush && window.stPush("invite", { iid: id }); }catch(e){}
   }
   function roomBar(r, t, c){
-    const bar = mk("div", "frinv"), o = invOut[(c.g === "an" ? "an_" : "ti_") + c.code + "_" + r.acc], inRoom = c.pl.includes(r.uid), pend = !!o && o.st === "pending" && Date.now() - o.ts < 600000, full = c.n >= (c.g === "an" ? 60 : 8);
+    const bar = mk("div", "frinv"), o = invOut[(c.g === "an" ? "an_" : c.g === "dp" ? "dp_" : "ti_") + c.code + "_" + r.acc], inRoom = c.pl.includes(r.uid), pend = !!o && o.st === "pending" && Date.now() - o.ts < 600000, full = c.n >= (c.cap || (c.g === "an" ? 60 : 8));
     const label = inRoom ? t.invRin : pend ? t.invW : full ? t.invRf : (o ? t.invFd : t.invR);
     bar.appendChild(btn(label, "ok sm", () => run("invRok", async () => { await inviteRoom(c, r); }), inRoom || pend || full));
     return bar;
