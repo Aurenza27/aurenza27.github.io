@@ -11944,7 +11944,7 @@ function drawRoute(cv, pts){
 function mapCanvas(pts){ const c = el("canvas", "map"); requestAnimationFrame(() => drawRoute(c, pts)); return c; }
 
 /* ===== perekaman ===== */
-const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, jc:0, cand:null, ap:0, apSince:0, stillT:0, pz:0, gt0:0, kf:null, coarse:0, mock:0, eg:0, ed:0, amax:null, aLast:null, altN:0, altRef:null, altSm:null, rdy:false};
+const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, jc:0, cand:null, ap:0, apSince:0, stillT:0, apA:null, apGo:0, apFc:0, apSpdMax:0, apHold:false, pz:0, gt0:0, kf:null, coarse:0, mock:0, eg:0, ed:0, amax:null, aLast:null, altN:0, altRef:null, altSm:null, rdy:false};
 if(!SP[rec.sp]) rec.sp = "run";
 let gpsId = null, nat = false, natN = false, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
 /* AUTO-JEDA: saat diam, jam berhenti (waktu bergerak). rec.ap = total ms auto-jeda pada segmen ini, rec.apSince = awal auto-jeda yang sedang berjalan (0 = tidak),
@@ -11955,19 +11955,44 @@ const apOpen = () => rec.apSince ? Math.max(0, Date.now() - rec.apSince) : 0;
    (Perangkat tanpa GPS: rdy langsung true, waktu tetap berjalan untuk Input jarak manual.) */
 const elapsed = () => rec.acc + (rec.st === "run" && rec.rdy ? Math.max(0, Date.now() - rec.t0 - rec.ap - apOpen()) : 0);
 const pzMs = () => rec.pz + (rec.st === "run" ? rec.ap + apOpen() : 0);
-const AP_STOP = {run:0.5, walk:0.4, ride:1.0, hike:0.3}, AP_GO = {run:1.0, walk:0.8, ride:1.5, hike:0.6};
-function apStep(spd, t, accepted, gap){
+const AP_STOP = {run:0.5, walk:0.4, ride:1.0, hike:0.3}, AP_GO = {run:1.0, walk:0.7, ride:1.5, hike:0.5};
+/* AUTO-JEDA (v2): jangan bergantung pada titik yang "diterima". Versi lama gagal saat kecepatan GPS kosong: goyangan GPS saat istirahat
+   terus diterima sebagai gerak, jadi jam dan jarak jalan terus.
+   - Kecepatan GPS terpercaya (angka, akurasi <= 25 m, dan perangkat memang pernah melapor kecepatan > 0): gerak = kecepatan >= AP_STOP pada 2 titik
+     berturut-turut. Tidak ada gerak 10 detik = auto-jeda (jam dihitung berhenti sejak gerak terakhir). Lanjut = kecepatan >= AP_GO pada 2 titik berturut-turut.
+   - Kecepatan kosong / tidak terpercaya: posisi mentah dibandingkan dengan sebuah jangkar. Bertahan 20 detik di dalam lingkaran (radius ~2x akurasi)
+     = auto-jeda. Lanjut = keluar dari lingkaran lebih jauh (radius ~2,5x akurasi) pada 3 titik berturut-turut.
+   - Selama jeda (dan 8-20 detik terakhir sebelum jeda pada mode kecepatan kosong) tidak ada titik rute dan jarak yang ditambah; jarak dihitung lagi sejak titik pertama setelah lanjut. */
+function apWatch(la, lo, acc, spd, t){
+  rec.apHold = false;
   if(!apOn()) return;
-  const known = typeof spd === "number" && isFinite(spd) && spd >= 0;
-  if(rec.apSince){
-    /* lanjut otomatis: titik gerak yang diterima, dengan kecepatan GPS cukup (atau dua titik gerak berdekatan bila kecepatan tidak tersedia) */
-    if(accepted && (known ? spd >= AP_GO[rec.sp] : gap <= 8)){ rec.ap += Math.max(0, t - rec.apSince); rec.apSince = 0; rec.stillT = 0; }
+  const raw = typeof spd === "number" && isFinite(spd) && spd >= 0;
+  if(raw && spd > rec.apSpdMax) rec.apSpdMax = spd;
+  /* kecepatan dianggap terpercaya hanya bila perangkat memang pernah melapor kecepatan > 0 (ada perangkat yang selalu melapor 0) */
+  const known = raw && acc <= 25 && rec.apSpdMax >= 0.3;
+  const a = rec.apA;
+  if(!a){ rec.apA = {la:la, lo:lo, t:t, acc:acc}; rec.apFc = 0; rec.apGo = 0; return; }
+  const dd = hav(a.la, a.lo, la, lo), ar = Math.max(a.acc, acc);
+  if(!rec.apSince){
+    if(known){
+      rec.apFc = spd >= AP_STOP[rec.sp] ? rec.apFc + 1 : 0;
+      if(rec.apFc >= 2){ rec.apA = {la:la, lo:lo, t:t, acc:acc}; rec.apFc = 0; return; }
+      if(t - a.t >= 10000){ rec.apSince = Math.max(rec.t0, a.t); rec.apFc = 0; rec.apGo = 0; }
+      return;
+    }
+    rec.apFc = 0;
+    if(dd > Math.min(35, Math.max(10, 2 * ar))){ rec.apA = {la:la, lo:lo, t:t, acc:acc}; return; }
+    a.la += 0.15 * (la - a.la); a.lo += 0.15 * (lo - a.lo); a.acc = Math.min(a.acc, acc);   /* jangkar dirata-rata pelan */
+    if(t - a.t >= 30000){ rec.apSince = Math.max(rec.t0, a.t); rec.apFc = 0; rec.apGo = 0; }
+    else if(t - a.t >= 8000) rec.apHold = true;   /* kemungkinan besar diam: goyangan GPS belum dihitung sebagai jarak */
     return;
   }
-  const still = !accepted && (known ? (spd < AP_STOP[rec.sp] && gap >= 5) : gap >= 15);
-  if(!still){ rec.stillT = 0; return; }
-  if(!rec.stillT){ rec.stillT = t; return; }
-  if(t - rec.stillT >= 4000){ rec.apSince = Math.max(rec.t0, t - gap * 1000); rec.stillT = 0; }   /* mulai dihitung dari titik gerak terakhir */
+  /* sedang auto-jeda: apGo = titik berturut-turut dengan kecepatan cukup, apFc = titik berturut-turut yang jauh dari jangkar */
+  rec.apGo = (known && spd >= AP_GO[rec.sp]) ? rec.apGo + 1 : 0;
+  const far = dd >= (known ? Math.min(50, Math.max(20, 3 * ar)) : Math.min(40, Math.max(15, 2.5 * ar)));
+  rec.apFc = far ? rec.apFc + 1 : 0;
+  if(rec.apGo < 2 && rec.apFc < 3) return;
+  rec.ap += Math.max(0, t - rec.apSince); rec.apSince = 0; rec.apA = {la:la, lo:lo, t:t, acc:acc}; rec.apGo = 0; rec.apFc = 0; rec.stillT = 0;
 }
 /* TANJAKAN: total naik (m) dari altitude GPS. Altitude GPS HP kasar (sering meleset belasan meter dan kadang melonjak sesaat), jadi disaring median 9 titik
    (membuang lonjakan), dihaluskan (EMA 0,05), lalu hanya dihitung bila naik >= 10 m dari titik acuan terakhir. Diuji dengan simulasi data GPS buatan. Hasilnya PERKIRAAN. altN = jumlah titik beraltitude; tanjakan baru disimpan bila cukup titik (>= 10). */
@@ -12067,9 +12092,10 @@ function onFix(pos){
     return;
   }
   rec.jc = 0; rec.cand = null;
-  if(d < Math.min(15, Math.max(3, acc / 2))){ apStep(spd, t, false, dt); updateLive(); return; }   /* getaran saat diam: abaikan, jarak terkumpul sampai cukup jauh */
-  if(typeof spd === "number" && isFinite(spd) && spd >= 0 && spd < 0.4 && d < 15){ apStep(spd, t, false, dt); updateLive(); return; }   /* kecepatan GPS ~0: diam */
-  apStep(spd, t, true, dt);
+  apWatch(c.latitude, c.longitude, acc, spd, t);   /* auto-jeda dinilai dari posisi mentah */
+  if(rec.apSince || rec.apHold){ updateLive(); return; }   /* sedang (atau hampir) auto-jeda: titik rute dan jarak tidak ditambah */
+  if(d < Math.min(15, Math.max(3, acc / 2))){ updateLive(); return; }   /* getaran saat diam: abaikan, jarak terkumpul sampai cukup jauh */
+  if(typeof spd === "number" && isFinite(spd) && spd >= 0 && spd < 0.4 && d < 15){ updateLive(); return; }   /* kecepatan GPS ~0: diam */
   altStep(c.altitude, c.altitudeAccuracy);
   rec.kf = f; rec.dist += d; rec.last = {la:f.la, lo:f.lo, t:t};
   rec.pts.push([f.la, f.lo, mt, rec.dist, nst(), rec.altSm]);
@@ -12118,12 +12144,12 @@ window.stRecActive = () => rec.st === "run";
 function startRec(){
   if(rec.st !== "idle") return;
   drop("aoff");   /* koreksi kalibrasi hanya berlaku untuk satu rekaman */
-  rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; rec.jc = 0; rec.cand = null; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.mock = 0; rec.eg = 0; rec.ed = 0; rec.amax = null; rec.aLast = null; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.stFresh = true; restored = false; resumeRec();
+  rec.start = Date.now(); rec.acc = 0; rec.pts = []; rec.dist = 0; rec.jit = 0; rec.jc = 0; rec.cand = null; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.apA = null; rec.apGo = 0; rec.apFc = 0; rec.apSpdMax = 0; rec.pz = 0; rec.mock = 0; rec.eg = 0; rec.ed = 0; rec.amax = null; rec.aLast = null; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.stFresh = true; restored = false; resumeRec();
 }
-function resumeRec(){ rec.st = "run"; rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.rdy = false; rec.t0 = Date.now(); rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); if(!nativeGps()) lockWake(); renderRec(); saveDraft(); }
-function pauseRec(){ const n = Date.now(), open = apOpen(); if(rec.rdy) rec.acc += Math.max(0, n - rec.t0 - rec.ap - open); rec.pz += rec.ap + open; rec.rdy = false; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.t0 = 0; rec.st = "pause"; stopGps(true); pushNotif(true); unlockWake(); renderRec(); saveDraft(); }
+function resumeRec(){ rec.st = "run"; rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.rdy = false; rec.t0 = Date.now(); rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.apA = null; rec.apGo = 0; rec.apFc = 0; rec.apSpdMax = 0; rec.last = null; rec.kf = null; rec.coarse = 0; rec.gt0 = Date.now(); rec.gps = ""; restored = false; startGps(); if(!nativeGps()) lockWake(); renderRec(); saveDraft(); }
+function pauseRec(){ const n = Date.now(), open = apOpen(); if(rec.rdy) rec.acc += Math.max(0, n - rec.t0 - rec.ap - open); rec.pz += rec.ap + open; rec.rdy = false; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.apA = null; rec.apGo = 0; rec.apFc = 0; rec.apSpdMax = 0; rec.t0 = 0; rec.st = "pause"; stopGps(true); pushNotif(true); unlockWake(); renderRec(); saveDraft(); }
 function discardRec(){
-  drop("aoff"); stopGps(); unlockWake(); rec.st = "idle"; rec.rdy = false; rec.acc = 0; rec.t0 = 0; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.pz = 0; rec.eg = 0; rec.ed = 0; rec.amax = null; rec.aLast = null; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
+  drop("aoff"); stopGps(); unlockWake(); rec.st = "idle"; rec.rdy = false; rec.acc = 0; rec.t0 = 0; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.apA = null; rec.apGo = 0; rec.apFc = 0; rec.apSpdMax = 0; rec.pz = 0; rec.eg = 0; rec.ed = 0; rec.amax = null; rec.aLast = null; rec.altN = 0; rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.pts = []; rec.dist = 0; rec.last = null; restored = false; drop("draft"); renderRec();
 }
 function finishRec(){
   if(rec.st === "run") pauseRec();
@@ -12972,7 +12998,7 @@ window.addEventListener("storage", e => { if(!e.key || e.key === "ol_lang"){ con
 (function(){
   const d = load("draft", null);
   if(d && SP[d.sp] && d.acc > 0 && Array.isArray(d.pts)){
-    rec.sp = d.sp; rec.acc = +d.acc; rec.start = +d.start || Date.now(); rec.pts = d.pts.filter(p => Array.isArray(p) && p.length >= 4); rec.dist = +d.dist || 0; rec.mock = +d.mock || 0; rec.pz = +d.pz || 0; rec.eg = +d.eg || 0; rec.ed = +d.ed || 0; rec.altN = +d.an || 0; { const al = rec.pts.filter(p => typeof p[5] === "number").map(p => p[5]); if(al.length){ rec.amax = Math.max.apply(null, al); rec.aLast = al[al.length - 1]; } } rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.st = "pause"; restored = true; tab = "rec"; view = "tab";
+    rec.sp = d.sp; rec.acc = +d.acc; rec.start = +d.start || Date.now(); rec.pts = d.pts.filter(p => Array.isArray(p) && p.length >= 4); rec.dist = +d.dist || 0; rec.mock = +d.mock || 0; rec.pz = +d.pz || 0; rec.eg = +d.eg || 0; rec.ed = +d.ed || 0; rec.altN = +d.an || 0; { const al = rec.pts.filter(p => typeof p[5] === "number").map(p => p[5]); if(al.length){ rec.amax = Math.max.apply(null, al); rec.aLast = al[al.length - 1]; } } rec.altRef = null; rec.altSm = null; rec.altBuf = []; rec.ap = 0; rec.apSince = 0; rec.stillT = 0; rec.apA = null; rec.apGo = 0; rec.apFc = 0; rec.apSpdMax = 0; rec.st = "pause"; restored = true; tab = "rec"; view = "tab";
   }
 })();
 if(wtSet()) freezeKc(weight());   /* aktivitas lama: kalori dibekukan dengan berat badan yang sudah diisi */
