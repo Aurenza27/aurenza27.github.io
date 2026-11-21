@@ -11944,7 +11944,7 @@ function drawRoute(cv, pts){
 function mapCanvas(pts){ const c = el("canvas", "map"); requestAnimationFrame(() => drawRoute(c, pts)); return c; }
 
 /* ===== perekaman ===== */
-const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, jc:0, cand:null, ap:0, apSince:0, stillT:0, apA:null, apGo:0, apFc:0, apSpdMax:0, apHold:false, pz:0, gt0:0, kf:null, coarse:0, mock:0, eg:0, ed:0, amax:null, aLast:null, altN:0, altRef:null, altSm:null, rdy:false};
+const rec = {sp:load("sport", "run"), st:"idle", acc:0, t0:0, start:0, pts:[], dist:0, last:null, gps:"", acc_m:0, jit:0, jc:0, cand:null, ap:0, apSince:0, stillT:0, apA:null, apGo:0, apFc:0, apSpdMax:0, apHold:false, stLast:-1, stT:0, stSeen:false, stBase:0, pz:0, gt0:0, kf:null, coarse:0, mock:0, eg:0, ed:0, amax:null, aLast:null, altN:0, altRef:null, altSm:null, rdy:false};
 if(!SP[rec.sp]) rec.sp = "run";
 let gpsId = null, nat = false, natN = false, wake = null, lastSave = 0, restored = false, tab = load("tab", "rec"), view = "tab", detId = null, manualOpen = false, histF = "all", statP = "week";
 /* AUTO-JEDA: saat diam, jam berhenti (waktu bergerak). rec.ap = total ms auto-jeda pada segmen ini, rec.apSince = awal auto-jeda yang sedang berjalan (0 = tidak),
@@ -11956,6 +11956,8 @@ const apOpen = () => rec.apSince ? Math.max(0, Date.now() - rec.apSince) : 0;
 const elapsed = () => rec.acc + (rec.st === "run" && rec.rdy ? Math.max(0, Date.now() - rec.t0 - rec.ap - apOpen()) : 0);
 const pzMs = () => rec.pz + (rec.st === "run" ? rec.ap + apOpen() : 0);
 const AP_STOP = {run:0.5, walk:0.4, ride:1.0, hike:0.3}, AP_GO = {run:1.0, walk:0.7, ride:1.5, hike:0.5};
+/* batas diam berbasis langkah (ms) per olahraga: [mulai tahan jarak, mulai auto-jeda]; hiking lebih longgar karena langkah di tanjakan jarang dan tidak beraturan */
+const AP_IDLE = {run:[3000, 6000], walk:[4000, 8000], hike:[5000, 10000]};
 /* AUTO-JEDA (v2): jangan bergantung pada titik yang "diterima". Versi lama gagal saat kecepatan GPS kosong: goyangan GPS saat istirahat
    terus diterima sebagai gerak, jadi jam dan jarak jalan terus.
    - Kecepatan GPS terpercaya (angka, akurasi <= 25 m, dan perangkat memang pernah melapor kecepatan > 0): gerak = kecepatan >= AP_STOP pada 2 titik
@@ -11970,10 +11972,23 @@ function apWatch(la, lo, acc, spd, t){
   if(raw && spd > rec.apSpdMax) rec.apSpdMax = spd;
   /* kecepatan dianggap terpercaya hanya bila perangkat memang pernah melapor kecepatan > 0 (ada perangkat yang selalu melapor 0) */
   const known = raw && acc <= 25 && rec.apSpdMax >= 0.3;
+  /* AUTO-JEDA GABUNGAN (v3): sensor langkah (hanya lari/jalan/hiking, hanya di Android native) dipakai sebagai konfirmasi diam yang lebih cepat dan
+     tahan goyangan GPS; GPS tetap jadi cadangan dan pemutus. Sepeda atau perangkat tanpa sensor langkah: perilaku v2 persis. */
+  const s = rec.sp === "ride" ? -1 : nst();
   const a = rec.apA;
-  if(!a){ rec.apA = {la:la, lo:lo, t:t, acc:acc}; rec.apFc = 0; rec.apGo = 0; return; }
+  if(!a){ rec.apA = {la:la, lo:lo, t:t, acc:acc}; rec.apFc = 0; rec.apGo = 0; rec.stLast = s; rec.stT = t; rec.stSeen = false; return; }
+  if(s >= 0){
+    if(rec.stLast < 0 || s < rec.stLast){ rec.stLast = s; rec.stT = t; }          /* hitungan direset / baru tersedia */
+    else if(s > rec.stLast){ rec.stLast = s; rec.stT = t; rec.stSeen = true; }     /* ada langkah baru */
+  }
+  const sOn = s >= 0 && rec.stSeen;   /* sensor dianggap hidup hanya bila sudah pernah menambah langkah pada segmen ini */
   const dd = hav(a.la, a.lo, la, lo), ar = Math.max(a.acc, acc);
   if(!rec.apSince){
+    if(sOn && !(known && spd >= AP_GO[rec.sp]) && (known || dd <= Math.min(35, Math.max(10, 2 * ar)))){
+      const idle = t - rec.stT, lim = AP_IDLE[rec.sp] || AP_IDLE.walk;   /* lama tanpa langkah baru */
+      if(idle >= lim[1]){ rec.apSince = Math.max(rec.t0, rec.stT); rec.stBase = rec.stLast; rec.apFc = 0; rec.apGo = 0; return; }
+      if(idle >= lim[0]){ rec.apHold = true; return; }   /* kemungkinan diam: jarak belum ditambah */
+    }
     if(known){
       rec.apFc = spd >= AP_STOP[rec.sp] ? rec.apFc + 1 : 0;
       if(rec.apFc >= 2){ rec.apA = {la:la, lo:lo, t:t, acc:acc}; rec.apFc = 0; return; }
@@ -11991,7 +12006,8 @@ function apWatch(la, lo, acc, spd, t){
   rec.apGo = (known && spd >= AP_GO[rec.sp]) ? rec.apGo + 1 : 0;
   const far = dd >= (known ? Math.min(50, Math.max(20, 3 * ar)) : Math.min(40, Math.max(15, 2.5 * ar)));
   rec.apFc = far ? rec.apFc + 1 : 0;
-  if(rec.apGo < 2 && rec.apFc < 3) return;
+  const stepGo = sOn && rec.stLast - rec.stBase >= 6 && (known ? spd >= AP_STOP[rec.sp] : dd >= Math.max(8, 1.5 * ar));   /* langkah naik DAN GPS setuju */
+  if(rec.apGo < 2 && rec.apFc < 3 && !stepGo) return;
   rec.ap += Math.max(0, t - rec.apSince); rec.apSince = 0; rec.apA = {la:la, lo:lo, t:t, acc:acc}; rec.apGo = 0; rec.apFc = 0; rec.stillT = 0;
 }
 /* TANJAKAN: total naik (m) dari altitude GPS. Altitude GPS HP kasar (sering meleset belasan meter dan kadang melonjak sesaat), jadi disaring median 9 titik
