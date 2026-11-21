@@ -2238,6 +2238,26 @@ window.stNativeAlarm = (function(){
       var P = plug(); if(!P) return;
       try{ await P.cancel(one(id)); }catch(e){}
       try{ await P.removeDeliveredNotifications(one(id)); }catch(e){}
+      /* penanda "sedang berjalan" memakai nomor alarm + 100000 */
+      if(id >= 500000 && id < 600000){ try{ await P.cancel(one(id + 100000)); }catch(e){} try{ await P.removeDeliveredNotifications(one(id + 100000)); }catch(e){} }
+    },
+    /* penanda "stopwatch sedang berjalan" di beranda HP (senyap, kanal terpisah). at = waktu mulai (ms) bila belum mulai, 0 = tampil sekarang */
+    run: async function(id, at, title, body){
+      var P = plug(); if(!P) return false;
+      try{
+        var p = await P.checkPermissions(); if(p.display !== "granted") return false;
+        try{ await P.createChannel({id:"st_sw_run", name:"Stopwatch berjalan", description:"Penanda stopwatch yang sedang berjalan", importance:2, visibility:1, vibration:false}); }catch(e){}
+        await P.cancel(one(id));
+        var n = {id:id, title:title, body:body, channelId:"st_sw_run", autoCancel:false};
+        if(at && at > Date.now() + 1500) n.schedule = {at:new Date(at), allowWhileIdle:true};
+        await P.schedule({notifications:[n]});
+        return true;
+      }catch(e){ return false; }
+    },
+    endRun: async function(id){
+      var P = plug(); if(!P) return;
+      try{ await P.cancel(one(id)); }catch(e){}
+      try{ await P.removeDeliveredNotifications(one(id)); }catch(e){}
     }
   };
 })();
@@ -10412,6 +10432,15 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-famil
 .sub{color:var(--muted);font-size:13px;line-height:1.4;margin:0}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
 .hint{font-size:12px;line-height:1.4;color:var(--muted);margin:8px 0 0}
+.sum{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;margin:2px 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);font-size:12.5px;line-height:1.35}
+.sum:empty{display:none}
+.sum .k{color:var(--muted)}
+.sum .v{text-align:right;color:var(--text);font-variant-numeric:tabular-nums}
+.sum .v b{color:var(--gold2);font-weight:700}
+.sum .v i{font-style:normal;color:var(--muted)}
+.sum .w{grid-column:1/-1;color:#e57b72}
+.rg{margin-top:3px;font-size:12px;line-height:1.4;color:var(--muted);font-variant-numeric:tabular-nums}
+.rg b{color:var(--text);font-weight:600}
 .ok{color:#7fd69b}.warn{color:#f0a35a}
 .seg{display:flex;gap:2px;padding:3px;background:var(--card);border:1px solid var(--line);border-radius:999px}
 .seg button{min-height:32px;padding:0 12px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);background:transparent;border:0;border-radius:999px;cursor:pointer}
@@ -10475,7 +10504,7 @@ input.nm:focus{outline:0;border-bottom-color:var(--gold)}
     </div>
     <div class="chips" id="chips"></div>
     <input class="txt" type="text" id="lb" maxlength="40">
-    <p class="hint" id="dur"></p>
+    <div class="sum" id="dur" aria-live="polite"></div>
     <button class="go" id="go" type="button" style="margin-top:10px"></button>
   </div>
 
@@ -10495,7 +10524,7 @@ input.nm:focus{outline:0;border-bottom-color:var(--gold)}
 <script>
 (function(){
 var $=function(i){return document.getElementById(i)};
-var lang="id",KEY="sw_list",OLD="sw_state",MAX=20,D={seq:0,items:[]},R={},Q=[],ac=null,rt=0,tt=0,ringStop=0,open=false,fmt="12",TS,TE;
+var lang="id",KEY="sw_list",OLD="sw_state",MAX=20,D={seq:0,items:[]},R={},Q=[],ac=null,rt=0,tt=0,ringStop=0,open=false,fmt="12",TS,TE,AUTO={s:true,e:60},lastTouch=0;
 function rl(){try{lang=String(localStorage.getItem("sw_lang")||"id").replace(/"/g,"")==="en"?"en":"id"}catch(e){lang="id"}}
 function L(a,b){return lang==="en"?b:a}
 function p2(n){return n<10?"0"+n:""+n}
@@ -10512,7 +10541,7 @@ function mkWheel(n,lab,on){
   function idx(){return Math.max(0,Math.min(n-1,Math.round(w.scrollTop/H)))}
   function hi(i){if(i!==mark){if(els[mark])els[mark].className="wi";els[i].className="wi sel";mark=i}}
   function settle(){var i=idx();hi(i);if(i!==cur){cur=i;on(i)}}
-  w.addEventListener("scroll",function(){dirty=false;hi(idx());clearTimeout(tm);tm=setTimeout(settle,110)});
+  w.addEventListener("scroll",function(){if(!(w.clientHeight>0))return;dirty=false;settle()});
   return{
     el:w,
     set:function(k){if(els[mark])els[mark].className="wi";cur=k;want=k;mark=-1;hi(k);w.scrollTop=k*H;dirty=!(w.clientHeight>0)},
@@ -10541,7 +10570,7 @@ function mkPicker(el,cb){
 }
 function hm24(ms){var d=new Date(ms);return p2(d.getHours())+":"+p2(d.getMinutes())}
 function dur(ms){ms=Math.max(0,Math.floor(ms/1000));return p2(Math.floor(ms/3600))+":"+p2(Math.floor(ms%3600/60))+":"+p2(ms%60)}
-function words(ms){var m=Math.round(ms/60000),h=Math.floor(m/60);m=m%60;return (h?h+L(" jam"," hr")+" ":"")+(m||!h?m+L(" menit"," min"):"")}
+function words(ms){var m=Math.round(ms/60000),h=Math.floor(m/60);m=m%60;return ((h?h+L(" jam"," hr")+" ":"")+(m||!h?m+L(" menit"," min"):"")).trim()}
 function nat(){try{var n=window.parent.stNativeAlarm;return n&&n.available()?n:null}catch(e){return null}}
 function toast(m){var e=$("toast");e.textContent=m;e.style.opacity="1";clearTimeout(tt);tt=setTimeout(function(){e.style.opacity="0"},2600)}
 function nowHM(add){return hm24(Date.now()+(add||0)*60000)}
@@ -10570,7 +10599,37 @@ function dayTag(ms){
   var a=new Date(ms),b=new Date(),x=new Date(a.getFullYear(),a.getMonth(),a.getDate()).getTime(),y=new Date(b.getFullYear(),b.getMonth(),b.getDate()).getTime(),k=Math.round((x-y)/864e5);
   return k===1?L(" · besok"," · tomorrow"):k===-1?L(" · kemarin"," · yesterday"):""
 }
-function body(it){return hm(it.st)+" → "+hm(it.en)+L(" selesai."," finished.")}
+function dl(ms){
+  var a=new Date(ms),b=new Date(),k=Math.round((new Date(a.getFullYear(),a.getMonth(),a.getDate())-new Date(b.getFullYear(),b.getMonth(),b.getDate()))/864e5);
+  if(k===0)return L("Hari ini","Today");if(k===1)return L("Besok","Tomorrow");if(k===-1)return L("Kemarin","Yesterday");
+  return a.getDate()+" "+["Jan","Feb","Mar","Apr",L("Mei","May"),"Jun","Jul",L("Agu","Aug"),"Sep",L("Okt","Oct"),"Nov",L("Des","Dec")][a.getMonth()]
+}
+function sumRow(k,v){return '<span class="k">'+k+'</span><span class="v">'+v+'</span>'}
+function body(it){return L("Waktu habis · ","Time is up · ")+hm(it.st)+" → "+hm(it.en)}
+function ttl(it){return "⏰ "+it.name}
+function rid(it){return nid(it)+100000}
+function runTxt(it){return{t:"⏱ "+it.name+L(" sedang berjalan"," is running"),b:L("Mulai ","Started ")+hm(it.st)+L(" · alarm berbunyi pukul "," · alarm at ")+hm(it.en)+dayTag(it.en)}}
+/* penanda "sedang berjalan" di beranda HP (aplikasi Android) */
+function nRun(it){var n=nat();if(!n||!n.run||it.done||Date.now()>=it.en)return;var x=runTxt(it);try{n.run(rid(it),it.st,x.t,x.b)}catch(e){}}
+/* versi web/PWA: notifikasi browser saat halaman di latar belakang */
+function PN(){try{return window.parent.Notification||window.Notification}catch(e){return window.Notification}}
+function webOn(){var N=PN();return !nat()&&!!N&&N.permission==="granted"}
+function askWeb(){try{var N=PN();if(!nat()&&N&&N.permission==="default")N.requestPermission()}catch(e){}}
+function wnReg(cb){try{var sw=window.parent.navigator.serviceWorker;if(sw&&sw.getRegistration){sw.getRegistration().then(cb,function(){cb(null)});return}}catch(e){}cb(null)}
+function wnShow(t,bd,tag,o){
+  if(!webOn())return;
+  o=o||{};o.body=bd;o.tag=tag;
+  wnReg(function(r){try{if(r&&r.showNotification)r.showNotification(t,o);else new (PN())(t,o)}catch(e){}})
+}
+function wnClose(tag){wnReg(function(r){try{if(r&&r.getNotifications)r.getNotifications({tag:tag}).then(function(l){l.forEach(function(x){x.close()})})}catch(e){}})}
+function webRun(){
+  if(!webOn())return;
+  if(!document.hidden){wnClose("st-run");return}
+  var now=Date.now(),a=D.items.filter(function(i){return !i.done&&now<i.en}).sort(function(x,y){return x.en-y.en});
+  if(!a.length){wnClose("st-run");return}
+  if(a.length===1){var x=runTxt(a[0]);wnShow(x.t,x.b,"st-run",{silent:true,requireInteraction:true});return}
+  wnShow("⏱ "+a.length+L(" stopwatch sedang berjalan"," stopwatches running"),a.slice(0,3).map(function(i){return i.name+" → "+hm(i.en)}).join(" · "),"st-run",{silent:true,requireInteraction:true})
+}
 
 function calc(a,b){
   var now=Date.now(),x=a.split(":"),y=b.split(":"),d=new Date(),D1=864e5;
@@ -10578,15 +10637,21 @@ function calc(a,b){
   var e0=new Date(d.getFullYear(),d.getMonth(),d.getDate(),+y[0],+y[1],0,0).getTime();
   if(e0<=s0)e0+=D1;
   /* jam mulai = kemunculan berikutnya dari jam itu (hari ini bila belum lewat atau sedang berjalan); jam selesai yang lebih kecil berarti besok, tidak pernah mundur ke kemarin */
+  /* sesi lewat tengah malam yang dimulai kemarin dan masih berjalan (mis. 22.00 - 06.00, sekarang 02.00) */
+  if(s0-D1<=now&&e0-D1>now)return{st:s0-D1,en:e0-D1};
   if(e0<=now){s0+=D1;e0+=D1}
   return{st:s0,en:e0}
 }
 function preview(){
   var a=TS.value,b=TE.value,e=$("dur");
   if(!a||!b){e.textContent="";return}
-  var r=calc(a,b);e.textContent=r?L("Durasi: ","Duration: ")+words(r.en-r.st)+(new Date(r.en).getDate()!==new Date(r.st).getDate()?L(" · selesai besok"," · ends next day"):""):""
+  if(a===b){e.innerHTML='<span class="w">'+L("Jam mulai dan selesai tidak boleh sama.","Start and end must differ.")+'</span>';return}
+  var r=calc(a,b),now=Date.now();
+  if(!r){e.textContent="";return}
+  var st=r.st<=now?L("sedang berjalan","running"):L("menunggu","waiting");
+  e.innerHTML=sumRow(L("Durasi","Duration"),"<b>"+words(r.en-r.st)+"</b>")+sumRow(L("Mulai","Start"),dl(r.st)+" "+hm(r.st)+" <i>· "+st+"</i>")+sumRow(L("Selesai","End"),dl(r.en)+" "+hm(r.en))
 }
-function resetForm(){TS.value=nowHM(0);TE.value=addMin(nowHM(0),60);$("lb").value="";preview()}
+function resetForm(){AUTO={s:true,e:60};TS.value=nowHM(0);TE.value=addMin(nowHM(0),60);$("lb").value="";preview()}
 function layout(){
   var has=D.items.length>0;
   $("setup").hidden=has&&!open;
@@ -10607,12 +10672,12 @@ function text(){
   [[0,L("Mulai sekarang","Start now")],[15,"+15m"],[30,"+30m"],[60,"+1"+L("j","h")],[120,"+2"+L("j","h")]].forEach(function(o){
     var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=o[1];
     b.onclick=function(){
-      if(o[0]===0){var s=nowHM(0),dd=(TE.value&&TS.value)?calc(TS.value,TE.value):null;var len=dd?Math.round((dd.en-dd.st)/60000):60;TS.value=s;TE.value=addMin(s,len)}
-      else{TE.value=addMin(TS.value||nowHM(0),o[0])}
+      if(o[0]===0){var s=nowHM(0),dd=(TE.value&&TS.value)?calc(TS.value,TE.value):null;var len=dd?Math.round((dd.en-dd.st)/60000):60;TS.value=s;TE.value=addMin(s,len);AUTO={s:true,e:len}}
+      else{TE.value=addMin(TS.value||nowHM(0),o[0]);AUTO.e=o[0]}
       preview()};
     c.appendChild(b)});
   var n=nat();
-  $("env").textContent=n?L("Di aplikasi Android, alarm dijadwalkan ke sistem sehingga tetap berbunyi walau aplikasi ditutup atau layar terkunci.","In the Android app the alarm is scheduled with the system, so it still rings when the app is closed or the screen is locked."):L("Versi web: biarkan halaman ini tetap terbuka agar alarm berbunyi. Untuk alarm saat aplikasi ditutup, pakai aplikasi Android.","Web version: keep this page open for the alarm to ring. For alarms while closed, use the Android app.");
+  $("env").textContent=n?L("Di aplikasi Android, alarm dijadwalkan ke sistem sehingga tetap berbunyi walau aplikasi ditutup atau layar terkunci. Selama stopwatch berjalan, penandanya tampil di beranda HP, dan saat waktu habis notifikasi alarm muncul.","In the Android app the alarm is scheduled with the system, so it still rings when the app is closed or the screen is locked. A running indicator shows on the phone while a stopwatch is active, and a notification appears when time is up."):L("Versi web: izinkan notifikasi agar pemberitahuan muncul di beranda HP saat halaman di latar belakang, dan biarkan halaman tetap terbuka (browser bisa menundanya bila ditutup). Untuk alarm yang pasti berbunyi, pakai aplikasi Android.","Web version: allow notifications so alerts appear on your phone while the page is in the background, and keep the page open (the browser may delay them if closed). For alarms that always ring, use the Android app.");
   preview();layout();paint()
 }
 
@@ -10662,7 +10727,7 @@ function rename(it,inp){
   var n=nat();
   if(n&&!it.done&&it.en>Date.now()){
     it.snd=curSnd();
-    try{n.schedule(nid(it),it.en,it.name,body(it)).then(function(ok){it.n=!!ok;save()}).catch(function(){})}catch(e){}
+    try{n.schedule(nid(it),it.en,ttl(it),body(it)).then(function(ok){it.n=!!ok;save();if(ok)nRun(it)}).catch(function(){})}catch(e){}
   }
 }
 function del(it){
@@ -10689,7 +10754,7 @@ function syncSnd(){
   D.items.forEach(function(it){
     if(!it.done&&it.n&&it.en>now&&it.snd!==k){
       it.snd=k;ch=true;
-      try{n.schedule(nid(it),it.en,it.name,body(it)).then(function(ok){it.n=!!ok;save()}).catch(function(){})}catch(e){}
+      try{n.schedule(nid(it),it.en,ttl(it),body(it)).then(function(ok){it.n=!!ok;save()}).catch(function(){})}catch(e){}
     }
   });
   if(ch)save()
@@ -10705,9 +10770,9 @@ function build(){
   var box=$("list");box.innerHTML="";R={};
   D.items.forEach(function(it){
     var c=document.createElement("div");c.className="panel card";
-    c.innerHTML='<div class="hd"><input class="nm" type="text" maxlength="40"><button class="ic pen" type="button">✎</button><button class="ic dl" type="button">✕</button></div><div class="sl"></div><div class="big">00:00:00</div><div class="bar"><i></i></div><div class="meta"><span class="el"></span><span class="pc"></span></div><p class="hint warn nt" hidden></p>';
+    c.innerHTML='<div class="hd"><input class="nm" type="text" maxlength="40"><button class="ic pen" type="button">✎</button><button class="ic dl" type="button">✕</button></div><div class="sl"></div><div class="rg"></div><div class="big">00:00:00</div><div class="bar"><i></i></div><div class="meta"><span class="el"></span><span class="pc"></span></div><p class="hint warn nt" hidden></p>';
     var q=function(s){return c.querySelector(s)};
-    var r={root:c,nm:q(".nm"),pen:q(".pen"),sl:q(".sl"),big:q(".big"),bar:q(".bar i"),el:q(".el"),pc:q(".pc"),nt:q(".nt"),dl:q(".dl")};
+    var r={root:c,nm:q(".nm"),pen:q(".pen"),sl:q(".sl"),rg:q(".rg"),big:q(".big"),bar:q(".bar i"),el:q(".el"),pc:q(".pc"),nt:q(".nt"),dl:q(".dl")};
     r.nm.value=it.name;
     r.nm.onchange=function(){rename(it,r.nm)};
     r.nm.onkeydown=function(e){if(e.key==="Enter")r.nm.blur()};
@@ -10725,10 +10790,11 @@ function paint(){
     var wait=now<it.st,done=now>=it.en,tot=it.en-it.st,p=done?1:wait?0:(now-it.st)/tot;
     if(done)any=true;
     r.root.className="panel card"+(done?" fin":"");
-    r.sl.textContent=(it.n&&!done?"🔔 ":"")+(done?L("Selesai","Finished"):wait?L("Menunggu mulai","Waiting to start"):L("Sedang berjalan","Running"))+" · "+L("pukul ","at ")+hm(it.st)+" - "+hm(it.en)+(new Date(it.en).getDate()!==new Date(it.st).getDate()?" (+1)":"")+dayTag(it.st);
+    r.sl.textContent=(it.n&&!done?"🔔 ":"")+(done?L("Selesai","Finished"):wait?L("Menunggu mulai","Waiting to start"):L("Sedang berjalan","Running"));
+    r.rg.innerHTML=L("Mulai ","Start ")+"<b>"+dl(it.st)+" "+hm(it.st)+"</b> → "+L("Selesai ","End ")+"<b>"+dl(it.en)+" "+hm(it.en)+"</b> · "+L("Durasi ","Duration ")+words(tot);
     r.big.textContent=dur(done?0:wait?it.st-now:it.en-now);
     r.bar.style.width=(p*100).toFixed(1)+"%";
-    r.el.textContent=done?L("Selesai ","Ended ")+words(Math.max(now-it.en,0))+L(" yang lalu"," ago"):wait?L("Mulai dalam ","Starts in ")+words(it.st-now):L("Berjalan ","Elapsed ")+dur(now-it.st);
+    r.el.textContent=done?L("Selesai ","Ended ")+words(Math.max(now-it.en,0))+L(" yang lalu"," ago"):wait?L("Mulai dalam ","Starts in ")+words(it.st-now):L("Berjalan ","Elapsed ")+dur(now-it.st)+L(" dari "," of ")+words(tot);
     r.pc.textContent=Math.round(p*100)+"%";
     var w=!done&&!it.n&&!!nat();
     r.nt.hidden=!w;
@@ -10738,13 +10804,25 @@ function paint(){
   });
   $("clr").hidden=!any
 }
+function liveForm(){
+  if(!TS||!AUTO.s||$("setup").hidden||Date.now()-lastTouch<2000)return;
+  var a=nowHM(0);if(a===TS.value)return;
+  TS.value=a;if(AUTO.e!=null)TE.value=addMin(a,AUTO.e);preview()
+}
 function tick(){
   var now=Date.now(),ch=false;
-  if(TS){TS.sync();TE.sync()}
+  if(TS){TS.sync();TE.sync();liveForm()}
   D.items.forEach(function(it){
     if(now>=it.en&&!it.done){
       it.done=true;ch=true;
-      if(now-it.en<120000){ringOn(it.id);var n=nat();if(n){try{n.cancel(nid(it))}catch(e){}}}
+      var n=nat(),bg=document.hidden;
+      if(now-it.en<120000){
+        if(n&&it.n&&bg){/* di latar belakang: notifikasi alarm native tetap tampil di beranda HP */}
+        else{ringOn(it.id);if(n){try{n.cancel(nid(it))}catch(e){}}}
+        if(!n&&bg)wnShow(ttl(it),body(it),"st-end-"+it.id,{requireInteraction:true,vibrate:[400,150,400,150,400]})
+      }
+      if(n&&n.endRun){try{n.endRun(rid(it))}catch(e){}}
+      if(!n)webRun()
     }
   });
   if(ch)save();
@@ -10752,19 +10830,20 @@ function tick(){
 }
 async function go(){
   var a=TS.value,b=TE.value;
+  if(AUTO.s&&a&&b){a=nowHM(0);if(AUTO.e!=null)b=addMin(a,AUTO.e)}
   if(!a||!b){toast(L("Isi jam mulai dan jam selesai.","Enter a start and end time."));return}
   if(a===b){toast(L("Jam mulai dan selesai tidak boleh sama.","Start and end must differ."));return}
   if(D.items.length>=MAX){toast(L("Maksimal "+MAX+" stopwatch. Hapus yang sudah selesai dulu.","Max "+MAX+" stopwatches. Remove finished ones first."));return}
-  initAudio();var r=calc(a,b);if(!r)return;
+  initAudio();askWeb();var r=calc(a,b);if(!r)return;
   var id=++D.seq,nm=$("lb").value.trim().slice(0,40)||("Stopwatch "+id);
   var it={id:id,st:r.st,en:r.en,name:nm,n:false,done:false,snd:curSnd()};
   D.items.push(it);sortItems();save();
   open=false;build();
-  TS.value=hm24(r.en);TE.value=addMin(hm24(r.en),60);$("lb").value="";preview();
+  AUTO={s:false,e:null};TS.value=hm24(r.en);TE.value=addMin(hm24(r.en),60);$("lb").value="";preview();
   var n=nat();
   if(n){
-    try{it.n=await n.schedule(nid(it),it.en,it.name,body(it))}catch(e){it.n=false}
-    save();paint();
+    try{it.n=await n.schedule(nid(it),it.en,ttl(it),body(it))}catch(e){it.n=false}
+    save();paint();if(it.n)nRun(it);
     if(!it.n)toast(L("Izin notifikasi ditolak.","Notification permission denied."))
   }
 }
@@ -10779,8 +10858,9 @@ window.addEventListener("storage",function(e){
   if(!e.key||e.key===KEY){load();build()}
   if(!e.key||e.key==="titikhilangs_settings"){syncSnd()}
 });
-document.addEventListener("visibilitychange",function(){if(!document.hidden)tick()});
-rl();rf();load();TS=mkPicker($("ts"),preview);TE=mkPicker($("te"),preview);
+document.addEventListener("visibilitychange",function(){if(!document.hidden)tick();webRun()});
+rl();rf();load();TS=mkPicker($("ts"),function(){AUTO.s=false;preview()});TE=mkPicker($("te"),function(){AUTO.e=null;preview()});
+["pointerdown","touchstart","scroll","wheel"].forEach(function(ev){$("setup").addEventListener(ev,function(){lastTouch=Date.now()},true)});
 $("fmtBox").onclick=function(e){var f=e.target&&e.target.getAttribute&&e.target.getAttribute("data-f");if(f&&f!==fmt)setFmt(f)};
 resetForm();text();build();syncSnd();tick();setInterval(tick,250);
 })();
