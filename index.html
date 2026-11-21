@@ -825,7 +825,7 @@ const MENUS = [
   { id:"info-makanan", cat:"medis", icon:"🥗", title:"KANDUNGAN MAKANAN", desc:"Cari kalori, protein, lemak, karbohidrat, serat, gula, dan natrium makanan, jus, serta gorengan, jumlahkan di Piringku, lalu bandingkan dengan kalkulator AKG.", descEn:"Look up calories, protein, fat, carbs, fiber, sugar, and sodium of foods, juices, and fried snacks, total them in My Plate, then compare with the RDA calculator.", src:"src-info-makanan" },
   { id:"cek-hamil", cat:"medis", icon:"🤰", title:"KEHAMILAN", desc:"Hitung usia kehamilan, HPL, jadwal periksa, dan kenaikan berat badan.", descEn:"Calculate gestational age, due date (EDD), checkup schedule, and weight gain.", src:"src-cek-hamil" },
   { id:"olahraga", cat:"medis", icon:"🏃", title:"OLAHRAGA", desc:"Catat lari, jalan, bersepeda, dan hiking dengan GPS: rute, pace, riwayat, dan statistik.", descEn:"Track runs, walks, rides, and hikes with GPS: route, pace, splits, history, and stats.", src:"src-olahraga" },
-  { id:"stopwatch", cat:"manajemen", icon:"⏱️", title:"STOPWATCH", desc:"Atur beberapa jam mulai dan jam selesai sekaligus dalam satu daftar, nama bisa diganti. Alarm tiap stopwatch berbunyi otomatis, bahkan saat aplikasi ditutup (aplikasi Android).", descEn:"Set several start and end times in one list, with renamable names. Each alarm rings automatically, even when the app is closed (Android app).", src:"src-stopwatch" },
+  { id:"stopwatch", cat:"manajemen", icon:"⏱️", title:"TIMER", desc:"Atur beberapa timer sekaligus dengan jam mulai dan jam selesai, nama bisa diganti. Alarm tiap timer berbunyi otomatis, bahkan saat aplikasi ditutup (aplikasi Android).", descEn:"Set several timers at once with start and end times, with renamable names. Each alarm rings automatically, even when the app is closed (Android app).", src:"src-stopwatch" },
   { id:"turnamen", cat:"manajemen", icon:"🏆", title:"TURNAMEN", desc:"Kelola turnamen olahraga atau eSports: jadwal, skor, klasemen, bagan gugur, dan top skor.", descEn:"Manage sports or eSports tournaments: fixtures, scores, standings, knockout brackets, and top scorers.", src:"src-turnamen" },
   { id:"tebak-inisial", cat:"hiburan", icon:"🔤", title:"TEBAK INISIAL", desc:"Acak huruf A–Z dan kategori untuk permainan tebak-tebakan anak.", descEn:"Randomize a letter (A–Z) and category for kids' guessing games.", src:"src-tebak-inisial" },
   { id:"versus", cat:"hiburan", icon:"⚔️", title:"VERSUS", desc:"Adu dua nama apa pun: menang, kalah, atau seri.", descEn:"Pit any two names against each other: win, lose, or draw.", src:"src-versus" },
@@ -845,7 +845,7 @@ const MTITLE = {
   "cek-hamil":["KEHAMILAN","PREGNANCY","CEK KEHAMILAN","PREGNANCY CHECK"],
   "turnamen":["TURNAMEN","TOURNAMENT","TURNAMEN","TOURNAMENT"],
   "olahraga":["OLAHRAGA","EXERCISE","CATAT OLAHRAGA","EXERCISE LOG"],
-  "stopwatch":["STOPWATCH","STOPWATCH","STOPWATCH","STOPWATCH"],
+  "stopwatch":["TIMER","TIMER","TIMER","TIMER"],
   "tebak-inisial":["TEBAK INISIAL","GUESS THE INITIAL","TEBAK INISIAL","GUESS THE INITIAL"],
   "versus":["VERSUS","VERSUS","VERSUS","VERSUS"],
   "duel-puzzle":["GEMS ARENA","GEMS ARENA","GEMS ARENA","GEMS ARENA"],
@@ -885,7 +885,7 @@ const HOME_SHORT = {
   "info-makanan":["Gizi makanan, jus, gorengan, dan kalkulator AKG.","Food, juice, and fried snack nutrition, plus RDA calculator."],
   "cek-hamil":["Usia hamil, HPL, jadwal periksa.","Gestation, due date, checkups."],
   "olahraga":["Rekam lari, jalan, sepeda dengan GPS.","Track runs and rides with GPS."],
-  "stopwatch":["Beberapa stopwatch sekaligus, alarm otomatis.","Several stopwatches, automatic alarms."],
+  "stopwatch":["Beberapa timer sekaligus, alarm otomatis.","Several timers, automatic alarms."],
   "turnamen":["Jadwal, skor, klasemen, bagan.","Fixtures, scores, standings."],
   "tebak-inisial":["Acak huruf dan kategori tebak-tebakan.","Random letter and category game."],
   "versus":["Adu dua nama: menang, kalah, seri.","Pit two names against each other."],
@@ -1128,13 +1128,13 @@ S.fsize = [90,100,115].includes(+S.fsize) ? +S.fsize : 100;
 if(S.fmode !== "sans") S.fmode = "serif";
 S.anim = S.anim !== false; S.vibe = S.vibe !== false; if(!["low","mid","high"].includes(S.vlevel)) S.vlevel = "mid";
 S.mvol = Math.min(100, Math.max(0, +S.mvol || 0)); S.aivol = Math.min(100, Math.max(0, +S.aivol || 0));
-/* ===== Alarm Stopwatch: pilihan suara + volume (dipakai panel Pengaturan, menu Stopwatch, dan alarm native Android) ===== */
+/* ===== Alarm Timer: pilihan suara + volume (dipakai panel Pengaturan, menu Timer, dan alarm native Android) ===== */
 const ALARMS = [["classic","Sirene dua nada","Two-tone siren"],["beep","Bip-bip-bip","Triple beep"],["bell","Lonceng","Bell"],["melody","Nada naik","Rising notes"],["siren","Darurat (sapuan)","Emergency sweep"]];
 if(!ALARMS.some(a => a[0] === S.alsnd)) S.alsnd = "classic";
 S.alvol = Math.min(100, Math.max(10, Math.round(+S.alvol || 100))); S.alarm = S.alarm !== false;
 window.stAlarmList = ALARMS;
 window.stAlarmCfg = () => ({snd:S.alarm ? S.alsnd : "off", vol:S.alvol, on:S.alarm});
-/* satu putaran bunyi (~0,9 dtk) digambar ke node "out" mulai waktu t; dipakai menu Stopwatch (di iframe) dan tombol Coba suara */
+/* satu putaran bunyi (~0,9 dtk) digambar ke node "out" mulai waktu t; dipakai menu Timer (di iframe) dan tombol Coba suara */
 window.stAlarmSynth = function(ac, out, key, t){
   const tone = (at, f, d, type, pk, f2) => {
     const o = ac.createOscillator(), g = ac.createGain();
@@ -1194,7 +1194,7 @@ function writeKeys(s){
   w("mk_lang", s.lang);
   /* Keuangan (awalan kg_; hanya mengikuti bahasa) */
   w("kg_lang", s.lang);
-  /* Stopwatch (awalan sw_; hanya mengikuti bahasa) */
+  /* Timer (awalan sw_; hanya mengikuti bahasa) */
   w("sw_lang", s.lang);
   w("tt_gap", j(gi)); w("tt_lang", j(s.lang)); w("tt_follow", j(s.scroll)); w("tt_anim", j(s.anim)); w("tt_vol", j(s.aivol / 100)); w("tt_mvol", j(s.mvol / 100));
 }
@@ -1520,8 +1520,8 @@ function paintPanel(){
   paintHome();
 }
 const ALT = {
-  id:{on:["⏰ Alarm Stopwatch: aktif","⏰ Alarm Stopwatch: diam"], vol:"Volume alarm: {n}%", note:"Di aplikasi Android, volume ini mengatur volume alarm di HP-mu. Perubahan suara berlaku juga untuk stopwatch yang sudah berjalan."},
-  en:{on:["⏰ Stopwatch alarm: active","⏰ Stopwatch alarm: silent"], vol:"Alarm volume: {n}%", note:"In the Android app, this sets your phone's alarm volume. A new sound also applies to stopwatches already running."}
+  id:{on:["⏰ Alarm Timer: aktif","⏰ Alarm Timer: diam"], vol:"Volume alarm: {n}%", note:"Di aplikasi Android, volume ini mengatur volume alarm di HP-mu. Perubahan suara berlaku juga untuk timer yang sudah berjalan."},
+  en:{on:["⏰ Timer alarm: active","⏰ Timer alarm: silent"], vol:"Alarm volume: {n}%", note:"In the Android app, this sets your phone's alarm volume. A new sound also applies to timers already running."}
 };
 let alPac = null;
 function alWebPreview(){
@@ -1619,7 +1619,7 @@ const PV = {
     {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, data turnamen, serta aktivitas olahraga beserta rute GPS yang kamu rekam di menu Olahraga) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk dengan akun Google."]},
     {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, termasuk ketika layar terkunci atau aplikasi berada di latar belakang (notifikasi tampil selama merekam), dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Jumlah langkah dibaca dari sensor langkah HP (izin Aktivitas Fisik) hanya saat merekam di aplikasi Android, dan hanya dipakai untuk memeriksa kewajaran jarak. Angkanya tidak ditampilkan atau disimpan di riwayat aktivitas.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif."]},
     {p:["Keuangan dan Arisan:"], l:["Catatan keuangan (uang masuk dan keluar, dompet, jatah belanja, tabungan) dan data Arisan (nama peserta, pemenang, status pembayaran) disimpan di perangkatmu. Bila kamu masuk dengan Google, data ini ikut tersalin ke akunmu.","Kunci menu: PIN dan kode pemulihan hanya disimpan di perangkat dalam bentuk hash (bukan teks asli), tidak dikirim ke server, dan tidak ikut tersalin ke akun. Sidik jari dan PIN/pola layar HP diperiksa oleh sistem Android; aplikasi tidak menerima atau menyimpan data sidik jarimu.","Ruangan Arisan online: nama host dan peserta, daftar nama kocokan, hasil, dan chat ruangan disimpan di server selama ruangan ada dan dihapus saat host menutup ruangan. Chat juga ditandai kedaluwarsa setelah 24 jam.","File cadangan: fitur Cadangkan di menu Keuangan dan Arisan membuat file di perangkatmu atas permintaanmu, lalu kamu sendiri yang memilih tempat menyimpannya. File ini tidak dienkripsi dan tidak berisi PIN atau kode pemulihan, jadi simpan di tempat aman."]},
-    {p:["Ringkasan per menu (data di perangkat):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, dan Jodoh: nama, tanggal lahir, dan isian lain yang kamu ketik, riwayat, papan skor, serta pengaturan suara dan musik. Fitur bacaan suara memakai mesin suara bawaan perangkatmu.","BMI & Kalori, Kehamilan, dan Kandungan Makanan: data tubuh dan kehamilan yang kamu isi (misalnya usia, jenis kelamin, berat, dan tinggi badan), profil AKG (termasuk status hamil atau menyusui), dan isi Piringku. Ini data kesehatan, jadi jaga perangkatmu.","Stopwatch: hanya pengaturan tampilan. Alarm dan notifikasi stopwatch dibuat di perangkatmu (notifikasi lokal), tanpa server.","Tebak Inisial, Gems Arena, dan Versus: bila dimainkan di satu perangkat, datanya hanya di perangkat. Ruangan online dijelaskan di bawah.","Turnamen, Olahraga, Keuangan, dan Arisan: dijelaskan di bagian lain di kebijakan ini.","Semua data di atas ikut tersalin ke akunmu bila kamu masuk dengan Google dan sinkronisasi aktif, kecuali PIN dan kode pemulihan kunci menu."]},
+    {p:["Ringkasan per menu (data di perangkat):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, dan Jodoh: nama, tanggal lahir, dan isian lain yang kamu ketik, riwayat, papan skor, serta pengaturan suara dan musik. Fitur bacaan suara memakai mesin suara bawaan perangkatmu.","BMI & Kalori, Kehamilan, dan Kandungan Makanan: data tubuh dan kehamilan yang kamu isi (misalnya usia, jenis kelamin, berat, dan tinggi badan), profil AKG (termasuk status hamil atau menyusui), dan isi Piringku. Ini data kesehatan, jadi jaga perangkatmu.","Timer: hanya pengaturan tampilan. Alarm dan notifikasi timer dibuat di perangkatmu (notifikasi lokal), tanpa server.","Tebak Inisial, Gems Arena, dan Versus: bila dimainkan di satu perangkat, datanya hanya di perangkat. Ruangan online dijelaskan di bawah.","Turnamen, Olahraga, Keuangan, dan Arisan: dijelaskan di bagian lain di kebijakan ini.","Semua data di atas ikut tersalin ke akunmu bila kamu masuk dengan Google dan sinkronisasi aktif, kecuali PIN dan kode pemulihan kunci menu."]},
     {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir. Nama dan foto profilmu dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui ID Akunmu (misalnya saat mereka menambah teman); di aplikasi, foto itu hanya bisa dibuka oleh temanmu. Status online dan waktu terakhir aktifmu hanya bisa dilihat temanmu. Alamat emailmu tidak terlihat pengguna lain.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, rute GPS olahraga, serta data Keuangan dan Arisan) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, nama (username) admin, moderator, atau pengikut, serta suara dan komentar yang kamu kirim (isi komentar, username, ID Akun, dan waktu) yang dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui kode turnamen tersebut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online; hanya bisa dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, ditandai kedaluwarsa setelah 30 hari, dan dihapus saat pertemanan dihapus.","Tanda dibaca: waktu terakhir kamu membuka chat dengan temanmu. Hanya bisa dilihat temanmu (untuk menandai pesan sudah dibaca) dan dihapus saat pertemanan dihapus."]},
     {p:["Ruangan game online (Main bersama lewat kode ruang):"], l:["Hanya untuk pengguna yang masuk dengan Google. Pada Tebak Inisial dan Gems Arena, kode ruang, nama host dan pemain, jawaban, skor atau hasil permainan (serta chat ruangan di Tebak Inisial dan Gems Arena) disimpan di server selama ruangan dipakai dan dihapus saat host menutup ruangan. Chat ditandai kedaluwarsa setelah 24 jam. Ruangan yang tidak ditutup dengan benar (misalnya aplikasi dihentikan paksa) dapat tersimpan lebih lama. Siapa pun yang sudah masuk akun dan mengetahui kode ruangan dapat melihat isi ruangan, termasuk chatnya."]},
     {p:["Notifikasi push (hanya aplikasi Android, setelah masuk dengan Google):"], l:["Aplikasi menyimpan token perangkat dari Firebase Cloud Messaging bersama ID penggunamu, jenis platform, dan waktu, supaya notifikasi tetap muncul walau aplikasi ditutup. Izin notifikasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Notifikasi dikirim untuk pesan teman, permintaan dan persetujuan pertemanan, serta undangan (moderator turnamen, pengikut turnamen, atau ruangan permainan) beserta balasannya. Saat kejadian itu terjadi, aplikasi mengirim jenis kejadian dan pengenal terkait ke server pengirim notifikasi (Cloudflare Workers) bersama token masuk akunmu untuk verifikasi. Server memeriksa kejadian itu, membaca data yang dibutuhkan dari akun (nama pengirim dan, untuk pesan teman, 100 huruf pertama isi pesan), lalu meneruskannya sebagai isi notifikasi lewat Firebase Cloud Messaging milik Google. Isi notifikasi dapat tampil di layar kunci sesuai pengaturan notifikasi HP-mu; matikan notifikasi aplikasi bila kamu tidak menghendakinya.","Token perangkat dihapus saat kamu keluar dari akun (perangkat itu) atau menghapus akun (semua perangkat)."]},
@@ -1641,7 +1641,7 @@ const PV = {
     {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, tournament data, and the sports activities and GPS routes you record in the Sports menu) are stored on your own device.","This data is not sent to our servers unless you sign in with a Google account."]},
     {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, including while the screen is locked or the app is in the background (a notification shows while recording), and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","The step count is read from your phone's step sensor (Physical activity permission) only while recording in the Android app, and is used only to check that the distance is plausible. It is not shown or stored in the activity history.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on."]},
     {p:["Finance and Arisan:"], l:["Financial records (money in and out, wallets, spending limits, savings) and Arisan data (participant names, winners, payment status) are stored on your device. If you sign in with Google, this data is also copied to your account.","Menu lock: the PIN and recovery code are stored only on your device as a hash (not the original text), are not sent to a server, and are not copied to your account. Your fingerprint and the phone's screen PIN/pattern are checked by the Android system; the app does not receive or store your fingerprint data.","Online Arisan rooms: the names of the host and participants, the draw name list, results, and the room chat are stored on a server while the room exists and are deleted when the host closes the room. Chat is also marked to expire after 24 hours.","Backup file: the Back up feature in the Finance and Arisan menus creates a file on your device at your request, and you choose where to save it. This file is not encrypted and does not contain the PIN or recovery code, so keep it somewhere safe."]},
-    {p:["Summary by menu (data on your device):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, and Jodoh: names, birth dates, and other text you type, history, scoreboards, and sound and music settings. The read-aloud feature uses your device’s built-in speech engine.","BMI & Kalori, Kehamilan, and Kandungan Makanan: the body and pregnancy data you enter (for example age, sex, weight, and height), the RDA (AKG) profile (including pregnant or breastfeeding status), and the contents of My Plate (Piringku). This is health data, so keep your device secure.","Stopwatch: display settings only. Stopwatch alarms and notifications are created on your device (local notifications), without a server.","Tebak Inisial, Gems Arena, and Versus: when played on a single device, the data stays on the device. Online rooms are described below.","Tournaments, Sports, Finance, and Arisan: described elsewhere in this policy.","All of the above is also copied to your account if you sign in with Google and sync is on, except the PIN and recovery code of the menu lock."]},
+    {p:["Summary by menu (data on your device):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, and Jodoh: names, birth dates, and other text you type, history, scoreboards, and sound and music settings. The read-aloud feature uses your device’s built-in speech engine.","BMI & Kalori, Kehamilan, and Kandungan Makanan: the body and pregnancy data you enter (for example age, sex, weight, and height), the RDA (AKG) profile (including pregnant or breastfeeding status), and the contents of My Plate (Piringku). This is health data, so keep your device secure.","Timer: display settings only. Timer alarms and notifications are created on your device (local notifications), without a server.","Tebak Inisial, Gems Arena, and Versus: when played on a single device, the data stays on the device. Online rooms are described below.","Tournaments, Sports, Finance, and Arisan: described elsewhere in this policy.","All of the above is also copied to your account if you sign in with Google and sync is on, except the PIN and recovery code of the menu lock."]},
     {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time. Your name and profile photo can be seen by other signed-in users who know your Account ID (for example when they add a friend); in the app, the photo can only be opened by your friends. Your online status and last-active time can only be seen by your friends. Your email address is not visible to other users.","A copy of your app data (settings, history, menu results, sports GPS routes, and Finance and Arisan data) so it can sync across devices.","For online tournaments: tournament data, tournament codes, the names (usernames) of admins, moderators, and followers, and the votes and comments you submit (comment text, username, Account ID, and time), which can be seen by other signed-in users who know that tournament’s code.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light; visible only to your friends).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, are marked to expire after 30 days, and are deleted when the friendship is removed.","Read receipts: the time you last opened the chat with your friend. Only your friend can see it (to mark messages as read), and it is deleted when the friendship is removed."]},
     {p:["Online game rooms (Play together via room code):"], l:["Only for users signed in with Google. In Tebak Inisial and Gems Arena, the room code, host and player names, answers, scores or game results (and the room chat in Tebak Inisial and Gems Arena) are stored on a server while the room is in use and deleted when the host closes the room. Chat is marked to expire after 24 hours. A room that is not closed properly (for example if the app is force-stopped) may be kept longer. Anyone signed in who knows the room code can see the room contents, including the chat."]},
     {p:["Push notifications (Android app only, after signing in with Google):"], l:["The app stores a device token from Firebase Cloud Messaging together with your user ID, the platform type, and a timestamp, so notifications still appear when the app is closed. Notification permission is requested by your device and you can revoke it at any time.","Notifications are sent for friend messages, friend requests and acceptances, and invitations (tournament moderator, tournament follower, or game room) and their replies. When such an event happens, the app sends the event type and related identifiers to the notification server (Cloudflare Workers) together with your sign-in token for verification. The server checks the event, reads the data it needs from your account (the sender’s name and, for friend messages, the first 100 characters of the message), and passes it on as the notification text through Google’s Firebase Cloud Messaging. The notification text may appear on your lock screen depending on your phone’s notification settings; turn off the app’s notifications if you do not want this.","The device token is deleted when you sign out (that device) or delete your account (all devices)."]},
@@ -2198,7 +2198,7 @@ window.stNativeGps = (function(){
   };
   return api;
 })();
-/* Alarm Stopwatch: dijadwalkan ke sistem Android lewat plugin @capacitor/local-notifications (AlarmManager),
+/* Alarm Timer: dijadwalkan ke sistem Android lewat plugin @capacitor/local-notifications (AlarmManager),
    jadi tetap berbunyi walau aplikasi ditutup atau layar terkunci. Di web/PWA available() = false dan menu memakai alarm di dalam halaman. */
 window.stNativeAlarm = (function(){
   function cap(){ try{ var C = window.Capacitor; return (C && C.isNativePlatform && C.isNativePlatform()) ? C : null; }catch(e){ return null; } }
@@ -2213,8 +2213,8 @@ window.stNativeAlarm = (function(){
   /* kanal notifikasi per suara (suara kanal tidak bisa diubah setelah dibuat, jadi tiap suara punya kanal sendiri) */
   async function chan(P, key){
     var id = "st_sw_" + key, V = vplug();
-    if(V){ try{ await V.channel({key:key, name:"Alarm Stopwatch - " + label(key)}); return id; }catch(e){} }
-    try{ await P.createChannel({id:id, name:"Alarm Stopwatch - " + label(key), description:"Alarm saat waktu stopwatch habis", importance:5, visibility:1, vibration:true, sound:(key === "off" ? undefined : "alarm_" + key + ".wav")}); }catch(e){}
+    if(V){ try{ await V.channel({key:key, name:"Alarm Timer - " + label(key)}); return id; }catch(e){} }
+    try{ await P.createChannel({id:id, name:"Alarm Timer - " + label(key), description:"Alarm saat waktu timer habis", importance:5, visibility:1, vibration:true, sound:(key === "off" ? undefined : "alarm_" + key + ".wav")}); }catch(e){}
     return id;
   }
   return {
@@ -2222,7 +2222,7 @@ window.stNativeAlarm = (function(){
     setVolume: setVol,
     preview: async function(key){ var V = vplug(); if(!V) return false; try{ await setVol(); await V.preview({sound:"alarm_" + key}); return true; }catch(e){ return false; } },
     stopPreview: async function(){ var V = vplug(); if(V){ try{ await V.stop(); }catch(e){} } },
-    /* id = nomor notifikasi unik per stopwatch; menjadwalkan ulang id yang sama otomatis menggantikan yang lama (dipakai saat rename / ganti suara) */
+    /* id = nomor notifikasi unik per timer; menjadwalkan ulang id yang sama otomatis menggantikan yang lama (dipakai saat rename / ganti suara) */
     service: function(){ return !!sw(); },
     stopAlarm: async function(){ var S = sw(); if(S){ try{ await S.stopAlarm(); }catch(e){} } },
     schedule: async function(id, at, title, body){
@@ -2253,15 +2253,15 @@ window.stNativeAlarm = (function(){
       /* penanda "sedang berjalan" memakai nomor alarm + 100000 */
       if(id >= 500000 && id < 600000){ try{ await P.cancel(one(id + 100000)); }catch(e){} try{ await P.removeDeliveredNotifications(one(id + 100000)); }catch(e){} }
     },
-    /* penanda "stopwatch sedang berjalan" di beranda HP (senyap, kanal terpisah). at = waktu mulai (ms) bila belum mulai, 0 = tampil sekarang */
+    /* penanda "timer sedang berjalan" di beranda HP (senyap, kanal terpisah). at = waktu mulai (ms) bila belum mulai, 0 = tampil sekarang */
     run: async function(id, at, title, body){
       var S = sw(); if(S){ try{ await S.run({id:id, at:at || 0, title:title, body:body}); return true; }catch(e){ return false; } }
       var P = plug(); if(!P) return false;
       try{
         var p = await P.checkPermissions(); if(p.display !== "granted") return false;
-        try{ await P.createChannel({id:"st_sw_run", name:"Stopwatch berjalan", description:"Penanda stopwatch yang sedang berjalan", importance:2, visibility:1, vibration:false}); }catch(e){}
+        try{ await P.createChannel({id:"st_sw_run", name:"Timer berjalan", description:"Penanda timer yang sedang berjalan", importance:2, visibility:1, vibration:false}); }catch(e){}
         await P.cancel(one(id));
-        var n = {id:id, title:title, body:body, channelId:"st_sw_run", autoCancel:false, ongoing:true};   /* permanen: tidak bisa digeser hilang selama stopwatch berjalan */
+        var n = {id:id, title:title, body:body, channelId:"st_sw_run", autoCancel:false, ongoing:true};   /* permanen: tidak bisa digeser hilang selama timer berjalan */
         if(at && at > Date.now() + 1500) n.schedule = {at:new Date(at), allowWhileIdle:true};
         await P.schedule({notifications:[n]});
         return true;
@@ -10434,7 +10434,7 @@ try{ startOnline(); }catch(e){}
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>STOPWATCH</title>
+<title>TIMER</title>
 <style>
 :root{--bg:#0e1015;--card:#171a22;--line:#262b38;--text:#eceae4;--muted:#8a90a0;--gold:#d4a94f;--gold2:#f0cf86;--red:#e0453a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -10503,7 +10503,7 @@ input.nm:focus{outline:0;border-bottom-color:var(--gold)}
 <body>
 <div class="app">
   <div class="top">
-    <h1>⏱️ <span id="t">STOPWATCH</span></h1>
+    <h1>⏱️ <span id="t">TIMER</span></h1>
     <div class="seg" id="fmtBox"><button type="button" data-f="12" id="fB12"></button><button type="button" data-f="24" id="fB24"></button></div>
   </div>
   <p class="sub" id="sub"></p>
@@ -10608,7 +10608,7 @@ function load(){
   }else{
     try{
       var o=JSON.parse(localStorage.getItem(OLD)||"null");
-      if(o&&o.st&&o.en){D.seq=1;D.items.push({id:1,st:o.st,en:o.en,name:o.label||"Stopwatch 1",n:!!o.n,done:!!o.done});save()}
+      if(o&&o.st&&o.en){D.seq=1;D.items.push({id:1,st:o.st,en:o.en,name:o.label||"Timer 1",n:!!o.n,done:!!o.done});save()}
       localStorage.removeItem(OLD)
     }catch(e){}
   }
@@ -10647,7 +10647,7 @@ function webRun(){
   var now=T(),a=D.items.filter(function(i){return !i.done&&now<i.en}).sort(function(x,y){return x.en-y.en});
   if(!a.length){wnClose("st-run");return}
   if(a.length===1){var x=runTxt(a[0]);wnShow(x.t,x.b,"st-run",{silent:true,requireInteraction:true});return}
-  wnShow("⏱ "+a.length+L(" stopwatch sedang berjalan"," stopwatches running"),a.slice(0,3).map(function(i){return i.name+" → "+hm(i.en)}).join(" · "),"st-run",{silent:true,requireInteraction:true})
+  wnShow("⏱ "+a.length+L(" timer sedang berjalan"," timers running"),a.slice(0,3).map(function(i){return i.name+" → "+hm(i.en)}).join(" · "),"st-run",{silent:true,requireInteraction:true})
 }
 
 function calc(a,b){
@@ -10677,11 +10677,11 @@ function layout(){
   $("addBtn").hidden=!has;
   $("rst").hidden=!has;
   if(TS&&!$("setup").hidden){TS.sync();TE.sync()}
-  $("addBtn").textContent=open?L("Tutup","Close"):L("＋ Tambah stopwatch","＋ Add stopwatch")
+  $("addBtn").textContent=open?L("Tutup","Close"):L("＋ Tambah timer","＋ Add timer")
 }
 function text(){
   document.documentElement.lang=lang;
-  $("sub").textContent=L("Banyak stopwatch sekaligus. Alarm berbunyi saat jam selesai. Ketuk ✎ untuk ganti nama.","Several stopwatches at once. The alarm rings at the end time. Tap ✎ to rename.");
+  $("sub").textContent=L("Banyak timer sekaligus. Alarm berbunyi saat jam selesai. Ketuk ✎ untuk ganti nama.","Several timers at once. The alarm rings at the end time. Tap ✎ to rename.");
   $("fB12").textContent=L("12 jam","12-hour");$("fB24").textContent=L("24 jam","24-hour");fmtUi();
   $("lbS").textContent=L("Mulai","Start");$("lbE").textContent=L("Selesai","End");
   $("lb").placeholder=L("Nama (opsional), mis. Belajar","Name (optional), e.g. Study");
@@ -10696,7 +10696,7 @@ function text(){
       preview()};
     c.appendChild(b)});
   var n=nat();
-  $("env").textContent=n?L("Di aplikasi Android, alarm dijadwalkan ke sistem sehingga tetap berbunyi walau aplikasi ditutup atau layar terkunci. Selama stopwatch berjalan, penandanya tampil di beranda HP, dan saat waktu habis notifikasi alarm muncul.","In the Android app the alarm is scheduled with the system, so it still rings when the app is closed or the screen is locked. A running indicator shows on the phone while a stopwatch is active, and a notification appears when time is up."):L("Versi web: izinkan notifikasi agar pemberitahuan muncul di beranda HP saat halaman di latar belakang, dan biarkan halaman tetap terbuka (browser bisa menundanya bila ditutup). Untuk alarm yang pasti berbunyi, pakai aplikasi Android.","Web version: allow notifications so alerts appear on your phone while the page is in the background, and keep the page open (the browser may delay them if closed). For alarms that always ring, use the Android app.");
+  $("env").textContent=n?L("Di aplikasi Android, alarm dijadwalkan ke sistem sehingga tetap berbunyi walau aplikasi ditutup atau layar terkunci. Selama timer berjalan, penandanya tampil di beranda HP, dan saat waktu habis notifikasi alarm muncul.","In the Android app the alarm is scheduled with the system, so it still rings when the app is closed or the screen is locked. A running indicator shows on the phone while a timer is active, and a notification appears when time is up."):L("Versi web: izinkan notifikasi agar pemberitahuan muncul di beranda HP saat halaman di latar belakang, dan biarkan halaman tetap terbuka (browser bisa menundanya bila ditutup). Untuk alarm yang pasti berbunyi, pakai aplikasi Android.","Web version: allow notifications so alerts appear on your phone while the page is in the background, and keep the page open (the browser may delay them if closed). For alarms that always ring, use the Android app.");
   preview();layout();paint()
 }
 
@@ -10740,7 +10740,7 @@ function ringOn(id,silent){
 function stopRing(){clearInterval(rt);rt=0;clearTimeout(ringStop);Q=[];$("ring").hidden=true;try{if(navigator.vibrate)navigator.vibrate(0)}catch(e){}}
 
 function rename(it,inp){
-  var v=inp.value.trim().slice(0,40)||("Stopwatch "+it.id);
+  var v=inp.value.trim().slice(0,40)||("Timer "+it.id);
   inp.value=v;if(v===it.name)return;
   it.name=v;save();
   var n=nat();
@@ -10758,14 +10758,14 @@ function del(it){
   build()
 }
 var rstT=0;
-function rstLabel(){$("rst").textContent=rstT?L("Yakin? Ketuk lagi untuk hapus semua","Sure? Tap again to delete all"):L("Reset (hapus semua stopwatch)","Reset (delete all stopwatches)")}
+function rstLabel(){$("rst").textContent=rstT?L("Yakin? Ketuk lagi untuk hapus semua","Sure? Tap again to delete all"):L("Reset (hapus semua timer)","Reset (delete all timers)")}
 function resetAll(){
   if(!rstT){rstT=setTimeout(function(){rstT=0;rstLabel()},3500);rstLabel();return}
   clearTimeout(rstT);rstT=0;
   var n=nat();
   D.items.forEach(function(it){if(n){try{n.cancel(nid(it))}catch(e){}}});
   D={seq:0,items:[]};R={};save();stopRing();build();rstLabel();
-  toast(L("Semua stopwatch dihapus.","All stopwatches deleted."))
+  toast(L("Semua timer dihapus.","All timers deleted."))
 }
 function syncSnd(){
   var n=nat();if(!n)return;
@@ -10860,10 +10860,10 @@ async function go(){
   if(AUTO.s&&a&&b){a=nowHM(0);if(AUTO.e!=null)b=addMin(a,AUTO.e)}
   if(!a||!b){toast(L("Isi jam mulai dan jam selesai.","Enter a start and end time."));return}
   if(a===b){toast(L("Jam mulai dan selesai tidak boleh sama.","Start and end must differ."));return}
-  if(D.items.length>=MAX){toast(L("Maksimal "+MAX+" stopwatch. Hapus yang sudah selesai dulu.","Max "+MAX+" stopwatches. Remove finished ones first."));return}
+  if(D.items.length>=MAX){toast(L("Maksimal "+MAX+" timer. Hapus yang sudah selesai dulu.","Max "+MAX+" timers. Remove finished ones first."));return}
   initAudio();askWeb();var r=calc(a,b);if(!r)return;
   if(AUTO.s){var s0=Math.floor(T()/1000)*1000;if(AUTO.e!=null)r={st:s0,en:s0+AUTO.e*60000};else if(r.st<=s0&&r.en>s0)r.st=s0}
-  var id=++D.seq,nm=$("lb").value.trim().slice(0,40)||("Stopwatch "+id);
+  var id=++D.seq,nm=$("lb").value.trim().slice(0,40)||("Timer "+id);
   var it={id:id,st:r.st,en:r.en,name:nm,n:false,done:false,snd:curSnd()};
   D.items.push(it);sortItems();save();
   open=false;build();
