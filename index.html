@@ -2282,8 +2282,8 @@ function stShareHelper(){
   try{
     var d = document, W = window, busy = false, tt = null;
     var T = {
-      id:{btn:"Bagikan", busy:"Membuat gambar\u2026", fail:"Gagal membuat gambar.", done:"Gambar diunduh.", btn2:"\uD83D\uDCC4 Bagikan PDF", donePdf:"PDF diunduh.", cta:"Coba sendiri di aplikasi Satu Titik"},
-      en:{btn:"Share", busy:"Creating image\u2026", fail:"Could not create the image.", done:"Image downloaded.", btn2:"\uD83D\uDCC4 Share PDF", donePdf:"PDF downloaded.", cta:"Try it yourself in the Satu Titik app"}
+      id:{btn:"Bagikan", busy:"Membuat gambar\u2026", fail:"Gagal membuat gambar.", none:"Adu dulu, lalu bagikan hasilnya.", done:"Gambar diunduh.", btn2:"\uD83D\uDCC4 Bagikan PDF", donePdf:"PDF diunduh.", cta:"Coba sendiri di aplikasi Satu Titik"},
+      en:{btn:"Share", busy:"Creating image\u2026", fail:"Could not create the image.", none:"Run a duel first, then share the result.", done:"Image downloaded.", btn2:"\uD83D\uDCC4 Share PDF", donePdf:"PDF downloaded.", cta:"Try it yourself in the Satu Titik app"}
     };
     var SKIP = "button,script,style,audio,video,iframe,input,textarea,select,.sp,.fx,.clr,[data-noshare]";
     var SVGNS = "http://www.w3.org/2000/svg";
@@ -2299,7 +2299,12 @@ function stShareHelper(){
       e.textContent = m; e.style.opacity = "1"; clearTimeout(tt);
       tt = setTimeout(function(){ e.style.opacity = "0"; }, 2200);
     }
-    function target(){ return $("out") || $("card"); }
+    function target(){
+      var o = $("out") || $("card"); if(o) return o;
+      /* Versus: hasilnya ada di #stage; baru boleh dibagikan setelah adu selesai (bukan saat kosong atau sedang berputar) */
+      var s = $("stage"), r = $("rR");
+      return s && r && !/\b(idle|run)\b/.test(r.className) ? s : null;
+    }
     function clrBtn(){ return $("clrBtn") || $("clr") || $("clearBtn"); }
 
     /* salin gaya hitungan (computed) ke klon supaya tampilan sama persis di dalam SVG */
@@ -2336,6 +2341,15 @@ function stShareHelper(){
         inlineAll(ca, cb); walk(ca, cb);
       }
     }
+    /* Pengaturan "Ukuran huruf" memasang html{zoom}. Dengan zoom, ukuran yang diukur (getBoundingClientRect) tidak sama dengan gaya hitungan yang disalin
+       ke klon, sehingga gambar hasil terpotong di kanan atau teks patah. Jadi zoom dimatikan sebentar (serempak, tanpa sempat tergambar di layar)
+       selama klon dibuat, lalu dikembalikan. Hasil bagikan pun sama di semua ukuran huruf. */
+    function withoutZoom(fn){
+      var root = d.documentElement, prev = root.style.zoom, st = d.createElement("style");
+      st.textContent = "*,*::before,*::after{transition:none!important}";
+      try{ (d.head || root).appendChild(st); root.style.zoom = "1"; return fn(); }
+      finally{ root.style.zoom = prev; st.remove(); }
+    }
     function build(el){
       var r = el.getBoundingClientRect(), w = Math.ceil(r.width), h = Math.ceil(Math.max(r.height, el.scrollHeight));
       var cl = el.cloneNode(true);
@@ -2348,6 +2362,9 @@ function stShareHelper(){
     function pickScale(w, h){
       var cw = w + 48, ch = 64 + h + 70, sc = 3;
       while(sc > 1 && cw * sc * ch * sc > 16e6) sc -= 0.25;
+      /* batas sisi terpanjang: banyak HP Android hanya sanggup menggambar gambar/kanvas sampai sekitar 4096 px per sisi; lebih dari itu bagian bawahnya
+         terpotong atau kosong. Hasil panjang (BMI & Kalori, Kehamilan) melewati batas itu pada skala 3, jadi skalanya diturunkan. */
+      while(sc > 0.5 && Math.max(cw, ch) * sc > 4096) sc -= 0.25;
       return sc;
     }
     /* ukuran SVG sudah dikali skala (viewBox tetap), jadi isinya digambar ulang tajam, bukan dibesarkan dari gambar kecil */
@@ -2384,12 +2401,12 @@ function stShareHelper(){
     }
     async function go(mode){
       if(busy) return;
-      var el = target(); if(!el) return;
+      var el = target(); if(!el){ toast(tx("none")); return; }
       busy = true;
       try{
         toast(tx("busy"));
         if(d.fonts && d.fonts.ready) await d.fonts.ready;
-        var pdf = mode === "pdf", o = build(el), sc = pickScale(o.w, o.h), img = new Image();
+        var pdf = mode === "pdf", o = withoutZoom(function(){ return build(el); }), sc = pickScale(o.w, o.h), img = new Image();
         if(pdf) sc = Math.min(sc, 2);
         await new Promise(function(ok, no){ img.onload = ok; img.onerror = no; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgOf(o, sc)); });
         var title = menuTitle(), c = draw(img, o.w, o.h, title, sc);
