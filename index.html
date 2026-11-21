@@ -936,7 +936,7 @@ const badgeSeen = (() => {
 let clockOffset = 0, remoteRelease = {};
 const nowMs = () => Date.now() + clockOffset;
 let clockSynced = false;   /* true setelah jam server berhasil dibaca */
-window.stClock = {now: () => nowMs(), synced: () => clockSynced};   /* dipakai semua menu (STime) */
+window.stClock = {now: () => nowMs(), synced: () => clockSynced, offset: () => clockOffset, resync: () => { try{ Net.sync(); }catch(e){} }};   /* dipakai semua menu (STime) */
 /* Label "Baru" dinonaktifkan untuk semua menu. */
 const badgeOn = id => false;
 function refreshBadges(){
@@ -2204,6 +2204,8 @@ window.stNativeAlarm = (function(){
   function cap(){ try{ var C = window.Capacitor; return (C && C.isNativePlatform && C.isNativePlatform()) ? C : null; }catch(e){ return null; } }
   function plug(){ var C = cap(); if(!C) return null; return (C.Plugins && C.Plugins.LocalNotifications) || (C.registerPlugin ? C.registerPlugin("LocalNotifications") : null); }
   function vplug(){ var C = cap(); if(!C) return null; return (C.Plugins && C.Plugins.AlarmVolume) || (C.registerPlugin ? C.registerPlugin("AlarmVolume") : null); }
+  /* plugin native StopwatchAlarm (alarm 5 menit + notifikasi permanen); bila APK belum memilikinya, dipakai LocalNotifications seperti sebelumnya */
+  function sw(){ var C = cap(); if(!C) return null; try{ if(C.isPluginAvailable && !C.isPluginAvailable("StopwatchAlarm")) return null; return (C.Plugins && C.Plugins.StopwatchAlarm) || (C.registerPlugin ? C.registerPlugin("StopwatchAlarm") : null); }catch(e){ return null; } }
   function one(id){ return {notifications:[{id:id}]}; }
   function cfg(){ try{ return window.stAlarmCfg(); }catch(e){ return {snd:"classic", vol:100}; } }
   function label(key){ if(key === "off") return "Senyap"; try{ var l = window.stAlarmList; for(var i = 0; i < l.length; i++) if(l[i][0] === key) return l[i][1]; }catch(e){} return key; }
@@ -2221,8 +2223,17 @@ window.stNativeAlarm = (function(){
     preview: async function(key){ var V = vplug(); if(!V) return false; try{ await setVol(); await V.preview({sound:"alarm_" + key}); return true; }catch(e){ return false; } },
     stopPreview: async function(){ var V = vplug(); if(V){ try{ await V.stop(); }catch(e){} } },
     /* id = nomor notifikasi unik per stopwatch; menjadwalkan ulang id yang sama otomatis menggantikan yang lama (dipakai saat rename / ganti suara) */
+    service: function(){ return !!sw(); },
+    stopAlarm: async function(){ var S = sw(); if(S){ try{ await S.stopAlarm(); }catch(e){} } },
     schedule: async function(id, at, title, body){
-      var P = plug(); if(!P) return false;
+      var P = plug(), S = sw();
+      if(S){
+        try{
+          if(P){ var q = await P.checkPermissions(); if(q.display !== "granted"){ q = await P.requestPermissions(); if(q.display !== "granted") return false; } }
+          var cf = cfg(); await S.schedule({id:id, at:at, title:title, body:body, snd:cf.snd, vol:cf.vol}); return true;
+        }catch(e){ return false; }
+      }
+      if(!P) return false;
       try{
         var p = await P.checkPermissions();
         if(p.display !== "granted"){ p = await P.requestPermissions(); if(p.display !== "granted") return false; }
@@ -2235,6 +2246,7 @@ window.stNativeAlarm = (function(){
       }catch(e){ return false; }
     },
     cancel: async function(id){
+      var S = sw(); if(S){ try{ await S.cancel({id:id}); }catch(e){} return; }
       var P = plug(); if(!P) return;
       try{ await P.cancel(one(id)); }catch(e){}
       try{ await P.removeDeliveredNotifications(one(id)); }catch(e){}
@@ -2243,18 +2255,20 @@ window.stNativeAlarm = (function(){
     },
     /* penanda "stopwatch sedang berjalan" di beranda HP (senyap, kanal terpisah). at = waktu mulai (ms) bila belum mulai, 0 = tampil sekarang */
     run: async function(id, at, title, body){
+      var S = sw(); if(S){ try{ await S.run({id:id, at:at || 0, title:title, body:body}); return true; }catch(e){ return false; } }
       var P = plug(); if(!P) return false;
       try{
         var p = await P.checkPermissions(); if(p.display !== "granted") return false;
         try{ await P.createChannel({id:"st_sw_run", name:"Stopwatch berjalan", description:"Penanda stopwatch yang sedang berjalan", importance:2, visibility:1, vibration:false}); }catch(e){}
         await P.cancel(one(id));
-        var n = {id:id, title:title, body:body, channelId:"st_sw_run", autoCancel:false};
+        var n = {id:id, title:title, body:body, channelId:"st_sw_run", autoCancel:false, ongoing:true};   /* permanen: tidak bisa digeser hilang selama stopwatch berjalan */
         if(at && at > Date.now() + 1500) n.schedule = {at:new Date(at), allowWhileIdle:true};
         await P.schedule({notifications:[n]});
         return true;
       }catch(e){ return false; }
     },
     endRun: async function(id){
+      var S = sw(); if(S){ try{ await S.endRun({id:id}); }catch(e){} return; }
       var P = plug(); if(!P) return;
       try{ await P.cancel(one(id)); }catch(e){}
       try{ await P.removeDeliveredNotifications(one(id)); }catch(e){}
@@ -10505,6 +10519,7 @@ input.nm:focus{outline:0;border-bottom-color:var(--gold)}
     <div class="chips" id="chips"></div>
     <input class="txt" type="text" id="lb" maxlength="40">
     <div class="sum" id="dur" aria-live="polite"></div>
+    <p class="hint" id="clk" style="text-align:center;margin:8px 0 0"></p>
     <button class="go" id="go" type="button" style="margin-top:10px"></button>
   </div>
 
@@ -10528,6 +10543,10 @@ var lang="id",KEY="sw_list",OLD="sw_state",MAX=20,D={seq:0,items:[]},R={},Q=[],a
 function rl(){try{lang=String(localStorage.getItem("sw_lang")||"id").replace(/"/g,"")==="en"?"en":"id"}catch(e){lang="id"}}
 function L(a,b){return lang==="en"?b:a}
 function p2(n){return n<10?"0"+n:""+n}
+/* jam acuan = jam server yang disinkronkan Beranda (STime); bila belum terbaca, jam perangkat */
+function T(){try{return window.STime?STime.now():Date.now()}catch(e){return Date.now()}}
+function OFF(){return T()-Date.now()}
+function hs(ms,force){var d=new Date(ms);if(!force&&!d.getSeconds())return hm(ms);var h=d.getHours(),sep=lang==="en"?":":".";return fmt==="24"?p2(h)+sep+p2(d.getMinutes())+sep+p2(d.getSeconds()):p2(h%12||12)+sep+p2(d.getMinutes())+sep+p2(d.getSeconds())+" "+(h<12?"AM":"PM")}
 function hm(ms){var d=new Date(ms),h=d.getHours(),sep=lang==="en"?":":".";return fmt==="24"?p2(h)+sep+p2(d.getMinutes()):p2(h%12||12)+sep+p2(d.getMinutes())+" "+(h<12?"AM":"PM")}
 function rf(){try{fmt=String(localStorage.getItem("sw_fmt")||"12").replace(/"/g,"")==="24"?"24":"12"}catch(e){fmt="12"}}
 function fmtUi(){var b=$("fmtBox").querySelectorAll("button"),i;for(i=0;i<b.length;i++)b[i].className=b[i].getAttribute("data-f")===fmt?"on":""}
@@ -10573,7 +10592,7 @@ function dur(ms){ms=Math.max(0,Math.floor(ms/1000));return p2(Math.floor(ms/3600
 function words(ms){var m=Math.round(ms/60000),h=Math.floor(m/60);m=m%60;return ((h?h+L(" jam"," hr")+" ":"")+(m||!h?m+L(" menit"," min"):"")).trim()}
 function nat(){try{var n=window.parent.stNativeAlarm;return n&&n.available()?n:null}catch(e){return null}}
 function toast(m){var e=$("toast");e.textContent=m;e.style.opacity="1";clearTimeout(tt);tt=setTimeout(function(){e.style.opacity="0"},2600)}
-function nowHM(add){return hm24(Date.now()+(add||0)*60000)}
+function nowHM(add){return hm24(T()+(add||0)*60000)}
 function addMin(v,n){var x=v.split(":"),m=((+x[0]*60+ +x[1]+n)%1440+1440)%1440;return p2(Math.floor(m/60))+":"+p2(m%60)}
 function nid(it){return 500000+(it.id%100000)}
 function byId(id){for(var i=0;i<D.items.length;i++)if(D.items[i].id===id)return D.items[i];return null}
@@ -10596,21 +10615,21 @@ function load(){
   sortItems()
 }
 function dayTag(ms){
-  var a=new Date(ms),b=new Date(),x=new Date(a.getFullYear(),a.getMonth(),a.getDate()).getTime(),y=new Date(b.getFullYear(),b.getMonth(),b.getDate()).getTime(),k=Math.round((x-y)/864e5);
+  var a=new Date(ms),b=new Date(T()),x=new Date(a.getFullYear(),a.getMonth(),a.getDate()).getTime(),y=new Date(b.getFullYear(),b.getMonth(),b.getDate()).getTime(),k=Math.round((x-y)/864e5);
   return k===1?L(" · besok"," · tomorrow"):k===-1?L(" · kemarin"," · yesterday"):""
 }
 function dl(ms){
-  var a=new Date(ms),b=new Date(),k=Math.round((new Date(a.getFullYear(),a.getMonth(),a.getDate())-new Date(b.getFullYear(),b.getMonth(),b.getDate()))/864e5);
+  var a=new Date(ms),b=new Date(T()),k=Math.round((new Date(a.getFullYear(),a.getMonth(),a.getDate())-new Date(b.getFullYear(),b.getMonth(),b.getDate()))/864e5);
   if(k===0)return L("Hari ini","Today");if(k===1)return L("Besok","Tomorrow");if(k===-1)return L("Kemarin","Yesterday");
   return a.getDate()+" "+["Jan","Feb","Mar","Apr",L("Mei","May"),"Jun","Jul",L("Agu","Aug"),"Sep",L("Okt","Oct"),"Nov",L("Des","Dec")][a.getMonth()]
 }
 function sumRow(k,v){return '<span class="k">'+k+'</span><span class="v">'+v+'</span>'}
-function body(it){return L("Waktu habis · ","Time is up · ")+hm(it.st)+" → "+hm(it.en)}
+function body(it){return L("Waktu habis · ","Time is up · ")+hs(it.st)+" → "+hm(it.en)}
 function ttl(it){return "⏰ "+it.name}
 function rid(it){return nid(it)+100000}
-function runTxt(it){return{t:"⏱ "+it.name+L(" sedang berjalan"," is running"),b:L("Mulai ","Started ")+hm(it.st)+L(" · alarm berbunyi pukul "," · alarm at ")+hm(it.en)+dayTag(it.en)}}
+function runTxt(it){return{t:"⏱ "+it.name+L(" sedang berjalan"," is running"),b:L("Mulai ","Started ")+hs(it.st)+L(" · alarm berbunyi pukul "," · alarm at ")+hm(it.en)+dayTag(it.en)}}
 /* penanda "sedang berjalan" di beranda HP (aplikasi Android) */
-function nRun(it){var n=nat();if(!n||!n.run||it.done||Date.now()>=it.en)return;var x=runTxt(it);try{n.run(rid(it),it.st,x.t,x.b)}catch(e){}}
+function nRun(it){var n=nat();if(!n||!n.run||it.done||T()>=it.en)return;var x=runTxt(it);try{n.run(rid(it),it.st-OFF(),x.t,x.b)}catch(e){}}
 /* versi web/PWA: notifikasi browser saat halaman di latar belakang */
 function PN(){try{return window.parent.Notification||window.Notification}catch(e){return window.Notification}}
 function webOn(){var N=PN();return !nat()&&!!N&&N.permission==="granted"}
@@ -10625,14 +10644,14 @@ function wnClose(tag){wnReg(function(r){try{if(r&&r.getNotifications)r.getNotifi
 function webRun(){
   if(!webOn())return;
   if(!document.hidden){wnClose("st-run");return}
-  var now=Date.now(),a=D.items.filter(function(i){return !i.done&&now<i.en}).sort(function(x,y){return x.en-y.en});
+  var now=T(),a=D.items.filter(function(i){return !i.done&&now<i.en}).sort(function(x,y){return x.en-y.en});
   if(!a.length){wnClose("st-run");return}
   if(a.length===1){var x=runTxt(a[0]);wnShow(x.t,x.b,"st-run",{silent:true,requireInteraction:true});return}
   wnShow("⏱ "+a.length+L(" stopwatch sedang berjalan"," stopwatches running"),a.slice(0,3).map(function(i){return i.name+" → "+hm(i.en)}).join(" · "),"st-run",{silent:true,requireInteraction:true})
 }
 
 function calc(a,b){
-  var now=Date.now(),x=a.split(":"),y=b.split(":"),d=new Date(),D1=864e5;
+  var now=T(),x=a.split(":"),y=b.split(":"),d=new Date(T()),D1=864e5;
   var s0=new Date(d.getFullYear(),d.getMonth(),d.getDate(),+x[0],+x[1],0,0).getTime();
   var e0=new Date(d.getFullYear(),d.getMonth(),d.getDate(),+y[0],+y[1],0,0).getTime();
   if(e0<=s0)e0+=D1;
@@ -10646,7 +10665,7 @@ function preview(){
   var a=TS.value,b=TE.value,e=$("dur");
   if(!a||!b){e.textContent="";return}
   if(a===b){e.innerHTML='<span class="w">'+L("Jam mulai dan selesai tidak boleh sama.","Start and end must differ.")+'</span>';return}
-  var r=calc(a,b),now=Date.now();
+  var r=calc(a,b),now=T();
   if(!r){e.textContent="";return}
   var st=r.st<=now?L("sedang berjalan","running"):L("menunggu","waiting");
   e.innerHTML=sumRow(L("Durasi","Duration"),"<b>"+words(r.en-r.st)+"</b>")+sumRow(L("Mulai","Start"),dl(r.st)+" "+hm(r.st)+" <i>· "+st+"</i>")+sumRow(L("Selesai","End"),dl(r.en)+" "+hm(r.en))
@@ -10710,12 +10729,12 @@ function showRing(){
   if(!Q.length){stopRing();return}
   var it=byId(Q[0]);
   $("ringT").textContent=it.name||L("Waktu habis","Time is up");
-  $("ringS").textContent=hm(it.st)+" → "+hm(it.en)+(Q.length>1?"  ·  +"+(Q.length-1)+L(" lainnya"," more"):"");
+  $("ringS").textContent=hs(it.st)+" → "+hm(it.en)+(Q.length>1?"  ·  +"+(Q.length-1)+L(" lainnya"," more"):"");
   $("ringB").textContent=L("MATIKAN ALARM","STOP ALARM");$("ring").hidden=false
 }
-function ringOn(id){
+function ringOn(id,silent){
   Q.push(id);initAudio();showRing();
-  if(!rt){beep();rt=setInterval(beep,900)}
+  if(!rt&&!silent){beep();rt=setInterval(beep,900)}   /* silent: alarm native (foreground service) sudah berbunyi */
   clearTimeout(ringStop);ringStop=setTimeout(stopRing,300000)
 }
 function stopRing(){clearInterval(rt);rt=0;clearTimeout(ringStop);Q=[];$("ring").hidden=true;try{if(navigator.vibrate)navigator.vibrate(0)}catch(e){}}
@@ -10725,9 +10744,9 @@ function rename(it,inp){
   inp.value=v;if(v===it.name)return;
   it.name=v;save();
   var n=nat();
-  if(n&&!it.done&&it.en>Date.now()){
+  if(n&&!it.done&&it.en>T()){
     it.snd=curSnd();
-    try{n.schedule(nid(it),it.en,ttl(it),body(it)).then(function(ok){it.n=!!ok;save();if(ok)nRun(it)}).catch(function(){})}catch(e){}
+    try{n.schedule(nid(it),it.en-OFF(),ttl(it),body(it)).then(function(ok){it.n=!!ok;save();if(ok)nRun(it)}).catch(function(){})}catch(e){}
   }
 }
 function del(it){
@@ -10750,17 +10769,17 @@ function resetAll(){
 }
 function syncSnd(){
   var n=nat();if(!n)return;
-  var k=curSnd(),now=Date.now(),ch=false;
+  var k=curSnd(),now=T(),ch=false;
   D.items.forEach(function(it){
     if(!it.done&&it.n&&it.en>now&&it.snd!==k){
       it.snd=k;ch=true;
-      try{n.schedule(nid(it),it.en,ttl(it),body(it)).then(function(ok){it.n=!!ok;save()}).catch(function(){})}catch(e){}
+      try{n.schedule(nid(it),it.en-OFF(),ttl(it),body(it)).then(function(ok){it.n=!!ok;save()}).catch(function(){})}catch(e){}
     }
   });
   if(ch)save()
 }
 function clearDone(){
-  var now=Date.now(),n=nat();
+  var now=T(),n=nat();
   D.items=D.items.filter(function(it){
     if(now>=it.en){if(n){try{n.cancel(nid(it))}catch(e){}}return false}
     return true});
@@ -10784,14 +10803,14 @@ function build(){
   layout();paint()
 }
 function paint(){
-  var now=Date.now(),any=false;
+  var now=T(),any=false;
   D.items.forEach(function(it){
     var r=R[it.id];if(!r)return;
     var wait=now<it.st,done=now>=it.en,tot=it.en-it.st,p=done?1:wait?0:(now-it.st)/tot;
     if(done)any=true;
     r.root.className="panel card"+(done?" fin":"");
     r.sl.textContent=(it.n&&!done?"🔔 ":"")+(done?L("Selesai","Finished"):wait?L("Menunggu mulai","Waiting to start"):L("Sedang berjalan","Running"));
-    r.rg.innerHTML=L("Mulai ","Start ")+"<b>"+dl(it.st)+" "+hm(it.st)+"</b> → "+L("Selesai ","End ")+"<b>"+dl(it.en)+" "+hm(it.en)+"</b> · "+L("Durasi ","Duration ")+words(tot);
+    r.rg.innerHTML=L("Mulai ","Start ")+"<b>"+dl(it.st)+" "+hs(it.st)+"</b> → "+L("Selesai ","End ")+"<b>"+dl(it.en)+" "+hm(it.en)+"</b> · "+L("Durasi ","Duration ")+words(tot);
     r.big.textContent=dur(done?0:wait?it.st-now:it.en-now);
     r.bar.style.width=(p*100).toFixed(1)+"%";
     r.el.textContent=done?L("Selesai ","Ended ")+words(Math.max(now-it.en,0))+L(" yang lalu"," ago"):wait?L("Mulai dalam ","Starts in ")+words(it.st-now):L("Berjalan ","Elapsed ")+dur(now-it.st)+L(" dari "," of ")+words(tot);
@@ -10809,15 +10828,23 @@ function liveForm(){
   var a=nowHM(0);if(a===TS.value)return;
   TS.value=a;if(AUTO.e!=null)TE.value=addMin(a,AUTO.e);preview()
 }
+function clk(){
+  var e=$("clk");if(!e||$("setup").hidden)return;
+  var sy=false,o=OFF();try{sy=!!(window.STime&&STime.synced())}catch(x){}
+  var t=L("Jam sekarang ","Now ")+hs(T(),true)+(sy?L(" · sama dengan jam server"," · matches server clock"):L(" · jam perangkat (server belum terbaca)"," · device clock (server not read yet)"));
+  if(sy&&Math.abs(o)>=1500)t+=L(" · jam HP selisih "+Math.round(o/1000)+" dtk"," · phone clock off by "+Math.round(o/1000)+" s");
+  if(e.textContent!==t)e.textContent=t
+}
 function tick(){
-  var now=Date.now(),ch=false;
+  var now=T(),ch=false;clk();
   if(TS){TS.sync();TE.sync();liveForm()}
   D.items.forEach(function(it){
     if(now>=it.en&&!it.done){
       it.done=true;ch=true;
       var n=nat(),bg=document.hidden;
       if(now-it.en<120000){
-        if(n&&it.n&&bg){/* di latar belakang: notifikasi alarm native tetap tampil di beranda HP */}
+        if(n&&it.n&&bg){/* di latar belakang: alarm native (suara 5 menit + notifikasi) jalan sendiri */}
+        else if(n&&it.n&&n.service&&n.service()){ringOn(it.id,true)}   /* aplikasi terbuka: tampilkan layar alarm, suara dari alarm native */
         else{ringOn(it.id);if(n){try{n.cancel(nid(it))}catch(e){}}}
         if(!n&&bg)wnShow(ttl(it),body(it),"st-end-"+it.id,{requireInteraction:true,vibrate:[400,150,400,150,400]})
       }
@@ -10835,6 +10862,7 @@ async function go(){
   if(a===b){toast(L("Jam mulai dan selesai tidak boleh sama.","Start and end must differ."));return}
   if(D.items.length>=MAX){toast(L("Maksimal "+MAX+" stopwatch. Hapus yang sudah selesai dulu.","Max "+MAX+" stopwatches. Remove finished ones first."));return}
   initAudio();askWeb();var r=calc(a,b);if(!r)return;
+  if(AUTO.s){var s0=Math.floor(T()/1000)*1000;if(AUTO.e!=null)r={st:s0,en:s0+AUTO.e*60000};else if(r.st<=s0&&r.en>s0)r.st=s0}
   var id=++D.seq,nm=$("lb").value.trim().slice(0,40)||("Stopwatch "+id);
   var it={id:id,st:r.st,en:r.en,name:nm,n:false,done:false,snd:curSnd()};
   D.items.push(it);sortItems();save();
@@ -10842,7 +10870,7 @@ async function go(){
   AUTO={s:false,e:null};TS.value=hm24(r.en);TE.value=addMin(hm24(r.en),60);$("lb").value="";preview();
   var n=nat();
   if(n){
-    try{it.n=await n.schedule(nid(it),it.en,ttl(it),body(it))}catch(e){it.n=false}
+    try{it.n=await n.schedule(nid(it),it.en-OFF(),ttl(it),body(it))}catch(e){it.n=false}
     save();paint();if(it.n)nRun(it);
     if(!it.n)toast(L("Izin notifikasi ditolak.","Notification permission denied."))
   }
@@ -10850,8 +10878,8 @@ async function go(){
 $("go").onclick=go;
 $("clr").onclick=clearDone;
 $("rst").onclick=resetAll;
-$("addBtn").onclick=function(){open=!open;layout();if(open){resetForm();try{$("setup").scrollIntoView({behavior:"smooth",block:"center"})}catch(e){}}};
-$("ringB").onclick=function(){Q.shift();if(Q.length)showRing();else stopRing();paint()};
+$("addBtn").onclick=function(){try{window.parent.stClock.resync()}catch(e){}open=!open;layout();if(open){resetForm();try{$("setup").scrollIntoView({behavior:"smooth",block:"center"})}catch(e){}}};
+$("ringB").onclick=function(){var n=nat();if(n&&n.service&&n.service()){try{n.stopAlarm()}catch(e){}Q=[];stopRing();paint();return}Q.shift();if(Q.length)showRing();else stopRing();paint()};
 window.addEventListener("storage",function(e){
   if(!e.key||e.key==="sw_lang"){rl();text()}
   if(!e.key||e.key==="sw_fmt"){rf();if(TS){TS.refresh();TE.refresh();fmtUi();preview()}}
@@ -10862,6 +10890,7 @@ document.addEventListener("visibilitychange",function(){if(!document.hidden)tick
 rl();rf();load();TS=mkPicker($("ts"),function(){AUTO.s=false;preview()});TE=mkPicker($("te"),function(){AUTO.e=null;preview()});
 ["pointerdown","touchstart","scroll","wheel"].forEach(function(ev){$("setup").addEventListener(ev,function(){lastTouch=Date.now()},true)});
 $("fmtBox").onclick=function(e){var f=e.target&&e.target.getAttribute&&e.target.getAttribute("data-f");if(f&&f!==fmt)setFmt(f)};
+try{window.parent.stClock.resync()}catch(e){}
 resetForm();text();build();syncSnd();tick();setInterval(tick,250);
 })();
 </scr@@ipt>
