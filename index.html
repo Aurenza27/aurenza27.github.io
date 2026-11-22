@@ -9,6 +9,17 @@
 const SHOW_DUKUNG = !(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
 if(!SHOW_DUKUNG){ const st = document.createElement("style"); st.textContent = "#gDukung,#dukungNote,#abDonate,#abDonateNote{display:none!important}"; document.head.appendChild(st); }
 </script>
+<script>
+/* Kunci Aplikasi: bila aktif, tampilan langsung ditutup sebelum isi halaman sempat terlihat (logikanya ada di blok "KUNCI APLIKASI" di bawah) */
+(function(){try{
+  var c = JSON.parse(localStorage.getItem("st_applock") || "null");
+  if(!(c && c.on && c.h && c.s)) return;
+  var ts = +sessionStorage.getItem("st_al_r") || 0; sessionStorage.removeItem("st_al_r");
+  if(ts && Date.now() - ts < 6000) return;
+  document.documentElement.classList.add("alk");
+}catch(e){}})();
+</script>
+<style>#alock{display:none}html.alk #alock{display:flex}html.alk body>*:not(#alock){visibility:hidden!important}html.alk{overflow:hidden}</style>
 <meta name="theme-color" content="#0b0d12">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -719,6 +730,60 @@ h1{font-size:26px;line-height:1.15}
     <div id="pvBody"></div>
   </div></div>
 </section>
+<style id="alCss">
+#alock{position:fixed;inset:0;z-index:2147483000;align-items:center;justify-content:center;overflow:auto;padding:calc(24px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px));background:radial-gradient(ellipse at 50% -10%,#1c2230 0%,var(--bg) 62%) fixed,var(--bg);color:var(--text);font-family:var(--ui)}
+#alock .alw{width:100%;max-width:340px;margin:auto;text-align:center}
+#alock .alic{display:grid;place-items:center;width:54px;height:54px;margin:0 auto 14px;border:1px solid var(--gold);border-radius:50%;color:var(--gold2)}
+#alock .alic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#alT{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
+#alock .als{margin:6px 0 22px;color:var(--muted);font-size:14px}
+#alock .alm{min-height:20px;margin:14px 0 6px;font-size:13px;color:#ffb4b0}
+#alock .alk2{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px auto;padding:10px 14px;background:none;border:0;color:var(--gold2);font:inherit;font-size:14px;cursor:pointer}
+#alock .alk2[hidden]{display:none}
+#alock .alk2 svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.aldots{display:flex;justify-content:center;gap:12px;height:18px;margin:0 0 18px}
+.aldots .d{width:12px;height:12px;border:1.5px solid var(--gold);border-radius:50%;transition:background .12s}
+.aldots .d.on{background:var(--gold)}
+.alkeys{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;justify-items:center;max-width:260px;margin:0 auto}
+.alkeys button{width:68px;height:68px;border:1px solid var(--line);border-radius:50%;background:rgba(255,255,255,.03);color:var(--text);font:500 24px var(--ui);cursor:pointer;padding:0}
+.alkeys button:active{border-color:var(--gold);background:rgba(212,169,79,.12)}
+.alkeys button.fn{font-size:19px;color:var(--muted)}
+.alkeys button:focus-visible,#alock .alk2:focus-visible,.albtn:focus-visible,.alin:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#spanel .alkeys{gap:10px;max-width:200px}
+#spanel .alkeys button{width:56px;height:56px;font-size:20px}
+#spanel .alpadbox{margin:8px 0 12px}
+#spanel .alpat{width:min(200px,60vw)}
+.alpat{position:relative;width:min(250px,70vw);aspect-ratio:1;margin:4px auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.alpat svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.alpat polyline{fill:none;stroke:var(--gold);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.alpat .alp{position:absolute;width:24%;height:24%;transform:translate(-50%,-50%);border-radius:50%;display:grid;place-items:center;transition:box-shadow .12s}
+.alpat .alp::before{content:"";width:30%;height:30%;border-radius:50%;background:var(--muted);transition:transform .12s,background .12s}
+.alpat .alp.on{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.alpat .alp.on::before{background:var(--gold);transform:scale(1.5)}
+.alpat.bad polyline{stroke:#ff8f8a}
+.alpat.bad .alp.on{box-shadow:inset 0 0 0 1.5px #ff8f8a}
+.alpat.bad .alp.on::before{background:#ff8f8a}
+#alPad.busy{opacity:.4;pointer-events:none}
+.shake{animation:alShake .35s}
+@keyframes alShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
+.alin{display:block;width:100%;min-height:46px;padding:0 14px;font:600 18px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;text-align:center;text-transform:uppercase;color:var(--text);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px}
+.albtn{display:block;width:100%;min-height:46px;margin:12px 0;font:inherit;font-size:15px;font-weight:600;color:#1a1405;background:var(--gold);border:0;border-radius:12px;cursor:pointer}
+.alrec{margin:8px 0;padding:14px 8px;border:1px dashed var(--gold);border-radius:12px;color:var(--gold2);font:600 20px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;text-align:center;user-select:all;-webkit-user-select:all}
+#alToast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);max-width:min(92vw,360px);padding:10px 16px;border:1px solid var(--gold);border-radius:12px;background:var(--card);color:var(--text);font-size:13px;line-height:1.4;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:2147483001}
+#alToast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+<div id="alock" role="dialog" aria-modal="true" aria-labelledby="alT">
+  <div class="alw">
+    <div class="alic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg></div>
+    <h2 id="alT">Satu Titik</h2>
+    <p class="als" id="alS"></p>
+    <div id="alPad"></div>
+    <p class="alm" id="alMsg" role="status"></p>
+    <button class="alk2" id="alBio" type="button" hidden></button>
+    <button class="alk2" id="alForgot" type="button"></button>
+  </div>
+</div>
 <style id="thAp"></style>
 <canvas id="bgVid" aria-hidden="true" hidden></canvas>
 <div id="bgShade" hidden></div>
@@ -732,6 +797,7 @@ h1{font-size:26px;line-height:1.15}
     <button class="sc grp" id="gPlay" data-g="play" type="button"></button>
     <button class="sc grp" id="gLook" data-g="look" type="button"></button>
     <button class="sc grp" id="gLang" data-g="lang" type="button"></button>
+    <button class="sc grp" id="gAppLock" data-g="applock" type="button"></button>
     <button class="sc grp" id="gGloss" data-g="gloss" type="button"></button>
     <button class="sc grp" id="gSaran" data-g="saran" type="button"></button>
     <button class="sc grp" id="gAbout" data-g="about" type="button"></button>
@@ -768,6 +834,7 @@ h1{font-size:26px;line-height:1.15}
   <div id="svLang" hidden>
     <button class="sc" id="sbLang" type="button"></button>
   </div>
+  <div id="svAppLock" hidden></div>
   <div id="svReset" hidden>
     <div id="rList">
       <p class="abp" id="rInfo"></p>
@@ -1306,6 +1373,8 @@ PIC.alert = GI('<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>');
 PIC.cache = GI('<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/>');
 PIC.heart = GI('<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>');
 PIC.info = GI('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>');
+PIC.lock = GI('<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>');
+PIC.finger = GI('<path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>');
 $("gear").innerHTML = PIC.gear; $("gearHome").innerHTML = PIC.gear; $("spB").innerHTML = GI('<path d="M15 6l-6 6 6 6"/>');
 const put = (id, k, text) => { $(id).innerHTML = PIC[k] + "<span>" + text.replace(/^[^\p{L}\p{N}]+/u, "") + "</span>"; };
 const TT = {
@@ -1452,8 +1521,8 @@ const AP = {
   id:{theme:"Tema", themes:["Biru malam","Hitam pekat","Kabut asap","Kabut laut","Langit berbintang","Asap sinematik"], size:"Ukuran huruf", sizes:["Kecil","Sedang","Besar"], font:"Mode font", fonts:["Serif klasik","Sans-serif"], anim:["Animasi: nyala","Animasi: mati"]},
   en:{theme:"Theme", themes:["Midnight blue","Pure black","Smoke","Sea fog","Starry sky","Cinematic smoke"], size:"Font size", sizes:["Small","Medium","Large"], font:"Font mode", fonts:["Classic serif","Sans-serif"], anim:["Animation: on","Animation: off"]}
 };
-Object.assign(TT.id, {bk:"Kembali", glq:"Cari istilah…", gle:"Istilah tidak ditemukan.", g:{sound:"Mode", play:"Pemutaran", lang:"Bahasa", about:"Tentang", look:"Tampilan", gloss:"Istilah", saran:"Kotak Saran", profile:"Profil", reset:"Reset", cache:"Hapus cache"}});
-Object.assign(TT.en, {bk:"Back", glq:"Search terms…", gle:"No terms found.", g:{sound:"Mode", play:"Playback", lang:"Language", about:"About", look:"Appearance", gloss:"Glossary", saran:"Suggestion Box", profile:"Profile", reset:"Reset", cache:"Clear cache"}});
+Object.assign(TT.id, {bk:"Kembali", glq:"Cari istilah…", gle:"Istilah tidak ditemukan.", g:{sound:"Mode", play:"Pemutaran", lang:"Bahasa", about:"Tentang", look:"Tampilan", gloss:"Istilah", saran:"Kotak Saran", profile:"Profil", reset:"Reset", cache:"Hapus cache", applock:"Kunci Aplikasi"}});
+Object.assign(TT.en, {bk:"Back", glq:"Search terms…", gle:"No terms found.", g:{sound:"Mode", play:"Playback", lang:"Language", about:"About", look:"Appearance", gloss:"Glossary", saran:"Suggestion Box", profile:"Profile", reset:"Reset", cache:"Clear cache", applock:"App Lock"}});
 Object.assign(TT.id, {
   rx:{info:"Pilih apa yang ingin direset.", data:["Reset data","Hapus riwayat dan hasil semua menu di perangkat dan di server (bila masuk dengan Google). Pengaturan dan akun tetap."], set:["Reset pengaturan","Kembalikan suara, musik, tampilan, dan bahasa ke bawaan. Ikut tersinkron ke akunmu. Data tetap."], all:["Kembali ke setelan awal","Reset data dan reset pengaturan sekaligus, di perangkat dan di server. Akun tetap masuk."],
     q:{data:"Reset data? Riwayat dan hasil semua menu akan dihapus dan tidak bisa dikembalikan.", set:"Reset pengaturan? Semua pengaturan kembali ke bawaan. Data tidak berubah.", all:"Kembali ke setelan awal? Semua data dan pengaturan akan dihapus dan tidak bisa dikembalikan."},
@@ -1505,7 +1574,7 @@ const SR = {
   en:{info:"Got a suggestion, feedback, or a menu idea? Write it below and send it. No login needed.", ph:"Write your suggestion here…", send:"Send suggestion", subj:"Suggestion for Satu Titik", empty:"Please write your suggestion first.", sending:"Sending…", queued:"You are offline. Your suggestion is saved and will be sent automatically once you are back online.", ok:"Thank you! Your suggestion has been sent.", fail:"Could not send (check your internet connection). Try again, or send via your email app.", mail:"Send via email app"}
 };
 let spView = "", rPend = null, chBytes = null;
-const SPV = {"":"sv0", sound:"svSound", play:"svPlay", lang:"svLang", about:"svAbout", look:"svLook", gloss:"svGloss", saran:"svSaran", profile:"svProfile", reset:"svReset", cache:"svCache"}, SPI = {sound:"mode", play:"auto", look:"look", lang:"lang", about:"info", gloss:"book", saran:"mail", profile:"user", reset:"reset", cache:"cache"};
+const SPV = {"":"sv0", sound:"svSound", play:"svPlay", lang:"svLang", about:"svAbout", look:"svLook", gloss:"svGloss", saran:"svSaran", profile:"svProfile", reset:"svReset", cache:"svCache", applock:"svAppLock"}, SPI = {sound:"mode", play:"auto", look:"look", lang:"lang", about:"info", gloss:"book", saran:"mail", profile:"user", reset:"reset", cache:"cache", applock:"lock"};
 function showView(v){ spView = v; rPend = null; $("rStat").hidden = true; $("chStat").hidden = true; paintPanel(); if(v === "cache") cacheUse(); }
 function paintPanel(){
   const t = TT[S.lang], pb = (id, k, on, a) => { put(id, k, on ? a[0] : a[1]); $(id).setAttribute("aria-pressed", String(!!on)); };
@@ -1518,6 +1587,7 @@ function paintPanel(){
   put("gSound", "mode", t.g.sound); put("gPlay", "auto", t.g.play); put("gLang", "lang", t.g.lang); put("gAbout", "info", t.g.about); put("gLook", "look", t.g.look);
   put("gSaran", "mail", t.g.saran); put("gDukung", "heart", S.lang === "en" ? "Support Us" : "Dukung Kami"); $("dukungNote").textContent = S.lang === "en" ? "Voluntary support. It does not unlock any features." : "Dukungan sukarela, tidak membuka fitur apa pun.";
   { const r = SR[S.lang]; $("srInfo").textContent = r.info; $("srMsg").placeholder = r.ph; put("srSend", "mail", r.send); $("srCnt").textContent = $("srMsg").value.length + " / 1500"; }
+  put("gAppLock", "lock", t.g.applock); if(window.stAppLock) window.stAppLock.paint();
   put("gGloss", "book", t.g.gloss); $("glQ").placeholder = t.glq; $("glEmpty").textContent = t.gle; $("spanel").classList.toggle("wide", spView === "gloss"); if(glLang !== S.lang) buildGloss();
   const A = AP[S.lang];
   $("lbTheme").textContent = A.theme; $("lbSize").textContent = A.size; $("lbFont").textContent = A.font;
@@ -1624,7 +1694,7 @@ $("gear").addEventListener("click", () => togglePanel()); $("gearHome").addEvent
    Klik penutup tidak diteruskan ke elemen di bawahnya, jadi tidak membuka menu secara tidak sengaja. */
 const spOpen = () => { const p = $("spanel"); return !p.hidden && !p.classList.contains("out"); };
 document.addEventListener("click", e => {
-  if(!spOpen() || e.target.closest("#spanel, #gear, #gearHome")) return;
+  if(!spOpen() || e.target.closest("#spanel, #gear, #gearHome, #alock")) return;
   e.preventDefault(); e.stopPropagation(); togglePanel(false);
 }, true);
 document.addEventListener("keydown", e => { if(e.key === "Escape" && spOpen()) togglePanel(false); });
@@ -1644,7 +1714,7 @@ const PV = {
     {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, termasuk ketika layar terkunci atau aplikasi berada di latar belakang (notifikasi tampil selama merekam), dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Jumlah langkah dibaca dari sensor langkah HP (izin Aktivitas Fisik) hanya saat merekam di aplikasi Android, dan hanya dipakai untuk memeriksa kewajaran jarak. Angkanya tidak ditampilkan atau disimpan di riwayat aktivitas.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif."]},
     {p:["Lokasi (menu Jadwal Sholat):"], l:["Untuk menghitung waktu sholat dan arah kiblat, kamu memilih kota dari daftar atau menekan tombol lokasi GPS. GPS hanya dibaca satu kali saat kamu menekan tombol itu (tidak terus-menerus dan tidak di latar belakang). Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Kota atau koordinat yang kamu pilih, metode hitung, dan pilihan alarm adzan disimpan di perangkatmu. Perhitungan dilakukan di perangkat, tanpa mengirim lokasimu ke server untuk keperluan menu ini. Bila kamu masuk dengan Google dan sinkronisasi aktif, pengaturan ini (termasuk koordinat lokasimu) ikut tersalin ke akunmu seperti data menu lain.","Kompas kiblat memakai sensor arah perangkat hanya saat kamu menyalakannya. Bacaan sensor tidak disimpan dan tidak dikirim.","Alarm adzan: di aplikasi Android, adzan dijadwalkan ke alarm sistem perangkat untuk 7 hari ke depan dan tetap berbunyi walau aplikasi ditutup; di browser, adzan hanya berbunyi selama menu terbuka. Butuh izin notifikasi atau alarm dari perangkatmu dan bisa kamu matikan kapan saja."]},
     {p:["Keuangan dan Arisan:"], l:["Catatan keuangan (uang masuk dan keluar, dompet, jatah belanja, tabungan) dan data Arisan (nama peserta, pemenang, status pembayaran) disimpan di perangkatmu. Bila kamu masuk dengan Google, data ini ikut tersalin ke akunmu.","Kunci menu: PIN dan kode pemulihan hanya disimpan di perangkat dalam bentuk hash (bukan teks asli), tidak dikirim ke server, dan tidak ikut tersalin ke akun. Sidik jari dan PIN/pola layar HP diperiksa oleh sistem Android; aplikasi tidak menerima atau menyimpan data sidik jarimu.","Ruangan Arisan online: nama host dan peserta, daftar nama kocokan, hasil, dan chat ruangan disimpan di server selama ruangan ada dan dihapus saat host menutup ruangan. Chat juga ditandai kedaluwarsa setelah 24 jam.","File cadangan: fitur Cadangkan di menu Keuangan dan Arisan membuat file di perangkatmu atas permintaanmu, lalu kamu sendiri yang memilih tempat menyimpannya. File ini tidak dienkripsi dan tidak berisi PIN atau kode pemulihan, jadi simpan di tempat aman."]},
-    {p:["Ringkasan per menu (data di perangkat):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, dan Jodoh: nama, tanggal lahir, dan isian lain yang kamu ketik, riwayat, papan skor, serta pengaturan suara dan musik. Fitur bacaan suara memakai mesin suara bawaan perangkatmu.","BMI & Kalori, Kehamilan, dan Kandungan Makanan: data tubuh dan kehamilan yang kamu isi (misalnya usia, jenis kelamin, berat, dan tinggi badan), profil AKG (termasuk status hamil atau menyusui), dan isi Piringku. Ini data kesehatan, jadi jaga perangkatmu.","Timer: hanya pengaturan tampilan. Alarm dan notifikasi timer dibuat di perangkatmu (notifikasi lokal), tanpa server.","Tebak Inisial, Gems Arena, dan Versus: bila dimainkan di satu perangkat, datanya hanya di perangkat. Ruangan online dijelaskan di bawah.","Jadwal Sholat: kota atau koordinat lokasi, metode hitung, dan pilihan alarm adzan, seperti dijelaskan di bagian Lokasi (menu Jadwal Sholat) di atas.","Catatan Cepat: judul dan isi catatan, warna, status sematan, serta alarm pengingat yang kamu atur. Catatan tersimpan di perangkatmu dan tidak dienkripsi tambahan, jadi jangan menyimpan kata sandi atau data yang sangat rahasia di dalamnya. Alarm pengingat bersifat pilihan, dijadwalkan ke alarm sistem perangkat (maksimal 50 alarm aktif), dan tidak memakai server.","Turnamen, Olahraga, Keuangan, dan Arisan: dijelaskan di bagian lain di kebijakan ini.","Semua data di atas ikut tersalin ke akunmu bila kamu masuk dengan Google dan sinkronisasi aktif, kecuali PIN dan kode pemulihan kunci menu."]},
+    {p:["Ringkasan per menu (data di perangkat):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, dan Jodoh: nama, tanggal lahir, dan isian lain yang kamu ketik, riwayat, papan skor, serta pengaturan suara dan musik. Fitur bacaan suara memakai mesin suara bawaan perangkatmu.","BMI & Kalori, Kehamilan, dan Kandungan Makanan: data tubuh dan kehamilan yang kamu isi (misalnya usia, jenis kelamin, berat, dan tinggi badan), profil AKG (termasuk status hamil atau menyusui), dan isi Piringku. Ini data kesehatan, jadi jaga perangkatmu.","Timer: hanya pengaturan tampilan. Alarm dan notifikasi timer dibuat di perangkatmu (notifikasi lokal), tanpa server.","Tebak Inisial, Gems Arena, dan Versus: bila dimainkan di satu perangkat, datanya hanya di perangkat. Ruangan online dijelaskan di bawah.","Jadwal Sholat: kota atau koordinat lokasi, metode hitung, dan pilihan alarm adzan, seperti dijelaskan di bagian Lokasi (menu Jadwal Sholat) di atas.","Catatan Cepat: judul dan isi catatan, warna, status sematan, serta alarm pengingat yang kamu atur. Catatan tersimpan di perangkatmu dan tidak dienkripsi tambahan, jadi jangan menyimpan kata sandi atau data yang sangat rahasia di dalamnya. Alarm pengingat bersifat pilihan, dijadwalkan ke alarm sistem perangkat (maksimal 50 alarm aktif), dan tidak memakai server.","Turnamen, Olahraga, Keuangan, dan Arisan: dijelaskan di bagian lain di kebijakan ini.","Kunci Aplikasi: PIN atau pola dan kode pemulihan disimpan di perangkatmu hanya dalam bentuk hash (tidak bisa dibaca kembali) dan tidak disalin ke akun. Sidik jari diproses oleh sistem HP; aplikasi hanya menerima hasil cocok atau tidak.","Semua data di atas ikut tersalin ke akunmu bila kamu masuk dengan Google dan sinkronisasi aktif, kecuali PIN dan kode pemulihan kunci menu."]},
     {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir. Nama dan foto profilmu dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui ID Akunmu (misalnya saat mereka menambah teman); di aplikasi, foto itu hanya bisa dibuka oleh temanmu. Status online dan waktu terakhir aktifmu hanya bisa dilihat temanmu. Alamat emailmu tidak terlihat pengguna lain.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, rute GPS olahraga, serta data Keuangan dan Arisan) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, nama (username) admin, moderator, atau pengikut, serta suara dan komentar yang kamu kirim (isi komentar, username, ID Akun, dan waktu) yang dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui kode turnamen tersebut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online; hanya bisa dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, ditandai kedaluwarsa setelah 30 hari, dan dihapus saat pertemanan dihapus.","Tanda dibaca: waktu terakhir kamu membuka chat dengan temanmu. Hanya bisa dilihat temanmu (untuk menandai pesan sudah dibaca) dan dihapus saat pertemanan dihapus."]},
     {p:["Ruangan game online (Main bersama lewat kode ruang):"], l:["Hanya untuk pengguna yang masuk dengan Google. Pada Tebak Inisial dan Gems Arena, kode ruang, nama host dan pemain, jawaban, skor atau hasil permainan (serta chat ruangan di Tebak Inisial dan Gems Arena) disimpan di server selama ruangan dipakai dan dihapus saat host menutup ruangan. Chat ditandai kedaluwarsa setelah 24 jam. Ruangan yang tidak ditutup dengan benar (misalnya aplikasi dihentikan paksa) dapat tersimpan lebih lama. Siapa pun yang sudah masuk akun dan mengetahui kode ruangan dapat melihat isi ruangan, termasuk chatnya."]},
     {p:["Notifikasi push (hanya aplikasi Android, setelah masuk dengan Google):"], l:["Aplikasi menyimpan token perangkat dari Firebase Cloud Messaging bersama ID penggunamu, jenis platform, dan waktu, supaya notifikasi tetap muncul walau aplikasi ditutup. Izin notifikasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Notifikasi dikirim untuk pesan teman, permintaan dan persetujuan pertemanan, serta undangan (moderator turnamen, pengikut turnamen, atau ruangan permainan) beserta balasannya. Saat kejadian itu terjadi, aplikasi mengirim jenis kejadian dan pengenal terkait ke server pengirim notifikasi (Cloudflare Workers) bersama token masuk akunmu untuk verifikasi. Server memeriksa kejadian itu, membaca data yang dibutuhkan dari akun (nama pengirim dan, untuk pesan teman, 100 huruf pertama isi pesan), lalu meneruskannya sebagai isi notifikasi lewat Firebase Cloud Messaging milik Google. Isi notifikasi dapat tampil di layar kunci sesuai pengaturan notifikasi HP-mu; matikan notifikasi aplikasi bila kamu tidak menghendakinya.","Token perangkat dihapus saat kamu keluar dari akun (perangkat itu) atau menghapus akun (semua perangkat)."]},
@@ -1668,7 +1738,7 @@ const PV = {
     {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, including while the screen is locked or the app is in the background (a notification shows while recording), and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","The step count is read from your phone's step sensor (Physical activity permission) only while recording in the Android app, and is used only to check that the distance is plausible. It is not shown or stored in the activity history.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on."]},
     {p:["Location (Prayer Times menu):"], l:["To calculate prayer times and the Qibla direction, you pick a city from a list or press the GPS location button. GPS is read only once when you press that button (not continuously and not in the background). Location permission is requested by your device and you can revoke it at any time.","The city or coordinates you choose, the calculation method, and your adhan alarm choices are stored on your device. Calculations run on the device, and your location is not sent to a server for this menu. If you sign in with Google and sync is on, these settings (including your location coordinates) are also copied to your account like other menu data.","The Qibla compass uses the device’s orientation sensor only while you have it turned on. Sensor readings are not stored or sent.","Adhan alarm: in the Android app, the adhan is scheduled with the device’s system alarm for the next 7 days and still sounds when the app is closed; in a browser, the adhan only sounds while the menu is open. It needs notification or alarm permission from your device and you can turn it off at any time."]},
     {p:["Finance and Arisan:"], l:["Financial records (money in and out, wallets, spending limits, savings) and Arisan data (participant names, winners, payment status) are stored on your device. If you sign in with Google, this data is also copied to your account.","Menu lock: the PIN and recovery code are stored only on your device as a hash (not the original text), are not sent to a server, and are not copied to your account. Your fingerprint and the phone's screen PIN/pattern are checked by the Android system; the app does not receive or store your fingerprint data.","Online Arisan rooms: the names of the host and participants, the draw name list, results, and the room chat are stored on a server while the room exists and are deleted when the host closes the room. Chat is also marked to expire after 24 hours.","Backup file: the Back up feature in the Finance and Arisan menus creates a file on your device at your request, and you choose where to save it. This file is not encrypted and does not contain the PIN or recovery code, so keep it somewhere safe."]},
-    {p:["Summary by menu (data on your device):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, and Jodoh: names, birth dates, and other text you type, history, scoreboards, and sound and music settings. The read-aloud feature uses your device’s built-in speech engine.","BMI & Kalori, Kehamilan, and Kandungan Makanan: the body and pregnancy data you enter (for example age, sex, weight, and height), the RDA (AKG) profile (including pregnant or breastfeeding status), and the contents of My Plate (Piringku). This is health data, so keep your device secure.","Timer: display settings only. Timer alarms and notifications are created on your device (local notifications), without a server.","Tebak Inisial, Gems Arena, and Versus: when played on a single device, the data stays on the device. Online rooms are described below.","Prayer Times: the city or location coordinates, calculation method, and adhan alarm choices, as described in the Location (Prayer Times menu) section above.","Quick Notes: the title and text of your notes, color, pinned status, and the reminder alarms you set. Notes are stored on your device and are not additionally encrypted, so do not keep passwords or highly confidential data in them. Reminder alarms are optional, scheduled with the device’s system alarm (up to 50 active alarms), and do not use a server.","Tournaments, Sports, Finance, and Arisan: described elsewhere in this policy.","All of the above is also copied to your account if you sign in with Google and sync is on, except the PIN and recovery code of the menu lock."]},
+    {p:["Summary by menu (data on your device):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, and Jodoh: names, birth dates, and other text you type, history, scoreboards, and sound and music settings. The read-aloud feature uses your device’s built-in speech engine.","BMI & Kalori, Kehamilan, and Kandungan Makanan: the body and pregnancy data you enter (for example age, sex, weight, and height), the RDA (AKG) profile (including pregnant or breastfeeding status), and the contents of My Plate (Piringku). This is health data, so keep your device secure.","Timer: display settings only. Timer alarms and notifications are created on your device (local notifications), without a server.","Tebak Inisial, Gems Arena, and Versus: when played on a single device, the data stays on the device. Online rooms are described below.","Prayer Times: the city or location coordinates, calculation method, and adhan alarm choices, as described in the Location (Prayer Times menu) section above.","Quick Notes: the title and text of your notes, color, pinned status, and the reminder alarms you set. Notes are stored on your device and are not additionally encrypted, so do not keep passwords or highly confidential data in them. Reminder alarms are optional, scheduled with the device’s system alarm (up to 50 active alarms), and do not use a server.","Tournaments, Sports, Finance, and Arisan: described elsewhere in this policy.","App Lock: the PIN or pattern and the recovery code are stored on your device only as a hash (they cannot be read back) and are not copied to your account. Your fingerprint is handled by the phone’s system; the app only receives a match or no-match result.","All of the above is also copied to your account if you sign in with Google and sync is on, except the PIN and recovery code of the menu lock."]},
     {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time. Your name and profile photo can be seen by other signed-in users who know your Account ID (for example when they add a friend); in the app, the photo can only be opened by your friends. Your online status and last-active time can only be seen by your friends. Your email address is not visible to other users.","A copy of your app data (settings, history, menu results, sports GPS routes, and Finance and Arisan data) so it can sync across devices.","For online tournaments: tournament data, tournament codes, the names (usernames) of admins, moderators, and followers, and the votes and comments you submit (comment text, username, Account ID, and time), which can be seen by other signed-in users who know that tournament’s code.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light; visible only to your friends).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, are marked to expire after 30 days, and are deleted when the friendship is removed.","Read receipts: the time you last opened the chat with your friend. Only your friend can see it (to mark messages as read), and it is deleted when the friendship is removed."]},
     {p:["Online game rooms (Play together via room code):"], l:["Only for users signed in with Google. In Tebak Inisial and Gems Arena, the room code, host and player names, answers, scores or game results (and the room chat in Tebak Inisial and Gems Arena) are stored on a server while the room is in use and deleted when the host closes the room. Chat is marked to expire after 24 hours. A room that is not closed properly (for example if the app is force-stopped) may be kept longer. Anyone signed in who knows the room code can see the room contents, including the chat."]},
     {p:["Push notifications (Android app only, after signing in with Google):"], l:["The app stores a device token from Firebase Cloud Messaging together with your user ID, the platform type, and a timestamp, so notifications still appear when the app is closed. Notification permission is requested by your device and you can revoke it at any time.","Notifications are sent for friend messages, friend requests and acceptances, and invitations (tournament moderator, tournament follower, or game room) and their replies. When such an event happens, the app sends the event type and related identifiers to the notification server (Cloudflare Workers) together with your sign-in token for verification. The server checks the event, reads the data it needs from your account (the sender’s name and, for friend messages, the first 100 characters of the message), and passes it on as the notification text through Google’s Firebase Cloud Messaging. The notification text may appear on your lock screen depending on your phone’s notification settings; turn off the app’s notifications if you do not want this.","The device token is deleted when you sign out (that device) or delete your account (all devices)."]},
@@ -1787,7 +1857,7 @@ $("srSend").addEventListener("click", async () => {
 /* kunci pengaturan (tiap menu menyimpan salinannya sendiri), kunci akun/sinkron yang tidak boleh dihapus, dan posisi panel */
 const SETRE = /^(titikhilangs_settings|asd_(follow|sound|music|voice|auto|gap|lang|vol|aivol|side|sidepos|livepos|livemini)|kh_(follow|fx|music|read|auto|gap|lang|vol|mvol|side|sideopen)|(th|tw|tj|tb|tk|tt|ol)_(follow|sound|fx|music|read|auto|gap|lang|vol|mvol|anim|side|sidepos|sideopen|livepos|livemini))$/;
 const POSRE = /(side|sidepos|sideopen|livepos|livemini)$/;
-const KEEPRE = /^(firebase:|st_sync_|sp_saran_queue$|sp_rel$)/;
+const KEEPRE = /^(firebase:|st_applock$|st_sync_|sp_saran_queue$|sp_rel$)/;
 const lsDel = f => { const a = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && f(k)) a.push(k); } }catch(e){} a.forEach(k => { try{ localStorage.removeItem(k); }catch(e){} }); };
 /* copot menu yang terbuka lebih dulu supaya ia tidak menulis ulang datanya saat halaman dimuat ulang */
 function dropFrame(){ const f = $("frame"); if(!f) return; try{ f.contentWindow.speechSynthesis.cancel(); }catch(e){} f.remove(); }
@@ -2672,6 +2742,430 @@ setInterval(() => hibSync(), 100);
 </script>
 
 
+<script id="alMod">
+/* ===== KUNCI APLIKASI =====
+   Sidik jari bila HP mendukung; PIN atau pola sebagai cadangan (dan satu-satunya cara bila tidak ada sidik jari).
+   Konfigurasi di localStorage "st_applock" (hanya hash, tidak disinkronkan ke akun). Tampilan ditutup lewat class "alk" di <html>. */
+(function(){
+"use strict";
+const KEY = "st_applock", ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", html = document.documentElement;
+
+const TX = {
+  id:{
+    locked:"Aplikasi terkunci", pinAsk:"Masukkan PIN", patAsk:"Gambar pola", useBio:"Pakai sidik jari", forgot:"Lupa PIN atau pola?",
+    wrongPin:"PIN salah.", wrongPat:"Pola salah.", wait:"Terlalu banyak percobaan. Coba lagi dalam {n} dtk.",
+    shortPin:"PIN minimal 4 angka.", shortPat:"Hubungkan minimal 4 titik.", bioReason:"Buka Satu Titik", cancel:"Batal",
+    recAsk:"Masukkan kode pemulihan", recGo:"Buka kunci", recBack:"Kembali ke PIN atau pola", recBad:"Kode pemulihan salah.",
+    recDone:"Kunci aplikasi dinonaktifkan. Atur kunci baru di Pengaturan.", del:"Hapus satu angka", ok:"Lanjut",
+    infoOff:"Kunci aplikasi memakai sidik jari bila HP mendukung. Bila tidak, kamu membuka aplikasi dengan PIN atau pola.",
+    enable:"Aktifkan kunci aplikasi", stOn:"Kunci aplikasi: aktif",
+    bioOn:"Sidik jari: aktif", bioOff:"Sidik jari: mati",
+    bioFound:"Sidik jari terdeteksi di HP ini. PIN atau pola tetap jadi cadangan.",
+    bioNA:"Sidik jari tidak tersedia di HP ini atau belum ada yang terdaftar. Pakai PIN atau pola.",
+    change:"Ganti PIN atau pola", after:"Kunci setelah keluar dari aplikasi", afters:["Langsung","30 dtk","1 mnt","5 mnt"],
+    newRec:"Buat kode pemulihan baru", vPin:"Masukkan PIN untuk melanjutkan", vPat:"Gambar pola untuk melanjutkan",
+    choose:"Pilih cara membuka kunci", optPin:"PIN (4 sampai 8 angka)", optPat:"Pola (hubungkan titik)",
+    n1Pin:"Buat PIN baru", n1Pat:"Gambar pola baru (minimal 4 titik)", n2Pin:"Ulangi PIN yang sama", n2Pat:"Gambar pola yang sama sekali lagi",
+    mismatch:"Tidak sama. Coba lagi dari awal.", recT:"Kode pemulihan",
+    recN:"Catat kode ini di tempat aman. Kode dipakai bila kamu lupa PIN atau pola, dan tidak akan ditampilkan lagi. Kode lama batal bila dibuat ulang.",
+    copy:"Salin kode", copied:"Kode disalin.", copyManual:"Tekan lama pada kode untuk menyalin.", noted:"Sudah saya catat",
+    onDone:"Kunci aplikasi aktif.", offDone:"Kunci aplikasi dimatikan.", changed:"PIN atau pola sudah diganti.", newRecDone:"Kode pemulihan baru sudah dibuat.",
+    note:"Kunci hanya menutup tampilan di HP ini dan tidak mengenkripsi data. PIN, pola, dan kode pemulihan tidak ikut disinkronkan ke akun.",
+    pat:"pola", saveFail:"Penyimpanan penuh, kunci tidak tersimpan."
+  },
+  en:{
+    locked:"App locked", pinAsk:"Enter PIN", patAsk:"Draw pattern", useBio:"Use fingerprint", forgot:"Forgot PIN or pattern?",
+    wrongPin:"Wrong PIN.", wrongPat:"Wrong pattern.", wait:"Too many attempts. Try again in {n} s.",
+    shortPin:"PIN needs at least 4 digits.", shortPat:"Connect at least 4 dots.", bioReason:"Unlock Satu Titik", cancel:"Cancel",
+    recAsk:"Enter recovery code", recGo:"Unlock", recBack:"Back to PIN or pattern", recBad:"Wrong recovery code.",
+    recDone:"App lock turned off. Set a new lock in Settings.", del:"Delete one digit", ok:"Continue",
+    infoOff:"App lock uses your fingerprint if the phone supports it. If not, you open the app with a PIN or pattern.",
+    enable:"Turn on app lock", stOn:"App lock: on",
+    bioOn:"Fingerprint: on", bioOff:"Fingerprint: off",
+    bioFound:"A fingerprint was detected on this phone. The PIN or pattern stays as a backup.",
+    bioNA:"Fingerprint isn't available on this phone, or none is enrolled. Use a PIN or pattern.",
+    change:"Change PIN or pattern", after:"Lock after leaving the app", afters:["Instantly","30 s","1 min","5 min"],
+    newRec:"Create a new recovery code", vPin:"Enter your PIN to continue", vPat:"Draw your pattern to continue",
+    choose:"Choose how to unlock", optPin:"PIN (4 to 8 digits)", optPat:"Pattern (connect dots)",
+    n1Pin:"Create a new PIN", n1Pat:"Draw a new pattern (at least 4 dots)", n2Pin:"Repeat the same PIN", n2Pat:"Draw the same pattern once more",
+    mismatch:"They don't match. Start again.", recT:"Recovery code",
+    recN:"Write this code down somewhere safe. It is used if you forget your PIN or pattern, and it won't be shown again. The old code stops working when a new one is made.",
+    copy:"Copy code", copied:"Code copied.", copyManual:"Long-press the code to copy it.", noted:"I wrote it down",
+    onDone:"App lock is on.", offDone:"App lock turned off.", changed:"PIN or pattern changed.", newRecDone:"New recovery code created.",
+    note:"The lock only covers the screen on this phone and does not encrypt data. The PIN, pattern, and recovery code are not synced to your account.",
+    pat:"pattern", saveFail:"Storage is full, the lock was not saved."
+  }
+};
+const L = k => TX[S.lang === "en" ? "en" : "id"][k];
+const q = id => document.getElementById(id);
+function el(tag, cls, txt){ const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+const icon = k => (typeof PIC !== "undefined" && PIC[k]) || "";
+function sc(k, text, pressed){
+  const b = el("button", "sc"); b.type = "button"; b.innerHTML = icon(k) + "<span></span>"; b.lastChild.textContent = text;
+  if(pressed !== undefined) b.setAttribute("aria-pressed", String(!!pressed));
+  return b;
+}
+let toastT = 0;
+function toast(m){
+  let t = q("alToast");
+  if(!t){ t = el("div"); t.id = "alToast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+  t.textContent = m; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2600);
+}
+
+/* ---------- penyimpanan & hash ---------- */
+const load = () => { try{ const c = JSON.parse(localStorage.getItem(KEY) || "null"); return c && c.on && c.h && c.s ? c : null; }catch(e){ return null; } };
+function save(c){ try{ localStorage.setItem(KEY, JSON.stringify(c)); return true; }catch(e){ toast(L("saveFail")); return false; } }
+let cfg = load();
+const hexOf = b => Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, "0")).join("");
+const newSalt = () => hexOf(crypto.getRandomValues(new Uint8Array(16)));
+async function hash(secret, salt){
+  try{
+    const enc = new TextEncoder(), k = await crypto.subtle.importKey("raw", enc.encode(secret), "PBKDF2", false, ["deriveBits"]);
+    return hexOf(await crypto.subtle.deriveBits({ name:"PBKDF2", hash:"SHA-256", salt: enc.encode(String(salt)), iterations: 100000 }, k, 256));
+  }catch(e){
+    /* konteks tidak aman (tanpa crypto.subtle): cadangan sederhana agar kunci tetap berfungsi */
+    let h = 5381; const s = salt + ":" + secret;
+    for(let r = 0; r < 2000; r++) for(let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+    return "f" + (h >>> 0).toString(16);
+  }
+}
+const recNorm = t => String(t || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+function newRecCode(){ const a = crypto.getRandomValues(new Uint8Array(10)); let t = ""; for(let i = 0; i < 10; i++){ t += ABC[a[i] % 32]; if(i === 4) t += "-"; } return t; }
+const waitLeft = () => Math.max(0, Math.ceil((((cfg && +cfg.u) || 0) - Date.now()) / 1000));
+/* cek PIN/pola (atau kode pemulihan bila rec) dengan jeda bertahap: tiap 5 salah → 30 dtk, 60 dtk, 2 mnt … maks 5 mnt */
+async function check(secret, rec){
+  if(!cfg) return { ok:true };
+  const w = waitLeft(); if(w > 0) return { ok:false, wait:w };
+  const h = await hash(secret, rec ? cfg.rs : cfg.s);
+  if(h === (rec ? cfg.rh : cfg.h)){ if(cfg.f || cfg.u){ cfg.f = 0; cfg.u = 0; save(cfg); } return { ok:true }; }
+  cfg.f = (+cfg.f || 0) + 1;
+  if(cfg.f % 5 === 0) cfg.u = Date.now() + Math.min(300, 30 * Math.pow(2, cfg.f / 5 - 1)) * 1000;
+  save(cfg); return { ok:false, wait:waitLeft() };
+}
+
+/* ---------- sidik jari (plugin Capacitor yang sama dengan menu Keuangan/Arisan) ---------- */
+const bio = (() => {
+  let P = null, N = null, ready = false;
+  const init = () => { if(ready) return; ready = true; try{
+    const C = window.Capacitor; if(!(C && C.isNativePlatform && C.isNativePlatform())) return;
+    const g = n => { try{ return (C.Plugins && C.Plugins[n]) || (C.registerPlugin ? C.registerPlugin(n) : null); }catch(e){ return null; } };
+    P = g("BiometricAuthNative"); N = g("NativeBiometric");
+  }catch(e){} };
+  const unimpl = e => !!e && (e.code === "UNIMPLEMENTED" || /not implemented|unimplemented/i.test(String(e.message || e)));
+  async function ok(){
+    init();
+    try{ if(P){ const r = await P.checkBiometry(); if(r && r.isAvailable) return true; } }catch(e){}
+    try{ if(N){ const r = await N.isAvailable(); if(r && r.isAvailable) return true; } }catch(e){}
+    return false;
+  }
+  async function ask(reason, cancel){
+    init();
+    if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason, cancelTitle: cancel, allowDeviceCredential: false, androidTitle: "SATU TITIK", androidSubtitle: reason }); return true; }catch(e){ if(!(N && unimpl(e))) return false; } }
+    if(N){ try{ await N.verifyIdentity({ reason, title: "SATU TITIK", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
+    return false;
+  }
+  return { ok, ask };
+})();
+let bioAvail = false, busyBio = false, guardUntil = 0;
+const guarded = () => busyBio || Date.now() < guardUntil;
+async function askBioRaw(){
+  busyBio = true; let ok = false;
+  try{ ok = await bio.ask(L("bioReason"), L("cancel")); }catch(e){}
+  busyBio = false; guardUntil = Date.now() + 1200;
+  return ok;
+}
+
+/* ---------- papan PIN ---------- */
+function pinPad(host, o){
+  const min = 4, max = 8; let v = "";
+  const wrap = el("div", "alpin"), dots = el("div", "aldots"), grid = el("div", "alkeys");
+  dots.setAttribute("aria-hidden", "true");
+  const draw = () => { dots.textContent = ""; const n = Math.max(min, v.length); for(let i = 0; i < n; i++) dots.appendChild(el("span", "d" + (i < v.length ? " on" : ""))); };
+  function press(k){
+    if(k === "b"){ v = v.slice(0, -1); draw(); return; }
+    if(k === "ok"){ if(v.length < min){ api.shake(); if(o.onShort) o.onShort(); return; } const x = v; v = ""; draw(); o.onSubmit(x); return; }
+    if(v.length < max){ v += k; draw(); }
+  }
+  ["1","2","3","4","5","6","7","8","9","b","0","ok"].forEach(k => {
+    const b = el("button", k === "b" || k === "ok" ? "fn" : "", k === "b" ? "⌫" : k === "ok" ? "✓" : k);
+    b.type = "button";
+    if(k === "b") b.setAttribute("aria-label", L("del"));
+    if(k === "ok") b.setAttribute("aria-label", L("ok"));
+    b.addEventListener("click", () => press(k)); grid.appendChild(b);
+  });
+  const api = {
+    key(e){ if(/^[0-9]$/.test(e.key)) press(e.key); else if(e.key === "Backspace") press("b"); else if(e.key === "Enter") press("ok"); else return false; e.preventDefault(); return true; },
+    shake(){ dots.classList.remove("shake"); void dots.offsetWidth; dots.classList.add("shake"); },
+    bad(){}
+  };
+  wrap.append(dots, grid); host.appendChild(wrap); draw(); return api;
+}
+
+/* ---------- papan pola 3×3 ---------- */
+function patPad(host, o){
+  const box = el("div", "alpat"), NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg"), line = document.createElementNS(NS, "polyline");
+  svg.setAttribute("viewBox", "0 0 100 100"); svg.setAttribute("aria-hidden", "true"); line.setAttribute("points", ""); svg.appendChild(line); box.appendChild(svg);
+  const C = [16.667, 50, 83.333], ctr = i => ({ x: C[i % 3], y: C[Math.floor(i / 3)] }), dots = [];
+  for(let i = 0; i < 9; i++){ const d = el("div", "alp"); d.style.left = ctr(i).x + "%"; d.style.top = ctr(i).y + "%"; box.appendChild(d); dots.push(d); }
+  let seq = [], down = false, cur = null, busy = false, timer = 0;
+  const draw = () => {
+    dots.forEach((d, i) => d.classList.toggle("on", seq.includes(i)));
+    const pts = seq.map(i => ctr(i).x + "," + ctr(i).y); if(down && cur && seq.length) pts.push(cur.x + "," + cur.y);
+    line.setAttribute("points", pts.join(" "));
+  };
+  const rel = e => { const r = box.getBoundingClientRect(); return { x:(e.clientX - r.left) / r.width * 100, y:(e.clientY - r.top) / r.height * 100 }; };
+  function add(i){
+    if(seq.includes(i)) return;
+    if(seq.length){
+      const a = seq[seq.length - 1], ar = Math.floor(a / 3), ac = a % 3, br = Math.floor(i / 3), bc = i % 3;
+      if((ar + br) % 2 === 0 && (ac + bc) % 2 === 0){ const m = ((ar + br) / 2) * 3 + (ac + bc) / 2; if(m !== a && m !== i && !seq.includes(m)) seq.push(m); }
+    }
+    seq.push(i);
+  }
+  const hit = p => { for(let i = 0; i < 9; i++){ const c = ctr(i); if(Math.hypot(p.x - c.x, p.y - c.y) < 13) add(i); } };
+  const reset = () => { seq = []; busy = false; box.classList.remove("bad"); draw(); };
+  box.addEventListener("pointerdown", e => {
+    if(busy) return; e.preventDefault(); clearTimeout(timer); seq = []; down = true;
+    try{ box.setPointerCapture(e.pointerId); }catch(_){}
+    cur = rel(e); hit(cur); draw();
+  });
+  box.addEventListener("pointermove", e => { if(!down) return; cur = rel(e); hit(cur); draw(); });
+  const end = () => {
+    if(!down) return; down = false; cur = null; draw(); busy = true;
+    const s = seq.slice();
+    if(s.length < 4){ box.classList.add("bad"); if(o.onShort) o.onShort(); timer = setTimeout(reset, 700); return; }
+    timer = setTimeout(reset, 700);
+    o.onDone(s.join(""));
+  };
+  box.addEventListener("pointerup", end); box.addEventListener("pointercancel", end);
+  box.addEventListener("contextmenu", e => e.preventDefault());
+  host.appendChild(box);
+  return { bad(){ box.classList.add("bad"); }, shake(){ box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake"); }, key(){ return false; } };
+}
+
+/* ---------- layar kunci ---------- */
+let lockedNow = html.classList.contains("alk"), pad = null, lockMode = "cred", cdTimer = 0, hiddenAt = 0;
+const setMsg = t => { const m = q("alMsg"); if(m) m.textContent = t || ""; };
+function startCd(){
+  clearInterval(cdTimer);
+  const tick = () => {
+    const w = waitLeft();
+    if(w <= 0){ clearInterval(cdTimer); q("alPad").classList.remove("busy"); setMsg(""); return; }
+    q("alPad").classList.add("busy"); setMsg(L("wait").replace("{n}", w));
+  };
+  tick(); cdTimer = setInterval(tick, 500);
+}
+function paintBioBtn(){
+  const b = q("alBio"); if(!b) return;
+  b.hidden = !(lockMode === "cred" && cfg && cfg.bio && bioAvail);
+  b.innerHTML = icon("finger") + "<span></span>"; b.lastChild.textContent = L("useBio");
+}
+function buildLock(){
+  if(!cfg) return; lockMode = "cred";
+  const m = cfg.m === "pat" ? "pat" : "pin", host = q("alPad");
+  q("alS").textContent = L(m === "pat" ? "patAsk" : "pinAsk"); host.textContent = ""; setMsg("");
+  pad = m === "pat"
+    ? patPad(host, { onDone: submitLock, onShort: () => setMsg(L("shortPat")) })
+    : pinPad(host, { onSubmit: submitLock, onShort: () => setMsg(L("shortPin")) });
+  paintBioBtn();
+  q("alForgot").textContent = L("forgot"); q("alForgot").hidden = false;
+  if(waitLeft() > 0) startCd();
+}
+async function submitLock(secret){
+  setMsg("");
+  const r = await check(secret);
+  if(r.ok){ unlockApp(); return; }
+  if(pad){ pad.bad(); pad.shake(); }
+  try{ if(navigator.vibrate) navigator.vibrate(60); }catch(e){}
+  if(r.wait > 0) startCd(); else setMsg(L(cfg.m === "pat" ? "wrongPat" : "wrongPin"));
+}
+function buildRec(){
+  lockMode = "rec"; pad = null; clearInterval(cdTimer);
+  const host = q("alPad"); host.classList.remove("busy"); host.textContent = ""; setMsg("");
+  q("alS").textContent = L("recAsk"); q("alBio").hidden = true; q("alForgot").textContent = L("recBack");
+  const inp = el("input", "alin"); inp.type = "text"; inp.maxLength = 11; inp.placeholder = "XXXXX-XXXXX"; inp.autocomplete = "off"; inp.spellcheck = false;
+  inp.setAttribute("autocapitalize", "characters"); inp.setAttribute("aria-label", L("recAsk"));
+  const go = el("button", "albtn", L("recGo")); go.type = "button";
+  const run = async () => {
+    const code = recNorm(inp.value);
+    if(code.length !== 10){ setMsg(L("recBad")); return; }
+    const r = await check(code, true);
+    if(r.ok){ cfg = null; try{ localStorage.removeItem(KEY); }catch(e){} unlockApp(); toast(L("recDone")); return; }
+    try{ if(navigator.vibrate) navigator.vibrate(60); }catch(e){}
+    setMsg(r.wait > 0 ? L("wait").replace("{n}", r.wait) : L("recBad"));
+  };
+  go.addEventListener("click", run); inp.addEventListener("keydown", e => { if(e.key === "Enter") run(); });
+  host.append(inp, go); setTimeout(() => { try{ inp.focus(); }catch(e){} }, 50);
+}
+function unlockApp(){
+  html.classList.remove("alk"); lockedNow = false; clearInterval(cdTimer); hiddenAt = 0;
+  const h = q("alPad"); if(h){ h.classList.remove("busy"); h.textContent = ""; } pad = null; setMsg("");
+}
+function lockNow(){
+  if(!cfg || lockedNow) return;
+  try{ if(typeof spOpen === "function" && spOpen() && typeof togglePanel === "function") togglePanel(false); }catch(e){}   /* panel Pengaturan yang terbuka tidak ikut tertinggal */
+  lockedNow = true; html.classList.add("alk"); buildLock();
+}
+async function askBio(manual){
+  if(!lockedNow || !cfg || !cfg.bio || lockMode !== "cred" || busyBio || document.hidden) return;
+  if(!bioAvail){ if(manual) setMsg(L("bioNA")); return; }
+  if(await askBioRaw() && lockedNow) unlockApp();
+}
+q("alForgot").addEventListener("click", () => { if(lockMode === "rec") buildLock(); else buildRec(); });
+q("alBio").addEventListener("click", () => askBio(true));
+document.addEventListener("keydown", e => { if(lockedNow && lockMode === "cred" && pad && pad.key) pad.key(e); });
+
+/* ---------- kapan harus mengunci ---------- */
+document.addEventListener("visibilitychange", () => {
+  if(!cfg) return;
+  if(document.hidden){
+    if(guarded() || lockedNow) return;
+    hiddenAt = Date.now();
+    if(!(+cfg.t > 0)) lockNow();     /* "Langsung": tutup juga tampilan di daftar aplikasi terbaru */
+  }else{
+    if(guarded()) return;
+    if(!lockedNow && hiddenAt && Date.now() - hiddenAt >= (+cfg.t || 0) * 1000) lockNow();
+    hiddenAt = 0;
+    if(lockedNow) setTimeout(() => askBio(false), 250);
+  }
+});
+/* muat ulang halaman saat sedang terbuka (mis. setelah Reset) tidak meminta kunci lagi */
+addEventListener("pagehide", () => { if(cfg && !lockedNow){ try{ sessionStorage.setItem("st_al_r", String(Date.now())); }catch(e){} } });
+
+/* ---------- Pengaturan > Kunci Aplikasi ---------- */
+let view = { s:"main" }, built = false, lastLang = "", pad2 = null;
+const stat = t => { const e = q("alStat"); if(e){ e.textContent = t || ""; e.hidden = !t; } };
+function go(s, extra){ view = Object.assign({ s }, extra || {}); render(); }
+function render(){
+  const host = q("svAppLock"); if(!host) return;
+  built = true; lastLang = S.lang; host.textContent = ""; pad2 = null;
+  (RENDER[view.s] || RENDER.main)(host);
+  const st = el("p", "abp"); st.id = "alStat"; st.setAttribute("role", "status"); st.hidden = true; host.appendChild(st);
+  if(view.msg) stat(view.msg);
+}
+function cancelBtn(host){ const c = sc("", L("cancel")); c.addEventListener("click", () => go("main")); host.appendChild(c); }
+function secretPad(host, label, onSecret){
+  host.appendChild(el("p", "abp", label));
+  const box = el("div", "alpadbox"); host.appendChild(box);
+  return (view.m || cfg && cfg.m) === "pat"
+    ? patPad(box, { onDone: onSecret, onShort: () => stat(L("shortPat")) })
+    : pinPad(box, { onSubmit: onSecret, onShort: () => stat(L("shortPin")) });
+}
+async function newRecovery(){
+  const code = newRecCode(), rs = newSalt(); cfg.rs = rs; cfg.rh = await hash(recNorm(code), rs); save(cfg); return code;
+}
+async function finalize(m, secret, next){
+  const salt = newSalt(), h = await hash(secret, salt);
+  if(next === "enable" || !cfg){
+    const code = newRecCode(), rs = newSalt(), rh = await hash(recNorm(code), rs);
+    const c = { on:true, m, h, s:salt, bio:bioAvail, t:30, rh, rs, f:0, u:0 };
+    if(!save(c)){ go("main"); return; }
+    cfg = c; go("recshow", { code, fresh:true });
+  }else{
+    cfg.m = m; cfg.h = h; cfg.s = salt; cfg.f = 0; cfg.u = 0; save(cfg); go("main", { msg:L("changed") });
+  }
+}
+function proceed(){
+  const n = view.next;
+  if(n === "disable"){ cfg = null; try{ localStorage.removeItem(KEY); }catch(e){} go("main", { msg:L("offDone") }); }
+  else if(n === "change") go("choose", { next:"change" });
+  else if(n === "rec") newRecovery().then(code => go("recshow", { code, fresh:false }));
+  else go("main");
+}
+const RENDER = {
+  main(host){
+    if(!cfg){
+      host.appendChild(el("p", "abp", L("infoOff")));
+      const b = sc("lock", L("enable"), false); b.addEventListener("click", () => go("choose", { next:"enable" })); host.appendChild(b);
+      host.appendChild(el("p", "abp", bioAvail ? L("bioFound") : L("bioNA")));
+      host.appendChild(el("p", "abp", L("note")));
+      return;
+    }
+    const off = sc("lock", L("stOn"), true); off.addEventListener("click", () => go("verify", { next:"disable" })); host.appendChild(off);
+    const useBio = !!(cfg.bio && bioAvail);
+    const bb = sc("finger", L(useBio ? "bioOn" : "bioOff"), useBio); bb.disabled = !bioAvail; host.appendChild(bb);
+    bb.addEventListener("click", async () => {
+      if(!bioAvail) return;
+      if(cfg.bio){ cfg.bio = false; save(cfg); render(); return; }
+      if(await askBioRaw()){ cfg.bio = true; save(cfg); }
+      render();
+    });
+    host.appendChild(el("p", "abp", bioAvail ? L("bioFound") : L("bioNA")));
+    const ch = sc("lock", L("change")); ch.addEventListener("click", () => go("verify", { next:"change" })); host.appendChild(ch);
+    host.appendChild(el("p", "abp", L("after")));
+    const seg = el("div", "seg");
+    [0, 30, 60, 300].forEach((n, i) => {
+      const b = el("button", "sg", L("afters")[i]); b.type = "button"; b.setAttribute("aria-pressed", String((+cfg.t || 0) === n));
+      b.addEventListener("click", () => { cfg.t = n; save(cfg); render(); }); seg.appendChild(b);
+    });
+    host.appendChild(seg);
+    const rc = sc("info", L("newRec")); rc.style.marginTop = "12px"; rc.addEventListener("click", () => go("verify", { next:"rec" })); host.appendChild(rc);
+    host.appendChild(el("p", "abp", L("note")));
+  },
+  verify(host){
+    const onSecret = async s => {
+      const r = await check(s);
+      if(r.ok){ proceed(); return; }
+      pad2.bad(); pad2.shake();
+      stat(r.wait > 0 ? L("wait").replace("{n}", r.wait) : L(cfg.m === "pat" ? "wrongPat" : "wrongPin"));
+    };
+    pad2 = secretPad(host, L(cfg.m === "pat" ? "vPat" : "vPin"), onSecret);
+    if(cfg.bio && bioAvail){
+      const b = sc("finger", L("useBio")); b.addEventListener("click", async () => { if(await askBioRaw()) proceed(); }); host.appendChild(b);
+    }
+    cancelBtn(host);
+  },
+  choose(host){
+    host.appendChild(el("p", "abp", L("choose")));
+    [["pin", "optPin"], ["pat", "optPat"]].forEach(([m, k]) => {
+      const b = sc("lock", L(k)); b.addEventListener("click", () => go("new1", { next:view.next, m })); host.appendChild(b);
+    });
+    cancelBtn(host);
+  },
+  new1(host){
+    pad2 = secretPad(host, L(view.m === "pat" ? "n1Pat" : "n1Pin"), s => go("new2", { next:view.next, m:view.m, first:s }));
+    cancelBtn(host);
+  },
+  new2(host){
+    pad2 = secretPad(host, L(view.m === "pat" ? "n2Pat" : "n2Pin"), async s => {
+      if(s !== view.first){ go("new1", { next:view.next, m:view.m, msg:L("mismatch") }); return; }
+      await finalize(view.m, s, view.next);
+    });
+    cancelBtn(host);
+  },
+  recshow(host){
+    host.appendChild(el("p", "abp", L("recT")));
+    const c = el("div", "alrec", view.code); host.appendChild(c);
+    host.appendChild(el("p", "abp", L("recN")));
+    const cp = sc("info", L("copy"));
+    cp.addEventListener("click", async () => {
+      try{ await navigator.clipboard.writeText(view.code); stat(L("copied")); }
+      catch(e){ try{ const r = document.createRange(); r.selectNodeContents(c); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }catch(_){} stat(L("copyManual")); }
+    });
+    host.appendChild(cp);
+    const ok = sc("lock", L("noted")); ok.addEventListener("click", () => go("main", { msg:view.fresh ? L("onDone") : L("newRecDone") })); host.appendChild(ok);
+  }
+};
+function refreshBio(){
+  const apply = v => { if(v !== bioAvail){ bioAvail = v; if(spView === "applock" && view.s === "main") render(); } };
+  bio.ok().then(v => { apply(v); if(!v) setTimeout(() => bio.ok().then(apply), 900); });
+}
+function paint(){
+  if(spView !== "applock"){ built = false; view = { s:"main" }; return; }
+  if(!built || lastLang !== S.lang){ render(); refreshBio(); }
+}
+window.stAppLock = { paint, lock: lockNow, isLocked: () => lockedNow };
+
+/* ---------- mulai ---------- */
+if(lockedNow){ if(cfg) buildLock(); else { html.classList.remove("alk"); lockedNow = false; } }
+bio.ok().then(v => {
+  bioAvail = v; if(lockedNow){ paintBioBtn(); setTimeout(() => askBio(false), 200); }
+  if(!v) setTimeout(() => bio.ok().then(v2 => { if(v2){ bioAvail = true; if(lockedNow){ paintBioBtn(); askBio(false); } } }), 900);
+});
+})();
+
+</script>
 <script type="text/plain" id="src-th-analytics"><!DOCTYPE html>
 <html lang="id">
 <head>
@@ -19524,7 +20018,7 @@ A.clearPhoto = async () => {
    Seluruh data aplikasi di localStorage (pengaturan, riwayat, hasil semua menu) disimpan di satu dokumen: users/{uid}.
    Cuma jalan saat sudah masuk dan online. Tanpa masuk, aplikasi memakai localStorage seperti biasa. */
 const SY = (() => {
-  const EX = /^(firebase:|st_sync_|kg_db$|kg_ts$|kg_lock$|an_lock$|sp_saran_queue$|asd_livepos$|asd_livemini$|asd_sidepos$|asd_side$|kh_side$|kh_sideopen$)/;
+  const EX = /^(firebase:|st_applock$|st_sync_|kg_db$|kg_ts$|kg_lock$|an_lock$|sp_saran_queue$|asd_livepos$|asd_livemini$|asd_sidepos$|asd_side$|kh_side$|kh_sideopen$)/;
   const M_H = "st_sync_h", M_TS = "st_sync_ts", M_UID = "st_sync_uid", MAXTOT = 880000, EVERY = 20000;
   const rd = k => { try{ return JSON.parse(localStorage.getItem(k) || "{}") || {}; }catch(e){ return {}; } };
   const wr = (k, o) => { try{ localStorage.setItem(k, JSON.stringify(o)); }catch(e){} };
@@ -20902,6 +21396,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       const A = (C.Plugins && C.Plugins.App) || (C.registerPlugin ? C.registerPlugin("App") : null);
       if(!A || !A.addListener) return;
       A.addListener("backButton", () => {
+        if(document.documentElement.classList.contains("alk")){ if(A.exitApp) A.exitApp(); return; }   /* layar Kunci Aplikasi */
         const L = layers();
         if(L.length){ L[L.length - 1](); return; }
         const v = $("view"), b = $("back");
