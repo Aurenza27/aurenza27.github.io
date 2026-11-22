@@ -98,7 +98,7 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 .gear{font:inherit;font-size:18px;min-width:44px;min-height:44px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--gold2);cursor:pointer}
 #gear{margin-left:auto}
 #gearHome{margin-left:auto;flex:none}
-#spanel{position:fixed;z-index:30;top:calc(54px + env(safe-area-inset-top,0px));right:10px;width:min(300px,calc(100vw - 20px));max-height:calc(100% - 70px);overflow:auto;padding:12px;border:1px solid var(--gold);border-radius:16px;background:var(--bg2);box-shadow:0 10px 30px rgba(0,0,0,.6)}
+#spanel{position:fixed;z-index:30;top:calc(54px + env(safe-area-inset-top,0px));right:10px;width:min(300px,calc(100vw - 20px));max-height:calc(100% - 70px - env(safe-area-inset-top,0px) - var(--adh,0px) - env(safe-area-inset-bottom,0px));overflow:auto;overscroll-behavior:contain;padding:12px;border:1px solid var(--gold);border-radius:16px;background:var(--bg2);box-shadow:0 10px 30px rgba(0,0,0,.6)}
 #spanel .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 #spanel .sc{display:block;width:100%;margin:6px 0;min-height:40px;padding:0 12px;text-align:left;font:inherit;font-size:14px;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:12px;cursor:pointer}
 #spanel .sc[aria-pressed="true"]{border-color:var(--gold)}
@@ -2064,7 +2064,7 @@ window.satuTitikNative = {
       if(cfg.banner !== false){
         /* Sisakan ruang di bawah halaman setinggi banner, supaya tulisan kaki beranda dan menu tidak tertutup iklan */
         const st = document.createElement("style");
-        st.textContent = "#home{padding-bottom:calc(96px + var(--adh,0px) + env(safe-area-inset-bottom,0px))!important}#view,#about,#privacy,#stTerms{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - var(--adh,0px))!important}";
+        st.textContent = "#home{padding-bottom:calc(96px + var(--adh,0px) + env(safe-area-inset-bottom,0px))!important}#view,#about,#privacy,#stTerms{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - env(safe-area-inset-top,0px) - var(--adh,0px) - env(safe-area-inset-bottom,0px))!important}#glList{padding-bottom:12px}";
         document.head.appendChild(st);
         const setH = h => { h = Math.round(+h || 0); if(h > 0) document.documentElement.style.setProperty("--adh", h + "px"); };
         try{ AdMob.addListener("bannerAdSizeChanged", e => setH(e && e.height)); }catch(e){}
