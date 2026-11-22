@@ -13,7 +13,7 @@ if(!SHOW_DUKUNG){ const st = document.createElement("style"); st.textContent = "
 /* Kunci Aplikasi: bila aktif, tampilan langsung ditutup sebelum isi halaman sempat terlihat (logikanya ada di blok "KUNCI APLIKASI" di bawah) */
 (function(){try{
   var c = JSON.parse(localStorage.getItem("st_applock") || "null");
-  if(!(c && c.on && c.h && c.s)) return;
+  if(!(c && c.on && ((c.h && c.s) || c.m === "dev"))) return;
   var ts = +sessionStorage.getItem("st_al_r") || 0; sessionStorage.removeItem("st_al_r");
   if(ts && Date.now() - ts < 6000) return;
   document.documentElement.classList.add("alk");
@@ -1714,7 +1714,7 @@ const PV = {
     {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, termasuk ketika layar terkunci atau aplikasi berada di latar belakang (notifikasi tampil selama merekam), dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Jumlah langkah dibaca dari sensor langkah HP (izin Aktivitas Fisik) hanya saat merekam di aplikasi Android, dan hanya dipakai untuk memeriksa kewajaran jarak. Angkanya tidak ditampilkan atau disimpan di riwayat aktivitas.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk dengan Google dan sinkronisasi aktif."]},
     {p:["Lokasi (menu Jadwal Sholat):"], l:["Untuk menghitung waktu sholat dan arah kiblat, kamu memilih kota dari daftar atau menekan tombol lokasi GPS. GPS hanya dibaca satu kali saat kamu menekan tombol itu (tidak terus-menerus dan tidak di latar belakang). Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Kota atau koordinat yang kamu pilih, metode hitung, dan pilihan alarm adzan disimpan di perangkatmu. Perhitungan dilakukan di perangkat, tanpa mengirim lokasimu ke server untuk keperluan menu ini. Bila kamu masuk dengan Google dan sinkronisasi aktif, pengaturan ini (termasuk koordinat lokasimu) ikut tersalin ke akunmu seperti data menu lain.","Kompas kiblat memakai sensor arah perangkat hanya saat kamu menyalakannya. Bacaan sensor tidak disimpan dan tidak dikirim.","Alarm adzan: di aplikasi Android, adzan dijadwalkan ke alarm sistem perangkat untuk 7 hari ke depan dan tetap berbunyi walau aplikasi ditutup; di browser, adzan hanya berbunyi selama menu terbuka. Butuh izin notifikasi atau alarm dari perangkatmu dan bisa kamu matikan kapan saja."]},
     {p:["Keuangan dan Arisan:"], l:["Catatan keuangan (uang masuk dan keluar, dompet, jatah belanja, tabungan) dan data Arisan (nama peserta, pemenang, status pembayaran) disimpan di perangkatmu. Bila kamu masuk dengan Google, data ini ikut tersalin ke akunmu.","Kunci menu: PIN dan kode pemulihan hanya disimpan di perangkat dalam bentuk hash (bukan teks asli), tidak dikirim ke server, dan tidak ikut tersalin ke akun. Sidik jari dan PIN/pola layar HP diperiksa oleh sistem Android; aplikasi tidak menerima atau menyimpan data sidik jarimu.","Ruangan Arisan online: nama host dan peserta, daftar nama kocokan, hasil, dan chat ruangan disimpan di server selama ruangan ada dan dihapus saat host menutup ruangan. Chat juga ditandai kedaluwarsa setelah 24 jam.","File cadangan: fitur Cadangkan di menu Keuangan dan Arisan membuat file di perangkatmu atas permintaanmu, lalu kamu sendiri yang memilih tempat menyimpannya. File ini tidak dienkripsi dan tidak berisi PIN atau kode pemulihan, jadi simpan di tempat aman."]},
-    {p:["Ringkasan per menu (data di perangkat):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, dan Jodoh: nama, tanggal lahir, dan isian lain yang kamu ketik, riwayat, papan skor, serta pengaturan suara dan musik. Fitur bacaan suara memakai mesin suara bawaan perangkatmu.","BMI & Kalori, Kehamilan, dan Kandungan Makanan: data tubuh dan kehamilan yang kamu isi (misalnya usia, jenis kelamin, berat, dan tinggi badan), profil AKG (termasuk status hamil atau menyusui), dan isi Piringku. Ini data kesehatan, jadi jaga perangkatmu.","Timer: hanya pengaturan tampilan. Alarm dan notifikasi timer dibuat di perangkatmu (notifikasi lokal), tanpa server.","Tebak Inisial, Gems Arena, dan Versus: bila dimainkan di satu perangkat, datanya hanya di perangkat. Ruangan online dijelaskan di bawah.","Jadwal Sholat: kota atau koordinat lokasi, metode hitung, dan pilihan alarm adzan, seperti dijelaskan di bagian Lokasi (menu Jadwal Sholat) di atas.","Catatan Cepat: judul dan isi catatan, warna, status sematan, serta alarm pengingat yang kamu atur. Catatan tersimpan di perangkatmu dan tidak dienkripsi tambahan, jadi jangan menyimpan kata sandi atau data yang sangat rahasia di dalamnya. Alarm pengingat bersifat pilihan, dijadwalkan ke alarm sistem perangkat (maksimal 50 alarm aktif), dan tidak memakai server.","Turnamen, Olahraga, Keuangan, dan Arisan: dijelaskan di bagian lain di kebijakan ini.","Kunci Aplikasi: PIN atau pola dan kode pemulihan disimpan di perangkatmu hanya dalam bentuk hash (tidak bisa dibaca kembali) dan tidak disalin ke akun. Sidik jari diproses oleh sistem HP; aplikasi hanya menerima hasil cocok atau tidak.","Semua data di atas ikut tersalin ke akunmu bila kamu masuk dengan Google dan sinkronisasi aktif, kecuali PIN, pola, dan kode pemulihan Kunci Aplikasi maupun kunci menu."]},
+    {p:["Ringkasan per menu (data di perangkat):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, dan Jodoh: nama, tanggal lahir, dan isian lain yang kamu ketik, riwayat, papan skor, serta pengaturan suara dan musik. Fitur bacaan suara memakai mesin suara bawaan perangkatmu.","BMI & Kalori, Kehamilan, dan Kandungan Makanan: data tubuh dan kehamilan yang kamu isi (misalnya usia, jenis kelamin, berat, dan tinggi badan), profil AKG (termasuk status hamil atau menyusui), dan isi Piringku. Ini data kesehatan, jadi jaga perangkatmu.","Timer: hanya pengaturan tampilan. Alarm dan notifikasi timer dibuat di perangkatmu (notifikasi lokal), tanpa server.","Tebak Inisial, Gems Arena, dan Versus: bila dimainkan di satu perangkat, datanya hanya di perangkat. Ruangan online dijelaskan di bawah.","Jadwal Sholat: kota atau koordinat lokasi, metode hitung, dan pilihan alarm adzan, seperti dijelaskan di bagian Lokasi (menu Jadwal Sholat) di atas.","Catatan Cepat: judul dan isi catatan, warna, status sematan, serta alarm pengingat yang kamu atur. Catatan tersimpan di perangkatmu dan tidak dienkripsi tambahan, jadi jangan menyimpan kata sandi atau data yang sangat rahasia di dalamnya. Alarm pengingat bersifat pilihan, dijadwalkan ke alarm sistem perangkat (maksimal 50 alarm aktif), dan tidak memakai server.","Turnamen, Olahraga, Keuangan, dan Arisan: dijelaskan di bagian lain di kebijakan ini.","Kunci Aplikasi: PIN atau pola dan kode pemulihan disimpan di perangkatmu hanya dalam bentuk hash (tidak bisa dibaca kembali) dan tidak disalin ke akun. Sidik jari diproses oleh sistem HP; aplikasi hanya menerima hasil cocok atau tidak. Bila kamu memakai kunci HP, aplikasi tidak menyimpan PIN atau pola sama sekali; verifikasinya dilakukan sepenuhnya oleh sistem Android.","Semua data di atas ikut tersalin ke akunmu bila kamu masuk dengan Google dan sinkronisasi aktif, kecuali PIN, pola, dan kode pemulihan Kunci Aplikasi maupun kunci menu."]},
     {p:["Setelah masuk dengan Google:"], l:["Nama tampilan, alamat email, dan foto dari akun Google.","ID Akun (ST-xxxxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir. Nama dan foto profilmu dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui ID Akunmu (misalnya saat mereka menambah teman); di aplikasi, foto itu hanya bisa dibuka oleh temanmu. Status online dan waktu terakhir aktifmu hanya bisa dilihat temanmu. Alamat emailmu tidak terlihat pengguna lain.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, rute GPS olahraga, serta data Keuangan dan Arisan) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, nama (username) admin, moderator, atau pengikut, serta suara dan komentar yang kamu kirim (isi komentar, username, ID Akun, dan waktu) yang dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui kode turnamen tersebut.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online; hanya bisa dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, ditandai kedaluwarsa setelah 30 hari, dan dihapus saat pertemanan dihapus.","Tanda dibaca: waktu terakhir kamu membuka chat dengan temanmu. Hanya bisa dilihat temanmu (untuk menandai pesan sudah dibaca) dan dihapus saat pertemanan dihapus."]},
     {p:["Ruangan game online (Main bersama lewat kode ruang):"], l:["Hanya untuk pengguna yang masuk dengan Google. Pada Tebak Inisial dan Gems Arena, kode ruang, nama host dan pemain, jawaban, skor atau hasil permainan (serta chat ruangan di Tebak Inisial dan Gems Arena) disimpan di server selama ruangan dipakai dan dihapus saat host menutup ruangan. Chat ditandai kedaluwarsa setelah 24 jam. Ruangan yang tidak ditutup dengan benar (misalnya aplikasi dihentikan paksa) dapat tersimpan lebih lama. Siapa pun yang sudah masuk akun dan mengetahui kode ruangan dapat melihat isi ruangan, termasuk chatnya."]},
     {p:["Notifikasi push (hanya aplikasi Android, setelah masuk dengan Google):"], l:["Aplikasi menyimpan token perangkat dari Firebase Cloud Messaging bersama ID penggunamu, jenis platform, dan waktu, supaya notifikasi tetap muncul walau aplikasi ditutup. Izin notifikasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Notifikasi dikirim untuk pesan teman, permintaan dan persetujuan pertemanan, serta undangan (moderator turnamen, pengikut turnamen, atau ruangan permainan) beserta balasannya. Saat kejadian itu terjadi, aplikasi mengirim jenis kejadian dan pengenal terkait ke server pengirim notifikasi (Cloudflare Workers) bersama token masuk akunmu untuk verifikasi. Server memeriksa kejadian itu, membaca data yang dibutuhkan dari akun (nama pengirim dan, untuk pesan teman, 100 huruf pertama isi pesan), lalu meneruskannya sebagai isi notifikasi lewat Firebase Cloud Messaging milik Google. Isi notifikasi dapat tampil di layar kunci sesuai pengaturan notifikasi HP-mu; matikan notifikasi aplikasi bila kamu tidak menghendakinya.","Token perangkat dihapus saat kamu keluar dari akun (perangkat itu) atau menghapus akun (semua perangkat)."]},
@@ -1738,7 +1738,7 @@ const PV = {
     {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, including while the screen is locked or the app is in the background (a notification shows while recording), and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","The step count is read from your phone's step sensor (Physical activity permission) only while recording in the Android app, and is used only to check that the distance is plausible. It is not shown or stored in the activity history.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in with Google and sync is on."]},
     {p:["Location (Prayer Times menu):"], l:["To calculate prayer times and the Qibla direction, you pick a city from a list or press the GPS location button. GPS is read only once when you press that button (not continuously and not in the background). Location permission is requested by your device and you can revoke it at any time.","The city or coordinates you choose, the calculation method, and your adhan alarm choices are stored on your device. Calculations run on the device, and your location is not sent to a server for this menu. If you sign in with Google and sync is on, these settings (including your location coordinates) are also copied to your account like other menu data.","The Qibla compass uses the device’s orientation sensor only while you have it turned on. Sensor readings are not stored or sent.","Adhan alarm: in the Android app, the adhan is scheduled with the device’s system alarm for the next 7 days and still sounds when the app is closed; in a browser, the adhan only sounds while the menu is open. It needs notification or alarm permission from your device and you can turn it off at any time."]},
     {p:["Finance and Arisan:"], l:["Financial records (money in and out, wallets, spending limits, savings) and Arisan data (participant names, winners, payment status) are stored on your device. If you sign in with Google, this data is also copied to your account.","Menu lock: the PIN and recovery code are stored only on your device as a hash (not the original text), are not sent to a server, and are not copied to your account. Your fingerprint and the phone's screen PIN/pattern are checked by the Android system; the app does not receive or store your fingerprint data.","Online Arisan rooms: the names of the host and participants, the draw name list, results, and the room chat are stored on a server while the room exists and are deleted when the host closes the room. Chat is also marked to expire after 24 hours.","Backup file: the Back up feature in the Finance and Arisan menus creates a file on your device at your request, and you choose where to save it. This file is not encrypted and does not contain the PIN or recovery code, so keep it somewhere safe."]},
-    {p:["Summary by menu (data on your device):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, and Jodoh: names, birth dates, and other text you type, history, scoreboards, and sound and music settings. The read-aloud feature uses your device’s built-in speech engine.","BMI & Kalori, Kehamilan, and Kandungan Makanan: the body and pregnancy data you enter (for example age, sex, weight, and height), the RDA (AKG) profile (including pregnant or breastfeeding status), and the contents of My Plate (Piringku). This is health data, so keep your device secure.","Timer: display settings only. Timer alarms and notifications are created on your device (local notifications), without a server.","Tebak Inisial, Gems Arena, and Versus: when played on a single device, the data stays on the device. Online rooms are described below.","Prayer Times: the city or location coordinates, calculation method, and adhan alarm choices, as described in the Location (Prayer Times menu) section above.","Quick Notes: the title and text of your notes, color, pinned status, and the reminder alarms you set. Notes are stored on your device and are not additionally encrypted, so do not keep passwords or highly confidential data in them. Reminder alarms are optional, scheduled with the device’s system alarm (up to 50 active alarms), and do not use a server.","Tournaments, Sports, Finance, and Arisan: described elsewhere in this policy.","App Lock: the PIN or pattern and the recovery code are stored on your device only as a hash (they cannot be read back) and are not copied to your account. Your fingerprint is handled by the phone’s system; the app only receives a match or no-match result.","All of the above is also copied to your account if you sign in with Google and sync is on, except the PIN, pattern, and recovery code of the App Lock and the menu lock."]},
+    {p:["Summary by menu (data on your device):"], l:["Insting Detektif, Khodam, Tri Hoki, Watak, and Jodoh: names, birth dates, and other text you type, history, scoreboards, and sound and music settings. The read-aloud feature uses your device’s built-in speech engine.","BMI & Kalori, Kehamilan, and Kandungan Makanan: the body and pregnancy data you enter (for example age, sex, weight, and height), the RDA (AKG) profile (including pregnant or breastfeeding status), and the contents of My Plate (Piringku). This is health data, so keep your device secure.","Timer: display settings only. Timer alarms and notifications are created on your device (local notifications), without a server.","Tebak Inisial, Gems Arena, and Versus: when played on a single device, the data stays on the device. Online rooms are described below.","Prayer Times: the city or location coordinates, calculation method, and adhan alarm choices, as described in the Location (Prayer Times menu) section above.","Quick Notes: the title and text of your notes, color, pinned status, and the reminder alarms you set. Notes are stored on your device and are not additionally encrypted, so do not keep passwords or highly confidential data in them. Reminder alarms are optional, scheduled with the device’s system alarm (up to 50 active alarms), and do not use a server.","Tournaments, Sports, Finance, and Arisan: described elsewhere in this policy.","App Lock: the PIN or pattern and the recovery code are stored on your device only as a hash (they cannot be read back) and are not copied to your account. Your fingerprint is handled by the phone’s system; the app only receives a match or no-match result. If you use the phone lock, the app stores no PIN or pattern at all; the verification is handled entirely by the Android system.","All of the above is also copied to your account if you sign in with Google and sync is on, except the PIN, pattern, and recovery code of the App Lock and the menu lock."]},
     {p:["After signing in with Google:"], l:["The display name, email address, and photo of your Google account.","The system-generated Account ID (ST-xxxxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time. Your name and profile photo can be seen by other signed-in users who know your Account ID (for example when they add a friend); in the app, the photo can only be opened by your friends. Your online status and last-active time can only be seen by your friends. Your email address is not visible to other users.","A copy of your app data (settings, history, menu results, sports GPS routes, and Finance and Arisan data) so it can sync across devices.","For online tournaments: tournament data, tournament codes, the names (usernames) of admins, moderators, and followers, and the votes and comments you submit (comment text, username, Account ID, and time), which can be seen by other signed-in users who know that tournament’s code.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light; visible only to your friends).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, are marked to expire after 30 days, and are deleted when the friendship is removed.","Read receipts: the time you last opened the chat with your friend. Only your friend can see it (to mark messages as read), and it is deleted when the friendship is removed."]},
     {p:["Online game rooms (Play together via room code):"], l:["Only for users signed in with Google. In Tebak Inisial and Gems Arena, the room code, host and player names, answers, scores or game results (and the room chat in Tebak Inisial and Gems Arena) are stored on a server while the room is in use and deleted when the host closes the room. Chat is marked to expire after 24 hours. A room that is not closed properly (for example if the app is force-stopped) may be kept longer. Anyone signed in who knows the room code can see the room contents, including the chat."]},
     {p:["Push notifications (Android app only, after signing in with Google):"], l:["The app stores a device token from Firebase Cloud Messaging together with your user ID, the platform type, and a timestamp, so notifications still appear when the app is closed. Notification permission is requested by your device and you can revoke it at any time.","Notifications are sent for friend messages, friend requests and acceptances, and invitations (tournament moderator, tournament follower, or game room) and their replies. When such an event happens, the app sends the event type and related identifiers to the notification server (Cloudflare Workers) together with your sign-in token for verification. The server checks the event, reads the data it needs from your account (the sender’s name and, for friend messages, the first 100 characters of the message), and passes it on as the notification text through Google’s Firebase Cloud Messaging. The notification text may appear on your lock screen depending on your phone’s notification settings; turn off the app’s notifications if you do not want this.","The device token is deleted when you sign out (that device) or delete your account (all devices)."]},
@@ -2752,7 +2752,7 @@ const KEY = "st_applock", ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", html = docum
 
 const TX = {
   id:{
-    locked:"Aplikasi terkunci", pinAsk:"Masukkan PIN", patAsk:"Gambar pola", useBio:"Pakai sidik jari", forgot:"Lupa PIN atau pola?",
+    locked:"Aplikasi terkunci", useDev:"Buka dengan kunci HP", devGone:"HP ini tidak punya kunci layar, jadi kunci aplikasi dilewati.", optDev:"Kunci HP (sidik jari, PIN, atau pola HP) — disarankan", devOn:"Memakai kunci bawaan HP. Aplikasi tidak menyimpan PIN atau kode pemulihan. Bila kunci layar HP dihapus, kunci aplikasi tidak berlaku.", vDev:"Verifikasi dengan kunci HP untuk melanjutkan", pinAsk:"Masukkan PIN", patAsk:"Gambar pola", useBio:"Pakai sidik jari", forgot:"Lupa PIN atau pola?",
     wrongPin:"PIN salah.", wrongPat:"Pola salah.", wait:"Terlalu banyak percobaan. Coba lagi dalam {n} dtk.",
     shortPin:"PIN minimal 4 angka.", shortPat:"Hubungkan minimal 4 titik.", bioReason:"Buka Satu Titik", cancel:"Batal",
     recAsk:"Masukkan kode pemulihan", recGo:"Buka kunci", recBack:"Kembali ke PIN atau pola", recBad:"Kode pemulihan salah.",
@@ -2774,7 +2774,7 @@ const TX = {
     pat:"pola", saveFail:"Penyimpanan penuh, kunci tidak tersimpan."
   },
   en:{
-    locked:"App locked", pinAsk:"Enter PIN", patAsk:"Draw pattern", useBio:"Use fingerprint", forgot:"Forgot PIN or pattern?",
+    locked:"App locked", useDev:"Unlock with phone lock", devGone:"This phone has no screen lock, so the app lock was skipped.", optDev:"Phone lock (fingerprint, PIN, or phone pattern) — recommended", devOn:"Using the phone’s own lock. The app stores no PIN or recovery code. If the phone’s screen lock is removed, the app lock no longer applies.", vDev:"Verify with your phone lock to continue", pinAsk:"Enter PIN", patAsk:"Draw pattern", useBio:"Use fingerprint", forgot:"Forgot PIN or pattern?",
     wrongPin:"Wrong PIN.", wrongPat:"Wrong pattern.", wait:"Too many attempts. Try again in {n} s.",
     shortPin:"PIN needs at least 4 digits.", shortPat:"Connect at least 4 dots.", bioReason:"Unlock Satu Titik", cancel:"Cancel",
     recAsk:"Enter recovery code", recGo:"Unlock", recBack:"Back to PIN or pattern", recBad:"Wrong recovery code.",
@@ -2813,7 +2813,7 @@ function toast(m){
 }
 
 /* ---------- penyimpanan & hash ---------- */
-const load = () => { try{ const c = JSON.parse(localStorage.getItem(KEY) || "null"); return c && c.on && c.h && c.s ? c : null; }catch(e){ return null; } };
+const load = () => { try{ const c = JSON.parse(localStorage.getItem(KEY) || "null"); return c && c.on && ((c.h && c.s) || c.m === "dev") ? c : null; }catch(e){ return null; } };
 function save(c){ try{ localStorage.setItem(KEY, JSON.stringify(c)); return true; }catch(e){ toast(L("saveFail")); return false; } }
 let cfg = load();
 const hexOf = b => Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, "0")).join("");
@@ -2864,9 +2864,23 @@ const bio = (() => {
     if(N){ try{ await N.verifyIdentity({ reason, title: "SATU TITIK", subtitle: reason, useFallback: false, maxAttempts: 3 }); return true; }catch(e){} }
     return false;
   }
-  return { ok, ask };
+  /* kunci bawaan HP (sidik jari, PIN, atau pola layar HP) */
+  async function dev(reason, cancel){
+    init();
+    if(P){ try{ await (P.internalAuthenticate || P.authenticate).call(P, { reason, cancelTitle: cancel, allowDeviceCredential: true, androidTitle: "SATU TITIK", androidSubtitle: reason }); return true; }catch(e){ if(!(N && unimpl(e))) return false; } }
+    if(N){ try{ await N.verifyIdentity({ reason, title: "SATU TITIK", subtitle: reason, useFallback: true, maxAttempts: 3 }); return true; }catch(e){} }
+    return false;
+  }
+  /* true = HP punya kunci layar, false = pasti tidak ada, null = tidak diketahui (web atau plugin tidak ada) */
+  async function secure(){
+    init();
+    try{ if(P){ const r = await P.checkBiometry(); if(r && typeof r.deviceIsSecure === "boolean") return r.deviceIsSecure || !!r.isAvailable; } }catch(e){}
+    try{ if(N){ const r = await N.isAvailable({ useFallback: true }); if(r && r.isAvailable) return true; } }catch(e){}
+    return null;
+  }
+  return { ok, ask, dev, secure };
 })();
-let bioAvail = false, busyBio = false, guardUntil = 0;
+let devOk = false, bioAvail = false, busyBio = false, guardUntil = 0;
 const guarded = () => busyBio || Date.now() < guardUntil;
 async function askBioRaw(){
   busyBio = true; let ok = false;
@@ -2961,8 +2975,26 @@ function paintBioBtn(){
   b.hidden = !(lockMode === "cred" && cfg && cfg.bio && bioAvail);
   b.innerHTML = icon("finger") + "<span></span>"; b.lastChild.textContent = L("useBio");
 }
+async function askDevRaw(){
+  busyBio = true; let ok = false;
+  try{ ok = await bio.dev(L("bioReason"), L("cancel")); }catch(e){}
+  busyBio = false; guardUntil = Date.now() + 1200;
+  return ok;
+}
+async function askDev(){
+  if(!lockedNow || !cfg || cfg.m !== "dev" || busyBio || document.hidden) return;
+  if((await bio.secure()) === false){ unlockApp(); toast(L("devGone")); return; }   /* HP tidak punya kunci layar lagi: tidak ada yang bisa diminta */
+  if(await askDevRaw() && lockedNow) unlockApp();
+}
+function buildDev(){
+  const host = q("alPad"); host.textContent = ""; host.classList.remove("busy"); setMsg("");
+  q("alS").textContent = L("locked"); q("alForgot").hidden = true;
+  const b = q("alBio"); b.hidden = false; b.innerHTML = icon("lock") + "<span></span>"; b.lastChild.textContent = L("useDev");
+  askDev();
+}
 function buildLock(){
   if(!cfg) return; lockMode = "cred";
+  if(cfg.m === "dev"){ buildDev(); return; }
   const m = cfg.m === "pat" ? "pat" : "pin", host = q("alPad");
   q("alS").textContent = L(m === "pat" ? "patAsk" : "pinAsk"); host.textContent = ""; setMsg("");
   pad = m === "pat"
@@ -3013,7 +3045,7 @@ async function askBio(manual){
   if(await askBioRaw() && lockedNow) unlockApp();
 }
 q("alForgot").addEventListener("click", () => { if(lockMode === "rec") buildLock(); else buildRec(); });
-q("alBio").addEventListener("click", () => askBio(true));
+q("alBio").addEventListener("click", () => (cfg && cfg.m === "dev") ? askDev() : askBio(true));
 document.addEventListener("keydown", e => { if(lockedNow && lockMode === "cred" && pad && pad.key) pad.key(e); });
 
 /* ---------- kapan harus mengunci ---------- */
@@ -3027,7 +3059,7 @@ document.addEventListener("visibilitychange", () => {
     if(guarded()) return;
     if(!lockedNow && hiddenAt && Date.now() - hiddenAt >= (+cfg.t || 0) * 1000) lockNow();
     hiddenAt = 0;
-    if(lockedNow) setTimeout(() => askBio(false), 250);
+    if(lockedNow) setTimeout(() => (cfg && cfg.m === "dev") ? askDev() : askBio(false), 250);
   }
 });
 /* muat ulang halaman saat sedang terbuka (mis. setelah Reset) tidak meminta kunci lagi */
@@ -3091,7 +3123,7 @@ const RENDER = {
       if(await askBioRaw()){ cfg.bio = true; save(cfg); }
       render();
     });
-    host.appendChild(el("p", "abp", bioAvail ? L("bioFound") : L("bioNA")));
+    const bp = host.appendChild(el("p", "abp", bioAvail ? L("bioFound") : L("bioNA")));
     const ch = sc("lock", L("change")); ch.addEventListener("click", () => go("verify", { next:"change" })); host.appendChild(ch);
     host.appendChild(el("p", "abp", L("after")));
     const seg = el("div", "seg");
@@ -3102,8 +3134,14 @@ const RENDER = {
     host.appendChild(seg);
     const rc = sc("info", L("newRec")); rc.style.marginTop = "12px"; rc.addEventListener("click", () => go("verify", { next:"rec" })); host.appendChild(rc);
     host.appendChild(el("p", "abp", L("note")));
+    if(cfg.m === "dev"){ [bb, bp, ch, rc].forEach(x => x.remove()); host.appendChild(el("p", "abp", L("devOn"))); }
   },
   verify(host){
+    if(cfg.m === "dev"){
+      host.appendChild(el("p", "abp", L("vDev")));
+      const db = sc("lock", L("useDev")); db.addEventListener("click", async () => { if(await askDevRaw()) proceed(); }); host.appendChild(db);
+      cancelBtn(host); return;
+    }
     const onSecret = async s => {
       const r = await check(s);
       if(r.ok){ proceed(); return; }
@@ -3118,6 +3156,14 @@ const RENDER = {
   },
   choose(host){
     host.appendChild(el("p", "abp", L("choose")));
+    if(devOk){
+      const d = sc("lock", L("optDev")); d.addEventListener("click", async () => {
+        if(!(await askDevRaw())) return;
+        const c = { on:true, m:"dev", t:(cfg && +cfg.t) || 30 };
+        if(!save(c)){ go("main"); return; }
+        cfg = c; go("main", { msg:L("onDone") });
+      }); host.appendChild(d);
+    }
     [["pin", "optPin"], ["pat", "optPat"]].forEach(([m, k]) => {
       const b = sc("lock", L(k)); b.addEventListener("click", () => go("new1", { next:view.next, m })); host.appendChild(b);
     });
@@ -3150,6 +3196,7 @@ const RENDER = {
 function refreshBio(){
   const apply = v => { if(v !== bioAvail){ bioAvail = v; if(spView === "applock" && view.s === "main") render(); } };
   bio.ok().then(v => { apply(v); if(!v) setTimeout(() => bio.ok().then(apply), 900); });
+  bio.secure().then(v => { const d = v === true; if(d !== devOk){ devOk = d; if(spView === "applock" && (view.s === "main" || view.s === "choose")) render(); } });
 }
 function paint(){
   if(spView !== "applock"){ built = false; view = { s:"main" }; return; }
