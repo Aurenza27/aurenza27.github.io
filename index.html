@@ -748,6 +748,8 @@ h1{font-size:26px;line-height:1.15}
     <div class="rl" id="rlVibe"><div class="rlw"><div class="rlc"><div class="seg s3" data-k="vlevel"><button class="sg" data-v="low" type="button"></button><button class="sg" data-v="mid" type="button"></button><button class="sg" data-v="high" type="button"></button></div></div></div></div>
     <button class="sc" id="sbAlarm" type="button"></button>
     <div class="rl" id="rlAlarm"><div class="rlw"><div class="rlc"><div class="seg" id="alSeg"><button class="sa" data-v="classic" type="button"></button><button class="sa" data-v="beep" type="button"></button><button class="sa" data-v="bell" type="button"></button><button class="sa" data-v="melody" type="button"></button><button class="sa" data-v="siren" type="button"></button></div><span class="rlt" id="alVL" style="margin-top:10px"></span><input type="range" id="alV" min="10" max="100" step="5"><p class="abp" id="alNote" style="margin:8px 0 0"></p></div></div></div>
+    <button class="sc" id="sbMsgMute" type="button"></button>
+    <p class="abp" id="mmNote"></p>
   </div>
   <div id="svPlay" hidden>
     <button class="sc" id="sbAuto" type="button"></button>
@@ -1126,7 +1128,7 @@ const unesc = s => s.split("</scr@@" + "ipt").join("</scr" + "ipt").split("<!@@"
    Disimpan di satu kunci, lalu ditulis ke kunci tiap menu sebelum menu dibuka dan diterapkan langsung bila menu sedang terbuka.
    Panel ⚙️ di dalam tiap menu disembunyikan. Menu baru: tambahkan kunci & id tombolnya di writeKeys, TOG, dan RNG. */
 const SKEY = "titikhilangs_settings", GAPS = [3, 5, 8, 12, 20, 30];
-const DEF = {sound:true, music:true, read:true, auto:false, scroll:true, mvol:70, aivol:100, gap:8, lang:"id", theme:"navy", fsize:100, fmode:"serif", anim:true, vibe:true, vlevel:"mid", alsnd:"classic", alvol:100, alarm:true};
+const DEF = {sound:true, music:true, read:true, auto:false, scroll:true, mvol:70, aivol:100, gap:8, lang:"id", theme:"navy", fsize:100, fmode:"serif", anim:true, vibe:true, vlevel:"mid", alsnd:"classic", alvol:100, alarm:true, mmute:false};
 let S = Object.assign({}, DEF), curMenu = null;
 try{ Object.assign(S, JSON.parse(localStorage.getItem(SKEY) || "{}")); }catch(e){}
 if(!GAPS.includes(S.gap)) S.gap = 8;
@@ -1139,7 +1141,7 @@ S.mvol = Math.min(100, Math.max(0, +S.mvol || 0)); S.aivol = Math.min(100, Math.
 /* ===== Alarm Timer: pilihan suara + volume (dipakai panel Pengaturan, menu Timer, dan alarm native Android) ===== */
 const ALARMS = [["classic","Sirene dua nada","Two-tone siren"],["beep","Bip-bip-bip","Triple beep"],["bell","Lonceng","Bell"],["melody","Nada naik","Rising notes"],["siren","Darurat (sapuan)","Emergency sweep"]];
 if(!ALARMS.some(a => a[0] === S.alsnd)) S.alsnd = "classic";
-S.alvol = Math.min(100, Math.max(10, Math.round(+S.alvol || 100))); S.alarm = S.alarm !== false;
+S.alvol = Math.min(100, Math.max(10, Math.round(+S.alvol || 100))); S.alarm = S.alarm !== false; S.mmute = S.mmute === true;
 window.stAlarmList = ALARMS;
 window.stAlarmCfg = () => ({snd:S.alarm ? S.alsnd : "off", vol:S.alvol, on:S.alarm});
 /* satu putaran bunyi (~0,9 dtk) digambar ke node "out" mulai waktu t; dipakai menu Timer (di iframe) dan tombol Coba suara */
@@ -1278,6 +1280,7 @@ function setS(patch){
 }
 const GI = d => '<svg viewBox="0 0 24 24" aria-hidden="true">' + d + '</svg>';
 const PIC = {
+  mute:GI('<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/><path d="M4 4l16 16"/>'),
   gear:GI('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>'),
   sound:GI('<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/>'),
   music:GI('<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>'),
@@ -1530,12 +1533,17 @@ function paintPanel(){
     $("alVL").textContent = L.vol.replace("{n}", S.alvol); $("alV").value = S.alvol; $("alNote").textContent = L.note;
     document.querySelectorAll("#alSeg .sa").forEach(b => { const a = ALARMS.find(x => x[0] === b.dataset.v); b.textContent = a[S.lang === "en" ? 2 : 1]; b.setAttribute("aria-pressed", String(S.alsnd === a[0])); });
     const e = $("rlAlarm"); e.classList.toggle("open", !!S.alarm); e.inert = !S.alarm; $("sbAlarm").classList.toggle("rlon", !!S.alarm); }
+  { const M = MMT[S.lang]; pb("sbMsgMute", "mute", S.mmute, M.on); $("mmNote").textContent = M.note; }
   paintAp();
   paintHome();
 }
 const ALT = {
   id:{on:["⏰ Alarm Timer: aktif","⏰ Alarm Timer: diam"], vol:"Volume alarm: {n}%", note:"Di aplikasi Android, volume ini mengatur volume alarm di HP-mu. Perubahan suara berlaku juga untuk timer yang sudah berjalan."},
   en:{on:["⏰ Timer alarm: active","⏰ Timer alarm: silent"], vol:"Alarm volume: {n}%", note:"In the Android app, this sets your phone's alarm volume. A new sound also applies to timers already running."}
+};
+const MMT = {
+  id:{on:["🔕 Senyapkan notifikasi pesan: aktif","🔔 Senyapkan notifikasi pesan: mati"], note:"Bila aktif, pesan dari semua teman tidak memunculkan notifikasi di HP-mu saat aplikasi di latar belakang atau HP terkunci. Pesan tetap masuk dan bisa dibaca di chat. Butuh internet saat mengubahnya."},
+  en:{on:["🔕 Mute message notifications: on","🔔 Mute message notifications: off"], note:"When on, messages from all friends do not show notifications on your phone while the app is in the background or the phone is locked. Messages still arrive and can be read in the chat. Needs internet when you change it."}
 };
 let alPac = null;
 function alWebPreview(){
@@ -1745,6 +1753,7 @@ hapticHook(document);
 $("sbVibe").addEventListener("click", () => { setS(!S.vibe ? {vibe:true, sound:true} : {vibe:false}); if(S.vibe) haptic(true); });
 $("svSound").addEventListener("click", e => { const b = e.target.closest(".sg"); if(!b || b.disabled) return; setS({vlevel:b.dataset.v}); haptic(true); });
 $("sbAuto").addEventListener("click", () => setS({auto:!S.auto}));
+$("sbMsgMute").addEventListener("click", () => { setS({mmute:!S.mmute}); try{ if(window.stMuteAllSync) window.stMuteAllSync(); }catch(e){} });
 $("sbScroll").addEventListener("click", () => setS({scroll:!S.scroll}));
 $("sbGap").addEventListener("click", () => setS({gap:GAPS[(GAPS.indexOf(S.gap) + 1) % GAPS.length]}));
 $("sbLang").addEventListener("click", () => setS({lang:S.lang === "id" ? "en" : "id"}));
@@ -1827,6 +1836,8 @@ async function wipeServer(A, joined){
   await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "friendships"), m.where("u", "array-contains", uid))); await Promise.all(sn.docs.map(d => soft(async () => { try{ for(let i = 0; i < 12; i++){ const ms = await m.getDocs(m.query(m.collection(d.ref, "msgs"), m.limit(100))); if(ms.empty) break; await Promise.all(ms.docs.map(x => m.deleteDoc(x.ref))); } }catch(e){} try{ await Promise.all(String(d.id).split("_").map(x => m.deleteDoc(m.doc(d.ref, "reads", x)))); }catch(e){} await m.deleteDoc(d.ref); }))); });
   /* 2c) daftar blokir milik pengguna */
   await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "blocks"), m.where("by", "==", uid))); await Promise.all(sn.docs.map(d => soft(() => m.deleteDoc(d.ref)))); });
+  /* 2d) daftar senyap milik pengguna */
+  await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "mutes"), m.where("by", "==", uid))); await Promise.all(sn.docs.map(d => soft(() => m.deleteDoc(d.ref)))); });
   /* 3) keluar dari turnamen orang lain: moderator, pengikut, suara */
   const cmtOids = new Set(joined);
   if(acc) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "tournaments"), m.where("modIds", "array-contains", acc))); await Promise.all(sn.docs.filter(d => d.data().owner !== uid).map(d => { cmtOids.add(d.id); return soft(() => m.updateDoc(d.ref, { modIds: m.arrayRemove(acc) })); })); });
@@ -20135,6 +20146,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       rqT:"Permintaan pertemanan", rqB:"{n} ingin berteman denganmu.", okT:"Pertemanan diterima", okB:"{n} ({a}) menerima permintaan pertemananmu.", nFr:"{n} teman", nRq:"{n} permintaan baru",
       acT:"Pertemanan diterima", acB:"Kamu sekarang berteman dengan {n} ({a}).", dnT:"Permintaan ditolak", dnB:"Kamu menolak permintaan pertemanan {n}.", cnT:"Permintaan dibatalkan", cnB:"{n} membatalkan permintaan pertemanannya.", rjT:"Permintaan pertemanan ditolak", rjB:"{n} menolak permintaan pertemananmu.",
       invH:"Undang ke turnamen “{n}”:", invM:"Jadikan moderator", invF:"Undang pengikut", invW:"Menunggu…", invMem:"Moderator ✓", invFd:"Undang lagi", invMd:"Undang lagi (moderator)", invMok:"Undangan moderator terkirim.", invFok:"Undangan pengikut terkirim.",
+      mu:"Senyapkan notifikasi pesan", umu:"Bunyikan notifikasi pesan", muOk:"Teman disenyapkan. Pesannya tidak memunculkan notifikasi di HP-mu.", umuOk:"Notifikasi pesan dari teman ini dibunyikan lagi.", muB:"🔕 Disenyapkan",
       e_max:"Daftar temanmu sudah penuh (maksimal 20 teman, termasuk permintaan terkirim).",
       e_invp:"Undangan masih menunggu jawaban.", e_banned:"Akun ini tidak bisa bergabung kembali ke ruangan ini karena sudah dikeluarkan pemilik ruangan.", e_invmem:"Dia sudah menjadi moderator.", e_invmax:"Maksimal 20 moderator.", e_noctx:"Buka detail turnamen online (sebagai admin) dulu.", e_invself:"Itu akunmu sendiri.",
       invRH:"Undang ke ruangan Tebak Inisial “{n}”:", invAH:"Undang ke arisan “{n}” (ruang online):", invR:"Undang ke ruangan", invRin:"Sudah di ruangan ✓", invRf:"Ruangan penuh", invRok:"Undangan ruangan terkirim." },
@@ -20146,6 +20158,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       rqT:"Friend request", rqB:"{n} wants to be your friend.", okT:"Friend request accepted", okB:"{n} ({a}) accepted your friend request.", nFr:"{n} friends", nRq:"{n} new requests",
       acT:"Friend request accepted", acB:"You are now friends with {n} ({a}).", dnT:"Request declined", dnB:"You declined the friend request from {n}.", cnT:"Request cancelled", cnB:"{n} cancelled their friend request.", rjT:"Friend request declined", rjB:"{n} declined your friend request.",
       invH:"Invite to tournament “{n}”:", invM:"Make moderator", invF:"Invite follower", invW:"Pending…", invMem:"Moderator ✓", invFd:"Invite again", invMd:"Invite again (moderator)", invMok:"Moderator invite sent.", invFok:"Follower invite sent.",
+      mu:"Mute message notifications", umu:"Unmute message notifications", muOk:"Friend muted. Their messages will not show notifications on your phone.", umuOk:"Message notifications from this friend are back on.", muB:"🔕 Muted",
       e_max:"Your friend list is full (maximum 20 friends, including sent requests).",
       e_invp:"The invite is still pending.", e_banned:"This account cannot rejoin this room because it was removed by the room owner.", e_invmem:"They are already a moderator.", e_invmax:"At most 20 moderators.", e_noctx:"Open an online tournament’s detail (as admin) first.", e_invself:"That is your own account.",
       invRH:"Invite to Guess the Initial room “{n}”:", invAH:"Invite to arisan “{n}” (online room):", invR:"Invite to room", invRin:"Already in the room ✓", invRf:"Room is full", invRok:"Room invite sent." }
@@ -20260,8 +20273,31 @@ if(navigator.onLine !== false) init().catch(() => {});
   addEventListener("online", () => beat());
   /* lampu yang kedaluwarsa (teman berhenti mengirim detak) ikut diperbarui saat panel terbuka */
   setInterval(() => { if(isOpen() && !working) paint(); }, 30000);
+  /* ===== SENYAPKAN: mutes/{uidku}_{uidTeman} = { by, to, ts }; mutes/{uidku}_all = semua pesan (dari Pengaturan) =====
+     Pengirim memeriksa dokumen ini sebelum meminta push; bila disenyapkan, push tidak dikirim (pesan tetap masuk ke chat). */
+  let muteSet = new Set(), unsubMu = null;
+  const muteCache = {};
+  async function setMute(ouid, on){
+    const a = A(), u = a && a.user; if(!u || !ouid || ouid === u.uid) throw new Error("e_fail");
+    const { m, db } = await a.getDb(), ref = m.doc(db, "mutes", u.uid + "_" + ouid);
+    if(on){ await m.setDoc(ref, { by: u.uid, to: ouid, ts: Date.now() }); muteSet.add(ouid); }
+    else { await m.deleteDoc(ref); muteSet.delete(ouid); }
+    emit();
+  }
+  async function syncMuteAll(){
+    const a = A(), u = a && a.user; if(!u || !a.getDb) return;
+    try{
+      const { m, db } = await a.getDb(), ref = m.doc(db, "mutes", u.uid + "_all");
+      if(typeof S !== "undefined" && S && S.mmute) await m.setDoc(ref, { by: u.uid, to: "all", ts: Date.now() });
+      else await m.deleteDoc(ref);
+    }catch(e){ console.warn("[senyap] gagal sinkron:", e && (e.code || e.message)); }
+  }
+  window.stMuteAllSync = syncMuteAll;
+  /* Pengecekan senyap dilakukan di Worker (server), bukan di sini, supaya pengirim tidak bisa tahu dirinya disenyapkan. */
   async function start(u){
     if(unsub){ try{ unsub(); }catch(e){} unsub = null; }
+    if(unsubMu){ try{ unsubMu(); }catch(e){} unsubMu = null; }
+    muteSet = new Set();
     if(unsubI){ try{ unsubI(); }catch(e){} unsubI = null; }
     unwatchPres(); invOut = {}; rows = []; cand = null; migDone = false; emit();
     if(!u) return;
@@ -20274,6 +20310,10 @@ if(navigator.onLine !== false) init().catch(() => {});
         const o = {}; snap.docs.forEach(d => { const x = d.data() || {}; if(x.kind === "room") o[d.id] = { st: String(x.status || ""), ts: +x.ts || 0 }; });
         invOut = o; try{ refresh(); }catch(e){}
       }, () => {});
+      unsubMu = m.onSnapshot(m.query(m.collection(db, "mutes"), m.where("by", "==", u.uid)), sn => {
+        muteSet = new Set(sn.docs.map(d => String((d.data() || {}).to || "")).filter(x => x && x !== "all")); emit();
+      }, e => { console.warn("[senyap] pendengar gagal:", e && (e.code || e.message)); });
+      syncMuteAll();
       unsub = m.onSnapshot(m.query(m.collection(db, "friendships"), m.where("u", "array-contains", u.uid)), snap => {
         rows = snap.docs.map(d => norm(d.id, d.data(), u.uid)).filter(Boolean);
         const ev = [];
@@ -20392,6 +20432,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(r.st === "ok"){ const on = isOn(r.acc), tt = T[lang()], dt = mk("span", "frdot" + (on ? " on" : "")); dt.setAttribute("role", "img"); dt.setAttribute("aria-label", on ? tt.stOn : tt.stOff); dt.title = on ? tt.stOn : tt.stOff; nmp.appendChild(dt); }
     nmp.appendChild(document.createTextNode(nameOf(r.acc))); w.appendChild(nmp); if(r.st === "ok") w.appendChild(mk("p", "frid", r.acc));
     if(isBlk) w.appendChild(mk("span", "frbadge", lang() === "en" ? "🚫 Blocked" : "🚫 Diblokir"));
+    if(r.st === "ok" && muteSet.has(otherUid(r.id))) w.appendChild(mk("span", "frbadge", T[lang()].muB));
     if(r.st === "ok"){ const lo = isOn(r.acc); w.appendChild(mk("p", "frls" + (lo ? " on" : ""), lo ? T[lang()].stOn : lastText(r.acc))); }
     li.appendChild(w);
     const b = mk("div", "frbt"); btns.forEach(x => b.appendChild(x)); if(r.st === "ok" && unread[r.id]){ const ud = mk("span", "frun"); ud.setAttribute("aria-hidden", "true"); b.appendChild(ud); }
@@ -20512,7 +20553,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     if(Date.now() - lastSend < 700) throw new Error("e_fail"); lastSend = Date.now();
     const { m, db } = await a.getDb();
     const mref = await m.addDoc(m.collection(db, "friendships", chatId, "msgs"), { u: u.uid, t: txt, at: m.serverTimestamp(), exp: m.Timestamp.fromMillis(Date.now() + 30 * 86400000) });
-    try{ window.stPush && window.stPush("friend_msg", { fid: chatId, mid: mref.id }); }catch(e){}
+    { const fidS = chatId, midS = mref.id; try{ window.stPush && window.stPush("friend_msg", { fid: fidS, mid: midS }); }catch(e){} }
   }
   async function delMsg(id){
     const a = A(), fid = chatId; delId = ""; chatErr = "";
@@ -20654,6 +20695,8 @@ if(navigator.onLine !== false) init().catch(() => {});
           const mn = mk("div", "frmenu");
           mn.appendChild(mk("p", "frh", t.mnuH));
           mn.appendChild(btn(t.pm + (unread[r.id] ? " ●" : ""), "ok", () => openChat(r)));
+          { const ou2 = otherUid(r.id), isM = muteSet.has(ou2);
+            if(ou2) mn.appendChild(btn(isM ? t.umu : t.mu, "", () => run(isM ? "umuOk" : "muOk", async () => { await setMute(ou2, !isM); return isM ? "umuOk" : "muOk"; }))); }
           { const SS = SAFE(), ou = otherUid(r.id);
             if(SS && ou){
               const isB = SS.isBlocked(ou);
@@ -20929,6 +20972,9 @@ if(navigator.onLine !== false) init().catch(() => {});
       if(p.receive !== "granted") return;
       wired = true;
       try{ await PN.createChannel({ id: "satutitik", name: "Notifikasi", description: "Undangan, pertemanan, pesan, dan kabar terbaru", importance: 4, visibility: 1, vibration: true }); }catch(e){}
+      /* kanal khusus pesan teman: suara sendiri (res/raw/pesan.wav, dibuat oleh workflow build).
+         vibration:false sengaja: mode dering = hanya suara; mode getar = Android mengubah suara jadi getar; mode diam = tanpa suara dan getar */
+      try{ await PN.createChannel({ id: "satutitik_pesan", name: "Pesan teman", description: "Notifikasi pesan dari teman", importance: 4, visibility: 1, vibration: false, sound: "pesan.wav" }); }catch(e){}
       PN.addListener("registration", t => { token = t && t.value || ""; save(); });
       PN.addListener("registrationError", e => { console.warn("[push] registrasi gagal:", e && (e.error || e.message)); });
       PN.addListener("pushNotificationActionPerformed", () => { setTimeout(() => { const b = document.getElementById("bellBtn"); if(b && b.getAttribute("aria-expanded") !== "true") b.click(); }, 700); });
