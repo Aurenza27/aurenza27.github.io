@@ -17470,7 +17470,16 @@ select,input[type=search]{width:100%;min-height:44px;padding:0 12px;font:inherit
   /* ===== tampilan: Jadwal ===== */
   var KEYS = ["imsak", "fajr", "sunrise", "dhuha", "dhuhr", "asr", "maghrib", "isha"], MAIN = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
   function hijriText(y, m, d){
-    try{ return new Intl.DateTimeFormat(T().hijri, {day:"numeric", month:"long", year:"numeric", timeZone:"UTC"}).format(new Date(Date.UTC(y, m - 1, d, 12))); }catch(e){ return ""; }
+    /* nama bulan Hijriah ditulis sendiri: data locale "id" di beberapa WebView tidak punya nama bulan dan era Hijriah (muncul "Juni" dan "SM") */
+    try{
+      var idn = String(T().hijri).indexOf("id") === 0, g = {};
+      new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {day:"numeric", month:"numeric", year:"numeric", timeZone:"UTC"}).formatToParts(new Date(Date.UTC(y, m - 1, d, 12))).forEach(function(x){ g[x.type] = x.value; });
+      var mi = parseInt(g.month, 10) - 1, hd = parseInt(g.day, 10), hy = parseInt(g.year, 10);
+      if(!(mi >= 0 && mi < 12) || !hd || !hy) return "";
+      var N = idn ? ["Muharram","Safar","Rabiulawal","Rabiulakhir","Jumadilawal","Jumadilakhir","Rajab","Syakban","Ramadan","Syawal","Zulkaidah","Zulhijah"]
+                  : ["Muharram","Safar","Rabi\u2019 al-awwal","Rabi\u2019 al-thani","Jumada al-awwal","Jumada al-thani","Rajab","Sha\u2019ban","Ramadan","Shawwal","Dhu al-Qi\u2019dah","Dhu al-Hijjah"];
+      return hd + " " + N[mi] + " " + hy + (idn ? " H" : " AH");
+    }catch(e){ return ""; }
   }
   function gregText(dt){
     var mo = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"], moEn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
