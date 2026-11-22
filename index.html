@@ -831,7 +831,9 @@ const MENUS = [
   { id:"versus", cat:"hiburan", icon:"⚔️", title:"VERSUS", desc:"Adu dua nama apa pun: menang, kalah, atau seri.", descEn:"Pit any two names against each other: win, lose, or draw.", src:"src-versus" },
   { id:"duel-puzzle", cat:"hiburan", icon:"💎", title:"GEMS ARENA", desc:"Puzzle match-3 online: balap 100%, skor tertinggi dalam waktu pilihan (60–180 detik), atau serang balik dengan batu.", descEn:"Online match-3 puzzle: race to 100%, highest score in your chosen time (60–180s), or counter-attack with rocks.", src:"src-duel-puzzle" },
   { id:"acak-nama", cat:"manajemen", icon:"🎲", title:"ARISAN", desc:"Arisan: manajemen arisan kamu agar lebih akurat, bisa offline atau online (ditonton real-time), plus catatan keuangan arisan.", descEn:"Arisan: manage your arisan more neatly, offline or online (watchable in real time), plus arisan finance tracking.", src:"src-acak-nama" },
-  { id:"keuangan", cat:"manajemen", icon:"💰", title:"KEUANGAN", desc:"Catat uang masuk dan keluar, atur jatah belanja, dan kumpulkan tabungan.", descEn:"Record income and expenses, set spending limits, and build savings.", src:"src-keuangan" }
+  { id:"keuangan", cat:"manajemen", icon:"💰", title:"KEUANGAN", desc:"Catat uang masuk dan keluar, atur jatah belanja, dan kumpulkan tabungan.", descEn:"Record income and expenses, set spending limits, and build savings.", src:"src-keuangan" },
+  { id:"sholat", cat:"ibadah", icon:"🕌", title:"JADWAL SHOLAT", desc:"Waktu sholat, hitung mundur, dan arah kiblat sesuai lokasimu. Dihitung di perangkat, jalan tanpa internet.", descEn:"Prayer times, countdown, and Qibla direction for your location. Calculated on your device, works offline.", src:"src-sholat" },
+  { id:"catatan", cat:"manajemen", icon:"📝", title:"CATATAN CEPAT", desc:"Tulis catatan singkat dalam sekali ketuk: sematkan, beri warna, dan cari kapan saja.", descEn:"Jot down short notes in one tap: pin, color, and search anytime.", src:"src-catatan" }
 ];
 /* judul menu per bahasa: [beranda ID, beranda EN, judul di dalam menu ID, judul di dalam menu EN]. Nama aplikasi "Satu Titik" tidak diterjemahkan. */
 const MTITLE = {
@@ -850,7 +852,9 @@ const MTITLE = {
   "versus":["VERSUS","VERSUS","VERSUS","VERSUS"],
   "duel-puzzle":["GEMS ARENA","GEMS ARENA","GEMS ARENA","GEMS ARENA"],
   "acak-nama":["ARISAN","ARISAN","ARISAN","ARISAN"],
-  "keuangan":["KEUANGAN","FINANCE","KEUANGAN","FINANCE"]
+  "keuangan":["KEUANGAN","FINANCE","KEUANGAN","FINANCE"],
+  "sholat":["JADWAL SHOLAT","PRAYER TIMES","JADWAL SHOLAT","PRAYER TIMES"],
+  "catatan":["CATATAN CEPAT","QUICK NOTES","CATATAN CEPAT","QUICK NOTES"]
 };
 const mTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 1 : 0] : m.title; };
 const fTitle = m => { const t = MTITLE[m.id]; return t ? t[S.lang === "en" ? 3 : 2] : m.title; };
@@ -869,6 +873,7 @@ function paintMenuTitles(){
   }catch(e){} }
 }
 const CATS = [
+  { id:"ibadah", icon:"🕌", title:"Ibadah", titleEn:"Worship", sub:"Waktu sholat dan arah kiblat.", subEn:"Prayer times and Qibla direction." },
   { id:"medis", icon:"🩺", title:"Kesehatan & Gaya Hidup", titleEn:"Health & Lifestyle", sub:"Informasi kesehatan umum.", subEn:"General health information." },
   { id:"manajemen", icon:"🗂️", title:"Produktivitas & Manajemen", titleEn:"Productivity & Management", sub:"Atur dan kelola kegiatan.", subEn:"Organize and manage activities." },
   { id:"hiburan", icon:"🎭", title:"Hiburan & Permainan", titleEn:"Entertainment & Games", sub:"Uji kemampuan dan seru-seruan.", subEn:"Test your skills and have fun." },
@@ -891,7 +896,9 @@ const HOME_SHORT = {
   "versus":["Adu dua nama: menang, kalah, seri.","Pit two names against each other."],
   "duel-puzzle":["Puzzle match-3 online lawan teman.","Online match-3 duel with friends."],
   "acak-nama":["Kelola arisan offline atau online.","Manage arisan offline or online."],
-  "keuangan":["Catat uang masuk, keluar, tabungan.","Track income, spending, savings."]
+  "keuangan":["Catat uang masuk, keluar, tabungan.","Track income, spending, savings."],
+  "sholat":["Waktu sholat, hitung mundur, arah kiblat.","Prayer times, countdown, Qibla."],
+  "catatan":["Catatan singkat: sematkan, warna, cari.","Quick notes: pin, color, search."]
 };
 const homeDesc = (m, en) => { const t = HOME_SHORT[m.id]; return t ? t[en ? 1 : 0] : (en ? m.descEn : m.desc); };
 const ICONS = {
@@ -910,7 +917,9 @@ const ICONS = {
   "tebak-inisial":'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="3"/><path d="M9 16l3-8 3 8M10.2 13.4h3.6"/></svg>',
   "versus":'<svg viewBox="0 0 24 24"><path d="M5 19 15 9M15 9l1-4 4-1-1 4-4 1zM19 19 9 9M9 9 8 5 4 4l1 4 4 1z"/></svg>',
   "acak-nama":'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>',
-  "keuangan":'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.3" fill="currentColor"/></svg>'
+  "keuangan":'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.3" fill="currentColor"/></svg>',
+  "sholat":'<svg viewBox="0 0 24 24"><path d="M4 20v-7a8 8 0 0 1 16 0v7"/><path d="M2.5 20h19M12 5V2.5M10.8 3.7a1.5 1.5 0 1 0 1.9-1"/><path d="M9 20v-4a3 3 0 0 1 6 0v4"/></svg>',
+  "catatan":'<svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8.5 10h7M8.5 13.5h7M8.5 17h4"/></svg>'
 };
 const BADGE = {"cek-watak":{id:"Baru", en:"New"}, "cek-jodoh":{id:"Baru", en:"New"}, "cek-bmi":{id:"Baru", en:"New"}, "cek-hamil":{id:"Baru", en:"New"}, "versus":{id:"Baru", en:"New"}, "acak-nama":{id:"Baru", en:"New"}, "keuangan":{id:"Baru", en:"New"}, "stopwatch":{id:"Baru", en:"New"}, "info-makanan":{id:"Baru", en:"New"}};
 /* Label "Baru" hilang otomatis 14 hari.
@@ -1194,6 +1203,10 @@ function writeKeys(s){
   w("mk_lang", s.lang);
   /* Keuangan (awalan kg_; hanya mengikuti bahasa) */
   w("kg_lang", s.lang);
+  /* Jadwal Sholat (awalan sh_; mengikuti bahasa dan Efek suara) */
+  w("sh_lang", s.lang); w("sh_fx", j(s.sound));
+  /* Catatan Cepat (awalan cn_; hanya mengikuti bahasa) */
+  w("cn_lang", s.lang);
   /* Timer (awalan sw_; hanya mengikuti bahasa) */
   w("sw_lang", s.lang);
   w("tt_gap", j(gi)); w("tt_lang", j(s.lang)); w("tt_follow", j(s.scroll)); w("tt_anim", j(s.anim)); w("tt_vol", j(s.aivol / 100)); w("tt_mvol", j(s.mvol / 100));
@@ -1213,7 +1226,9 @@ const TOG = {
   "tebak-inisial": {},
   "versus": {},
   "acak-nama": {},
-  "keuangan": {}
+  "keuangan": {},
+  "sholat": {},
+  "catatan": {}
 };
 const RNG = {"th-analytics":{mvol:"volRange", aivol:"aiVolRange"}, "cek-khodam":{mvol:"mvol", aivol:"vol"}, "hari-hoki":{mvol:"mvol", aivol:"vol"}, "cek-watak":{mvol:"mvol", aivol:"vol"}, "cek-jodoh":{mvol:"mvol", aivol:"vol"}, "cek-bmi":{mvol:"mvol", aivol:"vol"}, "cek-hamil":{mvol:"mvol", aivol:"vol"}, "turnamen":{mvol:"mvol", aivol:"vol"}, "olahraga":{}, "info-makanan":{}, "stopwatch":{}, "tebak-inisial":{}};
 /* Keadaan ASLI menu dibaca langsung dari bingkainya (bukan ditebak dari pengaturan sebelumnya),
@@ -2225,19 +2240,19 @@ window.stNativeAlarm = (function(){
     /* id = nomor notifikasi unik per timer; menjadwalkan ulang id yang sama otomatis menggantikan yang lama (dipakai saat rename / ganti suara) */
     service: function(){ return !!sw(); },
     stopAlarm: async function(){ var S = sw(); if(S){ try{ await S.stopAlarm(); }catch(e){} } },
-    schedule: async function(id, at, title, body){
+    schedule: async function(id, at, title, body, opts){
       var P = plug(), S = sw();
       if(S){
         try{
           if(P){ var q = await P.checkPermissions(); if(q.display !== "granted"){ q = await P.requestPermissions(); if(q.display !== "granted") return false; } }
-          var cf = cfg(); await S.schedule({id:id, at:at, title:title, body:body, snd:cf.snd, vol:cf.vol}); return true;
+          var cf = cfg(); if(opts && opts.snd) cf = {snd:opts.snd, vol:cf.vol}; await S.schedule({id:id, at:at, title:title, body:body, snd:cf.snd, vol:cf.vol}); return true;
         }catch(e){ return false; }
       }
       if(!P) return false;
       try{
         var p = await P.checkPermissions();
         if(p.display !== "granted"){ p = await P.requestPermissions(); if(p.display !== "granted") return false; }
-        var key = cfg().snd, ch = await chan(P, key);
+        var key = (opts && opts.snd) || cfg().snd, ch = await chan(P, key);
         await setVol();
         try{ var ex = await P.checkExactNotificationSetting(); if(ex && ex.exact_alarm === "denied") await P.changeExactNotificationSetting(); }catch(e){}
         await P.cancel(one(id));
@@ -2450,7 +2465,7 @@ function stShareHelper(){
 }
 const ST_SHARE = "<scr" + "ipt>(" + stShareHelper.toString() + ")();<\/scr" + "ipt>";
 function menuSrc(m){
-  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}/* lebar isi menu mengikuti layar HP (tablet dibatasi 560px); panel bawah dan bilah otomatis ikut selebar isi */ body:not(.stage) .app{max-width:min(100%,560px)!important}#inPanel,.autobar,.quickadd{max-width:min(calc(100% - 24px),536px)!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK + (m.id === "turnamen" || m.id === "stopwatch" ? "" : ST_SHARE), i = s.indexOf("</head>");
+  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}/* lebar isi menu mengikuti layar HP (tablet dibatasi 560px); panel bawah dan bilah otomatis ikut selebar isi */ body:not(.stage) .app{max-width:min(100%,560px)!important}#inPanel,.autobar,.quickadd{max-width:min(calc(100% - 24px),536px)!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK + (m.id === "turnamen" || m.id === "stopwatch" || m.id === "sholat" || m.id === "catatan" ? "" : ST_SHARE), i = s.indexOf("</head>");
   return i < 0 ? css + s : s.slice(0, i) + css + s.slice(i);
 }
 writeKeys(S); paintPanel();
@@ -2460,7 +2475,7 @@ function openMenu(m){
   window.satuTitikMenuOpenedAt = Date.now();   /* dipakai logika iklan: menu yang ditutup terlalu cepat tidak memicu iklan */
   $("vt").textContent = mTitle(m);
   const f = document.createElement("iframe");
-  f.id = "frame"; f.title = mTitle(m); f.setAttribute("allow", "autoplay; geolocation");
+  f.id = "frame"; f.title = mTitle(m); f.setAttribute("allow", "autoplay; geolocation *; accelerometer *; gyroscope *; magnetometer *");
   curMenu = m.id; try{ paintWarn(); }catch(e){} writeKeys(S); f.addEventListener("load", () => { try{ watchFrame(); }catch(e){} try{ paintMenuTitles(); }catch(e){} try{ medisHookFrame(); }catch(e){} try{ hibHookFrame(); }catch(e){} try{ hapticHook(); }catch(e){} }); f.srcdoc = menuSrc(m);
   $("view").appendChild(f);
   $("home").hidden = true; $("view").hidden = false;
@@ -16618,6 +16633,780 @@ body.noanim .reel.run .emo,body.noanim .rres.run .big,body.noanim .reel.land,bod
   var h0 = lsj("vs_hist", []);
   if(Array.isArray(h0)) hist = h0.filter(function(h){ return h && typeof h.a === "string" && typeof h.b === "string" && /^[ABD]$/.test(h.r); }).slice(0, 10);
   readSettings(); paint();
+})();
+</scr@@ipt>
+</body>
+</html>
+</script>
+
+<script type="text/plain" id="src-sholat"><!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JADWAL SHOLAT</title>
+<style>
+:root{--bg:#0d1017;--card:#171c27;--field:#0f131b;--line:#262d3b;--text:#eef0f4;--muted:#8b93a5;--gold:#d4a94f;--gold2:#f0cf86;--ok:#4cc38a;--bad:#e5534b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-variant-numeric:tabular-nums;display:flex;justify-content:center}
+.app{width:100%;max-width:420px;padding:18px 16px calc(34px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.brand{text-align:center}.brand .icon{font-size:34px}.brand h1{margin:4px 0 0;font-size:20px;letter-spacing:.14em}
+.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:14px}
+.tab{flex:1;min-height:40px;padding:0 4px;border:0;border-radius:10px;background:transparent;color:var(--muted);font:inherit;font-size:13.5px;cursor:pointer}
+.tab.on{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font-weight:700}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.label{display:block;font-size:14px;font-weight:600;color:var(--gold);margin:0 0 10px}
+.hint,small{font-size:13px;line-height:1.5;color:var(--muted)}
+.hint{margin:8px 0 0}
+.warnb{margin:10px 0 0;padding:9px 12px;border:1px solid #6b5420;border-radius:12px;background:rgba(212,169,79,.1);font-size:13px;line-height:1.45;color:var(--gold2)}
+.err{margin:10px 0 0;font-size:13px;line-height:1.45;color:var(--bad)}.err:empty{display:none}
+.row{display:flex;gap:8px}
+.btn{flex:1;min-height:44px;padding:0 12px;font:inherit;font-size:14px;font-weight:600;color:var(--gold2);background:transparent;border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.btn.pri{color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0}
+.btn:disabled{opacity:.55;cursor:default}
+.btn:focus-visible,.tab:focus-visible,.nav:focus-visible,.city:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.loc{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.loc b{display:block;font-size:16px;overflow-wrap:anywhere}
+.loc small{display:block;margin-top:2px}
+.hero{text-align:center;padding:20px 16px}
+.hero small{display:block;letter-spacing:.14em;text-transform:uppercase;font-size:11.5px}
+.hero .nx{margin:6px 0 0;font-size:28px;font-weight:700;color:var(--gold2)}
+.hero .tm{font-size:15px;color:var(--text);margin-top:2px}
+.hero .cd{margin:10px 0 0;font-size:34px;font-weight:700;letter-spacing:.04em}
+.hero .cd2{font-size:12.5px;color:var(--muted);margin-top:2px}
+.dt{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dt .mid{text-align:center;min-width:0}.dt .mid b{display:block;font-size:15px}.dt .mid small{display:block;margin-top:2px}
+.nav{flex:none;width:44px;height:44px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--gold2);font-size:20px;cursor:pointer}
+.today{display:block;margin:10px auto 0;min-height:34px;padding:0 14px;font:inherit;font-size:12.5px;color:var(--gold2);background:transparent;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+ul.times{list-style:none;margin:0;padding:0}
+ul.times li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 4px;border-top:1px solid var(--line);font-size:16px}
+ul.times li:first-child{border-top:0}
+ul.times li .nm{display:flex;align-items:center;gap:10px}
+ul.times li .ti{font-weight:700;font-size:17px}
+ul.times li.minor{font-size:14px;color:var(--muted)}ul.times li.minor .ti{font-size:15px;font-weight:600}
+ul.times li.past:not(.nx){opacity:.5}
+ul.times li.nx{margin:2px -8px;padding:13px 12px;border:1px solid var(--gold);border-radius:12px;background:rgba(212,169,79,.1);color:var(--gold2)}
+ul.times li .dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+ul.times li.nx .dot{background:var(--gold2)}
+.mrow{display:flex;gap:8px;align-items:center;margin-top:12px}
+select,input[type=search]{width:100%;min-height:46px;padding:0 12px;font:inherit;font-size:15px;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:12px}
+.cities{max-height:46vh;overflow:auto;margin-top:10px;border:1px solid var(--line);border-radius:12px;background:var(--field)}
+.city{display:flex;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:10px 12px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--text);font:inherit;font-size:14.5px;text-align:left;cursor:pointer}
+.city:first-child{border-top:0}.city small{flex:none}
+.city.on{color:var(--gold2)}
+/* kompas */
+.qw{display:flex;justify-content:center}
+.qw svg{width:min(78vw,300px);height:auto;display:block}
+.dial{transition:transform .12s linear;transform-origin:150px 150px}
+.qdeg{margin:6px 0 0;text-align:center;font-size:30px;font-weight:700;color:var(--gold2)}
+.qinfo{margin:2px 0 0;text-align:center}
+.qok{text-align:center;margin:8px 0 0;min-height:22px;font-weight:700;color:var(--ok);font-size:15px}
+.ph{display:flex;gap:8px;margin:0 0 4px}.ph .tile{flex:1;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--field);min-width:0}.ph .tile small{display:block}.ph .tile b{display:block;margin-top:3px;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{min-height:40px;padding:0 14px;font:inherit;font-size:14px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border-color:transparent;font-weight:700}
+.chip:disabled{opacity:.45}
+.stopbar{display:flex;align-items:center;justify-content:space-between;gap:10px;border-color:var(--gold)}
+.stopbar span{font-weight:600;color:var(--gold2)}
+.stopbar .btn{flex:none}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-width:88%;padding:10px 16px;border-radius:12px;background:rgba(20,20,24,.95);color:#fff;font-size:14px;text-align:center;z-index:50;pointer-events:none;opacity:0;transition:opacity .2s}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.dial{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brand"><div class="icon">🕌</div><h1 id="t">JADWAL SHOLAT</h1></div>
+  <div class="tabs" role="tablist">
+    <button class="tab on" id="tabT" type="button" role="tab" aria-selected="true"></button>
+    <button class="tab" id="tabQ" type="button" role="tab" aria-selected="false"></button>
+    <button class="tab" id="tabS" type="button" role="tab" aria-selected="false"></button>
+  </div>
+
+  <div class="panel stopbar" id="stopBar" hidden><span id="stopTxt"></span><button class="btn pri" id="stopBtn" type="button"></button></div>
+  <main id="vT">
+    <div class="panel hero" aria-live="polite">
+      <small id="hLbl"></small>
+      <p class="nx" id="hName">–</p>
+      <div class="tm" id="hTime"></div>
+      <div class="cd" id="hCd">--:--:--</div>
+      <div class="cd2" id="hCd2"></div>
+    </div>
+    <div class="panel">
+      <div class="dt">
+        <button class="nav" id="prev" type="button" aria-label="−1">‹</button>
+        <div class="mid"><b id="dG"></b><small id="dH"></small></div>
+        <button class="nav" id="next" type="button" aria-label="+1">›</button>
+      </div>
+      <button class="today" id="toToday" type="button" hidden></button>
+    </div>
+    <div class="panel">
+      <ul class="times" id="list"></ul>
+      <p class="hint" id="note"></p>
+    </div>
+    <div class="panel">
+      <div class="loc"><div style="min-width:0"><small id="lLbl"></small><b id="lName"></b><small id="lSub"></small></div></div>
+      <div class="warnb" id="lWarn" hidden></div>
+    </div>
+  </main>
+
+  <main id="vQ" hidden>
+    <div class="panel">
+      <div class="qw">
+        <svg viewBox="0 0 300 300" id="cmp" role="img">
+          <circle cx="150" cy="150" r="140" fill="#0f131b" stroke="#262d3b" stroke-width="2"/>
+          <g class="dial" id="dial">
+            <circle cx="150" cy="150" r="124" fill="none" stroke="#262d3b" stroke-width="1"/>
+            <g id="ticks"></g>
+            <text x="150" y="72" text-anchor="middle" fill="#e5534b" font-size="18" font-weight="700">N</text>
+            <text x="150" y="236" text-anchor="middle" fill="#8b93a5" font-size="15">S</text>
+            <text x="236" y="156" text-anchor="middle" fill="#8b93a5" font-size="15">E</text>
+            <text x="64" y="156" text-anchor="middle" fill="#8b93a5" font-size="15">W</text>
+            <g id="kb"><line x1="150" y1="150" x2="150" y2="82" stroke="#d4a94f" stroke-width="2" stroke-dasharray="4 4"/><rect x="136" y="26" width="28" height="28" rx="4" fill="#111" stroke="#d4a94f" stroke-width="2"/><path d="M136 36h28" stroke="#d4a94f" stroke-width="3"/></g>
+          </g>
+          <path d="M150 4 l9 16 h-18z" fill="#f0cf86"/>
+          <circle cx="150" cy="150" r="5" fill="#d4a94f"/>
+        </svg>
+      </div>
+      <div class="qdeg" id="qDeg"></div>
+      <div class="qinfo hint" id="qInfo"></div>
+      <div class="qok" id="qOk" aria-live="polite"></div>
+      <div class="row" style="margin-top:10px"><button class="btn pri" id="cmpBtn" type="button"></button></div>
+      <p class="err" id="qErr" role="alert"></p>
+      <p class="hint" id="qHint"></p>
+    </div>
+  </main>
+
+  <main id="vS" hidden>
+    <div class="panel">
+      <span class="label" id="sLoc"></span>
+      <div class="row"><button class="btn pri" id="gps" type="button"></button></div>
+      <p class="err" id="gErr" role="alert"></p>
+      <input type="search" id="q" autocomplete="off" spellcheck="false" style="margin-top:10px">
+      <div class="cities" id="cities"></div>
+    </div>
+    <div class="panel">
+      <span class="label" id="sMeth"></span>
+      <select id="meth"></select>
+      <p class="hint" id="mHint"></p>
+    </div>
+    <div class="panel">
+      <span class="label" id="sSnd"></span>
+      <div class="row"><button class="btn" id="snd" type="button" aria-pressed="false"></button></div>
+      <div class="chips" id="adzChips" role="group"></div>
+      <div class="row" style="margin-top:12px"><button class="btn" id="adzTest" type="button"></button><button class="btn" id="adzStop" type="button"></button></div>
+      <p class="err" id="adzErr" role="alert"></p>
+      <p class="hint" id="sndHint"></p>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var TT = {
+    id:{ tT:"Jadwal", tQ:"Kiblat", tS:"Atur",
+      nextLbl:"Sholat berikutnya", cdPre:"dalam", now:"Waktu sholat telah tiba",
+      names:{imsak:"Imsak", fajr:"Subuh", sunrise:"Terbit", dhuha:"Dhuha", dhuhr:"Dzuhur", asr:"Ashar", maghrib:"Maghrib", isha:"Isya"},
+      today:"Kembali ke hari ini", loc:"Lokasi", locDefault:"Lokasi belum diatur, sementara memakai Jakarta. Buka tab Atur untuk memilih kota atau memakai GPS.",
+      note:"Waktu dihitung langsung di perangkat, jadi tetap jalan tanpa internet. Selisih 1–2 menit dari jadwal masjid setempat itu wajar; ikuti adzan di tempatmu.",
+      tzNote:"Zona waktu: ", near:"dekat ", gpsLoc:"Lokasi saya", gpsBtn:"📍 Pakai lokasi saya (GPS)", gpsBusy:"Mencari lokasi…", gpsFail:"Lokasi tidak bisa dibaca. Izinkan akses lokasi di pengaturan HP, atau pilih kota dari daftar.", gpsNone:"Perangkat ini tidak mendukung GPS. Pilih kota dari daftar.", gpsOk:"Lokasi diperbarui.",
+      search:"Cari kota…", noCity:"Kota tidak ditemukan.", method:"Metode perhitungan", mHint:"Kemenag RI dipakai di Indonesia. Metode lain untuk perbandingan.",
+      sound:"Alarm adzan", sndOn:"🔔 Alarm adzan: AKTIF", sndOff:"🔕 Alarm adzan: MATI", adzTest:"▶ Coba adzan", adzStop:"■ Hentikan adzan", adzPlaying:"🔊 Adzan sedang berbunyi", adzStopB:"Hentikan",
+      sndHintApp:"Di aplikasi Android, adzan dijadwalkan ke sistem untuk 7 hari ke depan, sehingga tetap berbunyi walau aplikasi ditutup atau layar terkunci. Buka menu ini minimal seminggu sekali agar jadwal diperbarui. Hentikan lewat notifikasi atau tombol Hentikan adzan.",
+      sndHintWeb:"Di browser, adzan hanya berbunyi selama menu ini terbuka. Untuk bunyi saat aplikasi ditutup, pakai aplikasi Android.",
+      adzDenied:"Izin notifikasi/alarm ditolak, jadi adzan belum bisa dijadwalkan. Izinkan di pengaturan HP lalu aktifkan lagi.", adzPlayFail:"File adzan tidak bisa diputar.", adzSched:"Adzan dijadwalkan.", adzTitle:"🕌 Waktu {n}", adzBody:"Saatnya sholat {n} untuk {c}",
+      qDeg:"{d}° dari Utara", qInfo:"Jarak ke Ka'bah ± {k} km dari {n}", cmp:"🧭 Aktifkan kompas", cmpOff:"Matikan kompas",
+      qHint:"Putar badan sampai ikon Ka'bah tepat di atas, searah segitiga emas. Jauhkan HP dari logam dan magnet. Bila jarum tidak stabil, gerakkan HP membentuk angka 8.",
+      qNoSensor:"Sensor kompas tidak tersedia di perangkat ini. Pakai sudut {d}° dari Utara (searah jarum jam) dengan kompas lain.", qDenied:"Izin sensor ditolak. Izinkan lalu coba lagi.", qWait:"Menunggu sensor…", qOk:"✔ Menghadap kiblat",
+      days:["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"], hijri:"id-u-ca-islamic-umalqura",
+      mK:"Kemenag RI (Subuh 20°, Isya 18°)", mM:"MWL / Rabithah (Subuh 18°, Isya 17°)", mU:"Umm al-Qura (Subuh 18,5°, Isya 90 mnt)",
+      imsakInfo:"Imsak = Subuh − 10 menit", polar:"Tidak dapat dihitung untuk lokasi ini."},
+    en:{ tT:"Times", tQ:"Qibla", tS:"Settings",
+      nextLbl:"Next prayer", cdPre:"in", now:"It is prayer time",
+      names:{imsak:"Imsak", fajr:"Fajr", sunrise:"Sunrise", dhuha:"Duha", dhuhr:"Dhuhr", asr:"Asr", maghrib:"Maghrib", isha:"Isha"},
+      today:"Back to today", loc:"Location", locDefault:"Location is not set yet, using Jakarta for now. Open Settings to pick a city or use GPS.",
+      note:"Times are calculated on your device, so they work offline. A difference of 1–2 minutes from your local mosque is normal; follow the call to prayer where you are.",
+      tzNote:"Time zone: ", near:"near ", gpsLoc:"My location", gpsBtn:"📍 Use my location (GPS)", gpsBusy:"Finding location…", gpsFail:"Could not read your location. Allow location access in your phone settings, or pick a city from the list.", gpsNone:"This device does not support GPS. Pick a city from the list.", gpsOk:"Location updated.",
+      search:"Search city…", noCity:"City not found.", method:"Calculation method", mHint:"Kemenag RI is used in Indonesia. Other methods are for comparison.",
+      sound:"Adhan alarm", sndOn:"🔔 Adhan alarm: ON", sndOff:"🔕 Adhan alarm: OFF", adzTest:"▶ Test adhan", adzStop:"■ Stop adhan", adzPlaying:"🔊 Adhan is playing", adzStopB:"Stop",
+      sndHintApp:"In the Android app the adhan is scheduled with the system for the next 7 days, so it still sounds when the app is closed or the screen is locked. Open this menu at least once a week to refresh the schedule. Stop it from the notification or the Stop adhan button.",
+      sndHintWeb:"In a browser the adhan only plays while this menu is open. Use the Android app for sound while the app is closed.",
+      adzDenied:"Notification/alarm permission was denied, so the adhan could not be scheduled. Allow it in your phone settings and turn it on again.", adzPlayFail:"The adhan file could not be played.", adzSched:"Adhan scheduled.", adzTitle:"🕌 {n} time", adzBody:"It is time for {n} prayer in {c}",
+      qDeg:"{d}° from North", qInfo:"About {k} km to the Kaaba from {n}", cmp:"🧭 Turn on compass", cmpOff:"Turn off compass",
+      qHint:"Turn until the Kaaba icon is at the top, in line with the gold triangle. Keep your phone away from metal and magnets. If the needle is unstable, move the phone in a figure 8.",
+      qNoSensor:"No compass sensor on this device. Use {d}° from North (clockwise) with another compass.", qDenied:"Sensor permission denied. Allow it and try again.", qWait:"Waiting for sensor…", qOk:"✔ Facing the Qibla",
+      days:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], hijri:"en-u-ca-islamic-umalqura",
+      mK:"Kemenag RI (Fajr 20°, Isha 18°)", mM:"MWL / Rabita (Fajr 18°, Isha 17°)", mU:"Umm al-Qura (Fajr 18.5°, Isha 90 min)",
+      imsakInfo:"Imsak = Fajr − 10 min", polar:"Cannot be calculated for this location."}
+  };
+  /* kota: [nama, lintang, bujur, zona waktu (jam dari UTC)] */
+  var CITIES = [
+    ["Banda Aceh",5.5483,95.3238,7],["Medan",3.5952,98.6722,7],["Padang",-0.9471,100.4172,7],["Pekanbaru",0.5071,101.4478,7],["Batam",1.0456,104.0305,7],["Jambi",-1.6101,103.6131,7],["Palembang",-2.9761,104.7754,7],["Bengkulu",-3.8004,102.2655,7],["Bandar Lampung",-5.4295,105.2610,7],["Pangkal Pinang",-2.1316,106.1169,7],
+    ["Jakarta",-6.2088,106.8456,7],["Bogor",-6.5950,106.8166,7],["Depok",-6.4025,106.7942,7],["Tangerang",-6.1783,106.6319,7],["Bekasi",-6.2383,106.9756,7],["Serang",-6.1201,106.1503,7],["Bandung",-6.9175,107.6191,7],["Cirebon",-6.7320,108.5523,7],["Semarang",-6.9667,110.4167,7],["Surakarta (Solo)",-7.5755,110.8243,7],["Yogyakarta",-7.7956,110.3695,7],["Surabaya",-7.2575,112.7521,7],["Malang",-7.9666,112.6326,7],["Kediri",-7.8480,112.0178,7],["Jember",-8.1845,113.6681,7],["Banyuwangi",-8.2192,114.3691,7],
+    ["Pontianak",-0.0263,109.3425,7],["Palangka Raya",-2.2161,113.9135,7],["Banjarmasin",-3.3194,114.5908,8],["Balikpapan",-1.2379,116.8529,8],["Samarinda",-0.5022,117.1537,8],["Tarakan",3.3000,117.6333,8],
+    ["Denpasar",-8.6705,115.2126,8],["Mataram",-8.5833,116.1167,8],["Kupang",-10.1772,123.6070,8],["Makassar",-5.1477,119.4327,8],["Manado",1.4748,124.8421,8],["Palu",-0.8917,119.8707,8],["Kendari",-3.9985,122.5120,8],["Gorontalo",0.5435,123.0568,8],["Mamuju",-2.6748,118.8884,8],
+    ["Ambon",-3.6954,128.1814,9],["Ternate",0.7833,127.3667,9],["Jayapura",-2.5337,140.7181,9],["Sorong",-0.8762,131.2558,9],["Manokwari",-0.8615,134.0620,9],["Merauke",-8.4932,140.4018,9],
+    ["Kuala Lumpur",3.1390,101.6869,8],["Singapura",1.3521,103.8198,8],["Bandar Seri Begawan",4.9031,114.9398,8],["Makkah",21.4225,39.8262,3],["Madinah",24.4686,39.6142,3]
+  ];
+  var DEFAULT = {name:"Jakarta", lat:-6.2088, lng:106.8456, tz:7, set:false};
+  var METHODS = {kemenag:{fajr:20, isha:18, ishaMin:0, ihti:2}, mwl:{fajr:18, isha:17, ishaMin:0, ihti:0}, uqura:{fajr:18.5, isha:0, ishaMin:90, ihti:0}};
+  var MECCA = {lat:21.4225, lng:39.8262};
+
+  function ls(k, d){ try{ var v = localStorage.getItem(k); return v === null ? d : v; }catch(e){ return d; } }
+  function sv(k, v){ try{ localStorage.setItem(k, typeof v === "string" ? v : JSON.stringify(v)); }catch(e){} }
+  function lsj(k, d){ try{ var v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }
+  var lang = "id", fxOn = true, loc = DEFAULT, method = "kemenag", chime = false, adz = {fajr:true, dhuhr:true, asr:true, maghrib:true, isha:true}, dayOff = 0, tab = "T";
+  function T(){ return TT[lang]; }
+  function fill(s, o){ return s.replace(/\{(\w+)\}/g, function(m, k){ return o[k] != null ? o[k] : m; }); }
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  function nowMs(){ try{ return window.STime ? STime.now() : Date.now(); }catch(e){ return Date.now(); } }
+
+  function readSettings(){
+    lang = ls("sh_lang", "id") === "en" ? "en" : "id";
+    fxOn = lsj("sh_fx", true) !== false;
+    var l = lsj("sh_loc", null);
+    loc = (l && typeof l.lat === "number" && typeof l.lng === "number" && isFinite(l.lat) && isFinite(l.lng) && typeof l.tz === "number") ? {name:String(l.name || "").slice(0, 60), lat:l.lat, lng:l.lng, tz:l.tz, set:true, gps:!!l.gps} : DEFAULT;
+    var m = ls("sh_method", "kemenag"); method = METHODS[m] ? m : "kemenag";
+    chime = lsj("sh_chime", false) === true;
+    var a = lsj("sh_adz", null); adz = {fajr:true, dhuhr:true, asr:true, maghrib:true, isha:true};
+    if(a && typeof a === "object") MAIN.forEach(function(k){ if(a[k] === false) adz[k] = false; });
+    document.documentElement.lang = lang;
+  }
+
+  /* ===== perhitungan astronomi (Julian date, deklinasi matahari, persamaan waktu) ===== */
+  var R = Math.PI / 180;
+  function dsin(d){ return Math.sin(d * R); } function dcos(d){ return Math.cos(d * R); } function dtan(d){ return Math.tan(d * R); }
+  function dacos(x){ return Math.acos(x) / R; } function dasin(x){ return Math.asin(x) / R; } function datan2(y, x){ return Math.atan2(y, x) / R; }
+  function dacot(x){ return Math.atan(1 / x) / R; }
+  function fix(a, m){ a = a - m * Math.floor(a / m); return a < 0 ? a + m : a; }
+  function julian(y, m, d){ if(m <= 2){ y -= 1; m += 12; } var A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4); return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5; }
+  function sunPos(jd){
+    var D = jd - 2451545.0, g = fix(357.529 + 0.98560028 * D, 360), q = fix(280.459 + 0.98564736 * D, 360),
+        L = fix(q + 1.915 * dsin(g) + 0.020 * dsin(2 * g), 360), e = 23.439 - 0.00000036 * D,
+        RA = fix(datan2(dcos(e) * dsin(L), dcos(L)) / 15, 24);
+    return {decl:dasin(dsin(e) * dsin(L)), eq:q / 15 - RA};
+  }
+  /* kembalikan jam desimal (waktu setempat) untuk satu tanggal; NaN bila matahari tak mencapai sudut itu */
+  function compute(y, mo, d, lat, lng, tz, mk){
+    var jd = julian(y, mo, d) - lng / (15 * 24), M = METHODS[mk];
+    function mid(t){ return fix(12 - sunPos(jd + t).eq, 24); }
+    function angT(angle, t, ccw){
+      var dc = sunPos(jd + t).decl, c = (-dsin(angle) - dsin(dc) * dsin(lat)) / (dcos(dc) * dcos(lat));
+      if(c > 1 || c < -1) return NaN;
+      var v = dacos(c) / 15; return mid(t) + (ccw ? -v : v);
+    }
+    function asrT(t){
+      var dc = sunPos(jd + t).decl, ang = -dacot(1 + dtan(Math.abs(lat - dc)));
+      return angT(ang, t, false);
+    }
+    var o = {}, rs = 0.833;
+    o.fajr = angT(M.fajr, 5 / 24, true);
+    o.sunrise = angT(rs, 6 / 24, true);
+    o.dhuhr = mid(12 / 24);
+    o.asr = asrT(13 / 24);
+    o.maghrib = angT(rs, 18 / 24, false);
+    o.isha = M.ishaMin ? o.maghrib + M.ishaMin / 60 : angT(M.isha, 18 / 24, false);
+    var adj = tz - lng / 15;
+    for(var k in o) o[k] += adj;
+    /* ihtiyat (pengaman) ala Kemenag: +2 menit, terbit −2 menit; menit dibulatkan ke atas */
+    var ih = M.ihti / 60;
+    o.fajr += ih; o.dhuhr += ih; o.asr += ih; o.maghrib += ih; if(!M.ishaMin) o.isha += ih;
+    o.sunrise -= ih;
+    o.imsak = o.fajr - 10 / 60;
+    /* dhuha: matahari setinggi 4,5° */
+    var dcz = sunPos(jd + 8 / 24).decl, cz = (-dsin(-4.5) - dsin(dcz) * dsin(lat)) / (dcos(dcz) * dcos(lat));
+    o.dhuha = (cz > 1 || cz < -1) ? NaN : mid(8 / 24) - dacos(cz) / 15 + adj + ih;
+    return o;
+  }
+  function hm(h, sunrise){
+    if(!isFinite(h)) return "--:--";
+    var mins = sunrise ? Math.floor(h * 60 + 1e-6) : Math.ceil(h * 60 - 1e-6);
+    mins = ((mins % 1440) + 1440) % 1440;
+    return pad(Math.floor(mins / 60)) + ":" + pad(mins % 60);
+  }
+  /* tanggal "hari ini" di zona waktu lokasi */
+  function locNow(){ var n = new Date(nowMs() + loc.tz * 3600000); return {y:n.getUTCFullYear(), m:n.getUTCMonth() + 1, d:n.getUTCDate(), h:n.getUTCHours() + n.getUTCMinutes() / 60 + n.getUTCSeconds() / 3600}; }
+  function addDays(y, m, d, n){ var t = new Date(Date.UTC(y, m - 1, d + n)); return {y:t.getUTCFullYear(), m:t.getUTCMonth() + 1, d:t.getUTCDate(), dow:t.getUTCDay()}; }
+  function timesFor(dt){ return compute(dt.y, dt.m, dt.d, loc.lat, loc.lng, loc.tz, method); }
+  function minutesOf(h, up){ return up ? Math.ceil(h * 60 - 1e-6) : Math.floor(h * 60 + 1e-6); }
+
+  /* ===== kiblat ===== */
+  function qibla(lat, lng){
+    var dl = (MECCA.lng - lng) * R, p1 = lat * R, p2 = MECCA.lat * R;
+    return fix(Math.atan2(Math.sin(dl), Math.cos(p1) * Math.tan(p2) - Math.sin(p1) * Math.cos(dl)) / R, 360);
+  }
+  function dist(lat, lng, lat2, lng2){
+    var dp = (lat2 - lat) * R, dl = (lng2 - lng) * R, a = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(lat * R) * Math.cos(lat2 * R) * Math.sin(dl / 2) * Math.sin(dl / 2);
+    return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  /* ===== tampilan: Jadwal ===== */
+  var KEYS = ["imsak", "fajr", "sunrise", "dhuha", "dhuhr", "asr", "maghrib", "isha"], MAIN = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
+  function hijriText(y, m, d){
+    try{ return new Intl.DateTimeFormat(T().hijri, {day:"numeric", month:"long", year:"numeric", timeZone:"UTC"}).format(new Date(Date.UTC(y, m - 1, d, 12))); }catch(e){ return ""; }
+  }
+  function gregText(dt){
+    var mo = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"], moEn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    return T().days[dt.dow] + ", " + dt.d + " " + (lang === "en" ? moEn : mo)[dt.m - 1] + " " + dt.y;
+  }
+  function paintList(){
+    var t = T(), n = locNow(), dt = addDays(n.y, n.m, n.d, dayOff), tm = timesFor(dt), ul = $("list");
+    $("dG").textContent = gregText(dt); $("dH").textContent = hijriText(dt.y, dt.m, dt.d);
+    $("toToday").hidden = dayOff === 0;
+    var nxKey = null;
+    if(dayOff === 0){ for(var i = 0; i < MAIN.length; i++){ var v = tm[MAIN[i]]; if(isFinite(v) && v > n.h){ nxKey = MAIN[i]; break; } } }
+    ul.textContent = "";
+    KEYS.forEach(function(k){
+      var li = document.createElement("li"), nm = document.createElement("span"), dot = document.createElement("i"), ti = document.createElement("span"), minor = (k === "imsak" || k === "sunrise" || k === "dhuha");
+      li.className = (minor ? "minor " : "") + (k === nxKey ? "nx " : "") + (dayOff === 0 && isFinite(tm[k]) && tm[k] <= n.h ? "past" : "");
+      nm.className = "nm"; dot.className = "dot"; nm.append(dot, document.createTextNode(t.names[k]));
+      ti.className = "ti"; ti.textContent = hm(tm[k], k === "sunrise");
+      li.append(nm, ti); ul.appendChild(li);
+    });
+    $("note").textContent = t.note;
+  }
+  var lastNext = "", lastKey = "";
+  function tickHero(){
+    var t = T(), n = locNow(), tm = timesFor({y:n.y, m:n.m, d:n.d}), key = null, when = 0, tomorrow = false;
+    for(var i = 0; i < MAIN.length; i++){ var v = tm[MAIN[i]]; if(isFinite(v) && v > n.h){ key = MAIN[i]; when = v; break; } }
+    if(!key){ var a = addDays(n.y, n.m, n.d, 1), tm2 = timesFor(a); key = "fajr"; when = tm2.fajr + 24; tomorrow = true; }
+    $("hLbl").textContent = t.nextLbl;
+    if(!isFinite(when)){ $("hName").textContent = "–"; $("hTime").textContent = t.polar; $("hCd").textContent = "--:--:--"; $("hCd2").textContent = ""; return; }
+    var m = minutesOf(when, key !== "sunrise"), secs = Math.max(0, m * 60 - Math.round(n.h * 3600));
+    $("hName").textContent = t.names[key]; $("hTime").textContent = pad(Math.floor((m % 1440) / 60)) + ":" + pad(m % 60);
+    $("hCd").textContent = pad(Math.floor(secs / 3600)) + ":" + pad(Math.floor(secs % 3600 / 60)) + ":" + pad(secs % 60);
+    $("hCd2").textContent = t.cdPre;
+    var tg = tomorrow ? addDays(n.y, n.m, n.d, 1) : n, id = tg.y + "-" + tg.m + "-" + tg.d + key, changed = lastNext !== id;
+    if(changed && lastNext) onArrive(lastKey);
+    lastNext = id; lastKey = key;
+    if(changed && dayOff === 0) paintList();
+  }
+  /* ===== ADZAN =====
+     Android (APK): dijadwalkan ke alarm sistem lewat window.parent.stNativeAlarm (suara "adzan" = res/raw/alarm_adzan.mp3), tetap bunyi saat aplikasi ditutup.
+     Web/PWA: diputar di halaman (assets/adzan.mp3) hanya selama menu terbuka. */
+  var AZ_BASE = 800000, AZ_DAYS = 7, au = null, auKey = "";
+  function nat(){ try{ var n = window.parent && window.parent.stNativeAlarm; return n && n.available() ? n : null; }catch(e){ return null; } }
+  function adzVol(){ try{ return Math.max(0.1, Math.min(1, window.parent.stAlarmCfg().vol / 100)); }catch(e){ return 1; } }
+  function showStop(on, txt){ $("stopBar").hidden = !on; if(on){ $("stopTxt").textContent = txt || T().adzPlaying; $("stopBtn").textContent = T().adzStopB; } }
+  function stopWeb(){ try{ if(au){ au.pause(); au.currentTime = 0; } }catch(e){} showStop(false); }
+  function playWeb(report){
+    try{
+      if(!au){ au = new Audio("assets/adzan.mp3"); au.preload = "auto"; au.addEventListener("ended", function(){ showStop(false); }); au.addEventListener("error", function(){ showStop(false); }); }
+      au.volume = adzVol(); au.currentTime = 0;
+      var pr = au.play(); showStop(true);
+      if(pr && pr.catch) pr.catch(function(){ showStop(false); if(report) $("adzErr").textContent = T().adzPlayFail; });
+    }catch(e){ showStop(false); if(report) $("adzErr").textContent = T().adzPlayFail; }
+  }
+  var schedBusy = false, schedAgain = false;
+  async function schedAdzan(report){
+    var N = nat(); if(!N) return;
+    if(schedBusy){ schedAgain = true; return; }
+    schedBusy = true;
+    try{
+      $("adzErr").textContent = "";
+      for(var d = 0; d < AZ_DAYS + 1; d++) for(var i = 0; i < 5; i++){ try{ await N.cancel(AZ_BASE + d * 10 + i); }catch(e){} }
+      if(!chime) return;
+      var n = locNow(), ok = true, cnt = 0, t = T(), city = locLabel();
+      for(var d2 = 0; d2 < AZ_DAYS; d2++){
+        var dt = addDays(n.y, n.m, n.d, d2), tm = timesFor(dt);
+        for(var j = 0; j < MAIN.length; j++){
+          var k = MAIN[j], h = tm[k]; if(!adz[k] || !isFinite(h)) continue;
+          var at = Date.UTC(dt.y, dt.m - 1, dt.d) + minutesOf(h, true) * 60000 - loc.tz * 3600000;
+          if(at <= nowMs() + 3000) continue;
+          var r = await N.schedule(AZ_BASE + d2 * 10 + j, at, fill(t.adzTitle, {n:t.names[k]}), fill(t.adzBody, {n:t.names[k], c:city}), {snd:"adzan"});
+          if(r === false){ ok = false; break; } cnt++;
+        }
+        if(!ok) break;
+      }
+      if(!ok){ $("adzErr").textContent = t.adzDenied; chime = false; sv("sh_chime", false); paintSettings(); }
+      else if(report && cnt) toast(t.adzSched);
+    }catch(e){}
+    finally{ schedBusy = false; if(schedAgain){ schedAgain = false; schedAdzan(false); } }
+  }
+  function onArrive(key){
+    toast(T().now);
+    try{ if(parent && typeof parent.haptic === "function") parent.haptic(true); }catch(e){}
+    if(chime && key && adz[key] && !nat()) playWeb(false);
+  }
+
+  /* ===== lokasi ===== */
+  function nearest(lat, lng){
+    var best = null, bd = 1e9;
+    CITIES.forEach(function(c){ var d = dist(lat, lng, c[1], c[2]); if(d < bd){ bd = d; best = c; } });
+    return {c:best, d:bd};
+  }
+  function locLabel(){
+    if(loc.gps){ var nr = nearest(loc.lat, loc.lng); return T().gpsLoc + (nr.c && nr.d < 120 ? " · " + T().near + nr.c[0] : ""); }
+    return loc.name;
+  }
+  function tzLabel(tz){ return tz === 7 ? "WIB" : tz === 8 ? "WITA" : tz === 9 ? "WIT" : "UTC" + (tz >= 0 ? "+" : "") + tz; }
+  function paintLoc(){
+    var t = T();
+    $("lLbl").textContent = t.loc; $("lName").textContent = locLabel();
+    $("lSub").textContent = loc.lat.toFixed(3) + ", " + loc.lng.toFixed(3) + " · " + t.tzNote + tzLabel(loc.tz);
+    $("lWarn").hidden = loc.set; $("lWarn").textContent = t.locDefault;
+  }
+  function setLoc(o){ loc = {name:o.name, lat:o.lat, lng:o.lng, tz:o.tz, set:true, gps:!!o.gps}; sv("sh_loc", {name:loc.name, lat:loc.lat, lng:loc.lng, tz:loc.tz, gps:loc.gps}); lastNext = ""; dayOff = 0; paintAll(); schedAdzan(false); }
+  function paintCities(){
+    var q = $("q").value.trim().toLowerCase(), box = $("cities"); box.textContent = ""; var n = 0;
+    CITIES.forEach(function(c){
+      if(q && c[0].toLowerCase().indexOf(q) < 0) return; n++;
+      var b = document.createElement("button"), s = document.createElement("small");
+      b.type = "button"; b.className = "city" + (!loc.gps && loc.set && loc.name === c[0] ? " on" : ""); b.textContent = c[0]; s.textContent = tzLabel(c[3]); b.appendChild(s);
+      b.addEventListener("click", function(){ setLoc({name:c[0], lat:c[1], lng:c[2], tz:c[3], gps:false}); toast(T().gpsOk); paintCities(); });
+      box.appendChild(b);
+    });
+    if(!n){ var p = document.createElement("p"); p.className = "hint"; p.style.padding = "0 12px"; p.textContent = T().noCity; box.appendChild(p); }
+  }
+  function useGps(){
+    var t = T(), b = $("gps"), er = $("gErr"); er.textContent = "";
+    if(!navigator.geolocation){ er.textContent = t.gpsNone; return; }
+    b.disabled = true; b.textContent = t.gpsBusy;
+    navigator.geolocation.getCurrentPosition(function(p){
+      b.disabled = false; b.textContent = T().gpsBtn;
+      var tz = -new Date(nowMs()).getTimezoneOffset() / 60;
+      setLoc({name:"", lat:p.coords.latitude, lng:p.coords.longitude, tz:tz, gps:true}); toast(T().gpsOk); paintCities();
+    }, function(){ b.disabled = false; b.textContent = T().gpsBtn; er.textContent = T().gpsFail; }, {enableHighAccuracy:false, timeout:20000, maximumAge:600000});
+  }
+
+  /* ===== kompas ===== */
+  var heading = null, cmpOn = false, qb = 0, okState = false;
+  function paintQibla(){
+    var t = T(); qb = qibla(loc.lat, loc.lng);
+    $("qDeg").textContent = fill(t.qDeg, {d:qb.toFixed(1).replace(".", lang === "en" ? "." : ",")});
+    $("qInfo").textContent = fill(t.qInfo, {k:Math.round(dist(loc.lat, loc.lng, MECCA.lat, MECCA.lng)).toLocaleString(lang === "en" ? "en-US" : "id-ID"), n:locLabel()});
+    $("kb").setAttribute("transform", "rotate(" + qb + " 150 150)");
+    $("cmpBtn").textContent = cmpOn ? t.cmpOff : t.cmp; $("qHint").textContent = t.qHint;
+    applyHeading();
+  }
+  function applyHeading(){
+    var h = heading === null ? 0 : heading;
+    $("dial").style.transform = "rotate(" + (-h) + "deg)";
+    var ok = false;
+    if(heading !== null){ var diff = Math.abs(fix(qb - heading + 180, 360) - 180); ok = diff <= 3; }
+    $("qOk").textContent = ok ? T().qOk : "";
+    if(ok && !okState){ try{ if(navigator.vibrate) navigator.vibrate(60); }catch(e){} }
+    okState = ok;
+  }
+  function onOri(e){
+    var h = null;
+    if(typeof e.webkitCompassHeading === "number" && isFinite(e.webkitCompassHeading)) h = e.webkitCompassHeading;
+    else if(e.alpha !== null && e.alpha !== undefined && (e.absolute === true || e.type === "deviceorientationabsolute")) h = fix(360 - e.alpha, 360);
+    if(h === null) return;
+    var so = (screen.orientation && screen.orientation.angle) || 0; h = fix(h + so, 360);
+    /* haluskan sedikit agar jarum tidak bergetar */
+    heading = heading === null ? h : fix(heading + ((fix(h - heading + 180, 360) - 180) * 0.35), 360);
+    $("qErr").textContent = ""; applyHeading();
+  }
+  var noSensorT = null;
+  function startCompass(){
+    var er = $("qErr"); er.textContent = "";
+    function go(){
+      cmpOn = true; heading = null; $("cmpBtn").textContent = T().cmpOff; er.textContent = T().qWait;
+      window.addEventListener("deviceorientationabsolute", onOri, true);
+      window.addEventListener("deviceorientation", onOri, true);
+      clearTimeout(noSensorT); noSensorT = setTimeout(function(){ if(heading === null) er.textContent = fill(T().qNoSensor, {d:qb.toFixed(1).replace(".", lang === "en" ? "." : ",")}); }, 2500);
+    }
+    try{
+      if(typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function"){
+        DeviceOrientationEvent.requestPermission().then(function(r){ if(r === "granted") go(); else er.textContent = T().qDenied; }).catch(function(){ er.textContent = T().qDenied; });
+      } else go();
+    }catch(e){ er.textContent = fill(T().qNoSensor, {d:qb.toFixed(1)}); }
+  }
+  function stopCompass(){
+    cmpOn = false; heading = null; clearTimeout(noSensorT);
+    window.removeEventListener("deviceorientationabsolute", onOri, true); window.removeEventListener("deviceorientation", onOri, true);
+    $("qErr").textContent = ""; applyHeading(); $("cmpBtn").textContent = T().cmp;
+  }
+  /* ===== pengaturan, tab, util ===== */
+  function paintSettings(){
+    var t = T();
+    $("sLoc").textContent = t.loc; $("gps").textContent = $("gps").disabled ? t.gpsBusy : t.gpsBtn; $("q").placeholder = t.search;
+    $("sMeth").textContent = t.method; $("mHint").textContent = t.mHint;
+    var s = $("meth"); s.textContent = "";
+    [["kemenag", t.mK], ["mwl", t.mM], ["uqura", t.mU]].forEach(function(m){ var o = document.createElement("option"); o.value = m[0]; o.textContent = m[1]; if(m[0] === method) o.selected = true; s.appendChild(o); });
+    $("sSnd").textContent = t.sound; $("snd").textContent = chime ? t.sndOn : t.sndOff; $("snd").setAttribute("aria-pressed", String(chime)); $("sndHint").textContent = nat() ? t.sndHintApp : t.sndHintWeb;
+    $("adzTest").textContent = t.adzTest; $("adzStop").textContent = t.adzStop;
+    var cb = $("adzChips"); cb.textContent = "";
+    MAIN.forEach(function(k){
+      var b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = t.names[k]; b.setAttribute("aria-pressed", String(!!adz[k])); b.disabled = !chime;
+      b.addEventListener("click", function(){ adz[k] = !adz[k]; sv("sh_adz", adz); paintSettings(); schedAdzan(false); });
+      cb.appendChild(b);
+    });
+    paintCities();
+  }
+  var tt = null;
+  function toast(m){ var e = $("toast"); e.textContent = m; e.classList.add("on"); clearTimeout(tt); tt = setTimeout(function(){ e.classList.remove("on"); }, 2200); }
+  function paintTabs(){
+    var t = T(); $("tabT").textContent = t.tT; $("tabQ").textContent = t.tQ; $("tabS").textContent = t.tS;
+    ["T", "Q", "S"].forEach(function(k){ var on = tab === k; $("tab" + k).classList.toggle("on", on); $("tab" + k).setAttribute("aria-selected", String(on)); $("v" + k).hidden = !on; });
+    $("toToday").textContent = t.today;
+  }
+  function paintAll(){ paintTabs(); paintLoc(); paintList(); tickHero(); paintQibla(); paintSettings(); }
+  function setTab(k){ tab = k; if(k !== "Q" && cmpOn) stopCompass(); paintTabs(); window.scrollTo(0, 0); }
+
+  function drawTicks(){
+    var g = $("ticks"), s = "";
+    for(var i = 0; i < 72; i++){ var a = i * 5, major = a % 30 === 0, l = major ? 12 : 6; s += '<line x1="150" y1="' + (26) + '" x2="150" y2="' + (26 + l) + '" stroke="' + (major ? "#8b93a5" : "#3a4256") + '" stroke-width="' + (major ? 2 : 1) + '" transform="rotate(' + a + ' 150 150)"/>'; }
+    g.innerHTML = s;
+  }
+
+  $("tabT").addEventListener("click", function(){ setTab("T"); });
+  $("tabQ").addEventListener("click", function(){ setTab("Q"); paintQibla(); });
+  $("tabS").addEventListener("click", function(){ setTab("S"); });
+  $("prev").addEventListener("click", function(){ dayOff--; paintList(); });
+  $("next").addEventListener("click", function(){ dayOff++; paintList(); });
+  $("toToday").addEventListener("click", function(){ dayOff = 0; paintList(); });
+  $("gps").addEventListener("click", useGps);
+  $("q").addEventListener("input", paintCities);
+  $("meth").addEventListener("change", function(){ method = $("meth").value; sv("sh_method", method); lastNext = ""; paintList(); tickHero(); schedAdzan(false); });
+  $("snd").addEventListener("click", function(){ chime = !chime; sv("sh_chime", chime); paintSettings(); schedAdzan(true); });
+  $("adzTest").addEventListener("click", function(){ $("adzErr").textContent = ""; var N = nat(); if(N && N.preview){ Promise.resolve(N.preview("adzan")).then(function(ok){ if(!ok) playWeb(true); }); } else playWeb(true); });
+  $("adzStop").addEventListener("click", function(){ stopWeb(); var N = nat(); if(N){ try{ if(N.stopPreview) N.stopPreview(); if(N.stopAlarm) N.stopAlarm(); }catch(e){} } });
+  $("stopBtn").addEventListener("click", stopWeb);
+  $("cmpBtn").addEventListener("click", function(){ if(cmpOn) stopCompass(); else startCompass(); });
+  window.addEventListener("storage", function(e){ if(!e.key || e.key === "sh_lang" || e.key === "sh_fx" || e.key === "sh_loc" || e.key === "sh_method" || e.key === "sh_chime" || e.key === "sh_adz"){ readSettings(); paintAll(); } });
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden){ tickHero(); paintList(); } });
+
+  readSettings(); drawTicks(); paintAll(); schedAdzan(false);
+  setInterval(tickHero, 1000);
+})();
+</scr@@ipt>
+</body>
+</html>
+</script>
+
+<script type="text/plain" id="src-catatan"><!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CATATAN CEPAT</title>
+<style>
+:root{--bg:#0d1017;--card:#171c27;--field:#0f131b;--line:#262d3b;--text:#eef0f4;--muted:#8b93a5;--gold:#d4a94f;--gold2:#f0cf86;--bad:#e5534b;
+--c0:#171c27;--c1:#3b3217;--c2:#173a2b;--c3:#172f4a;--c4:#46202c;--c5:#2f2347}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;display:flex;justify-content:center}
+.app{width:100%;max-width:420px;padding:18px 16px calc(34px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.brand{text-align:center}.brand .icon{font-size:34px}.brand h1{margin:4px 0 0;font-size:20px;letter-spacing:.14em}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.hint,small{font-size:13px;line-height:1.5;color:var(--muted)}
+textarea,input[type=text],input[type=search]{width:100%;font:inherit;font-size:16px;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:12px;padding:12px;resize:none}
+textarea{min-height:84px;line-height:1.45}
+input[type=search]{min-height:46px;padding:0 12px}
+textarea:focus,input:focus{outline:2px solid var(--gold2);outline-offset:1px}
+.btn{min-height:44px;padding:0 16px;font:inherit;font-size:14.5px;font-weight:600;color:var(--gold2);background:transparent;border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.btn.pri{color:#1a1405;background:linear-gradient(180deg,var(--gold2),var(--gold));border:0}
+.btn.bad{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:focus-visible,.dot:focus-visible,.note:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.dots{display:flex;gap:8px}
+.dot{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
+.dot.on{border-color:var(--gold2);box-shadow:0 0 0 2px rgba(240,207,134,.25)}
+.dot[data-c="0"]{background:#2a3142}.dot[data-c="1"]{background:#8a6d22}.dot[data-c="2"]{background:#237a54}.dot[data-c="3"]{background:#2a5f98}.dot[data-c="4"]{background:#9a3a52}.dot[data-c="5"]{background:#6a4aa8}
+.sec{margin:6px 2px 8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.grid{columns:2;column-gap:10px}
+.note{display:block;width:100%;break-inside:avoid;margin:0 0 10px;padding:12px;text-align:left;font:inherit;color:var(--text);border:1px solid var(--line);border-radius:14px;cursor:pointer;overflow:hidden}
+.note[data-c="0"]{background:var(--c0)}.note[data-c="1"]{background:var(--c1)}.note[data-c="2"]{background:var(--c2)}.note[data-c="3"]{background:var(--c3)}.note[data-c="4"]{background:var(--c4)}.note[data-c="5"]{background:var(--c5)}
+.note b{display:block;font-size:15px;line-height:1.3;margin-bottom:4px;overflow-wrap:anywhere}
+.note p{margin:0;font-size:14px;line-height:1.45;color:#d4d8e1;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:9;-webkit-box-orient:vertical;overflow:hidden}
+.note .pin{float:right;margin:0 0 0 6px;font-size:13px}
+.note time{display:block;margin-top:8px;font-size:11px;color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:26px 10px;font-size:14px;line-height:1.5}
+.empty .big{font-size:34px;display:block;margin-bottom:6px}
+.ov{position:fixed;inset:0;z-index:20;background:rgba(5,7,10,.72);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:480px;max-height:92vh;overflow:auto;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px));border:1px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;background:var(--card)}
+.sheet[data-c="1"]{background:var(--c1)}.sheet[data-c="2"]{background:var(--c2)}.sheet[data-c="3"]{background:var(--c3)}.sheet[data-c="4"]{background:var(--c4)}.sheet[data-c="5"]{background:var(--c5)}
+.sheet input[type=text]{font-weight:700;margin-bottom:8px}
+.sheet textarea{min-height:200px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.row .btn{flex:1;min-width:0}
+.cnt{margin:6px 2px 0;text-align:right;font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:12px;max-width:90%;padding:10px 16px;border-radius:12px;background:rgba(20,20,24,.96);border:1px solid var(--line);color:#fff;font-size:14px;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1;pointer-events:auto}
+.toast button{background:none;border:0;color:var(--gold2);font:inherit;font-weight:700;cursor:pointer;padding:6px}
+@media (max-width:340px){.grid{columns:1}}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brand"><div class="icon">📝</div><h1 id="t">CATATAN CEPAT</h1></div>
+  <div class="panel">
+    <textarea id="qa" maxlength="5000"></textarea>
+    <div class="bar">
+      <div class="dots" id="qdots" role="radiogroup"></div>
+      <button class="btn pri" id="qsave" type="button"></button>
+    </div>
+  </div>
+  <input type="search" id="find" autocomplete="off" spellcheck="false" hidden>
+  <div id="out"></div>
+</div>
+
+<div class="ov" id="ov" hidden>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true">
+    <input type="text" id="eT" maxlength="80" autocomplete="off">
+    <textarea id="eB" maxlength="5000"></textarea>
+    <div class="cnt" id="eCnt"></div>
+    <div class="bar"><div class="dots" id="edots" role="radiogroup"></div><button class="btn" id="ePin" type="button" aria-pressed="false"></button></div>
+    <div class="row">
+      <button class="btn" id="eCopy" type="button"></button>
+      <button class="btn bad" id="eDel" type="button"></button>
+    </div>
+    <div class="row"><button class="btn pri" id="eDone" type="button"></button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"><span id="tMsg"></span><button id="tUndo" type="button" hidden></button></div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var TT = {
+    id:{ ph:"Tulis catatan cepat…", save:"Simpan", find:"Cari catatan…", pinned:"Disematkan", others:"Catatan",
+      empty:"Belum ada catatan.", emptyD:"Tulis di kotak atas lalu ketuk Simpan. Ketuk catatan untuk mengubah, menyematkan, atau mengubah warna.", noRes:"Tidak ada catatan yang cocok.",
+      title:"Judul (boleh kosong)", body:"Isi catatan…", pin:"📌 Sematkan", unpin:"📌 Lepas sematan", copy:"Salin", copied:"Catatan disalin.", copyFail:"Gagal menyalin.", del:"Hapus", done:"Selesai",
+      deleted:"Catatan dihapus.", undo:"Urungkan", restored:"Catatan dikembalikan.", empty2:"Catatan masih kosong.", full:"Batas 300 catatan tercapai. Hapus yang lama dulu.", saved:"Catatan disimpan.",
+      colors:["Polos","Emas","Hijau","Biru","Merah muda","Ungu"], chars:"{n} / 5000", untitled:"Tanpa judul", loc:"id-ID" },
+    en:{ ph:"Write a quick note…", save:"Save", find:"Search notes…", pinned:"Pinned", others:"Notes",
+      empty:"No notes yet.", emptyD:"Type in the box above and tap Save. Tap a note to edit it, pin it, or change its color.", noRes:"No matching notes.",
+      title:"Title (optional)", body:"Note text…", pin:"📌 Pin", unpin:"📌 Unpin", copy:"Copy", copied:"Note copied.", copyFail:"Could not copy.", del:"Delete", done:"Done",
+      deleted:"Note deleted.", undo:"Undo", restored:"Note restored.", empty2:"The note is empty.", full:"300 note limit reached. Delete some old ones first.", saved:"Note saved.",
+      colors:["Plain","Gold","Green","Blue","Pink","Purple"], chars:"{n} / 5000", untitled:"Untitled", loc:"en-GB" }
+  };
+  function ls(k, d){ try{ var v = localStorage.getItem(k); return v === null ? d : v; }catch(e){ return d; } }
+  function sv(k, v){ try{ localStorage.setItem(k, typeof v === "string" ? v : JSON.stringify(v)); return true; }catch(e){ return false; } }
+  var lang = "id", notes = [], qColor = 0, editId = null, lastDel = null, q = "";
+  function T(){ return TT[lang]; }
+  function fill(s, o){ return s.replace(/\{(\w+)\}/g, function(m, k){ return o[k] != null ? o[k] : m; }); }
+  function readLang(){ lang = ls("cn_lang", "id") === "en" ? "en" : "id"; document.documentElement.lang = lang; }
+  function load(){
+    try{ var a = JSON.parse(ls("cn_notes", "[]")); notes = Array.isArray(a) ? a.filter(function(n){ return n && typeof n.id === "string" && typeof n.b === "string"; }).map(function(n){ return {id:n.id, t:String(n.t || "").slice(0, 80), b:n.b.slice(0, 5000), c:(n.c >= 0 && n.c <= 5) ? n.c | 0 : 0, p:!!n.p, u:+n.u || Date.now()}; }) : []; }catch(e){ notes = []; }
+  }
+  function save(){ if(!sv("cn_notes", notes)) toast("⚠️ Storage full / penyimpanan penuh"); }
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  /* ===== daftar ===== */
+  function dateText(ts){
+    var d = new Date(ts), n = new Date(), same = d.toDateString() === n.toDateString();
+    try{ return same ? d.toLocaleTimeString(T().loc, {hour:"2-digit", minute:"2-digit", hour12:false}) : d.toLocaleDateString(T().loc, {day:"numeric", month:"short", year: d.getFullYear() === n.getFullYear() ? undefined : "numeric"}); }catch(e){ return ""; }
+  }
+  function card(n){
+    var b = document.createElement("button"); b.type = "button"; b.className = "note"; b.dataset.c = n.c; b.dataset.id = n.id;
+    if(n.p){ var pn = document.createElement("span"); pn.className = "pin"; pn.textContent = "📌"; b.appendChild(pn); }
+    if(n.t){ var h = document.createElement("b"); h.textContent = n.t; b.appendChild(h); }
+    if(n.b){ var p = document.createElement("p"); p.textContent = n.b; b.appendChild(p); }
+    var tm = document.createElement("time"); tm.textContent = dateText(n.u); b.appendChild(tm);
+    b.addEventListener("click", function(){ openEditor(n.id); });
+    return b;
+  }
+  function section(label, list){
+    var out = document.createDocumentFragment();
+    if(label){ var s = document.createElement("div"); s.className = "sec"; s.textContent = label; out.appendChild(s); }
+    var g = document.createElement("div"); g.className = "grid"; list.forEach(function(n){ g.appendChild(card(n)); }); out.appendChild(g);
+    return out;
+  }
+  function paint(){
+    var t = T(), out = $("out"), ql = q.trim().toLowerCase();
+    $("qa").placeholder = t.ph; $("qsave").textContent = t.save; $("find").placeholder = t.find; $("find").hidden = notes.length < 4 && !q;
+    out.textContent = "";
+    var list = notes.filter(function(n){ return !ql || (n.t + "\n" + n.b).toLowerCase().indexOf(ql) >= 0; }).sort(function(a, b){ return b.u - a.u; });
+    if(!list.length){
+      var e = document.createElement("div"); e.className = "empty";
+      e.innerHTML = '<span class="big">📝</span><b></b><br><span></span>';
+      e.querySelector("b").textContent = notes.length ? t.noRes : t.empty; e.querySelector("span:last-child").textContent = notes.length ? "" : t.emptyD;
+      out.appendChild(e); return;
+    }
+    var pins = list.filter(function(n){ return n.p; }), rest = list.filter(function(n){ return !n.p; });
+    if(pins.length) out.appendChild(section(t.pinned, pins));
+    if(rest.length) out.appendChild(section(pins.length ? t.others : "", rest));
+  }
+
+  /* ===== warna ===== */
+  function dots(box, cur, onPick){
+    box.textContent = "";
+    for(var i = 0; i < 6; i++){
+      (function(i){
+        var b = document.createElement("button"); b.type = "button"; b.className = "dot" + (i === cur ? " on" : ""); b.dataset.c = i;
+        b.setAttribute("role", "radio"); b.setAttribute("aria-checked", String(i === cur)); b.setAttribute("aria-label", T().colors[i]); b.title = T().colors[i];
+        b.addEventListener("click", function(){ onPick(i); });
+        box.appendChild(b);
+      })(i);
+    }
+  }
+  function paintQDots(){ dots($("qdots"), qColor, function(i){ qColor = i; paintQDots(); }); }
+
+  /* ===== tambah cepat ===== */
+  function quickSave(){
+    var v = $("qa").value.replace(/\s+$/, ""); if(!v.trim()){ toast(T().empty2); $("qa").focus(); return; }
+    if(notes.length >= 300){ toast(T().full); return; }
+    notes.unshift({id:uid(), t:"", b:v.slice(0, 5000), c:qColor, p:false, u:Date.now()}); save();
+    $("qa").value = ""; paint(); toast(T().saved);
+  }
+
+  /* ===== editor ===== */
+  function cur(){ for(var i = 0; i < notes.length; i++) if(notes[i].id === editId) return notes[i]; return null; }
+  function paintEditor(){
+    var n = cur(), t = T(); if(!n) return;
+    $("sheet").dataset.c = n.c; $("eT").placeholder = t.title; $("eB").placeholder = t.body;
+    $("ePin").textContent = n.p ? t.unpin : t.pin; $("ePin").setAttribute("aria-pressed", String(n.p));
+    $("eCopy").textContent = t.copy; $("eDel").textContent = t.del; $("eDone").textContent = t.done;
+    $("eCnt").textContent = fill(t.chars, {n:$("eB").value.length});
+    dots($("edots"), n.c, function(i){ n.c = i; n.u = Date.now(); save(); paintEditor(); paint(); });
+  }
+  function openEditor(id){
+    editId = id; var n = cur(); if(!n) return;
+    $("eT").value = n.t; $("eB").value = n.b; $("ov").hidden = false; paintEditor();
+    setTimeout(function(){ try{ $("eB").focus(); $("eB").setSelectionRange(n.b.length, n.b.length); }catch(e){} }, 50);
+  }
+  function commit(){
+    var n = cur(); if(!n) return;
+    var t = $("eT").value.trim(), b = $("eB").value;
+    if(t !== n.t || b !== n.b){ n.t = t; n.b = b; n.u = Date.now(); save(); }
+  }
+  function closeEditor(){
+    var n = cur(); if(n){ commit(); if(!n.t.trim() && !n.b.trim()){ notes = notes.filter(function(x){ return x !== n; }); save(); } }
+    editId = null; $("ov").hidden = true; paint();
+  }
+  function copyText(s){
+    function fb(){ try{ var ta = document.createElement("textarea"); ta.value = s; ta.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(ta); ta.select(); var ok = document.execCommand("copy"); ta.remove(); return ok; }catch(e){ return false; } }
+    try{ if(navigator.clipboard && navigator.clipboard.writeText){ return navigator.clipboard.writeText(s).then(function(){ return true; }, function(){ return fb(); }); } }catch(e){}
+    return Promise.resolve(fb());
+  }
+
+  /* ===== toast ===== */
+  var tt = null;
+  function toast(m, undo){
+    var e = $("toast"); $("tMsg").textContent = m; $("tUndo").hidden = !undo; if(undo) $("tUndo").textContent = T().undo;
+    e.classList.add("on"); clearTimeout(tt); tt = setTimeout(function(){ e.classList.remove("on"); if(undo) lastDel = null; }, undo ? 6000 : 2000);
+  }
+
+  $("qsave").addEventListener("click", quickSave);
+  $("qa").addEventListener("keydown", function(e){ if(e.key === "Enter" && (e.ctrlKey || e.metaKey)){ e.preventDefault(); quickSave(); } });
+  $("find").addEventListener("input", function(){ q = $("find").value; paint(); });
+  $("eT").addEventListener("input", commit); $("eB").addEventListener("input", function(){ commit(); $("eCnt").textContent = fill(T().chars, {n:$("eB").value.length}); });
+  $("eT").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); $("eB").focus(); } });
+  $("ePin").addEventListener("click", function(){ var n = cur(); if(!n) return; n.p = !n.p; n.u = Date.now(); save(); paintEditor(); });
+  $("eDone").addEventListener("click", closeEditor);
+  $("ov").addEventListener("click", function(e){ if(e.target === $("ov")) closeEditor(); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("ov").hidden) closeEditor(); });
+  $("eCopy").addEventListener("click", function(){
+    var n = cur(); if(!n) return; commit();
+    Promise.resolve(copyText((n.t ? n.t + "\n\n" : "") + n.b)).then(function(ok){ toast(ok ? T().copied : T().copyFail); });
+  });
+  $("eDel").addEventListener("click", function(){
+    var n = cur(); if(!n) return; var i = notes.indexOf(n); lastDel = {n:n, i:i};
+    notes.splice(i, 1); save(); editId = null; $("ov").hidden = true; paint(); toast(T().deleted, true);
+  });
+  $("tUndo").addEventListener("click", function(){
+    if(!lastDel) return; notes.splice(Math.min(lastDel.i, notes.length), 0, lastDel.n); lastDel = null; save(); paint(); toast(T().restored);
+  });
+  window.addEventListener("storage", function(e){ if(!e.key || e.key === "cn_lang"){ readLang(); paintQDots(); paint(); if(editId) paintEditor(); } if(!e.key || e.key === "cn_notes"){ if(!editId){ load(); paint(); } } });
+
+  readLang(); load(); paintQDots(); paint();
 })();
 </scr@@ipt>
 </body>
