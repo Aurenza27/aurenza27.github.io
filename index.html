@@ -9263,6 +9263,17 @@ button:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
 .dhead{display:flex;align-items:center;gap:10px}
 .dhead h2{flex:1;font-size:15px;letter-spacing:.06em;color:var(--gold2);text-transform:none;overflow-wrap:anywhere}
 .rd{margin:6px 0 2px;font-size:12px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase}
+.rbar{display:flex;gap:8px;justify-content:flex-end;margin:0 0 4px}
+.rbar button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-size:12px;cursor:pointer}
+.rdh{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;margin:6px 0 0;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:rgba(212,169,79,.06);color:var(--gold);font:inherit;font-size:12px;letter-spacing:.18em;text-transform:uppercase;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rdh[aria-expanded=true]{border-color:rgba(212,169,79,.45);background:rgba(212,169,79,.12)}
+.rdh .chev{flex:none;display:inline-block;width:14px;transition:transform .18s}
+.rdh[aria-expanded=true] .chev{transform:rotate(90deg)}
+.rdh .rdt{flex:1}
+.rdh .rdc{flex:none;font-size:11px;letter-spacing:.04em;color:var(--muted);text-transform:none}
+.rdh .rdc.ok{color:var(--ok)}
+.rdb{padding:0 0 6px}
+.rdb[hidden]{display:none}
 .m{display:grid;grid-template-columns:1fr 46px 12px 46px 1fr;gap:6px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
 .m:first-of-type{border-top:0}
 .m .tn{font-size:13px;line-height:1.25;overflow-wrap:anywhere}
@@ -9326,6 +9337,9 @@ input:disabled,select:disabled{opacity:.55;cursor:not-allowed;-webkit-text-fill-
   body{background:#fff;color:#000;display:block}
   .app{max-width:none;padding:0}
   .brand,.tabs,.dhead button,.btn,.mx,.no-print{display:none!important}
+  .rbar,.rdh .chev,.rdh .rdc{display:none!important}
+  .rdb[hidden]{display:block!important}
+  .rdh{border:0;background:none;padding:0;min-height:0;color:#333}
   .panel,.bm{background:#fff;border-color:#999;color:#000}
   th,.rd,.bcol h3,h2{color:#333}
   td.pt,.m .tn.w,.bm .w{color:#000}
@@ -10835,23 +10849,45 @@ function paintDetail(m){
 function tn(t, i, cls){ return el("div", "tn " + (cls || ""), i === null ? L("Menunggu", "TBD") : t.teams[i]); }
 function mtime(mm){ return mm && mm.at ? el("div", "mtime", "🕒 " + STime.fmt(mm.at)) : ""; }
 function createdLine(t){ return t && t.created ? el("small", "tdate", "🕒 " + L("Dibuat ", "Created ") + STime.fmt(t.created)) : ""; }
+const RDO = {};   /* status buka/tutup tiap putaran (kunci: id turnamen|grup|putaran); dipertahankan saat layar digambar ulang */
 function paintSched(box, t){
   const hasStage = t.fmt === "group";
   const groups = hasStage ? t.gr.map((_, g) => g) : [0];
+  const done = mm => mm.sa !== null && mm.sb !== null;
   groups.forEach(g => {
     const p = el("div", "panel");
     if(hasStage) p.append(el("span", "label", L("GRUP ", "GROUP ") + gname(g)));
-    const ms = t.matches.filter(x => x.g === g); let last = 0;
-    ms.forEach(mm => {
-      if(mm.rd !== last){ last = mm.rd; p.append(el("div", "rd", L("Putaran ", "Round ") + mm.rd)); }
-      if(isSet(t)){ p.append(setCard(t, mm), mtime(mm)); return; }
-      if(mm.live){ p.append(genLive(t, mm, false)); return; }
-      const row = el("div", "m"), a = mm.sa, b = mm.sb;
-      row.append(tn(t, mm.a, "r " + (a !== null && a > b ? "w" : "")),
-        numIn(a, v => setScore(t, mm, v, mm.sb)), el("div", "dash", "-"), numIn(b, v => setScore(t, mm, mm.sa, v)),
-        tn(t, mm.b, b !== null && b > a ? "w" : ""));
-      lockRow(mm, row);
-      p.append(row, mtime(mm));
+    const ms = t.matches.filter(x => x.g === g), rounds = [];
+    ms.forEach(mm => { let r = rounds[rounds.length - 1]; if(!r || r.rd !== mm.rd){ r = {rd:mm.rd, ms:[]}; rounds.push(r); } r.ms.push(mm); });
+    const pre = curId + "|" + g + "|", firstOpen = rounds.findIndex(r => r.ms.some(x => !done(x))), secs = [];
+    const setAll = open => secs.forEach(s => { RDO[s.k] = open; s.hd.setAttribute("aria-expanded", String(open)); s.bd.hidden = !open; });
+    if(rounds.length > 1){
+      const bar = el("div", "rbar keep no-print");
+      const o = el("button", "keep", L("Buka semua", "Expand all")), c = el("button", "keep", L("Tutup semua", "Collapse all"));
+      o.type = c.type = "button"; o.onclick = () => setAll(true); c.onclick = () => setAll(false);
+      bar.append(o, c); p.append(bar);
+    }
+    rounds.forEach((r, ri) => {
+      const k = pre + r.rd;
+      if(!(k in RDO)) RDO[k] = ri === firstOpen;      /* awal: hanya putaran pertama yang belum selesai yang terbuka */
+      const open = RDO[k], nd = r.ms.filter(done).length;
+      const hd = el("button", "rdh keep"); hd.type = "button"; hd.setAttribute("aria-expanded", String(open));
+      const cnt = el("span", "rdc" + (nd === r.ms.length ? " ok" : ""), (nd === r.ms.length ? "✓ " : "") + nd + "/" + r.ms.length);
+      hd.append(el("span", "chev", "▶"), el("span", "rdt", L("Putaran ", "Round ") + r.rd), cnt);
+      const bd = el("div", "rdb"); bd.hidden = !open;
+      hd.onclick = () => { const v = bd.hidden; bd.hidden = !v; RDO[k] = v; hd.setAttribute("aria-expanded", String(v)); };
+      secs.push({k, hd, bd});
+      r.ms.forEach(mm => {
+        if(isSet(t)){ bd.append(setCard(t, mm), mtime(mm)); return; }
+        if(mm.live){ bd.append(genLive(t, mm, false)); return; }
+        const row = el("div", "m"), a = mm.sa, b = mm.sb;
+        row.append(tn(t, mm.a, "r " + (a !== null && a > b ? "w" : "")),
+          numIn(a, v => setScore(t, mm, v, mm.sb)), el("div", "dash", "-"), numIn(b, v => setScore(t, mm, mm.sa, v)),
+          tn(t, mm.b, b !== null && b > a ? "w" : ""));
+        lockRow(mm, row);
+        bd.append(row, mtime(mm));
+      });
+      p.append(hd, bd);
     });
     box.append(p);
   });
