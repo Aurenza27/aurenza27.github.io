@@ -10302,11 +10302,21 @@ function livePanel(t, mm, ko){        /* live untuk cabang berset */
   const c = el("div", "lv"), g = mm.gs || (mm.gs = []), u = t.sport === "padel" ? "Set " : L("Gim ", "Game ");
   c.append(el("div", "label", "🔴 LIVE · " + u + (g.length + 1) + (isStb(t, g.length) ? " (STB)" : "")));
   if(mm.live.ce){
-    const bn = el("div", "ce"), sw = mm.live.ce.startsWith("🔄"), ok = el("button", "btn sm", sw ? L("✓ Sudah ganti", "✓ Done") : "OK");
+    const bn = el("div", "ce"), sw = mm.live.ce.startsWith("🔄"), ok = el("button", "btn sm", sw ? L("✓ Ganti", "✓ Done") : "OK");
     ok.type = "button"; ok.onclick = () => { if(sw) mm.live.sw = mm.live.sw ? 0 : 1; mm.live.ce = null; persist(); paint(); };
     bn.append(el("span", "", mm.live.ce), ok); c.append(bn);
   }
   if(g.length) c.append(el("p", "hint", g.map((r, i) => u + (i + 1) + ": " + r[0] + "-" + r[1]).join(" · ")));
+  /* tombol ganti sisi manual: bila posisi pemain tertukar / lupa ganti, papan skor langsung menyesuaikan (berlaku untuk tenis meja, badminton, padel) */
+  const ces = el("button", "btn ghost sm", L("🔄 Ganti sisi", "🔄 Change ends")); ces.type = "button";
+  ces.setAttribute("aria-label", L("Tukar posisi kiri dan kanan di papan skor", "Swap left and right sides on the scoreboard"));
+  ces.onclick = () => {
+    const lv = mm.live; lv.sw = lv.sw ? 0 : 1;
+    if(lv.ce && lv.ce.startsWith("🔄")) lv.ce = null;      /* pengingat ganti sisi dianggap sudah dijalankan, supaya tidak tertukar dua kali */
+    persist(); paint(); fx("ce");
+    toast(L("Posisi ditukar. Kiri: ", "Sides swapped. Left: ") + t.teams[lv.sw ? mm.b : mm.a] + L(", kanan: ", ", right: ") + t.teams[lv.sw ? mm.a : mm.b]);
+  };
+  c.append(ces);
   c.append(liveBoard(t, mm, ko));
   c.append(el("p", "hint", ceHint(t)));
   const r = el("div", "row"), cx = el("button", "btn ghost sm grow", L("Batalkan live", "Cancel live")); cx.type = "button";
@@ -13287,6 +13297,7 @@ button{font:inherit;cursor:pointer}
 .btn.danger{background:transparent;color:var(--bad);border:1px solid var(--line);font-weight:600;letter-spacing:.06em}
 .btn.sm{width:auto;min-height:34px;padding:0 14px;font-size:12px;border-radius:10px}
 .row2{display:flex;gap:10px}.row2>*{flex:1;min-width:0}
+.btn.ico{display:flex;align-items:center;justify-content:center;gap:8px}.btn.ico svg{display:block;flex:none}
 .tabs{display:flex;gap:6px;padding:4px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03)}
 .tab{flex:1;min-height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:13px;letter-spacing:.06em}
 .tab.on{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;font-weight:700}
@@ -13882,7 +13893,11 @@ function renderRec(){
   v.append(p);
   const bt = el("div"); bt.style.cssText = "display:flex;flex-direction:column;gap:10px;margin-top:14px";
   const mkb = (cls, txt, fn) => { const b = el("button", "btn " + cls, txt); b.type = "button"; b.onclick = fn; return b; };
-  if(rec.st === "idle"){ bt.append(mkb("go", L("▶  MULAI", "▶  START"), startRec), mkb("ghost", manualOpen ? L("Tutup input manual", "Close manual entry") : L("＋ Input manual", "＋ Manual entry"), () => { manualOpen = !manualOpen; renderRec(); }), mkb("ghost", L("⬆ Impor GPX / TCX (jam olahraga)", "⬆ Import GPX / TCX (sports watch)"), pickImport)); if(hcPlug()) bt.append(mkb("ghost", L("⬇ Impor dari Pusat Kesehatan Perangkat", "⬇ Import from Device Health Hub"), importHealth)); }
+  /* ikon pengganti panah: jam pintar = impor GPX / TCX (jam olahraga), HP = impor dari Pusat Kesehatan Perangkat */
+  const SVG_WATCH = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7l.7-4h4.6L15 7M9 17l.7 4h4.6l.7-4"/><rect x="6" y="7" width="12" height="10" rx="3"/><path d="M12 10v2.2l1.6 1"/></svg>';
+  const SVG_PHONE = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.6"/><path d="M10.5 18.5h3"/></svg>';
+  const icoB = (svg, lbl, fn) => { const b = el("button", "btn ghost ico"); b.type = "button"; b.innerHTML = svg; b.append(el("span", "", lbl)); b.onclick = fn; return b; };
+  if(rec.st === "idle"){ bt.append(mkb("go", L("▶  MULAI", "▶  START"), startRec), mkb("ghost", manualOpen ? L("Tutup input manual", "Close manual entry") : L("＋ Input manual", "＋ Manual entry"), () => { manualOpen = !manualOpen; renderRec(); }), icoB(SVG_WATCH, L("Impor GPX / TCX (jam olahraga)", "Import GPX / TCX (sports watch)"), pickImport)); if(hcPlug()) bt.append(icoB(SVG_PHONE, L("Impor dari Pusat Kesehatan Perangkat", "Import from Device Health Hub"), importHealth)); }
   else if(rec.st === "run"){ const r = el("div", "row2"); r.append(mkb("ghost", L("⏸  JEDA", "⏸  PAUSE"), pauseRec), mkb("", L("■  SELESAI", "■  FINISH"), finishRec)); bt.append(r); }
   else { const r = el("div", "row2"); r.append(mkb("go", L("▶  LANJUT", "▶  RESUME"), resumeRec), mkb("", L("■  SELESAI", "■  FINISH"), finishRec)); bt.append(r, mkb("danger", L("Buang rekaman", "Discard recording"), () => { if(confirm(L("Buang rekaman ini?", "Discard this recording?"))) discardRec(); })); }
   v.append(bt);
