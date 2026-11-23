@@ -21242,7 +21242,7 @@ A.clearPhoto = async () => {
    Seluruh data aplikasi di localStorage (pengaturan, riwayat, hasil semua menu) disimpan di satu dokumen: users/{uid}.
    Cuma jalan saat sudah masuk dan online. Tanpa masuk, aplikasi memakai localStorage seperti biasa. */
 const SY = (() => {
-  const EX = /^(firebase:|st_applock$|st_sync_|kg_db$|kg_ts$|kg_lock$|an_lock$|sp_saran_queue$|asd_livepos$|asd_livemini$|asd_sidepos$|asd_side$|kh_side$|kh_sideopen$)/;
+  const EX = /^(firebase:|st_applock$|st_sync_|kg_db$|kg_ts$|kg_lock$|an_lock$|tt_snaps$|sp_saran_queue$|asd_livepos$|asd_livemini$|asd_sidepos$|asd_side$|kh_side$|kh_sideopen$)/;
   const M_H = "st_sync_h", M_TS = "st_sync_ts", M_UID = "st_sync_uid", MAXTOT = 880000, EVERY = 20000;
   const rd = k => { try{ return JSON.parse(localStorage.getItem(k) || "{}") || {}; }catch(e){ return {}; } };
   const wr = (k, o) => { try{ localStorage.setItem(k, JSON.stringify(o)); }catch(e){} };
