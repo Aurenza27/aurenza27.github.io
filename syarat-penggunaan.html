@@ -2,234 +2,177 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Syarat Penggunaan · Satu Titik</title>
-<meta name="description" content="Syarat Penggunaan aplikasi Satu Titik oleh Aurenza27. / Terms of Use for the Satu Titik app by Aurenza27.">
-<meta name="color-scheme" content="dark light">
+<meta name="description" content="Syarat Penggunaan aplikasi Satu Titik oleh Aurenza27 / Terms of Use of the Satu Titik app by Aurenza27.">
 <style>
-:root{--bg:#0b0d12;--bg2:#141821;--text:#ece7da;--muted:#a3a9b8;--line:#2a3040;--gold:#d4a94f;--ink:#f0cf86;--link:#f0cf86;
-  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-@media (prefers-color-scheme:light){:root{--bg:#f5f6f9;--bg2:#ffffff;--text:#1a1e29;--muted:#555c6e;--line:#d6dae4;--gold:#a97a14;--ink:#7a5608;--link:#7a5608}}
+:root{--bg:#0b0d12;--bg2:#141821;--card:#161a23;--line:#2a3040;--text:#ece7da;--muted:#a3a9b8;--gold:#d4a94f;--gold2:#f0cf86;--head:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#faf8f3;--bg2:#f1ede3;--card:#fff;--line:#ddd6c4;--text:#1d1b16;--muted:#5d5a50;--gold:#9a6f12;--gold2:#7a5609;color-scheme:light}}
+:root[data-theme="light"]{--bg:#faf8f3;--bg2:#f1ede3;--card:#fff;--line:#ddd6c4;--text:#1d1b16;--muted:#5d5a50;--gold:#9a6f12;--gold2:#7a5609;color-scheme:light}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;scroll-padding-top:72px}
-@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
-body{margin:0;background:var(--bg);color:var(--text);font:17px/1.7 var(--sans);padding-bottom:env(safe-area-inset-bottom,0px)}
-a{color:var(--link);text-underline-offset:3px}
-:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:3px}
-.bar{position:sticky;top:0;z-index:5;background:var(--bg2);border-bottom:1px solid var(--line);padding:calc(8px + env(safe-area-inset-top,0px)) 16px 8px}
-.barin{max-width:720px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
-.brand{font:700 18px/1 var(--serif);margin-right:auto;color:var(--text)}
-.brand small{font:400 13px var(--sans);color:var(--muted);margin-left:6px}
-.lang{display:flex;gap:2px}
-.lang button{font:600 14px/1 var(--sans);color:var(--muted);padding:9px 12px;border-radius:8px;border:1px solid transparent;background:none;cursor:pointer}
-.lang button:hover{color:var(--text)}
-.lang button[aria-pressed=true]{color:var(--text);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 14%,transparent)}
-main{max-width:720px;margin:0 auto;padding:32px 20px 40px}
-article{display:none}
-body[data-lang=id] #a-id,body[data-lang=en] #a-en{display:block}
-h1{font:700 34px/1.15 var(--serif);margin:0;letter-spacing:-.01em}
-.upd{margin:10px 0 0;color:var(--muted);font-size:14px}
-.dochead{padding-bottom:24px;border-bottom:1px solid var(--line)}
-.toc{margin:24px 0 8px;padding:16px 20px;background:var(--bg2);border:1px solid var(--line);border-radius:10px}
-.toc h2{font:600 15px/1.2 var(--serif);margin:0 0 8px;color:var(--ink)}
-.toc ol{margin:0;padding-left:24px;columns:2;column-gap:28px;font-size:15px;line-height:1.5}
-.toc li{margin:4px 0;break-inside:avoid}
-.sec{padding:28px 0;border-bottom:1px solid var(--line)}
-.sec:last-of-type{border-bottom:0}
-.sec h2{font:700 22px/1.3 var(--serif);margin:0 0 14px;display:flex;gap:12px;align-items:baseline}
-.num{color:var(--gold);font-variant-numeric:tabular-nums;min-width:1.5ch}
-.sec h3{font:700 16px/1.4 var(--serif);color:var(--ink);margin:22px 0 6px}
-.sec p{margin:0 0 12px}
-.sec ul{margin:0 0 12px;padding-left:22px}
-.sec li{margin:0 0 8px}
-.sec li::marker{color:var(--gold)}
-.contact{margin-top:18px!important;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--bg2);border-radius:6px}
-footer{max-width:720px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:14px}
-footer p{margin:0 0 8px}
-@media (max-width:560px){body{font-size:16.5px}h1{font-size:28px}.toc ol{columns:1}.brand small{display:none}}
-@media print{.bar,.toc{display:none}body{background:#fff;color:#000}}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 var(--ui);-webkit-text-size-adjust:100%}
+.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px;background:var(--bg2);border-bottom:1px solid var(--line)}
+.bar b{font:600 16px var(--head);letter-spacing:.02em}
+.sw{display:flex;gap:6px}
+.sw button{font:600 13px var(--ui);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
+.sw button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold2)}
+.sw button:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+main{max-width:720px;margin:0 auto;padding:24px 18px 60px}
+.hd{padding:4px 0 22px;border-bottom:1px solid var(--line)}
+.hd h1{margin:0;font:600 32px/1.15 var(--head)}
+.hd .sub{margin:6px 0 0;color:var(--muted)}
+.hd .upd{display:inline-block;margin:12px 0 0;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:12px;color:var(--muted)}
+.toc{margin:22px 0;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.toc h2{margin:0 0 8px;font:600 15px var(--head);color:var(--gold2)}
+.toc ol{margin:0;padding-left:20px;font-size:14.5px;line-height:1.9}
+a{color:var(--gold2);text-underline-offset:2px}
+.sec{padding:22px 0;border-bottom:1px solid var(--line)}
+.sec h2{display:flex;align-items:center;gap:10px;margin:0 0 12px;font:600 19px/1.25 var(--head)}
+.sec h2 .n{flex:none;display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--gold);border-radius:50%;font:600 13px var(--ui);color:var(--gold2)}
+.sec h3{margin:18px 0 6px;font:600 15px var(--ui);color:var(--gold2)}
+.sec p{margin:0 0 10px;font-size:15px}
+.sec ul{margin:0 0 10px;padding-left:20px;font-size:15px}
+.sec li{margin:0 0 7px}
+.card{margin-top:14px!important;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+footer{margin-top:24px;text-align:center;font-size:13px;color:var(--muted)}
+@media (max-width:480px){.hd h1{font-size:27px}}
 </style>
-<style>body[data-lang=id] [data-l=en],body[data-lang=en] [data-l=id]{display:none}</style>
 </head>
-<body data-lang="id">
-<header class="bar"><div class="barin">
-  <span class="brand">Satu Titik<small>Aurenza27</small></span>
-  <div class="lang" role="group" aria-label="Bahasa / Language"><button type="button" data-set="id" aria-pressed="true">ID</button><button type="button" data-set="en" aria-pressed="false">EN</button></div>
-</div></header>
+<body>
+<div class="bar"><b>Satu Titik</b><div class="sw" role="group" aria-label="Language / Bahasa"><button type="button" data-l="id" aria-pressed="true">ID</button><button type="button" data-l="en" aria-pressed="false">EN</button></div></div>
 <main>
-<article id="a-id" data-lang="id" lang="id">
-<header class="dochead"><h1>Syarat Penggunaan</h1><p class="upd">Terakhir diperbarui: 22 November 2026</p></header>
-<nav class="toc" aria-label="Daftar isi"><h2>Daftar isi</h2><ol>
-<li><a href="#id-1">Penerimaan</a></li>
-<li><a href="#id-2">Akunmu</a></li>
-<li><a href="#id-3">Perilaku dan konten yang dilarang</a></li>
-<li><a href="#id-4">Tanggung jawab atas kontenmu</a></li>
-<li><a href="#id-5">Melapor dan memblokir</a></li>
-<li><a href="#id-6">Tindakan kami</a></li>
-<li><a href="#id-7">Pesan pribadi</a></li>
-<li><a href="#id-8">Jadwal sholat, catatan, dan alarm</a></li>
-<li><a href="#id-9">Senyapkan notifikasi</a></li>
-<li><a href="#id-10">Hasil menu</a></li>
-<li><a href="#id-11">Iklan</a></li>
-<li><a href="#id-12">Menghapus akun</a></li>
-<li><a href="#id-13">Kunci Aplikasi, kunci menu, dan penghapusan data</a></li>
-<li><a href="#id-14">Layanan apa adanya</a></li>
-<li><a href="#id-15">Hukum yang berlaku</a></li>
-<li><a href="#id-16">Perubahan syarat</a></li>
-<li><a href="#id-17">Kontak</a></li>
-</ol></nav>
-<section class="sec" id="id-1"><h2><span class="num" aria-hidden="true">1</span>Penerimaan</h2>
+<div class="lang" id="lang-id" lang="id">
+<header class="hd"><h1>Syarat Penggunaan</h1><p class="sub">Satu Titik</p><p class="upd">Terakhir diperbarui: 23 November 2026</p></header>
+<nav class="toc" aria-label="Daftar isi"><h2>Daftar isi</h2><ol><li><a href="#id-s1">Penerimaan</a></li><li><a href="#id-s2">Akunmu</a></li><li><a href="#id-s3">Perilaku dan konten yang dilarang</a></li><li><a href="#id-s4">Tanggung jawab atas kontenmu</a></li><li><a href="#id-s5">Melapor dan memblokir</a></li><li><a href="#id-s6">Tindakan kami</a></li><li><a href="#id-s7">Pesan pribadi</a></li><li><a href="#id-s8">Jadwal sholat, catatan, dan alarm</a></li><li><a href="#id-s9">Senyapkan notifikasi</a></li><li><a href="#id-s10">Hasil menu</a></li><li><a href="#id-s11">Iklan dan donasi</a></li><li><a href="#id-s12">Menghapus akun</a></li><li><a href="#id-s13">Kunci Aplikasi, kunci menu, dan penghapusan data</a></li><li><a href="#id-s14">Layanan apa adanya</a></li><li><a href="#id-s15">Hukum yang berlaku</a></li><li><a href="#id-s16">Perubahan syarat</a></li><li><a href="#id-s17">Kontak</a></li></ol></nav>
+<section class="sec" id="id-s1"><h2><span class="n">1</span>Penerimaan</h2>
 <p>Dengan masuk dan memakai fitur sosial Satu Titik (teman, pesan pribadi, komentar turnamen, ruangan game dan arisan online, serta chat ruangan), kamu menyetujui Syarat Penggunaan ini beserta Kebijakan Privasi. Bila tidak setuju, jangan masuk akun. Menu yang tidak membutuhkan akun tetap bisa dipakai.</p>
 </section>
-<section class="sec" id="id-2"><h2><span class="num" aria-hidden="true">2</span>Akunmu</h2>
-<ul><li>Pakai akunmu sendiri dan jaga keamanannya.</li><li>Jangan menyamar sebagai orang lain.</li><li>Aplikasi ini tidak ditujukan untuk anak di bawah 13 tahun.</li></ul>
+<section class="sec" id="id-s2"><h2><span class="n">2</span>Akunmu</h2>
+<ul><li>Pakai akunmu sendiri dan jaga keamanannya.</li><li>Jangan menyamar sebagai orang lain.</li><li>Fitur akun dan sosial hanya untuk pengguna berusia 16 tahun ke atas. Pengguna di bawah 18 tahun wajib mendapat izin orang tua atau wali.</li><li>Dengan menyetujui syarat ini, versi syarat dan waktu persetujuanmu disimpan di akunmu dan dihapus saat akunmu dihapus.</li></ul>
 </section>
-<section class="sec" id="id-3"><h2><span class="num" aria-hidden="true">3</span>Perilaku dan konten yang dilarang</h2>
-<h3>Saat membuat konten (pesan, komentar, nama, atau foto profil), kamu dilarang</h3>
+<section class="sec" id="id-s3"><h2><span class="n">3</span>Perilaku dan konten yang dilarang</h2>
+<p>Saat membuat konten (pesan, komentar, nama, atau foto profil), kamu dilarang:</p>
 <ul><li>Melecehkan, merundung, mengancam, atau menakut-nakuti orang lain.</li><li>Menyebarkan ujaran kebencian atau merendahkan orang berdasarkan suku, agama, ras, antargolongan, gender, disabilitas, atau orientasi seksual.</li><li>Membuat atau membagikan konten seksual, pornografi, atau vulgar, termasuk apa pun yang mengeksploitasi anak.</li><li>Mendorong kekerasan, melukai diri sendiri, atau kegiatan yang melanggar hukum.</li><li>Melakukan penipuan, spam, atau membagikan tautan berbahaya.</li><li>Membagikan data pribadi orang lain tanpa izin.</li><li>Mengganggu atau menyalahgunakan cara kerja aplikasi.</li></ul>
 </section>
-<section class="sec" id="id-4"><h2><span class="num" aria-hidden="true">4</span>Tanggung jawab atas kontenmu</h2>
-<p>Kamu bertanggung jawab atas konten yang kamu buat. Kami tidak memantau semua konten secara langsung, jadi kami mengandalkan laporan pengguna.</p>
+<section class="sec" id="id-s4"><h2><span class="n">4</span>Tanggung jawab atas kontenmu</h2>
+<p>Kamu bertanggung jawab atas konten yang kamu buat. Kami tidak memantau semua konten secara langsung, jadi kami mengandalkan laporan pengguna. Kontenmu tetap milikmu, tetapi dengan membuatnya kamu mengizinkan kami menyimpan dan menampilkannya di dalam aplikasi sesuai fitur yang kamu pakai (misalnya komentar turnamen dan chat ruangan). Konten orang lain tidak boleh disalin atau disebarkan tanpa izin pemiliknya.</p>
 </section>
-<section class="sec" id="id-5"><h2><span class="num" aria-hidden="true">5</span>Melapor dan memblokir</h2>
+<section class="sec" id="id-s5"><h2><span class="n">5</span>Melapor dan memblokir</h2>
 <ul><li>Di chat pribadi: ketuk pesan temanmu lalu pilih Laporkan. Di menu teman, kamu juga bisa memilih Blokir atau Laporkan pengguna.</li><li>Di komentar turnamen: pilih Laporkan di bawah komentar.</li><li>Pengguna yang kamu blokir tidak bisa mengirim pesan atau permintaan pertemanan kepadamu. Kamu bisa membuka blokir kapan saja lewat menu teman.</li><li>Laporan berisi alasan, ID akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan dan catatan tambahan (bila kamu menulisnya). Laporan hanya dibaca pengelola.</li></ul>
 </section>
-<section class="sec" id="id-6"><h2><span class="num" aria-hidden="true">6</span>Tindakan kami</h2>
+<section class="sec" id="id-s6"><h2><span class="n">6</span>Tindakan kami</h2>
 <p>Kami meninjau laporan dan dapat menghapus konten, membatasi fitur, atau menutup akun yang melanggar syarat ini, termasuk tanpa pemberitahuan lebih dulu untuk pelanggaran berat. Kami dapat menyerahkan data kepada pihak berwenang bila diwajibkan oleh hukum.</p>
 </section>
-<section class="sec" id="id-7"><h2><span class="num" aria-hidden="true">7</span>Pesan pribadi</h2>
+<section class="sec" id="id-s7"><h2><span class="n">7</span>Pesan pribadi</h2>
 <p>Pesan pribadi hanya antar teman dan ditandai kedaluwarsa setelah 30 hari; chat ruangan online ditandai kedaluwarsa setelah 24 jam. Data yang kedaluwarsa dihapus otomatis oleh server, yang bisa memerlukan waktu. Jangan memakainya untuk data yang sangat rahasia.</p>
 </section>
-<section class="sec" id="id-8"><h2><span class="num" aria-hidden="true">8</span>Jadwal sholat, catatan, dan alarm</h2>
+<section class="sec" id="id-s8"><h2><span class="n">8</span>Jadwal sholat, catatan, dan alarm</h2>
 <ul><li>Waktu sholat, arah kiblat, dan hitung mundur dihitung otomatis dari lokasi yang kamu pilih dan hanya sebagai bantuan. Hasilnya bisa berbeda 1 sampai 2 menit dari jadwal masjid setempat; ikuti adzan dan ketentuan di tempatmu.</li><li>Alarm adzan dan alarm pengingat catatan bergantung pada izin, pengaturan hemat baterai, volume, dan kondisi perangkatmu, jadi kami tidak menjamin alarm selalu berbunyi tepat waktu. Jangan jadikan satu-satunya pengingat untuk hal yang penting.</li><li>Isi Catatan Cepat adalah tanggung jawabmu. Catatan tersimpan di perangkatmu (dan di akunmu bila sinkronisasi aktif) tanpa enkripsi tambahan, jadi jangan menyimpan kata sandi atau data yang sangat rahasia. Catatan yang hilang karena perangkat, penghapusan data aplikasi, atau reset tidak bisa dipulihkan.</li></ul>
 </section>
-<section class="sec" id="id-9"><h2><span class="num" aria-hidden="true">9</span>Senyapkan notifikasi</h2>
+<section class="sec" id="id-s9"><h2><span class="n">9</span>Senyapkan notifikasi</h2>
 <p>Menyenyapkan teman atau semua teman hanya menghentikan notifikasi pesan di HP-mu. Pesan tetap masuk, temanmu tidak diberi tahu, dan aturan di bagian 3 sampai 6 tetap berlaku. Untuk menghentikan pesan sama sekali, pakai Blokir. Rincian data senyap ada di Kebijakan Privasi.</p>
 </section>
-<section class="sec" id="id-10"><h2><span class="num" aria-hidden="true">10</span>Hasil menu</h2>
+<section class="sec" id="id-s10"><h2><span class="n">10</span>Hasil menu</h2>
 <p>Ketentuan tentang hasil menu ada di Kebijakan Privasi bagian 8.</p>
 </section>
-<section class="sec" id="id-11"><h2><span class="num" aria-hidden="true">11</span>Iklan</h2>
-<p>Versi aplikasi tertentu menampilkan iklan dari pihak ketiga. Rinciannya ada di Kebijakan Privasi.</p>
+<section class="sec" id="id-s11"><h2><span class="n">11</span>Iklan dan donasi</h2>
+<p>Versi aplikasi tertentu menampilkan iklan dari pihak ketiga. Rinciannya ada di Kebijakan Privasi. Donasi lewat Saweria (hanya di versi web) bersifat sukarela dan diproses oleh Saweria dengan ketentuannya sendiri.</p>
 </section>
-<section class="sec" id="id-12"><h2><span class="num" aria-hidden="true">12</span>Menghapus akun</h2>
+<section class="sec" id="id-s12"><h2><span class="n">12</span>Menghapus akun</h2>
 <p>Kamu bisa menghapus akunmu lewat halaman Profil di Pengaturan. Data akun, daftar teman, dan pesan pribadi ikut dihapus. Komentar di turnamen milik orang lain dianonimkan (isinya tetap tampil), dan laporan yang pernah kamu kirim dapat tetap tersimpan. Ruangan online yang kamu buat dan belum ditutup tidak ikut terhapus, jadi tutup ruangannya sebelum menghapus akun; rinciannya ada di Kebijakan Privasi bagian 6.</p>
 </section>
-<section class="sec" id="id-13"><h2><span class="num" aria-hidden="true">13</span>Kunci Aplikasi, kunci menu, dan penghapusan data</h2>
-<p>Kamu bertanggung jawab menjaga PIN atau pola dan kode pemulihan Kunci Aplikasi, serta PIN dan kode pemulihan menu Keuangan dan Arisan. Kami tidak bisa memulihkannya. Data yang sudah dihapus lewat reset, hapus arisan, atau penghapusan data aplikasi tidak bisa dikembalikan. Kunci Aplikasi dan kunci menu hanya mengunci tampilan dan bukan enkripsi.</p>
+<section class="sec" id="id-s13"><h2><span class="n">13</span>Kunci Aplikasi, kunci menu, dan penghapusan data</h2>
+<p>Kamu bertanggung jawab menjaga kunci HP-mu. Bila kamu masih memakai PIN atau pola dan kode pemulihan lama dari Kunci Aplikasi atau menu Keuangan dan Arisan, jaga juga itu. Kami tidak bisa memulihkannya. Data yang sudah dihapus lewat reset, hapus arisan, atau penghapusan data aplikasi tidak bisa dikembalikan. Bila Kunci Aplikasi memakai kunci HP, aplikasi tidak menyimpan PIN atau pola. Kunci menu Keuangan dan Arisan juga memakai kunci HP, tanpa PIN buatan aplikasi. Kunci Aplikasi dan kunci menu hanya mengunci tampilan dan bukan enkripsi.</p>
 </section>
-<section class="sec" id="id-14"><h2><span class="num" aria-hidden="true">14</span>Layanan apa adanya</h2>
+<section class="sec" id="id-s14"><h2><span class="n">14</span>Layanan apa adanya</h2>
 <p>Satu Titik diberikan apa adanya. Kami berusaha menjaganya tetap berjalan, tetapi tidak menjamin layanan selalu tersedia, bebas gangguan, atau bebas kesalahan. Kami dapat mengubah, membatasi, atau menghentikan fitur kapan saja. Sejauh diizinkan hukum, kami tidak bertanggung jawab atas kerugian tidak langsung, kehilangan data akibat perangkat, penghapusan data aplikasi, atau reset yang kamu lakukan, alarm yang tidak berbunyi tepat waktu, maupun keputusan yang kamu ambil berdasarkan hasil menu.</p>
 </section>
-<section class="sec" id="id-15"><h2><span class="num" aria-hidden="true">15</span>Hukum yang berlaku</h2>
+<section class="sec" id="id-s15"><h2><span class="n">15</span>Hukum yang berlaku</h2>
 <p>Syarat ini tunduk pada hukum Republik Indonesia.</p>
 </section>
-<section class="sec" id="id-16"><h2><span class="num" aria-hidden="true">16</span>Perubahan syarat</h2>
+<section class="sec" id="id-s16"><h2><span class="n">16</span>Perubahan syarat</h2>
 <p>Syarat ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Bila ada perubahan penting, kamu akan diminta menyetujui lagi.</p>
 </section>
-<section class="sec" id="id-17"><h2><span class="num" aria-hidden="true">17</span>Kontak</h2>
-<p>Pertanyaan tentang syarat ini dapat dikirim lewat Kotak Saran di Pengaturan atau ke email <a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a>.</p>
-<p class="contact"><strong>Aurenza27 · Satu Titik</strong><br><a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a></p>
+<section class="sec" id="id-s17"><h2><span class="n">17</span>Kontak</h2>
+<p>Pertanyaan tentang syarat ini dapat dikirim lewat Kotak Saran di Pengaturan atau ke email titikhilangs27@gmail.com.</p>
+<p class="card"><strong>Aurenza27 · Satu Titik</strong><br><a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a></p>
 </section>
-</article>
-<article id="a-en" data-lang="en" lang="en">
-<header class="dochead"><h1>Terms of Use</h1><p class="upd">Last updated: 22 November 2026</p></header>
-<nav class="toc" aria-label="Contents"><h2>Contents</h2><ol>
-<li><a href="#en-1">Acceptance</a></li>
-<li><a href="#en-2">Your account</a></li>
-<li><a href="#en-3">Prohibited behavior and content</a></li>
-<li><a href="#en-4">Responsibility for your content</a></li>
-<li><a href="#en-5">Reporting and blocking</a></li>
-<li><a href="#en-6">Our actions</a></li>
-<li><a href="#en-7">Private messages</a></li>
-<li><a href="#en-8">Prayer times, notes, and alarms</a></li>
-<li><a href="#en-9">Mute notifications</a></li>
-<li><a href="#en-10">Menu results</a></li>
-<li><a href="#en-11">Ads</a></li>
-<li><a href="#en-12">Deleting your account</a></li>
-<li><a href="#en-13">App Lock, menu lock, and data deletion</a></li>
-<li><a href="#en-14">Service as is</a></li>
-<li><a href="#en-15">Governing law</a></li>
-<li><a href="#en-16">Changes to these terms</a></li>
-<li><a href="#en-17">Contact</a></li>
-</ol></nav>
-<section class="sec" id="en-1"><h2><span class="num" aria-hidden="true">1</span>Acceptance</h2>
+</div>
+<div class="lang" id="lang-en" lang="en" hidden>
+<header class="hd"><h1>Terms of Use</h1><p class="sub">Satu Titik</p><p class="upd">Last updated: 23 November 2026</p></header>
+<nav class="toc" aria-label="Contents"><h2>Contents</h2><ol><li><a href="#en-s1">Acceptance</a></li><li><a href="#en-s2">Your account</a></li><li><a href="#en-s3">Prohibited behavior and content</a></li><li><a href="#en-s4">Responsibility for your content</a></li><li><a href="#en-s5">Reporting and blocking</a></li><li><a href="#en-s6">Our actions</a></li><li><a href="#en-s7">Private messages</a></li><li><a href="#en-s8">Prayer times, notes, and alarms</a></li><li><a href="#en-s9">Mute notifications</a></li><li><a href="#en-s10">Menu results</a></li><li><a href="#en-s11">Ads and donations</a></li><li><a href="#en-s12">Deleting your account</a></li><li><a href="#en-s13">App Lock, menu lock, and data deletion</a></li><li><a href="#en-s14">Service as is</a></li><li><a href="#en-s15">Governing law</a></li><li><a href="#en-s16">Changes to these terms</a></li><li><a href="#en-s17">Contact</a></li></ol></nav>
+<section class="sec" id="en-s1"><h2><span class="n">1</span>Acceptance</h2>
 <p>By signing in and using Satu Titik’s social features (friends, private messages, tournament comments, online game and arisan rooms, and room chat), you agree to these Terms of Use and the Privacy Policy. If you do not agree, do not sign in. Menus that do not need an account remain available.</p>
 </section>
-<section class="sec" id="en-2"><h2><span class="num" aria-hidden="true">2</span>Your account</h2>
-<ul><li>Use your own account and keep it secure.</li><li>Do not impersonate anyone.</li><li>This app is not intended for children under 13.</li></ul>
+<section class="sec" id="en-s2"><h2><span class="n">2</span>Your account</h2>
+<ul><li>Use your own account and keep it secure.</li><li>Do not impersonate anyone.</li><li>Account and social features are only for users aged 16 and over. Users under 18 must have a parent’s or guardian’s permission.</li><li>By agreeing to these terms, the terms version and the time of your agreement are stored in your account and deleted when your account is deleted.</li></ul>
 </section>
-<section class="sec" id="en-3"><h2><span class="num" aria-hidden="true">3</span>Prohibited behavior and content</h2>
+<section class="sec" id="en-s3"><h2><span class="n">3</span>Prohibited behavior and content</h2>
 <p>When you create content (messages, comments, names, or profile photos), you must not:</p>
 <ul><li>Harass, bully, threaten, or intimidate others.</li><li>Spread hate speech or demean people based on ethnicity, religion, race, group identity, gender, disability, or sexual orientation.</li><li>Create or share sexual, pornographic, or vulgar content, including anything that exploits children.</li><li>Encourage violence, self-harm, or illegal activity.</li><li>Commit fraud, send spam, or share harmful links.</li><li>Share other people’s personal data without permission.</li><li>Disrupt or abuse how the app works.</li></ul>
 </section>
-<section class="sec" id="en-4"><h2><span class="num" aria-hidden="true">4</span>Responsibility for your content</h2>
-<p>You are responsible for the content you create. We do not watch all content in real time, so we rely on user reports.</p>
+<section class="sec" id="en-s4"><h2><span class="n">4</span>Responsibility for your content</h2>
+<p>You are responsible for the content you create. We do not watch all content in real time, so we rely on user reports. Your content stays yours, but by creating it you allow us to store and display it inside the app as the features you use require (for example tournament comments and room chat). Other people’s content must not be copied or redistributed without the owner’s permission.</p>
 </section>
-<section class="sec" id="en-5"><h2><span class="num" aria-hidden="true">5</span>Reporting and blocking</h2>
+<section class="sec" id="en-s5"><h2><span class="n">5</span>Reporting and blocking</h2>
 <ul><li>In private chat: tap your friend’s message and choose Report. In the friend menu you can also choose Block or Report user.</li><li>In tournament comments: choose Report under the comment.</li><li>A user you block cannot send you messages or friend requests. You can unblock at any time from the friend menu.</li><li>A report contains the reason, the Account IDs of the reporter and the reported user, the time, a copy of the reported text, and your optional note. Reports are read only by the maintainer.</li></ul>
 </section>
-<section class="sec" id="en-6"><h2><span class="num" aria-hidden="true">6</span>Our actions</h2>
+<section class="sec" id="en-s6"><h2><span class="n">6</span>Our actions</h2>
 <p>We review reports and may remove content, restrict features, or close accounts that break these terms, including without prior notice for serious violations. We may hand over data to the authorities when required by law.</p>
 </section>
-<section class="sec" id="en-7"><h2><span class="num" aria-hidden="true">7</span>Private messages</h2>
+<section class="sec" id="en-s7"><h2><span class="n">7</span>Private messages</h2>
 <p>Private messages are only between friends and are marked to expire after 30 days; online room chat is marked to expire after 24 hours. Expired data is deleted automatically by the server, which can take some time. Do not use them for highly confidential data.</p>
 </section>
-<section class="sec" id="en-8"><h2><span class="num" aria-hidden="true">8</span>Prayer times, notes, and alarms</h2>
+<section class="sec" id="en-s8"><h2><span class="n">8</span>Prayer times, notes, and alarms</h2>
 <ul><li>Prayer times, the Qibla direction, and the countdown are calculated automatically from the location you choose and are only an aid. Results can differ by 1 to 2 minutes from the local mosque’s schedule; follow the adhan and rulings in your area.</li><li>Adhan alarms and note reminder alarms depend on your device’s permissions, battery-saving settings, volume, and condition, so we do not guarantee that an alarm will always sound on time. Do not make them your only reminder for anything important.</li><li>You are responsible for what you write in Quick Notes. Notes are stored on your device (and in your account if sync is on) without additional encryption, so do not keep passwords or highly confidential data in them. Notes lost through your device, clearing app data, or a reset cannot be recovered.</li></ul>
 </section>
-<section class="sec" id="en-9"><h2><span class="num" aria-hidden="true">9</span>Mute notifications</h2>
+<section class="sec" id="en-s9"><h2><span class="n">9</span>Mute notifications</h2>
 <p>Muting a friend or all friends only stops message notifications on your phone. Messages still arrive, your friend is not told, and the rules in sections 3 to 6 still apply. To stop messages entirely, use Block. Details of mute data are in the Privacy Policy.</p>
 </section>
-<section class="sec" id="en-10"><h2><span class="num" aria-hidden="true">10</span>Menu results</h2>
+<section class="sec" id="en-s10"><h2><span class="n">10</span>Menu results</h2>
 <p>Terms about menu results are in section 8 of the Privacy Policy.</p>
 </section>
-<section class="sec" id="en-11"><h2><span class="num" aria-hidden="true">11</span>Ads</h2>
-<p>Certain app versions show third-party ads. Details are in the Privacy Policy.</p>
+<section class="sec" id="en-s11"><h2><span class="n">11</span>Ads and donations</h2>
+<p>Certain app versions show third-party ads. Details are in the Privacy Policy. Donations through Saweria (web version only) are voluntary and processed by Saweria under its own terms.</p>
 </section>
-<section class="sec" id="en-12"><h2><span class="num" aria-hidden="true">12</span>Deleting your account</h2>
+<section class="sec" id="en-s12"><h2><span class="n">12</span>Deleting your account</h2>
 <p>You can delete your account from the Profile page in Settings. Account data, your friend list, and private messages are deleted as well. Comments in other people’s tournaments are anonymized (the text stays visible), and reports you submitted may still be kept. Online rooms you created and have not closed are not deleted, so close them before deleting your account; details are in section 6 of the Privacy Policy.</p>
 </section>
-<section class="sec" id="en-13"><h2><span class="num" aria-hidden="true">13</span>App Lock, menu lock, and data deletion</h2>
-<p>You are responsible for keeping the PIN or pattern and recovery code of the App Lock, and the PIN and recovery code of the Finance and Arisan menus, safe. We cannot recover them. Data deleted through reset, by deleting an arisan, or by clearing the app data cannot be restored. The App Lock and the menu lock only lock the screen and are not encryption.</p>
+<section class="sec" id="en-s13"><h2><span class="n">13</span>App Lock, menu lock, and data deletion</h2>
+<p>You are responsible for keeping your phone lock safe. If you still use an old PIN or pattern and recovery code from the App Lock or the Finance and Arisan menus, keep those safe too. We cannot recover them. Data deleted through reset, by deleting an arisan, or by clearing the app data cannot be restored. When the App Lock uses the phone lock, the app stores no PIN or pattern. The Finance and Arisan menu locks also use the phone lock, with no app-made PIN. The App Lock and the menu lock only lock the screen and are not encryption.</p>
 </section>
-<section class="sec" id="en-14"><h2><span class="num" aria-hidden="true">14</span>Service as is</h2>
+<section class="sec" id="en-s14"><h2><span class="n">14</span>Service as is</h2>
 <p>Satu Titik is provided as is. We try to keep it running but do not guarantee that the service will always be available, uninterrupted, or error-free. We may change, restrict, or discontinue features at any time. To the extent permitted by law, we are not liable for indirect losses, for data lost through your device, clearing app data, or resets you perform, alarms that do not sound on time, or for decisions you make based on menu results.</p>
 </section>
-<section class="sec" id="en-15"><h2><span class="num" aria-hidden="true">15</span>Governing law</h2>
+<section class="sec" id="en-s15"><h2><span class="n">15</span>Governing law</h2>
 <p>These terms are governed by the laws of the Republic of Indonesia.</p>
 </section>
-<section class="sec" id="en-16"><h2><span class="num" aria-hidden="true">16</span>Changes to these terms</h2>
+<section class="sec" id="en-s16"><h2><span class="n">16</span>Changes to these terms</h2>
 <p>These terms may be updated. The date of the latest update is shown at the top of this page. For important changes you will be asked to agree again.</p>
 </section>
-<section class="sec" id="en-17"><h2><span class="num" aria-hidden="true">17</span>Contact</h2>
-<p>Questions about these terms can be sent through the Suggestion Box in Settings or to <a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a>.</p>
-<p class="contact"><strong>Aurenza27 · Satu Titik</strong><br><a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a></p>
+<section class="sec" id="en-s17"><h2><span class="n">17</span>Contact</h2>
+<p>Questions about these terms can be sent through the Suggestion Box in Settings or to titikhilangs27@gmail.com.</p>
+<p class="card"><strong>Aurenza27 · Satu Titik</strong><br><a href="mailto:titikhilangs27@gmail.com">titikhilangs27@gmail.com</a></p>
 </section>
-</article>
+</div>
+<footer>© Aurenza27</footer>
 </main>
-<footer>
-<p><a href="kebijakan-privasi.html"><span data-l="id">Baca Kebijakan Privasi</span><span data-l="en">Read the Privacy Policy</span></a></p>
-<p>© 2026 Aurenza27. All Rights Reserved.</p>
-</footer>
 <script>
 (function(){
-  var B=document.body, T={id:"Syarat Penggunaan",en:"Terms of Use"};
-  function st(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}}
-  var q=(location.search.match(/[?&]lang=(id|en)/)||[])[1];
-  var lang=q||st("st_legal_lang")||((navigator.language||"id").slice(0,2)==="id"?"id":"en");
-  if(lang!=="en")lang="id";
-  function paint(){
-    B.dataset.lang=lang;document.documentElement.lang=lang;document.title=T[lang]+" · Satu Titik";
-    document.querySelectorAll(".lang button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.set===lang));});
+  var cur="id";
+  function set(l,save){
+    cur=l;
+    document.documentElement.lang=l;
+    ["id","en"].forEach(function(k){document.getElementById("lang-"+k).hidden=(k!==l)});
+    document.querySelectorAll(".sw button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.l===l))});
+    if(save){try{localStorage.setItem("st-tm-lang",l)}catch(e){}}
   }
-  function jump(){
-    var h=decodeURIComponent(location.hash.slice(1)),el=h&&document.getElementById(h),art=el&&el.closest("article");
-    if(art){lang=art.dataset.lang;paint();el.scrollIntoView();}
-  }
-  document.querySelectorAll(".lang button").forEach(function(b){b.addEventListener("click",function(){lang=b.dataset.set;st("st_legal_lang",lang);paint();});});
-  window.addEventListener("hashchange",jump);
-  paint();jump();
+  var q=(location.search.match(/[?&]lang=(id|en)/)||[])[1], s=null;
+  try{s=localStorage.getItem("st-pv-lang")}catch(e){}
+  var init=q||s||((navigator.language||"id").slice(0,2)==="en"?"en":"id");
+  set(init,false);
+  document.querySelectorAll(".sw button").forEach(function(b){b.addEventListener("click",function(){set(b.dataset.l,true);window.scrollTo(0,0)})});
 })();
 </script>
 </body>
