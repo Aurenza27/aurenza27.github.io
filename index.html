@@ -2714,7 +2714,7 @@ function openMenu(m){
   $("vt").textContent = mTitle(m);
   const f = document.createElement("iframe");
   f.id = "frame"; f.title = mTitle(m); f.setAttribute("allow", "autoplay; geolocation *; accelerometer *; gyroscope *; magnetometer *");
-  curMenu = m.id; try{ paintWarn(); }catch(e){} writeKeys(S); f.addEventListener("load", () => { try{ watchFrame(); }catch(e){} try{ paintMenuTitles(); }catch(e){} try{ medisHookFrame(); }catch(e){} try{ hibHookFrame(); }catch(e){} try{ hapticHook(); }catch(e){} }); f.srcdoc = menuSrc(m);
+  curMenu = m.id; try{ paintWarn(); }catch(e){} writeKeys(S); f.addEventListener("load", () => { try{ watchFrame(); }catch(e){} try{ paintMenuTitles(); }catch(e){} try{ medisHookFrame(); }catch(e){} try{ hibHookFrame(); }catch(e){} try{ manHookFrame(); }catch(e){} try{ hapticHook(); }catch(e){} }); f.srcdoc = menuSrc(m);
   $("view").appendChild(f);
   $("home").hidden = true; $("view").hidden = false;
   { const v = $("view"); v.classList.remove("vin"); void v.offsetWidth; v.classList.add("vin"); }
@@ -2722,6 +2722,7 @@ function openMenu(m){
   document.title = mTitle(m);
   try{ medisSync(true); }catch(e){}   /* musik kategori medis mulai di sini (masih dalam sentuhan pengguna) */
   try{ hibSync(true); }catch(e){}   /* musik kategori hiburan, sama */
+  try{ manSync(true); }catch(e){}   /* musik kategori produktivitas & manajemen, sama */
 }
 function closeMenu(){
   if($("view").hidden) return;
@@ -2733,6 +2734,7 @@ function closeMenu(){
   { const h = $("home"); h.classList.remove("hin"); void h.offsetWidth; h.classList.add("hin"); }
   try{ medisSync(true); }catch(e){}
   try{ hibSync(true); }catch(e){}
+  try{ manSync(true); }catch(e){}
   try{ if(window.satuTitikAds) window.satuTitikAds.onMenuClosed(); }catch(e){}
   document.title = "Satu Titik";
 }
@@ -2813,9 +2815,14 @@ if(document.readyState === "loading") addEventListener("DOMContentLoaded", route
 })();
 
 /* ===== MUSIK KATEGORI MEDIS =====
-   "measured_recovery.mp3" ditanam satu kali di blok #medisBgm (base64) dan diputar oleh Home SELAMA menu berkategori "medis" terbuka.
+   "musik-medis.mp3" (media/musik-medis.mp3, lagu Kesehatan & Gaya Hidup) diputar berulang (loop) oleh Home SELAMA menu berkategori "medis" terbuka.
    Menu kategori lain (primbon, dst.) dan beranda tidak memutarnya. Menu medis baru otomatis ikut: cukup beri cat:"medis" di MENUS.
-   Mengikuti panel pengaturan: tombol Musik (S.music) dan Volume musik (S.mvol); mengecil saat AI membacakan hasil. */
+   Mengikuti panel pengaturan: tombol Musik (S.music) dan Volume musik (S.mvol).
+   Volume otomatis (turun cepat, naik pelan agar halus):
+   - mengisi data (berat/tinggi badan, tanggal, pencarian makanan, catatan, pilihan) : 30%
+   - AI membacakan hasil                                                            : 20%
+   - alarm / pengingat sedang berbunyi                                              :  6%
+   - selain itu (membaca hasil, melihat grafik, istirahat)                          : 100% dari volume pilihan */
 const medisAud = new Audio();
 medisAud.loop = true; medisAud.preload = "none"; medisAud.volume = 0;
 let medisReady = false, medisBlocked = false, medisLvl = 0;
@@ -2828,6 +2835,20 @@ function inMedis(){ const m = MENUS.find(x => x.id === curMenu); return !!m && m
 function medisSpeaking(){
   try{ const f = $("frame"); return !!((f && f.contentWindow.speechSynthesis.speaking) || speechSynthesis.speaking); }catch(e){ return false; }
 }
+function medisDuck(){
+  let k = 1;
+  try{
+    const f = $("frame"), d = f && f.contentDocument;
+    if(d){
+      const r = d.getElementById("ring"), sb = d.getElementById("stopBar");
+      if((r && !r.hidden) || (sb && !sb.hidden)) return .06;   /* alarm berbunyi: musik hampir hening agar suaranya jelas */
+      const a = d.activeElement;
+      if(a && (a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.isContentEditable || (a.tagName === "INPUT" && !/^(checkbox|radio|range|button|submit|reset|color|file|image)$/i.test(a.type)))) k = .3;   /* sedang mengisi data */
+    }
+  }catch(e){}
+  if(medisSpeaking()) k = Math.min(k, .2);
+  return k;
+}
 function medisSync(now){
   if(!inMedis()){   /* keluar dari kategori medis: berhenti dan kembali ke awal */
     if(!medisAud.paused) medisAud.pause();
@@ -2836,8 +2857,8 @@ function medisSync(now){
   }
   if(!S.music){ if(!medisAud.paused) medisAud.pause(); medisLvl = 0; return; }
   if(!medisLoad()) return;
-  const target = Math.min(1, Math.max(0, S.mvol / 100)) * (medisSpeaking() ? .2 : 1);
-  medisLvl = now === true ? target : medisLvl + (target - medisLvl) * .35;
+  const target = Math.min(1, Math.max(0, S.mvol / 100)) * medisDuck();
+  medisLvl += (target - medisLvl) * (target < medisLvl ? .3 : .08);   /* turun cepat, naik pelan (fade) */
   if(Math.abs(target - medisLvl) < .005) medisLvl = target;
   medisAud.volume = Math.min(1, Math.max(0, medisLvl));
   if(medisAud.paused && (now === true || !medisBlocked)){
@@ -2855,18 +2876,83 @@ function medisHookFrame(){
 setInterval(() => medisSync(), 100);
 
 /* ===== MUSIK KATEGORI HIBURAN =====
-   Musik latar Insting Detektif (yang sudah tertanam di blok menunya) dipakai untuk SEMUA menu berkategori "hiburan".
-   Insting Detektif memutarnya sendiri di dalam menunya (ownBgm:true), jadi Home hanya memutarnya untuk menu hiburan lain (mis. Turnamen).
-   Menu hiburan baru otomatis ikut: cukup beri cat:"hiburan" di MENUS. Mengikuti Musik (S.music) dan Volume musik (S.mvol); mengecil saat AI membacakan hasil. */
+   "musik-hiburan.mp3" (media/musik-hiburan.mp3, lagu Hiburan & Permainan) diputar berulang (loop) untuk SEMUA menu berkategori "hiburan".
+   Insting Detektif memutarnya sendiri di dalam menunya (ownBgm:true), jadi Home hanya memutarnya untuk menu hiburan lain (Tebak Inisial, Versus, Gem Duel, dst.).
+   Menu hiburan baru otomatis ikut: cukup beri cat:"hiburan" di MENUS. Mengikuti Musik (S.music) dan Volume musik (S.mvol).
+   Volume otomatis (turun cepat, naik pelan agar halus):
+   - mengetik (nama, tebakan, kode ruangan, kolom isian) : 30%
+   - AI membacakan hasil                                 : 12%
+   - alarm / suara penting sedang berbunyi               :  6%
+   - selain itu (bermain, melihat skor)                  : 100% dari volume pilihan */
 const hibAud = new Audio();
 hibAud.loop = true; hibAud.preload = "none"; hibAud.volume = 0;
 let hibReady = false, hibBlocked = false, hibLvl = 0;
 function hibLoad(){
   if(hibReady) return true;
-  hibAud.src = "media/musik-detektif.mp3";
+  hibAud.src = "media/musik-hiburan.mp3";
   return (hibReady = true);
 }
 function inHib(){ const m = MENUS.find(x => x.id === curMenu); return !!m && m.cat === "hiburan" && !m.ownBgm; }
+/* ===== SUARA BAWAAN MENU / GAME DIUTAMAKAN =====
+   Efek suara milik menu atau game (WebAudio atau elemen audio non-loop) dideteksi dari Home tanpa mengubah kode menunya.
+   Selama efek berbunyi, backsound kategori hiburan dan manajemen turun jadi suara kedua (25%), lalu naik pelan setelah efek selesai. */
+let sfxUntil = 0; const sfxEls = new Set();
+function sfxMark(ms){
+  const t = performance.now() + Math.min(3000, Math.max(0, ms));
+  if(t > sfxUntil) sfxUntil = t;
+  try{ hibSync(); }catch(e){} try{ manSync(); }catch(e){}   /* turunkan musik seketika, bersamaan dengan efek */
+}
+function sfxBusy(){
+  if(performance.now() < sfxUntil + 150) return true;
+  for(const e of sfxEls){ if(e.paused || e.ended || e.muted || e.volume === 0) sfxEls.delete(e); else return true; }
+  return false;
+}
+function sfxHookFrame(){
+  try{
+    const w = $("frame").contentWindow; if(!w || w.__stSfx) return; w.__stSfx = 1;
+    sfxUntil = 0; sfxEls.clear();
+    new Set([w.AudioContext, w.webkitAudioContext]).forEach(AC => {
+      const P = AC && AC.prototype; if(!P) return;
+      ["createOscillator", "createBufferSource"].forEach(fn => {
+        const o = P[fn]; if(typeof o !== "function") return;
+        P[fn] = function(){
+          const n = o.apply(this, arguments), ctx = this, st = n.start, sp = n.stop;
+          n.start = function(when){
+            const r = st.apply(n, arguments);
+            try{ sfxMark(n.buffer ? (Math.max(0, (when || 0) - ctx.currentTime) + n.buffer.duration) * 1000 : 150); }catch(e){}
+            return r;
+          };
+          n.stop = function(when){
+            const r = sp.apply(n, arguments);
+            try{ sfxMark(Math.max(0, (when || 0) - ctx.currentTime) * 1000); }catch(e){}
+            return r;
+          };
+          return n;
+        };
+      });
+    });
+    const HM = w.HTMLMediaElement && w.HTMLMediaElement.prototype;
+    if(HM && HM.play){
+      const pl = HM.play;
+      HM.play = function(){ try{ if(this.id !== "bgm" && !this.loop){ sfxEls.add(this); sfxMark(150); } }catch(e){} return pl.apply(this, arguments); };
+    }
+  }catch(e){}
+}
+function hibDuck(){
+  let k = 1;
+  try{
+    const f = $("frame"), d = f && f.contentDocument;
+    if(d){
+      const r = d.getElementById("ring"), sb = d.getElementById("stopBar");
+      if((r && !r.hidden) || (sb && !sb.hidden)) return .06;   /* alarm berbunyi: musik hampir hening agar suaranya jelas */
+      const a = d.activeElement;
+      if(a && (a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.isContentEditable || (a.tagName === "INPUT" && !/^(checkbox|radio|range|button|submit|reset|color|file|image)$/i.test(a.type)))) k = .3;   /* sedang mengetik */
+    }
+  }catch(e){}
+  if(sfxBusy()) k = Math.min(k, .25);   /* suara bawaan game berbunyi: musik jadi suara kedua */
+  if(medisSpeaking()) k = Math.min(k, .12);
+  return k;
+}
 function hibSync(now){
   if(!inHib()){   /* di luar menu hiburan (atau di menu yang punya musik sendiri): berhenti dan kembali ke awal */
     if(!hibAud.paused) hibAud.pause();
@@ -2875,8 +2961,8 @@ function hibSync(now){
   }
   if(!S.music){ if(!hibAud.paused) hibAud.pause(); hibLvl = 0; return; }
   if(!hibLoad()) return;
-  const target = Math.min(1, Math.max(0, S.mvol / 100)) * (medisSpeaking() ? .12 : 1);
-  hibLvl = now === true ? target : hibLvl + (target - hibLvl) * .35;
+  const target = Math.min(1, Math.max(0, S.mvol / 100)) * hibDuck();
+  hibLvl += (target - hibLvl) * (target < hibLvl ? .5 : .08);   /* turun cepat, naik pelan (fade) */
   if(Math.abs(target - hibLvl) < .005) hibLvl = target;
   hibAud.volume = Math.min(1, Math.max(0, hibLvl));
   if(hibAud.paused && (now === true || !hibBlocked)){
@@ -2887,10 +2973,70 @@ function hibSync(now){
 function hibGesture(){ if(hibBlocked && inHib() && S.music){ hibBlocked = false; hibSync(true); } }
 ["pointerup", "touchend", "click", "keydown"].forEach(ev => addEventListener(ev, hibGesture, true));
 function hibHookFrame(){
+  sfxHookFrame();
   const d = $("frame").contentDocument; if(!d) return;
   ["pointerup", "touchend", "click", "keydown"].forEach(ev => d.addEventListener(ev, hibGesture, true));
 }
 setInterval(() => hibSync(), 100);
+
+/* ===== MUSIK KATEGORI PRODUKTIVITAS & MANAJEMEN =====
+   "musik-manajemen.mp3" (media/musik-manajemen.mp3) diputar berulang (loop) oleh Home SELAMA menu berkategori "manajemen" terbuka
+   (Timer, Turnamen, Arisan, Keuangan, Jadwal Sholat, Catatan Cepat). Menu manajemen baru otomatis ikut: cukup beri cat:"manajemen" di MENUS.
+   Mengikuti panel pengaturan: tombol Musik (S.music) dan Volume musik (S.mvol).
+   Volume otomatis (turun cepat, naik pelan agar halus):
+   - mengisi data (kolom teks/angka/tanggal/jam, area catatan, pilihan) : 30%
+   - AI membacakan hasil                                              : 20%
+   - alarm timer / alarm catatan / adzan sedang berbunyi              :  6%
+   - selain itu                                                       : 100% dari volume pilihan */
+const manAud = new Audio();
+manAud.loop = true; manAud.preload = "none"; manAud.volume = 0;
+let manReady = false, manBlocked = false, manLvl = 0;
+function manLoad(){
+  if(manReady) return true;
+  manAud.src = "media/musik-manajemen.mp3";
+  return (manReady = true);
+}
+function inMan(){ const m = MENUS.find(x => x.id === curMenu); return !!m && m.cat === "manajemen"; }
+function manDuck(){
+  let k = 1;
+  try{
+    const f = $("frame"), d = f && f.contentDocument;
+    if(d){
+      const r = d.getElementById("ring"), sb = d.getElementById("stopBar");
+      if((r && !r.hidden) || (sb && !sb.hidden)) return .06;   /* alarm atau adzan berbunyi: musik hampir hening agar suaranya jelas */
+      const a = d.activeElement;
+      if(a && (a.tagName === "TEXTAREA" || a.tagName === "SELECT" || a.isContentEditable || (a.tagName === "INPUT" && !/^(checkbox|radio|range|button|submit|reset|color|file|image)$/i.test(a.type)))) k = .3;   /* sedang mengisi data */
+    }
+  }catch(e){}
+  if(sfxBusy()) k = Math.min(k, .25);   /* suara bawaan menu berbunyi: musik jadi suara kedua */
+  if(medisSpeaking()) k = Math.min(k, .2);
+  return k;
+}
+function manSync(now){
+  if(!inMan()){   /* keluar dari kategori manajemen: berhenti dan kembali ke awal */
+    if(!manAud.paused) manAud.pause();
+    if(manAud.currentTime) try{ manAud.currentTime = 0; }catch(e){}
+    manLvl = 0; return;
+  }
+  if(!S.music){ if(!manAud.paused) manAud.pause(); manLvl = 0; return; }
+  if(!manLoad()) return;
+  const target = Math.min(1, Math.max(0, S.mvol / 100)) * manDuck();
+  manLvl += (target - manLvl) * (target < manLvl ? .5 : .08);   /* turun cepat, naik pelan (fade) */
+  if(Math.abs(target - manLvl) < .005) manLvl = target;
+  manAud.volume = Math.min(1, Math.max(0, manLvl));
+  if(manAud.paused && (now === true || !manBlocked)){
+    const p = manAud.play();
+    if(p && p.then) p.then(() => { manBlocked = false; }, () => { manBlocked = true; });
+  }
+}
+function manGesture(){ if(manBlocked && inMan() && S.music){ manBlocked = false; manSync(true); } }
+["pointerup", "touchend", "click", "keydown"].forEach(ev => addEventListener(ev, manGesture, true));
+function manHookFrame(){
+  sfxHookFrame();
+  const d = $("frame").contentDocument; if(!d) return;
+  ["pointerup", "touchend", "click", "keydown"].forEach(ev => d.addEventListener(ev, manGesture, true));
+}
+setInterval(() => manSync(), 100);
 </script>
 
 
@@ -3862,7 +4008,7 @@ body.hasqa.hasbar .scrollchip{bottom:calc(228px + env(safe-area-inset-bottom,0px
   <button class="btn qbtn" id="qaBtn" data-i18n="addBtn">+ TAMBAH</button>
 </div>
 <div class="toast" id="toast"></div>
-<audio id="bgm" src="media/musik-detektif.mp3" preload="auto" loop></audio>
+<audio id="bgm" src="media/musik-hiburan.mp3" preload="auto" loop></audio>
 
 <script>
 const SPECS_ID = [
@@ -9899,6 +10045,7 @@ const SFX = {pt:[[880, 0]], game:[[660, 0], [880, .11]], ce:[[740, 0], [740, .16
 function fx(k){ if(!fxOn || !SFX[k]) return; try{ const t0 = ac().currentTime; SFX[k].forEach(n => note(n[0], t0 + n[1], k === "pt" ? .12 : .5, .08)); }catch(e){} }
 const PEN = [0, 2, 4, 7, 9, 12, 14];
 function musicTick(){
+  return;   /* musik latar kini dari Home (musik-manajemen.mp3), musik sintesis lama dimatikan */
   if(!musicOn || mVol <= 0) return;
   try{
     const t0 = ac().currentTime; let duck = 1; try{ if(readOn && speechSynthesis.speaking) duck = .25; }catch(e){}
