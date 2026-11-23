@@ -2117,10 +2117,11 @@ window.satuTitikNative = {
   googleWebClientId: "109811928525-6faa62nh89vmt3alpu3ob2v61glcv4m9.apps.googleusercontent.com",
   /* Iklan: isi ad unit banner asli dari AdMob lalu ubah testMode menjadi false. Default memakai iklan uji resmi Google. */
   adBanner: "ca-app-pub-5946674639326014/3036495241",
-  banner: true,                 /* true = tampilkan iklan banner di bawah beranda; false = tidak ada banner (interstisial tetap jalan sesuai pengaturannya) */
+  adsEnabled: false,            /* SAKLAR UTAMA: false = AdMob tidak diinisialisasi sama sekali (tanpa banner, interstisial, maupun form consent). Ubah ke true saat aplikasi sudah dirilis. */
+  banner: false,                /* true = tampilkan iklan banner di bawah beranda; false = tidak ada banner (interstisial tetap jalan sesuai pengaturannya) */
   /* Interstisial (iklan layar penuh): muncul hanya saat pengguna menutup sebuah menu, dengan jeda minimal antar iklan.
      interstitial: false = matikan sepenuhnya (kembali seperti semula). adInterstitial kosong = pakai iklan uji Google. */
-  interstitial: true,
+  interstitial: false,
   adInterstitial: "ca-app-pub-5946674639326014/1532501020",
   interstitialFirstMin: 2,      /* iklan pertama baru boleh muncul setelah aplikasi dipakai sekian menit */
   interstitialGapMin: 4,        /* jeda minimal antar iklan berikutnya (menit) */
@@ -2186,7 +2187,7 @@ window.satuTitikNative = {
   }
   async function initAds(){
     const AdMob = plug("AdMob"), cfg = window.satuTitikNative;
-    if(!AdMob) return;
+    if(!AdMob || cfg.adsEnabled === false) return;
     try{
       await AdMob.initialize({});
       try{ const ci = await AdMob.requestConsentInfo(); if(ci && ci.isConsentFormAvailable && ci.status === "REQUIRED") await AdMob.showConsentForm(); }catch(e){}
