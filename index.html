@@ -815,7 +815,8 @@ h1{font-size:26px;line-height:1.15}
 #infc .it .dt{padding:1px 7px;font-size:10px}
 #infc .it p{font-size:12px;line-height:1.4;-webkit-line-clamp:2}
 #infc .spc{border-radius:10px}
-#infc .spc .spi{aspect-ratio:21/9}
+#infc .spc .spi{aspect-ratio:7/3}
+#infc .spc h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #infc .spc .spb{padding:9px 10px;gap:3px}
 #infc .spc .spp{padding:2px 7px;font-size:9.5px}
 #infc .spc h3{margin:1px 0 0;font-size:13.5px}
@@ -827,8 +828,8 @@ h1{font-size:26px;line-height:1.15}
 #spnc .hh .hl:focus-visible{outline-color:#9fbcf5}
 .spc{overflow:hidden;border:1px solid rgba(143,180,255,.28);border-radius:14px;background:linear-gradient(180deg,rgba(143,180,255,.07),rgba(255,255,255,.015))}
 .spc+.spc{margin-top:10px}
-.spc .spi{position:relative;aspect-ratio:16/9;background:#0d1017;overflow:hidden}
-.spc .spi img{display:block;width:100%;height:100%;object-fit:cover}
+.spc .spi{position:relative;aspect-ratio:7/3;background:#0d1017;overflow:hidden}
+.spc .spi img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover}
 .spc .spb{display:flex;flex-direction:column;gap:6px;padding:12px}
 .spc .spr{display:flex;align-items:center;gap:8px;min-width:0}
 .spc .spp{flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9fbcf5;background:rgba(143,180,255,.14);border:1px solid rgba(143,180,255,.4);border-radius:999px}
@@ -3390,7 +3391,7 @@ window.stVer = (function(){
 })();
 /* ===== Konten Sponsor (iklan atau endorse dari pihak luar, bukan AdMob) =====
    Data: Firestore "sponsors/{id}" = {name, title:{id,en}, text:{id,en}, url, cta, from, until, img, iv, by, t}
-         dan "sponsorImg/{id}" = {d, iv}: gambar JPEG ±640x360 sebagai teks base64, hanya diunduh bila versinya (iv) berubah.
+         dan "sponsorImg/{id}" = {d, iv}: gambar JPEG 630x270 (7:3) sebagai teks base64, hanya diunduh bila versinya (iv) berubah.
    Semua orang boleh membaca; hanya akun developer yang boleh menulis (aturan database). Tayang bila from <= hari ini <= until menurut jam server (nowMs).
    Label "Bersponsor" ditulis di kode, bukan di teks isi, supaya selalu tampil. Tidak ada pelacakan klik; tautan dibuka di browser hanya setelah tombol diketuk.
    Salinan terakhir ada di localStorage "st_sync_spn_cache" dan "st_sync_spnimg_<id>" (awalan st_sync_ tidak ikut sinkron akun, cadangan, maupun reset). */
@@ -3492,7 +3493,7 @@ function spnCompress(file){
     im.onload = () => {
       try{
         let out = "";
-        for(const wh of [[640, 360], [480, 270]]){
+        for(const wh of [[630, 270], [462, 198]]){
           const W = wh[0], H = wh[1], c = document.createElement("canvas"); c.width = W; c.height = H;
           const x = c.getContext("2d"); x.fillStyle = "#0d1017"; x.fillRect(0, 0, W, H);
           const tr = W / H, sr = im.width / im.height; let sw, sh, sx, sy;
@@ -3526,7 +3527,7 @@ function spnDevOpen(edit){
     const box = hEl("div", "dvimgb"), pvw = hEl("div", "dvimgp"), acts = hEl("div", "dvimga"), fi = document.createElement("input");
     fi.type = "file"; fi.accept = "image/*"; fi.hidden = true;
     const pick = hEl("button", "dvb sm"), clr = hEl("button", "dvb sm del"); pick.type = clr.type = "button"; pick.textContent = "Pilih gambar dari galeri"; clr.textContent = "Hapus gambar";
-    const hint = hEl("p", "dvh sub"); hint.textContent = "Dipotong otomatis 16:9 dari tengah, lalu dikompres (±640×360, di bawah ±90 KB). Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
+    const hint = hEl("p", "dvh sub"); hint.textContent = "Ukuran saran 630×270 px (rasio 7:3). Gambar lain dipotong otomatis dari tengah, jadi letakkan objek utama di tengah. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
     const prev = hEl("div", "dvprev");
     const msg = hEl("p", "dvm"), say = (t, bad) => { msg.textContent = t; msg.className = "dvm" + (bad ? " bad" : ""); };
     const refresh = () => {
