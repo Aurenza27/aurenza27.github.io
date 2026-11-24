@@ -796,10 +796,10 @@ h1{font-size:26px;line-height:1.15}
 #stSheet .empty{padding:24px 8px;text-align:center;font-size:13px;color:var(--muted)}
 /* Konten Sponsor: aksen biru keabu-abuan supaya jelas berbeda dari emas khas aplikasi */
 /* Slider Informasi & Sponsor: maksimal 5 slide (3 iklan + 2 pengumuman) */
-#infc .sld{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#infc .sld{--sh:140px;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 #infc .sld::-webkit-scrollbar{display:none}
-#infc .sl{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column}
-#infc .sl>.ib,#infc .sl>.spc{flex:1}
+#infc .sl{flex:0 0 100%;height:var(--sh);min-width:0;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column}
+#infc .sl>.ib,#infc .sl>.spc{flex:1;min-height:0;box-sizing:border-box}
 #infc .sl>.ib{height:100%;box-sizing:border-box}
 #infc .sdots{display:flex;justify-content:center;gap:4px;margin-top:8px}
 #infc .sdots button{width:24px;height:16px;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
@@ -815,22 +815,25 @@ h1{font-size:26px;line-height:1.15}
 #infc .it .dt{padding:1px 7px;font-size:10px}
 #infc .it p{font-size:12px;line-height:1.4;-webkit-line-clamp:2}
 #infc .spc{border-radius:10px}
-#infc .spc .spi{aspect-ratio:7/3}
+#infc .spc .spi{min-height:0}
+#infc .spc .spb{overflow:hidden}
+#infc .it{justify-content:center}
+#infc .spcol p{-webkit-line-clamp:3}
 #infc .spc h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #infc .spc .spb{padding:9px 10px;gap:3px}
 #infc .spc .spp{padding:2px 7px;font-size:9.5px}
 #infc .spc h3{margin:1px 0 0;font-size:13.5px}
-#infc .spc p{font-size:12px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-#infc .spc .spgo{min-height:34px;margin-top:4px;font-size:12.5px;border-radius:10px}
+#infc .spc p{font-size:12px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#infc .spc .spgo{width:auto;align-self:flex-start;min-height:30px;margin-top:2px;padding:0 14px;font-size:12.5px;border-radius:10px}
 #infc .sdots{margin-top:6px}
 #spnc{border-color:rgba(143,180,255,.3)}
 #spnc .hh .hi,#spnc .hh b,#spnc .hh .hl{color:#9fbcf5}
 #spnc .hh .hl:focus-visible{outline-color:#9fbcf5}
-.spc{overflow:hidden;border:1px solid rgba(143,180,255,.28);border-radius:14px;background:linear-gradient(180deg,rgba(143,180,255,.07),rgba(255,255,255,.015))}
+.spc{display:flex;overflow:hidden;border:1px solid rgba(143,180,255,.28);border-radius:14px;background:linear-gradient(180deg,rgba(143,180,255,.07),rgba(255,255,255,.015))}
 .spc+.spc{margin-top:10px}
-.spc .spi{position:relative;aspect-ratio:7/3;background:#0d1017;overflow:hidden}
+.spc .spi{position:relative;flex:none;width:112px;min-height:120px;background:#0d1017;overflow:hidden}
 .spc .spi img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover}
-.spc .spb{display:flex;flex-direction:column;gap:6px;padding:12px}
+.spc .spb{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding:12px}
 .spc .spr{display:flex;align-items:center;gap:8px;min-width:0}
 .spc .spp{flex:none;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9fbcf5;background:rgba(143,180,255,.14);border:1px solid rgba(143,180,255,.4);border-radius:999px}
 .spc .spp svg{flex:none;width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -843,8 +846,15 @@ h1{font-size:26px;line-height:1.15}
 #spnc .spnempty{margin:0;padding:10px 4px 4px;font-size:12.5px;color:var(--muted)}
 #stSheet .spnote{margin:0 0 12px;padding:10px 12px;font-size:12.5px;line-height:1.5;color:var(--muted);background:rgba(143,180,255,.07);border:1px solid rgba(143,180,255,.25);border-radius:12px}
 #stSheet .dvimgb{display:flex;flex-direction:column;gap:8px}
-#stSheet .dvimgp{aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden;padding:0 12px;text-align:center;font-size:12px;color:var(--muted);background:rgba(255,255,255,.03);border:1px dashed var(--line);border-radius:10px}
-#stSheet .dvimgp img{display:block;width:100%;height:100%;object-fit:cover}
+#stSheet .dvimgp{min-height:64px;display:grid;place-items:center;overflow:hidden;padding:0 12px;text-align:center;font-size:12px;color:var(--muted);background:rgba(255,255,255,.03);border:1px dashed var(--line);border-radius:10px}
+#stSheet .dvimgp img{display:block;width:160px;height:160px;max-width:100%;object-fit:cover;margin:8px 0}
+#stSheet .dvimgp.crop{display:block;padding:0;border:0;background:none;overflow:visible}
+#stSheet .dvcrop{display:flex;flex-direction:column;align-items:center;gap:8px}
+#stSheet .dvcv{display:block;width:100%;max-width:240px;aspect-ratio:1;border:1px solid rgba(143,180,255,.5);border-radius:12px;background:#0d1017;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent}
+#stSheet .dvcv:active{cursor:grabbing}
+#stSheet .dvcv:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#stSheet .dvcz{display:flex;align-items:center;gap:8px;width:100%;max-width:240px;font-size:11.5px;color:var(--muted)}
+#stSheet .dvcz input{flex:1;min-width:0;accent-color:#d4a94f}
 #stSheet .dvimga{display:flex;gap:8px;flex-wrap:wrap}
 #stSheet .dvimga [hidden]{display:none}
 #stSheet .dvprev{margin:0 0 4px}
@@ -3391,7 +3401,7 @@ window.stVer = (function(){
 })();
 /* ===== Konten Sponsor (iklan atau endorse dari pihak luar, bukan AdMob) =====
    Data: Firestore "sponsors/{id}" = {name, title:{id,en}, text:{id,en}, url, cta, from, until, img, iv, by, t}
-         dan "sponsorImg/{id}" = {d, iv}: gambar JPEG 630x270 (7:3) sebagai teks base64, hanya diunduh bila versinya (iv) berubah.
+         dan "sponsorImg/{id}" = {d, iv}: gambar JPEG persegi 400x400 sebagai teks base64, hanya diunduh bila versinya (iv) berubah.
    Semua orang boleh membaca; hanya akun developer yang boleh menulis (aturan database). Tayang bila from <= hari ini <= until menurut jam server (nowMs).
    Label "Bersponsor" ditulis di kode, bukan di teks isi, supaya selalu tampil. Tidak ada pelacakan klik; tautan dibuka di browser hanya setelah tombol diketuk.
    Salinan terakhir ada di localStorage "st_sync_spn_cache" dan "st_sync_spnimg_<id>" (awalan st_sync_ tidak ikut sinkron akun, cadangan, maupun reset). */
@@ -3400,7 +3410,8 @@ let SPN_REMOTE = (function(){ try{ const a = JSON.parse(localStorage.getItem(SPN
 HI.tag = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>';
 HI.ext = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>';
 const spnPad = n => String(n).padStart(2, "0");
-const spnYmd = d => d.getFullYear() + "-" + spnPad(d.getMonth() + 1) + "-" + spnPad(d.getDate());
+/* hari tayang dihitung menurut WIB (UTC+7) di semua perangkat; pergantian hari tepat pukul 00.00 WIB */
+const spnYmd = d => { const w = new Date(d.getTime() + 252e5); return w.getUTCFullYear() + "-" + spnPad(w.getUTCMonth() + 1) + "-" + spnPad(w.getUTCDate()); };
 const spnToday = () => spnYmd(new Date(nowMs()));
 const spnUrlOk = u => { try{ const x = new URL(u); return x.protocol === "https:" && u.length <= 300 && !/\s/.test(u); }catch(e){ return false; } };
 const SPN_DRE = /^\d{4}-\d{2}-\d{2}$/;
@@ -3454,7 +3465,7 @@ function spnCard(it, img, preview){
 const SPN_MAIL = "titikhilangs27@gmail.com";
 /* banner pengganti bila tidak ada iklan sponsor yang tayang: ajakan kerja sama lewat email */
 function spnCollab(){
-  const en = tdEn(), c = hEl("div", "spc");
+  const en = tdEn(), c = hEl("div", "spc spcol");
   const b = hEl("div", "spb", '<div class="spr"><span class="spp">' + HI.tag + '<span></span></span></div><h3></h3><p></p><button type="button" class="spgo"><span></span>' + HI.ext + '</button>');
   b.querySelector(".spp span").textContent = en ? "Partnership" : "Kerja Sama";
   b.querySelector("h3").textContent = en ? "Grow your business with Satu Titik" : "Kembangkan bisnismu bersama Satu Titik";
@@ -3479,6 +3490,16 @@ async function spnSync(force){
                        : m.query(m.collection(db, "sponsors"), m.where("until", ">=", spnToday()), m.orderBy("until"), m.limit(10));
     const sn = await m.getDocs(q);
     SPN_REMOTE = sn.docs.map(d => spnClean(d.id, d.data())).filter(Boolean);
+    /* masa tayang habis: akun developer menghapus permanen data iklan dan gambarnya dari Firestore (cadangan selain TTL) */
+    if(INFO_DEV){
+      const t0 = spnToday(), old = SPN_REMOTE.filter(x => x.until < t0);
+      if(old.length){
+        try{
+          const b = m.writeBatch(db); old.forEach(x => { b.delete(m.doc(db, "sponsors", x.rid)); b.delete(m.doc(db, "sponsorImg", x.rid)); }); await b.commit();
+          const gone = new Set(old.map(x => x.rid)); SPN_REMOTE = SPN_REMOTE.filter(x => !gone.has(x.rid)); old.forEach(x => spnImgDel(x.rid));
+        }catch(e){}
+      }
+    }
     try{ localStorage.setItem(SPN_CK, JSON.stringify(SPN_REMOTE)); }catch(e){}
     renderSpn();
     for(const it of spnActive()){ if(!it.img) continue; const c = spnImgGet(it.rid); if(!c || c.iv !== it.iv){ await spnLoadImg(it); renderSpn(); } }
@@ -3486,29 +3507,31 @@ async function spnSync(force){
   }catch(e){ SPN_LAST = 0; }
 }
 /* gambar dari galeri: dipotong ke 16:9 dari tengah, dikecilkan dan dikompres JPEG sampai <= ±90 KB */
-function spnCompress(file){
+function spnReadImg(file){
   return new Promise((ok, no) => {
     if(!file || !/^image\//.test(file.type || "")) return no(new Error("bukan gambar"));
     const url = URL.createObjectURL(file), im = new Image();
-    im.onload = () => {
-      try{
-        let out = "";
-        for(const wh of [[630, 270], [462, 198]]){
-          const W = wh[0], H = wh[1], c = document.createElement("canvas"); c.width = W; c.height = H;
-          const x = c.getContext("2d"); x.fillStyle = "#0d1017"; x.fillRect(0, 0, W, H);
-          const tr = W / H, sr = im.width / im.height; let sw, sh, sx, sy;
-          if(sr > tr){ sh = im.height; sw = sh * tr; sx = (im.width - sw) / 2; sy = 0; } else { sw = im.width; sh = sw / tr; sx = 0; sy = (im.height - sh) / 2; }
-          x.drawImage(im, sx, sy, sw, sh, 0, 0, W, H);
-          let q = .86, d = c.toDataURL("image/jpeg", q);
-          while(d.length > 90000 && q > .42){ q -= .06; d = c.toDataURL("image/jpeg", q); }
-          if(d.length <= 100000){ out = d; break; }
-        }
-        URL.revokeObjectURL(url); out ? ok(out) : no(new Error("terlalu besar"));
-      }catch(e){ URL.revokeObjectURL(url); no(e); }
-    };
+    im.onload = () => { URL.revokeObjectURL(url); (im.naturalWidth && im.naturalHeight) ? ok(im) : no(new Error("gagal dibaca")); };
     im.onerror = () => { URL.revokeObjectURL(url); no(new Error("gagal dibaca")); };
     im.src = url;
   });
+}
+/* gambar jendela persegi (st.sx, st.sy, st.side, dalam piksel sumber) ke kanvas persegi; bagian di luar gambar diisi warna gelap */
+function spnDraw(c, im, st){
+  const W = c.width, x = c.getContext("2d"), w = im.naturalWidth, h = im.naturalHeight, k = W / st.side;
+  x.fillStyle = "#0d1017"; x.fillRect(0, 0, W, W);
+  const x0 = Math.max(st.sx, 0), y0 = Math.max(st.sy, 0), x1 = Math.min(st.sx + st.side, w), y1 = Math.min(st.sy + st.side, h);
+  if(x1 > x0 && y1 > y0) x.drawImage(im, x0, y0, x1 - x0, y1 - y0, (x0 - st.sx) * k, (y0 - st.sy) * k, (x1 - x0) * k, (y1 - y0) * k);
+}
+/* kompres hasil potongan ke JPEG di bawah ±90 KB (400x400, cadangan 300x300) */
+function spnExport(c, im, st){
+  for(const W of [400, 300]){
+    let cv = c; if(c.width !== W){ cv = document.createElement("canvas"); cv.width = cv.height = W; spnDraw(cv, im, st); }
+    let q = .86, d = cv.toDataURL("image/jpeg", q);
+    while(d.length > 90000 && q > .42){ q -= .06; d = cv.toDataURL("image/jpeg", q); }
+    if(d.length <= 100000) return d;
+  }
+  return "";
 }
 /* panel developer Konten Sponsor: form (dengan pratinjau langsung) + daftar sponsor di server */
 function spnDevOpen(edit){
@@ -3527,30 +3550,68 @@ function spnDevOpen(edit){
     const box = hEl("div", "dvimgb"), pvw = hEl("div", "dvimgp"), acts = hEl("div", "dvimga"), fi = document.createElement("input");
     fi.type = "file"; fi.accept = "image/*"; fi.hidden = true;
     const pick = hEl("button", "dvb sm"), clr = hEl("button", "dvb sm del"); pick.type = clr.type = "button"; pick.textContent = "Pilih gambar dari galeri"; clr.textContent = "Hapus gambar";
-    const hint = hEl("p", "dvh sub"); hint.textContent = "Ukuran saran 630×270 px (rasio 7:3). Gambar lain dipotong otomatis dari tengah, jadi letakkan objek utama di tengah. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
+    const hint = hEl("p", "dvh sub"); hint.textContent = "Ukuran saran 400×400 px (persegi). Gambar yang lebih besar bisa digeser dan di-zoom dulu sebelum diterbitkan. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
     const prev = hEl("div", "dvprev");
     const msg = hEl("p", "dvm"), say = (t, bad) => { msg.textContent = t; msg.className = "dvm" + (bad ? " bad" : ""); };
-    const refresh = () => {
-      pvw.innerHTML = ""; if(img){ const im = document.createElement("img"); im.alt = ""; im.src = img; pvw.appendChild(im); } else pvw.textContent = "Belum ada gambar (kartu tampil tanpa gambar)";
-      clr.hidden = !img;
+    let crop = null;
+    const refreshPrev = () => {
       prev.innerHTML = "";
       prev.appendChild(spnCard({ name: nm.value.trim() || "Nama sponsor", title:{ id: ti.value.trim() || "Judul penawaran", en: te.value.trim() }, text:{ id: xi.value.trim() || "Isi penawaran singkat.", en: xe.value.trim() }, url: "https://contoh.com", cta: ct.value.trim() }, img, true));
     };
-    [nm, ti, te, xi, xe, ct].forEach(e => e.addEventListener("input", refresh));
+    const refresh = () => {
+      pvw.innerHTML = ""; pvw.classList.toggle("crop", !!crop);
+      if(crop) pvw.appendChild(crop);
+      else if(img){ const im = document.createElement("img"); im.alt = ""; im.src = img; pvw.appendChild(im); } else pvw.textContent = "Belum ada gambar (kartu tampil tanpa gambar)";
+      clr.hidden = !img;
+      refreshPrev();
+    };
+    /* pemotong gambar: geser untuk mengatur posisi, slider untuk memperbesar atau memperkecil */
+    const startCrop = im => {
+      const w = im.naturalWidth, h = im.naturalHeight, base = Math.min(w, h), maxSide = Math.max(w, h), zmin = Math.min(1, base / maxSide);
+      const st = { side: base, sx: (w - base) / 2, sy: (h - base) / 2 };
+      const clamp = () => { st.sx = Math.max(Math.min(0, w - st.side), Math.min(Math.max(0, w - st.side), st.sx)); st.sy = Math.max(Math.min(0, h - st.side), Math.min(Math.max(0, h - st.side), st.sy)); };
+      const wrap = hEl("div", "dvcrop"), cv = document.createElement("canvas"); cv.width = cv.height = 400; cv.className = "dvcv"; cv.tabIndex = 0;
+      cv.setAttribute("role", "img"); cv.setAttribute("aria-label", "Pratinjau potongan gambar. Geser atau pakai tombol panah untuk mengatur posisi.");
+      const zw = hEl("label", "dvcz", "<span></span>"), zr = document.createElement("input"); zr.type = "range"; zr.min = String(zmin); zr.max = "3"; zr.step = "0.01"; zr.value = "1";
+      zw.firstChild.textContent = "Zoom"; zw.appendChild(zr);
+      const rs = hEl("button", "dvb sm"); rs.type = "button"; rs.textContent = "Reset posisi";
+      const note = hEl("p", "dvh sub"); note.textContent = "Geser gambar untuk mencari posisi yang pas. Pakai slider untuk memperbesar atau memperkecil.";
+      wrap.append(cv, zw, rs, note);
+      let raf = 0; const draw = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => spnDraw(cv, im, st)); };
+      const commit = () => { spnDraw(cv, im, st); const d = spnExport(cv, im, st); if(!d){ say("Gambar terlalu besar setelah dikompres. Perkecil atau pilih gambar lain.", true); return; } say(""); img = d; imgChanged = true; clr.hidden = false; refreshPrev(); };
+      let drag = null;
+      cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY }; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
+      cv.addEventListener("pointermove", e => {
+        if(!drag) return; const r = cv.getBoundingClientRect(); if(!r.width) return;
+        st.sx -= (e.clientX - drag.x) * st.side / r.width; st.sy -= (e.clientY - drag.y) * st.side / r.height; drag.x = e.clientX; drag.y = e.clientY; clamp(); draw();
+      });
+      const end = () => { if(drag){ drag = null; commit(); } };
+      cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
+      cv.addEventListener("keydown", e => {
+        const dx = e.key === "ArrowLeft" ? -1 : e.key === "ArrowRight" ? 1 : 0, dy = e.key === "ArrowUp" ? -1 : e.key === "ArrowDown" ? 1 : 0; if(!dx && !dy) return;
+        e.preventDefault(); st.sx += dx * st.side * .05; st.sy += dy * st.side * .05; clamp(); draw(); clearTimeout(cv._kt); cv._kt = setTimeout(commit, 250);
+      });
+      zr.addEventListener("input", () => { const cx = st.sx + st.side / 2, cy = st.sy + st.side / 2; st.side = base / (+zr.value || 1); st.sx = cx - st.side / 2; st.sy = cy - st.side / 2; clamp(); draw(); });
+      zr.addEventListener("change", commit);
+      rs.addEventListener("click", () => { st.side = base; st.sx = (w - base) / 2; st.sy = (h - base) / 2; zr.value = "1"; commit(); });
+      commit(); return wrap;
+    };
+    [nm, ti, te, xi, xe, ct].forEach(e => e.addEventListener("input", refreshPrev));
     pick.addEventListener("click", () => fi.click());
     fi.addEventListener("change", async () => {
       const file = fi.files && fi.files[0]; fi.value = ""; if(!file) return;
       say("Memproses gambar…");
-      try{ img = await spnCompress(file); imgChanged = true; say(""); refresh(); }
+      try{ const im = await spnReadImg(file); crop = startCrop(im); refresh(); }
       catch(e){ say("Gambar tidak bisa dipakai. Coba format JPG atau PNG yang lain.", true); }
     });
-    clr.addEventListener("click", () => { img = ""; imgChanged = true; refresh(); });
+    clr.addEventListener("click", () => { img = ""; crop = null; imgChanged = true; refresh(); });
     acts.append(pick, clr, fi); box.append(pvw, acts, hint);
     if(edit && edit.img){ spnLoadImg(edit).then(d => { if(d && !imgChanged){ img = d; refresh(); } }); }
     const ck = hEl("label", "dvck", '<input type="checkbox"><span></span>'); ck.lastChild.textContent = "Saya memastikan konten ini bukan judi, pinjaman online ilegal, atau konten dewasa, dan sesuai kebijakan Google Play.";
     const go = hEl("button", "dvb pri"); go.type = "button"; go.textContent = edit ? "Simpan perubahan" : "Terbitkan";
     const dh1 = hEl("p", "dvh"); dh1.textContent = "Pratinjau (tampilan di beranda)";
-    f.append(fld("Nama sponsor", nm), fld("Judul (Indonesia)", ti), fld("Judul (English)", te), fld("Isi (Indonesia)", xi), fld("Isi (English)", xe), fld("Gambar", box), fld("Link produk (wajib https://)", ur), fld("Teks tombol (kosong = Kunjungi)", ct), fld("Tayang mulai", df), fld("Tayang sampai", du), dh1, prev, ck, msg, go);
+    const cl = hEl("button", "dvb"); cl.type = "button"; cl.textContent = "Tutup panel"; cl.addEventListener("click", stClose);
+    f.append(fld("Nama sponsor", nm), fld("Judul (Indonesia)", ti), fld("Judul (English)", te), fld("Isi (Indonesia)", xi), fld("Isi (English)", xe), fld("Gambar", box), fld("Link produk (wajib https://)", ur), fld("Teks tombol (kosong = Kunjungi)", ct), fld("Tayang mulai", df), fld("Tayang sampai", du), dh1, prev, ck, msg, go, cl);
     if(edit){ const cb = hEl("button", "dvb"); cb.type = "button"; cb.textContent = "Batal ubah"; cb.addEventListener("click", () => spnDevOpen()); f.append(cb); }
     go.addEventListener("click", async () => {
       const hasImg = imgChanged ? !!img : !!(edit && edit.img);
@@ -3566,9 +3627,11 @@ function spnDevOpen(edit){
         const { m, db } = await A.getDb();
         const ref = edit && edit.rid ? m.doc(db, "sponsors", edit.rid) : m.doc(m.collection(db, "sponsors")), id = ref.id;
         const iv = !hasImg ? 0 : (imgChanged ? Date.now() : (edit.iv || Date.now()));
-        const data = Object.assign(d, { iv: iv, by: u.uid, t: Date.now() });
+        const exp = new Date(Date.UTC(+d.until.slice(0, 4), +d.until.slice(5, 7) - 1, +d.until.slice(8, 10) + 1) - 252e5);   /* tepat 00.00 WIB sehari setelah hari tayang terakhir: iklan lepas dari tayang dan boleh dihapus (dihapus Worker terjadwal) */
+        const data = Object.assign(d, { iv: iv, by: u.uid, t: Date.now(), exp: exp });
         const b = m.writeBatch(db); b.set(ref, data);
-        if(imgChanged){ if(img) b.set(m.doc(db, "sponsorImg", id), { d: img, iv: iv }); else b.delete(m.doc(db, "sponsorImg", id)); }
+        if(imgChanged){ if(img) b.set(m.doc(db, "sponsorImg", id), { d: img, iv: iv, exp: exp }); else b.delete(m.doc(db, "sponsorImg", id)); }
+        else if(hasImg) b.set(m.doc(db, "sponsorImg", id), { exp: exp }, { merge: true });
         await b.commit();
         if(imgChanged){ if(img) spnImgSet(id, iv, img); else spnImgDel(id); }
         await spnSync(true); spnDevOpen();
@@ -3612,7 +3675,8 @@ function infoDevOpen(edit){
     const xi = inp(true, cur.text && cur.text.id, 300, "Isi 1-2 kalimat"), xe = inp(true, cur.text && cur.text.en, 300, "Text (English, optional)");
     const msg = hEl("p", "dvm"), say = (t, bad) => { msg.textContent = t; msg.className = "dvm" + (bad ? " bad" : ""); };
     const go = hEl("button", "dvb pri"); go.type = "button"; go.textContent = edit ? "Simpan perubahan" : "Terbitkan";
-    f.append(fld("Tanggal", dt), fld("Jenis ikon", ic), fld("Judul (Indonesia)", ti), fld("Judul (English)", te), fld("Isi (Indonesia)", xi), fld("Isi (English)", xe), msg, go);
+    const cl = hEl("button", "dvb"); cl.type = "button"; cl.textContent = "Tutup panel"; cl.addEventListener("click", stClose);
+    f.append(fld("Tanggal", dt), fld("Jenis ikon", ic), fld("Judul (Indonesia)", ti), fld("Judul (English)", te), fld("Isi (Indonesia)", xi), fld("Isi (English)", xe), msg, go, cl);
     if(edit){ const cb = hEl("button", "dvb"); cb.type = "button"; cb.textContent = "Batal ubah"; cb.addEventListener("click", () => infoDevOpen()); f.append(cb); }
     go.addEventListener("click", async () => {
       const d = { date: dt.value, icon: ic.value, title:{ id: ti.value.trim(), en: te.value.trim() }, text:{ id: xi.value.trim(), en: xe.value.trim() } };
@@ -3741,6 +3805,16 @@ function renderInfo(){
 }
 function renderHome2(){ renderRcnt(); renderRecd(); renderTagl(); renderInfo(); try{ infoSync(false); }catch(e){} try{ spnSync(false); }catch(e){} }
 renderHome2();
+/* tepat 00.00 WIB: iklan yang masa tayangnya habis langsung hilang dari beranda, lalu dihapus dari Firestore (pengguna yang sedang online mulai dengan jeda acak agar tidak serentak) */
+function spnMidnight(){
+  const now = nowMs(), next = (Math.floor((now + 252e5) / 864e5) + 1) * 864e5 - 252e5;
+  setTimeout(async () => {
+    try{ renderInfo(); }catch(e){}
+    try{ if(!INFO_DEV) await new Promise(r => setTimeout(r, Math.random() * 30000)); await spnSync(true); }catch(e){}
+    spnMidnight();
+  }, Math.max(1000, next - now) + 1500);
+}
+spnMidnight();
 addEventListener("hashchange", () => { try{ setTimeout(renderHome2, 80); }catch(e){} });
 document.addEventListener("visibilitychange", () => { try{ if(!document.hidden && !$("home").hidden) renderHome2(); }catch(e){} });
 /* Bagian "Lanjutkan" dihapus dari beranda: wadah #recent tidak lagi dibuat, renderRecent() otomatis berhenti karena wadahnya tidak ada. */
