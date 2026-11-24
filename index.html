@@ -27932,10 +27932,10 @@ if(navigator.onLine !== false) init().catch(() => {});
 #hTutBtn{font:inherit;font-size:13px;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--gold2);cursor:pointer}
 #hTutBtn:active{border-color:var(--gold)}
 #hTutBtn:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
-#hTutO{position:fixed;top:0;left:0;right:0;bottom:0;z-index:70;touch-action:none}
+#hTutO{position:fixed;top:0;left:0;right:0;bottom:calc(var(--adh,0px) + env(safe-area-inset-bottom,0px));z-index:70;touch-action:none}
 #hTutO.dim{background:rgba(5,7,12,.8)}
 #hTutH{position:fixed;display:none;border-radius:14px;border:2px solid var(--gold);box-shadow:0 0 0 100vmax rgba(5,7,12,.8);pointer-events:none;transition:left .22s,top .22s,width .22s,height .22s}
-#hTutC{position:fixed;width:min(320px,calc(100vw - 24px));max-height:calc(100vh - 16px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:14px;background:var(--bg2);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.6);animation:hTutRise .25s ease-out}
+#hTutC{position:fixed;width:min(320px,calc(100vw - 24px));max-height:calc(100vh - 16px - var(--adh,0px) - env(safe-area-inset-bottom,0px));overflow:auto;display:flex;flex-direction:column;gap:8px;padding:14px;background:var(--bg2);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.6);animation:hTutRise .25s ease-out}
 #hTutC b.hTt{font-size:15px;color:var(--gold2)}
 #hTutC p{margin:0;font-size:13.5px;line-height:1.5;color:var(--text)}
 #hTutC .tutf{display:flex;align-items:center;gap:8px;margin-top:4px}
@@ -27944,6 +27944,14 @@ if(navigator.onLine !== false) init().catch(() => {});
 #hTutC .tutf .tnx{border:0;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405}
 #hTutC .tutf .tsk{border-color:rgba(240,207,134,.6);color:var(--gold2);font-weight:500;padding:8px 12px}
 #hTutC .tutf button:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+/* ===== Aman dari banner AdMob: panel, sheet, dan lapisan layar penuh di beranda berhenti tepat di atas banner (--adh = tinggi banner, 0 bila tanpa banner) ===== */
+#favSheet,#stSheet{bottom:var(--adh,0px)}
+#favSheet .fsp,#stSheet .fsp{max-height:calc(84vh - var(--adh,0px))}
+#frpanel{max-height:calc(100% - 70px - var(--adh,0px) - env(safe-area-inset-bottom,0px))}
+#view > #bellPanel{max-height:calc(100% - 70px - var(--adh,0px) - env(safe-area-inset-bottom,0px))}
+.frlb{bottom:var(--adh,0px)}
+#alock,#alVerify{bottom:var(--adh,0px)}
+#alToast{bottom:calc(28px + var(--adh,0px) + env(safe-area-inset-bottom,0px))}
 @keyframes hTutRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media (prefers-reduced-motion:reduce){#hTutC{animation:none}#hTutH{transition:none}}
 </style>
@@ -28136,9 +28144,11 @@ function target(s){ return s && s.q ? document.querySelector(s.q) : null; }
 function place(){
   if(!tu) return;
   var s = tu.s[tu.i], o = $("hTutO"), h = $("hTutH"), c = $("hTutC"); if(!o || !h || !c) return;
-  var vw = window.innerWidth, vh = window.innerHeight, cw = c.offsetWidth, ch = c.offsetHeight, y, e = target(s);
+  var vw = o.clientWidth || window.innerWidth, vh = o.clientHeight || window.innerHeight, cw = c.offsetWidth, ch = c.offsetHeight, y, e = target(s);   /* tinggi area tersedia = layar dikurangi banner AdMob (overlay berhenti tepat di atas banner) */
   if(e && vis(e)){
     var r = e.getBoundingClientRect(), p = 6; o.className = ""; h.style.display = "block";
+    /* target berada di bawah batas banner: gulir sekali ke tengah area yang terlihat, lalu ukur ulang */
+    if(r.bottom + p > vh && r.height < vh * 0.8 && tu.fx !== tu.i){ tu.fx = tu.i; try{ e.scrollIntoView({ block:"center", inline:"nearest" }); }catch(x){} r = e.getBoundingClientRect(); }
     h.style.left = (r.left - p) + "px"; h.style.top = (r.top - p) + "px"; h.style.width = (r.width + p * 2) + "px"; h.style.height = (r.height + p * 2) + "px";
     if(s.pos === "bot") y = Math.max(8, vh - ch - 8);
     else if(vh - (r.bottom + p) - 12 >= ch) y = r.bottom + p + 12;
