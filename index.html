@@ -2268,6 +2268,42 @@ function stBackHelper(){
   };
 }
 const ST_BACK = "<scr" + "ipt>(" + stBackHelper.toString() + ")();<\/scr" + "ipt>";
+/* Perbaikan sorotan tutorial: kotak sorotan harus pas melingkari elemen yang dijelaskan di semua menu.
+   1) "Ukuran huruf" (90% atau 115%) memasang html{zoom}. getBoundingClientRect ikut terskala, sedangkan kotak sorotan (position:fixed)
+      di dokumen yang sama dikali zoom sekali lagi, sehingga kotak bergeser. Faktor skala diukur langsung lalu dibatalkan di lapisan tutorial (--tz).
+   2) Saat layar atau kotak isi di-scroll, posisi dihitung ulang seketika (lewat event resize yang sudah dipakai semua tutorial)
+      dan animasi gerak kotak dimatikan sebentar supaya kotak tidak tertinggal di belakang elemennya. */
+function tutFixHelper(){
+  try{
+    var d = document, root = d.documentElement, W = window, raf = 0, tm = 0;
+    function k(){
+      var p = d.createElement("div"), w = 0;
+      p.style.cssText = "position:absolute;left:0;top:0;width:100px;height:1px;visibility:hidden;pointer-events:none";
+      try{ (d.body || root).appendChild(p); w = p.getBoundingClientRect().width; }catch(e){}
+      try{ p.remove(); }catch(e){}
+      return w > 0 ? w / 100 : 1;
+    }
+    function sync(){ try{ var z = k(); root.style.setProperty("--tz", Math.abs(z - 1) < 0.005 ? "1" : String(1 / z)); }catch(e){} }
+    function live(){ return d.getElementById("tutO") || d.getElementById("tutP"); }
+    function onScroll(){
+      if(!live()) return;
+      var h = d.getElementById("tutH");
+      if(h){ h.style.transition = "none"; clearTimeout(tm); tm = setTimeout(function(){ var x = d.getElementById("tutH"); if(x) x.style.transition = ""; }, 180); }
+      if(raf) return;
+      raf = requestAnimationFrame(function(){ raf = 0; try{ W.dispatchEvent(new Event("resize")); }catch(e){} });
+    }
+    function boot(){
+      sync();
+      try{ var ap = d.getElementById("thAp"); if(ap) new MutationObserver(sync).observe(ap, {childList:true, characterData:true, subtree:true}); }catch(e){}
+      try{ if(d.body) new MutationObserver(function(ms){ for(var i = 0; i < ms.length; i++) for(var j = 0; j < ms[i].addedNodes.length; j++){ var n = ms[i].addedNodes[j]; if(n.id === "tutO" || n.id === "tutP" || n.id === "tutB"){ sync(); return; } } }).observe(d.body, {childList:true}); }catch(e){}
+    }
+    W.addEventListener("resize", sync);
+    W.addEventListener("load", sync);
+    d.addEventListener("scroll", onScroll, true);
+    if(d.readyState === "loading") d.addEventListener("DOMContentLoaded", boot); else boot();
+  }catch(e){}
+}
+const ST_TUTFIX = "<style>#tutO,#tutP,#tutB{zoom:var(--tz,1)}</style><scr" + "ipt>(" + tutFixHelper.toString() + ")();<\/scr" + "ipt>";
 /* Bagikan gambar di aplikasi Android (Capacitor): WebView tidak punya navigator.share untuk file, jadi gambar disimpan ke cache
    lewat plugin Filesystem lalu dibuka di lembar bagikan lewat plugin Share. Di web/PWA fungsi ini mengembalikan false dan jalur biasa dipakai. */
 /* Lembar pilihan "Bagikan" (gambar atau PDF): satu tombol saja di menu, pilihannya muncul di lembar dari bawah. Dipakai semua menu dan Turnamen. */
@@ -2706,7 +2742,7 @@ function stShareHelper(){
 }
 const ST_SHARE = "<scr" + "ipt>(" + stShareHelper.toString() + ")();<\/scr" + "ipt>";
 function menuSrc(m){
-  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}/* lebar isi menu mengikuti layar HP (tablet dibatasi 560px); panel bawah dan bilah otomatis ikut selebar isi */ body:not(.stage) .app{max-width:min(100%,560px)!important}#inPanel,.autobar,.quickadd{max-width:min(calc(100% - 24px),536px)!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK + (m.id === "turnamen" || m.id === "stopwatch" || m.id === "sholat" || m.id === "catatan" ? "" : ST_SHARE), i = s.indexOf("</head>");
+  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}/* lebar isi menu mengikuti layar HP (tablet dibatasi 560px); panel bawah dan bilah otomatis ikut selebar isi */ body:not(.stage) .app{max-width:min(100%,560px)!important}#inPanel,.autobar,.quickadd{max-width:min(calc(100% - 24px),536px)!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK + ST_TUTFIX + (m.id === "turnamen" || m.id === "stopwatch" || m.id === "sholat" || m.id === "catatan" ? "" : ST_SHARE), i = s.indexOf("</head>");
   return i < 0 ? css + s : s.slice(0, i) + css + s.slice(i);
 }
 writeKeys(S); paintPanel();
