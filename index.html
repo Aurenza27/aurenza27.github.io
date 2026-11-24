@@ -825,6 +825,18 @@ h1{font-size:26px;line-height:1.15}
 #infc .spc h3{margin:1px 0 0;font-size:13.5px}
 #infc .spc p{font-size:12px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 #infc .spc .spgo{width:auto;align-self:flex-start;min-height:30px;margin-top:2px;padding:0 14px;font-size:12.5px;border-radius:10px}
+/* Teks panjang di slide pengumuman & sponsor: tinggi kartu tetap, isi bisa digulir ke bawah secara manual (tanpa dipotong "...") */
+#infc .it{min-height:0;overflow:hidden}
+#infc .it .ir{flex:none}
+#infc .it p,#infc .spc .spb p{display:block;-webkit-line-clamp:unset;-webkit-box-orient:unset;flex:1 1 auto;min-height:2.8em;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:auto;-webkit-overflow-scrolling:touch;padding-right:4px;scrollbar-width:thin;scrollbar-color:rgba(240,207,134,.55) transparent}
+#infc .it p::-webkit-scrollbar,#infc .spc .spb p::-webkit-scrollbar{width:3px}
+#infc .it p::-webkit-scrollbar-thumb,#infc .spc .spb p::-webkit-scrollbar-thumb{background:rgba(240,207,134,.55);border-radius:3px}
+#infc .spc .spb .spr,#infc .spc .spb h3,#infc .spc .spb .spgo{flex:none}
+.spc .spa{flex:none;display:flex;align-items:center;gap:8px;min-width:0}
+.spc .spa .spgo{flex:none}
+.spc .spt{flex:1;min-width:0;font-size:11px;font-variant-numeric:tabular-nums;color:#9fbcf5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#infc .spc .spa{margin-top:2px}
+#infc .spc .spa .spgo{margin-top:0}
 #infc .sdots{margin-top:6px}
 #spnc{border-color:rgba(143,180,255,.3)}
 #spnc .hh .hi,#spnc .hh b,#spnc .hh .hl{color:#9fbcf5}
@@ -3458,10 +3470,26 @@ function spnCard(it, img, preview){
     const g = hEl("button", "spgo", "<span></span>" + HI.ext); g.type = "button"; g.firstChild.textContent = lbl;
     g.setAttribute("aria-label", lbl + (en ? " (opens in browser)" : " (dibuka di browser)"));
     if(!preview) g.addEventListener("click", () => spnOpen(it.url));
-    b.appendChild(g);
+    const row = hEl("div", "spa"); row.appendChild(g);
+    const endMs = spnEndMs(it.until);
+    if(endMs){ const t = hEl("span", "spt"); t.dataset.end = String(endMs); t.setAttribute("role", "timer"); row.appendChild(t); spnTickOne(t); }
+    b.appendChild(row);
   }
   c.appendChild(b); return c;
 }
+/* hitung mundur masa tayang: iklan tayang sampai pukul 00.00 WIB sehari setelah tanggal "until" (sama dengan pergantian hari di spnToday) */
+function spnEndMs(until){
+  if(!SPN_DRE.test(String(until || ""))) return 0;
+  const p = until.split("-").map(Number); return Date.UTC(p[0], p[1] - 1, p[2] + 1) - 252e5;
+}
+function spnTickOne(el){
+  const en = tdEn(), left = +el.dataset.end - nowMs();
+  if(!(left > 0)){ el.textContent = en ? "Ended" : "Berakhir"; return; }
+  const sec = Math.floor(left / 1000), d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+  el.textContent = d >= 1 ? (en ? "Ends in " + d + "d " + h + "h" : "Sisa " + d + " hr " + h + " j")
+                          : (en ? "Ends in " : "Sisa ") + spnPad(h) + ":" + spnPad(m) + ":" + spnPad(s);
+}
+setInterval(() => { if(document.hidden) return; document.querySelectorAll(".spt[data-end]").forEach(spnTickOne); }, 1000);
 const SPN_MAIL = "titikhilangs27@gmail.com";
 /* banner pengganti bila tidak ada iklan sponsor yang tayang: ajakan kerja sama lewat email */
 function spnCollab(){
@@ -3797,6 +3825,8 @@ function renderInfo(){
   sld.addEventListener("touchstart", () => { touching = true; last = Date.now(); }, { passive: true });
   ["touchend", "touchcancel"].forEach(ev => sld.addEventListener(ev, () => { touching = false; last = Date.now(); clearTimeout(fixTm); fixTm = setTimeout(fix, 200); }, { passive: true }));
   ["pointerdown", "focusin", "wheel"].forEach(ev => sld.addEventListener(ev, () => { last = Date.now(); }, { passive: true }));
+  /* pengguna sedang menggulir teks di dalam slide: tahan geser otomatis */
+  sld.addEventListener("scroll", e => { if(e.target !== sld) last = Date.now(); }, { capture: true, passive: true });
   const keep = Math.min(INFO_IDX, n - 1); mark(keep); sld.style.scrollSnapType = "none"; sld.scrollLeft = (keep + 1) * step(); requestAnimationFrame(() => { sld.style.scrollSnapType = ""; });
   if(!reduce) INFO_TM = setInterval(() => {
     const hm = $("home"); if(document.hidden || (hm && hm.hidden) || !sld.isConnected || touching || Date.now() - last < 8000) return;
