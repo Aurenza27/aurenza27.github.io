@@ -14666,6 +14666,11 @@ input.txt:focus{outline:2px solid var(--gold);outline-offset:1px}
 .chips{display:flex;gap:6px;overflow-x:auto;margin:2px 0 10px;padding-bottom:2px}
 .chip{flex:0 0 auto;min-height:34px;padding:0 12px;font:inherit;font-size:13px;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:999px;cursor:pointer}
 .chip:active{background:rgba(212,169,79,.14)}
+.cust{display:flex;gap:6px;align-items:center;margin:0 0 10px}
+.cust input{flex:1;min-width:0;min-height:40px;font:inherit;font-size:15px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0 12px;color-scheme:dark}
+.cust input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.cust .seg button{min-height:34px}
+.cust .chip{background:var(--gold);color:#1a1405;border-color:var(--gold);font-weight:700}
 input.txt{width:100%;min-height:44px;font:inherit;font-size:15px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0 12px;color-scheme:dark}
 .go{width:100%;min-height:48px;font:inherit;font-size:15px;font-weight:700;letter-spacing:.08em;color:#1a1405;background:var(--gold);border:0;border-radius:12px;cursor:pointer}
 .go:active{opacity:.85}
@@ -14729,6 +14734,7 @@ input.nm:focus{outline:0;border-bottom-color:var(--gold)}
       <div><span class="lb" id="lbE"></span><div class="tp" id="te"></div></div>
     </div>
     <div class="chips" id="chips"></div>
+    <div class="cust"><input type="text" id="cuV" inputmode="decimal" autocomplete="off" maxlength="6"><div class="seg" id="cuU"><button type="button" data-u="m"></button><button type="button" data-u="h"></button></div><button type="button" class="chip" id="cuB"></button></div>
     <input class="txt" type="text" id="lb" maxlength="40">
     <div class="sum" id="dur" aria-live="polite"></div>
     <p class="hint" id="clk" style="text-align:center;margin:8px 0 0"></p>
@@ -14883,6 +14889,25 @@ function preview(){
   var st=r.st<=now?L("sedang berjalan","running"):L("menunggu","waiting");
   e.innerHTML=sumRow(L("Durasi","Duration"),"<b>"+words(r.en-r.st)+"</b>")+sumRow(L("Mulai","Start"),dl(r.st)+" "+hm(r.st)+" <i>· "+st+"</i>")+sumRow(L("Selesai","End"),dl(r.en)+" "+hm(r.en))
 }
+var cuUnit="m";
+function cuUi(){var b=$("cuU").querySelectorAll("button"),i;for(i=0;i<b.length;i++)b[i].className=b[i].getAttribute("data-u")===cuUnit?"on":""}
+function cuApply(q){
+  var raw=$("cuV").value.trim().toLowerCase().replace(",","."),u=cuUnit,mt;
+  /* boleh diketik langsung dengan satuan: 45, 45m, 2j, 1.5 jam, 1h30m */
+  mt=raw.match(/^(\d+)\s*(?:j|jam|h|hr|hour|hours)\s*(\d+)\s*(?:m|mnt|menit|min|minute|minutes)?$/);
+  var n;
+  if(mt){n=Math.round(+mt[1]*60+ +mt[2])}
+  else{
+    mt=raw.match(/^(\d+(?:\.\d+)?)\s*(j|jam|h|hr|hour|hours|m|mnt|menit|min|minute|minutes)?$/);
+    if(!mt){if(!q)toast(L("Ketik angka saja, mis. 45 atau 1.5","Type a number, e.g. 45 or 1.5"));return}
+    if(mt[2])u=/^(j|jam|h|hr|hour|hours)$/.test(mt[2])?"h":"m";
+    n=Math.round(+mt[1]*(u==="h"?60:1))
+  }
+  if(!(n>=1)){if(!q)toast(L("Durasi minimal 1 menit","Minimum duration is 1 minute"));return}
+  if(n>1439){if(!q)toast(L("Maksimal 23 jam 59 menit","Maximum is 23 h 59 min"));return}
+  TE.value=addMin(TS.value||nowHM(0),n);AUTO.e=n;preview();
+  if(!q)toast(L("Durasi: ","Duration: ")+words(n*60000))
+}
 function resetForm(){AUTO={s:true,e:60};TS.value=nowHM(0);TE.value=addMin(nowHM(0),60);$("lb").value="";preview()}
 function layout(){
   var has=D.items.length>0;
@@ -14901,13 +14926,17 @@ function text(){
   $("go").textContent=L("TAMBAH","ADD");
   $("clr").textContent=L("Hapus yang sudah selesai","Remove finished ones");rstLabel();if(TU_UI)tuLabel();
   var c=$("chips");c.innerHTML="";
-  [[0,L("Mulai sekarang","Start now")],[15,"+15m"],[30,"+30m"],[60,"+1"+L("j","h")],[120,"+2"+L("j","h")]].forEach(function(o){
+  [[0,L("Mulai sekarang","Start now")],[30,"30 "+L("menit","min")],[60,"1 "+L("jam","hour")],[120,"2 "+L("jam","hours")]].forEach(function(o){
     var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=o[1];
     b.onclick=function(){
       if(o[0]===0){var s=nowHM(0),dd=(TE.value&&TS.value)?calc(TS.value,TE.value):null;var len=dd?Math.round((dd.en-dd.st)/60000):60;TS.value=s;TE.value=addMin(s,len);AUTO={s:true,e:len}}
       else{TE.value=addMin(TS.value||nowHM(0),o[0]);AUTO.e=o[0]}
       preview()};
     c.appendChild(b)});
+  $("cuV").placeholder=L("Ketik durasi, mis. 45","Type duration, e.g. 45");
+  $("cuU").querySelector('[data-u="m"]').textContent=L("menit","min");
+  $("cuU").querySelector('[data-u="h"]').textContent=L("jam","hours");
+  $("cuB").textContent=L("Atur","Set");cuUi();
   var n=nat();
   $("env").textContent=n?L("Di aplikasi Android, alarm tetap berbunyi walau aplikasi ditutup atau layar terkunci. Penanda tampil di beranda HP saat timer berjalan.","On the Android app, the alarm still rings when the app is closed or the screen is locked. An indicator shows on the phone’s home screen while a timer runs."):L("Versi web: izinkan notifikasi dan biarkan halaman terbuka. Untuk alarm yang pasti berbunyi, pakai aplikasi Android.","Web version: allow notifications and keep the page open. For alarms that always ring, use the Android app.");
   preview();layout();paint()
@@ -15101,7 +15130,12 @@ window.addEventListener("storage",function(e){
   if(!e.key||e.key==="titikhilangs_settings"){syncSnd()}
 });
 document.addEventListener("visibilitychange",function(){if(!document.hidden)tick();webRun()});
-rl();rf();load();TS=mkPicker($("ts"),function(){AUTO.s=false;preview()});TE=mkPicker($("te"),function(){AUTO.e=null;preview()});
+rl();rf();load();
+$("cuB").onclick=function(){cuApply()};
+$("cuV").addEventListener("input",function(){cuApply(true)});
+$("cuV").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();cuApply();$("cuV").blur()}});
+$("cuU").addEventListener("click",function(e){var u=e.target.getAttribute&&e.target.getAttribute("data-u");if(u){cuUnit=u;cuUi();cuApply(true)}});
+TS=mkPicker($("ts"),function(){AUTO.s=false;preview()});TE=mkPicker($("te"),function(){AUTO.e=null;preview()});
 ["pointerdown","touchstart","scroll","wheel"].forEach(function(ev){$("setup").addEventListener(ev,function(){lastTouch=Date.now()},true)});
 $("fmtBox").onclick=function(e){var f=e.target&&e.target.getAttribute&&e.target.getAttribute("data-f");if(f&&f!==fmt)setFmt(f)};
 try{window.parent.stClock.resync()}catch(e){}
