@@ -918,6 +918,22 @@ h1{font-size:26px;line-height:1.15}
 #stSheet .dvcv:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
 #stSheet .dvcz{display:flex;align-items:center;gap:8px;width:100%;max-width:240px;font-size:11.5px;color:var(--muted)}
 #stSheet .dvcz input{flex:1;min-width:0;accent-color:#d4a94f}
+/* Sponsor format "Banner saja": gambar memenuhi seluruh panel, tanpa judul/deskripsi/tombol; seluruh banner bisa diketuk */
+.spc.spfull{position:relative;display:block;width:100%;margin:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;background:#0d1017;aspect-ratio:16/7;-webkit-tap-highlight-color:transparent}
+#infc .spc.spfull{aspect-ratio:auto}
+.spc.spfull img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover}
+.spc.spfull .spp{position:absolute;top:8px;left:8px;z-index:1;padding:2px 7px;font-size:9.5px;background:rgba(13,16,23,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.spc.spfull:focus-visible{outline:2px solid #9fbcf5;outline-offset:2px}
+/* panel developer: pilihan format sponsor */
+#stSheet .dvf [hidden]{display:none!important}
+#stSheet .dvmode{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#stSheet .dvmo{display:flex;flex-direction:column;gap:2px;align-items:flex-start;padding:10px;text-align:left;font:inherit;color:var(--text);background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#stSheet .dvmo b{font-size:12.5px}
+#stSheet .dvmo small{font-size:11px;line-height:1.35;color:var(--muted)}
+#stSheet .dvmo[aria-checked=true]{border-color:rgba(143,180,255,.7);background:rgba(143,180,255,.12)}
+#stSheet .dvmo:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#stSheet .dvcv.wide{max-width:100%;aspect-ratio:16/7}
+#stSheet .dvimgp.wide img{width:100%;height:auto;aspect-ratio:16/7;margin:8px 0}
 #stSheet .dvimga{display:flex;gap:8px;flex-wrap:wrap}
 #stSheet .dvimga [hidden]{display:none}
 #stSheet .dvprev{margin:0 0 4px}
@@ -3644,7 +3660,9 @@ window.stVer = (function(){
   };
 })();
 /* ===== Konten Sponsor (iklan atau endorse dari pihak luar, bukan AdMob) =====
-   Data: Firestore "sponsors/{id}" = {name, title:{id,en}, text:{id,en}, url, cta, from, until, img, iv, by, t}
+   Data: Firestore "sponsors/{id}" = {mode:"card"|"full", name, title:{id,en}, text:{id,en}, url, cta, from, until, img, iv, by, t}
+         mode "card" = banner + deskripsi (gambar persegi 400x400 + judul, isi, tombol); mode "full" = banner gambar saja (800x350, memenuhi panel, title/text/cta kosong, seluruh banner bisa diketuk).
+         Dokumen lama tanpa field mode dianggap "card".
          dan "sponsorImg/{id}" = {d, iv}: gambar JPEG persegi 400x400 sebagai teks base64, hanya diunduh bila versinya (iv) berubah.
    Semua orang boleh membaca; hanya akun developer yang boleh menulis (aturan database). Tayang bila from <= hari ini <= until menurut jam server (nowMs).
    Label "Bersponsor" ditulis di kode, bukan di teks isi, supaya selalu tampil. Tidak ada pelacakan klik; tautan dibuka di browser hanya setelah tombol diketuk.
@@ -3662,9 +3680,10 @@ const SPN_DRE = /^\d{4}-\d{2}-\d{2}$/;
 function spnClean(rid, d){
   if(!d || typeof d !== "object") return null;
   const t = d.title || {}, x = d.text || {};
-  const o = { rid: rid, name: infoStr(d.name, 40), title:{ id: infoStr(t.id, 80), en: infoStr(t.en, 80) }, text:{ id: infoStr(x.id, 300), en: infoStr(x.en, 300) },
+  const mode = d.mode === "full" ? "full" : "card";
+  const o = { rid: rid, mode: mode, name: infoStr(d.name, 40), title:{ id: infoStr(t.id, 80), en: infoStr(t.en, 80) }, text:{ id: infoStr(x.id, 300), en: infoStr(x.en, 300) },
     url: infoStr(d.url, 300), cta: infoStr(d.cta, 20), from: infoStr(d.from, 10), until: infoStr(d.until, 10), img: d.img === true, iv: +d.iv || 0, ts: +d.t || 0 };
-  return (o.name && o.title.id && o.text.id && spnUrlOk(o.url) && SPN_DRE.test(o.from) && SPN_DRE.test(o.until)) ? o : null;
+  return (o.name && (mode === "full" ? o.img : (o.title.id && o.text.id)) && spnUrlOk(o.url) && SPN_DRE.test(o.from) && SPN_DRE.test(o.until)) ? o : null;
 }
 function spnImgGet(id){ try{ const j = JSON.parse(localStorage.getItem(SPN_IK + id) || "null"); return (j && typeof j.d === "string" && /^data:image\/jpeg;base64,/.test(j.d)) ? j : null; }catch(e){ return null; } }
 function spnImgSet(id, iv, d){ try{ localStorage.setItem(SPN_IK + id, JSON.stringify({ iv: iv, d: d })); }catch(e){} }
@@ -3692,6 +3711,14 @@ function spnActive(){
 function spnOpen(u){ if(!spnUrlOk(u)) return; try{ window.open(u, "_blank", "noopener,noreferrer"); }catch(e){} }
 function spnCard(it, img, preview){
   const en = tdEn(), tx = o => o ? (o[en ? "en" : "id"] || o.id || "") : "", lbl = it.cta || (en ? "Visit" : "Kunjungi");
+  if(it.mode === "full"){
+    const f = hEl("button", "spc spfull"); f.type = "button";
+    if(img && /^data:image\/jpeg;base64,/.test(img)){ const im = document.createElement("img"); im.alt = ""; im.decoding = "async"; im.src = img; f.appendChild(im); }
+    const sp = hEl("span", "spp", HI.tag + "<span></span>"); sp.lastChild.textContent = en ? "Sponsored" : "Bersponsor"; f.appendChild(sp);
+    f.setAttribute("aria-label", (it.name || "") + " · " + (en ? "Sponsored" : "Bersponsor") + (en ? " (opens in browser)" : " (dibuka di browser)"));
+    if(!preview) f.addEventListener("click", () => spnOpen(it.url));
+    return f;
+  }
   const c = hEl("div", "spc");
   if(img && /^data:image\/jpeg;base64,/.test(img)){ const w = hEl("div", "spi"), im = document.createElement("img"); im.alt = ""; im.decoding = "async"; im.src = img; w.appendChild(im); c.appendChild(w); }
   const b = hEl("div", "spb", '<div class="spr"><span class="spp">' + HI.tag + '<span></span></span><span class="spn"></span></div><h3></h3><p></p>');
@@ -3776,17 +3803,18 @@ function spnReadImg(file){
     im.src = url;
   });
 }
-/* gambar jendela persegi (st.sx, st.sy, st.side, dalam piksel sumber) ke kanvas persegi; bagian di luar gambar diisi warna gelap */
+/* gambar jendela (st.sx, st.sy, lebar st.side, dalam piksel sumber; tinggi mengikuti rasio kanvas: persegi untuk kartu, 16:7 untuk banner) ke kanvas; bagian di luar gambar diisi warna gelap */
 function spnDraw(c, im, st){
-  const W = c.width, x = c.getContext("2d"), w = im.naturalWidth, h = im.naturalHeight, k = W / st.side;
-  x.fillStyle = "#0d1017"; x.fillRect(0, 0, W, W);
-  const x0 = Math.max(st.sx, 0), y0 = Math.max(st.sy, 0), x1 = Math.min(st.sx + st.side, w), y1 = Math.min(st.sy + st.side, h);
+  const W = c.width, H = c.height, x = c.getContext("2d"), w = im.naturalWidth, h = im.naturalHeight, k = W / st.side, sh = st.side * H / W;
+  x.fillStyle = "#0d1017"; x.fillRect(0, 0, W, H);
+  const x0 = Math.max(st.sx, 0), y0 = Math.max(st.sy, 0), x1 = Math.min(st.sx + st.side, w), y1 = Math.min(st.sy + sh, h);
   if(x1 > x0 && y1 > y0) x.drawImage(im, x0, y0, x1 - x0, y1 - y0, (x0 - st.sx) * k, (y0 - st.sy) * k, (x1 - x0) * k, (y1 - y0) * k);
 }
-/* kompres hasil potongan ke JPEG di bawah ±90 KB (400x400, cadangan 300x300) */
+/* kompres hasil potongan ke JPEG di bawah ±90 KB (kartu: 400x400, cadangan 300x300; banner: 800x350, cadangan 640x280 dan 480x210) */
 function spnExport(c, im, st){
-  for(const W of [400, 300]){
-    let cv = c; if(c.width !== W){ cv = document.createElement("canvas"); cv.width = cv.height = W; spnDraw(cv, im, st); }
+  const r = c.height / c.width;
+  for(const W of (r < 1 ? [800, 640, 480] : [400, 300])){
+    let cv = c; if(c.width !== W){ cv = document.createElement("canvas"); cv.width = W; cv.height = Math.round(W * r); spnDraw(cv, im, st); }
     let q = .86, d = cv.toDataURL("image/jpeg", q);
     while(d.length > 90000 && q > .42){ q -= .06; d = cv.toDataURL("image/jpeg", q); }
     if(d.length <= 100000) return d;
@@ -3806,31 +3834,34 @@ function spnDevOpen(edit){
     const ur = inp(false, cur.url, 300, "https://contoh.com/produk"); ur.inputMode = "url"; ur.autocapitalize = "off"; ur.spellcheck = false; ur.autocomplete = "off";
     const ct = inp(false, cur.cta, 20, "Kunjungi");
     const df = hEl("input", "dvi"), du = hEl("input", "dvi"); df.type = du.type = "date"; df.value = cur.from || today; du.value = cur.until || plus;
-    let img = "", imgChanged = false;
+    let img = "", imgChanged = false, mode = cur.mode === "full" ? "full" : "card", lastIm = null;
     const box = hEl("div", "dvimgb"), pvw = hEl("div", "dvimgp"), acts = hEl("div", "dvimga"), fi = document.createElement("input");
     fi.type = "file"; fi.accept = "image/*"; fi.hidden = true;
     const pick = hEl("button", "dvb sm"), clr = hEl("button", "dvb sm del"); pick.type = clr.type = "button"; pick.textContent = "Pilih gambar dari galeri"; clr.textContent = "Hapus gambar";
-    const hint = hEl("p", "dvh sub"); hint.textContent = "Ukuran saran 400×400 px (persegi). Gambar yang lebih besar bisa digeser dan di-zoom dulu sebelum diterbitkan. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
+    const HINT_CARD = "Ukuran saran 400×400 px (persegi). Gambar yang lebih besar bisa digeser dan di-zoom dulu sebelum diterbitkan. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
+    const HINT_FULL = "Ukuran saran 800×350 px (melebar, rasio 16:7). Gambar memenuhi seluruh panel sponsor, jadi letakkan teks dan logo penting di tengah. Tanpa judul, deskripsi, atau tombol: seluruh banner bisa diketuk untuk membuka link. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
+    const hint = hEl("p", "dvh sub");
     const prev = hEl("div", "dvprev");
     const msg = hEl("p", "dvm"), say = (t, bad) => { msg.textContent = t; msg.className = "dvm" + (bad ? " bad" : ""); };
     let crop = null;
     const refreshPrev = () => {
       prev.innerHTML = "";
-      prev.appendChild(spnCard({ name: nm.value.trim() || "Nama sponsor", title:{ id: ti.value.trim() || "Judul penawaran", en: te.value.trim() }, text:{ id: xi.value.trim() || "Isi penawaran singkat.", en: xe.value.trim() }, url: "https://contoh.com", cta: ct.value.trim() }, img, true));
+      prev.appendChild(spnCard({ mode: mode, name: nm.value.trim() || "Nama sponsor", title:{ id: ti.value.trim() || "Judul penawaran", en: te.value.trim() }, text:{ id: xi.value.trim() || "Isi penawaran singkat.", en: xe.value.trim() }, url: "https://contoh.com", cta: ct.value.trim() }, img, true));
     };
     const refresh = () => {
-      pvw.innerHTML = ""; pvw.classList.toggle("crop", !!crop);
+      pvw.innerHTML = ""; pvw.classList.toggle("crop", !!crop); pvw.classList.toggle("wide", mode === "full");
       if(crop) pvw.appendChild(crop);
-      else if(img){ const im = document.createElement("img"); im.alt = ""; im.src = img; pvw.appendChild(im); } else pvw.textContent = "Belum ada gambar (kartu tampil tanpa gambar)";
+      else if(img){ const im = document.createElement("img"); im.alt = ""; im.src = img; pvw.appendChild(im); } else pvw.textContent = mode === "full" ? "Belum ada gambar (banner wajib punya gambar)" : "Belum ada gambar (kartu tampil tanpa gambar)";
       clr.hidden = !img;
       refreshPrev();
     };
     /* pemotong gambar: geser untuk mengatur posisi, slider untuk memperbesar atau memperkecil */
     const startCrop = im => {
-      const w = im.naturalWidth, h = im.naturalHeight, base = Math.min(w, h), maxSide = Math.max(w, h), zmin = Math.min(1, base / maxSide);
-      const st = { side: base, sx: (w - base) / 2, sy: (h - base) / 2 };
-      const clamp = () => { st.sx = Math.max(Math.min(0, w - st.side), Math.min(Math.max(0, w - st.side), st.sx)); st.sy = Math.max(Math.min(0, h - st.side), Math.min(Math.max(0, h - st.side), st.sy)); };
-      const wrap = hEl("div", "dvcrop"), cv = document.createElement("canvas"); cv.width = cv.height = 400; cv.className = "dvcv"; cv.tabIndex = 0;
+      const ar = mode === "full" ? 800 / 350 : 1;   /* lebar : tinggi jendela potong */
+      const w = im.naturalWidth, h = im.naturalHeight, base = Math.min(w, h * ar), maxSide = Math.max(w, h * ar), zmin = Math.min(1, base / maxSide);
+      const st = { side: base, sx: (w - base) / 2, sy: (h - base / ar) / 2 };
+      const clamp = () => { const sh = st.side / ar; st.sx = Math.max(Math.min(0, w - st.side), Math.min(Math.max(0, w - st.side), st.sx)); st.sy = Math.max(Math.min(0, h - sh), Math.min(Math.max(0, h - sh), st.sy)); };
+      const wrap = hEl("div", "dvcrop"), cv = document.createElement("canvas"); cv.width = ar === 1 ? 400 : 800; cv.height = ar === 1 ? 400 : 350; cv.className = "dvcv" + (ar === 1 ? "" : " wide"); cv.tabIndex = 0;
       cv.setAttribute("role", "img"); cv.setAttribute("aria-label", "Pratinjau potongan gambar. Geser atau pakai tombol panah untuk mengatur posisi.");
       const zw = hEl("label", "dvcz", "<span></span>"), zr = document.createElement("input"); zr.type = "range"; zr.min = String(zmin); zr.max = "3"; zr.step = "0.01"; zr.value = "1";
       zw.firstChild.textContent = "Zoom"; zw.appendChild(zr);
@@ -3843,7 +3874,7 @@ function spnDevOpen(edit){
       cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY }; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
       cv.addEventListener("pointermove", e => {
         if(!drag) return; const r = cv.getBoundingClientRect(); if(!r.width) return;
-        st.sx -= (e.clientX - drag.x) * st.side / r.width; st.sy -= (e.clientY - drag.y) * st.side / r.height; drag.x = e.clientX; drag.y = e.clientY; clamp(); draw();
+        st.sx -= (e.clientX - drag.x) * st.side / r.width; st.sy -= (e.clientY - drag.y) * st.side / r.width; drag.x = e.clientX; drag.y = e.clientY; clamp(); draw();
       });
       const end = () => { if(drag){ drag = null; commit(); } };
       cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
@@ -3851,9 +3882,9 @@ function spnDevOpen(edit){
         const dx = e.key === "ArrowLeft" ? -1 : e.key === "ArrowRight" ? 1 : 0, dy = e.key === "ArrowUp" ? -1 : e.key === "ArrowDown" ? 1 : 0; if(!dx && !dy) return;
         e.preventDefault(); st.sx += dx * st.side * .05; st.sy += dy * st.side * .05; clamp(); draw(); clearTimeout(cv._kt); cv._kt = setTimeout(commit, 250);
       });
-      zr.addEventListener("input", () => { const cx = st.sx + st.side / 2, cy = st.sy + st.side / 2; st.side = base / (+zr.value || 1); st.sx = cx - st.side / 2; st.sy = cy - st.side / 2; clamp(); draw(); });
+      zr.addEventListener("input", () => { const cx = st.sx + st.side / 2, cy = st.sy + st.side / ar / 2; st.side = base / (+zr.value || 1); st.sx = cx - st.side / 2; st.sy = cy - st.side / ar / 2; clamp(); draw(); });
       zr.addEventListener("change", commit);
-      rs.addEventListener("click", () => { st.side = base; st.sx = (w - base) / 2; st.sy = (h - base) / 2; zr.value = "1"; commit(); });
+      rs.addEventListener("click", () => { st.side = base; st.sx = (w - base) / 2; st.sy = (h - base / ar) / 2; zr.value = "1"; commit(); });
       commit(); return wrap;
     };
     [nm, ti, te, xi, xe, ct].forEach(e => e.addEventListener("input", refreshPrev));
@@ -3861,22 +3892,48 @@ function spnDevOpen(edit){
     fi.addEventListener("change", async () => {
       const file = fi.files && fi.files[0]; fi.value = ""; if(!file) return;
       say("Memproses gambar…");
-      try{ const im = await spnReadImg(file); crop = startCrop(im); refresh(); }
+      try{ const im = await spnReadImg(file); lastIm = im; crop = startCrop(im); refresh(); }
       catch(e){ say("Gambar tidak bisa dipakai. Coba format JPG atau PNG yang lain.", true); }
     });
-    clr.addEventListener("click", () => { img = ""; crop = null; imgChanged = true; refresh(); });
+    clr.addEventListener("click", () => { img = ""; crop = null; lastIm = null; imgChanged = true; refresh(); });
     acts.append(pick, clr, fi); box.append(pvw, acts, hint);
     if(edit && edit.img){ spnLoadImg(edit).then(d => { if(d && !imgChanged){ img = d; refresh(); } }); }
     const ck = hEl("label", "dvck", '<input type="checkbox"><span></span>'); ck.lastChild.textContent = "Saya memastikan konten ini bukan judi, pinjaman online ilegal, atau konten dewasa, dan sesuai kebijakan Google Play.";
     const go = hEl("button", "dvb pri"); go.type = "button"; go.textContent = edit ? "Simpan perubahan" : "Terbitkan";
     const dh1 = hEl("p", "dvh"); dh1.textContent = "Pratinjau (tampilan di beranda)";
     const cl = hEl("button", "dvb"); cl.type = "button"; cl.textContent = "Tutup panel"; cl.addEventListener("click", stClose);
-    f.append(fld("Nama sponsor", nm), fld("Judul (Indonesia)", ti), fld("Judul (English)", te), fld("Isi (Indonesia)", xi), fld("Isi (English)", xe), fld("Gambar", box), fld("Link produk (wajib https://)", ur), fld("Teks tombol (kosong = Kunjungi)", ct), fld("Tayang mulai", df), fld("Tayang sampai", du), dh1, prev, ck, msg, go, cl);
+    /* pilihan format: 1) banner + deskripsi (kartu), 2) banner gambar saja (gambar memenuhi panel) */
+    const mw = hEl("div", "dvmode"), mos = [];
+    mw.setAttribute("role", "radiogroup"); mw.setAttribute("aria-label", "Format sponsor");
+    const descFlds = [fld("Judul (Indonesia)", ti), fld("Judul (English)", te), fld("Isi (Indonesia)", xi), fld("Isi (English)", xe)], ctFld = fld("Teks tombol (kosong = Kunjungi)", ct);
+    const applyMode = () => {
+      mos.forEach(o => o.b.setAttribute("aria-checked", String(o.v === mode)));
+      descFlds.forEach(e => { e.hidden = mode === "full"; }); ctFld.hidden = mode === "full";
+      hint.textContent = mode === "full" ? HINT_FULL : HINT_CARD;
+    };
+    const mkMode = (v, t, sub) => {
+      const b = hEl("button", "dvmo", "<b></b><small></small>"); b.type = "button"; b.setAttribute("role", "radio"); b.firstChild.textContent = t; b.lastChild.textContent = sub;
+      b.addEventListener("click", () => {
+        if(mode === v) return; mode = v; applyMode();
+        /* rasio gambar berbeda: potong ulang dari gambar yang baru dipilih, atau minta pilih gambar lagi bila gambar berasal dari server */
+        if(lastIm){ crop = startCrop(lastIm); }
+        else if(img){ img = ""; crop = null; imgChanged = true; say("Format diganti, rasio gambar berbeda. Pilih gambar lagi.", true); }
+        refresh();
+      });
+      mos.push({ v: v, b: b }); mw.appendChild(b);
+    };
+    mkMode("card", "Banner + deskripsi", "Gambar persegi di kiri, judul, isi, dan tombol di kanan.");
+    mkMode("full", "Banner gambar saja", "Gambar memenuhi seluruh panel, tanpa deskripsi.");
+    applyMode();
+    f.append(fld("Format sponsor", mw), fld("Nama sponsor", nm), descFlds[0], descFlds[1], descFlds[2], descFlds[3], fld("Gambar", box), fld("Link produk (wajib https://)", ur), ctFld, fld("Tayang mulai", df), fld("Tayang sampai", du), dh1, prev, ck, msg, go, cl);
     if(edit){ const cb = hEl("button", "dvb"); cb.type = "button"; cb.textContent = "Batal ubah"; cb.addEventListener("click", () => spnDevOpen()); f.append(cb); }
     go.addEventListener("click", async () => {
       const hasImg = imgChanged ? !!img : !!(edit && edit.img);
-      const d = { name: nm.value.trim(), title:{ id: ti.value.trim(), en: te.value.trim() }, text:{ id: xi.value.trim(), en: xe.value.trim() }, url: ur.value.trim(), cta: ct.value.trim() || "Kunjungi", from: df.value, until: du.value, img: hasImg };
-      if(!d.name || !d.title.id || !d.text.id){ say("Nama sponsor, judul, dan isi (Indonesia) wajib diisi.", true); return; }
+      const full = mode === "full";
+      const d = { mode: mode, name: nm.value.trim(), title:{ id: full ? "" : ti.value.trim(), en: full ? "" : te.value.trim() }, text:{ id: full ? "" : xi.value.trim(), en: full ? "" : xe.value.trim() }, url: ur.value.trim(), cta: full ? "" : (ct.value.trim() || "Kunjungi"), from: df.value, until: du.value, img: hasImg };
+      if(!d.name){ say("Nama sponsor wajib diisi.", true); return; }
+      if(!full && (!d.title.id || !d.text.id)){ say("Judul dan isi (Indonesia) wajib diisi untuk format banner + deskripsi.", true); return; }
+      if(full && !hasImg){ say("Format banner gambar saja wajib punya gambar.", true); return; }
       if(!spnUrlOk(d.url)){ say("Link produk harus diawali https:// dan valid (tanpa spasi).", true); return; }
       if(!SPN_DRE.test(d.from) || !SPN_DRE.test(d.until) || d.until < d.from){ say("Tanggal tayang tidak valid: \"sampai\" tidak boleh sebelum \"mulai\".", true); return; }
       if(!ck.querySelector("input").checked){ say("Centang pernyataan kebijakan konten dulu.", true); return; }
@@ -3903,7 +3960,7 @@ function spnDevOpen(edit){
     mine.forEach(it => {
       const st = it.until < t ? ["Berakhir", ""] : (it.from > t ? ["Dijadwalkan", "soon"] : ["Tayang", "on"]);
       const r = hEl("div", "dvr", '<div class="dt"><b></b><small><span class="dvst"></span><span class="rg"></span></small></div><div class="ac"></div>');
-      r.querySelector("b").textContent = it.name + " · " + it.title.id;
+      r.querySelector("b").textContent = it.name + " · " + (it.mode === "full" ? "Banner saja" : it.title.id);
       const sp = r.querySelector(".dvst"); sp.textContent = st[0]; if(st[1]) sp.classList.add(st[1]);
       r.querySelector(".rg").textContent = infoDate(it.from) + " – " + infoDate(it.until);
       const ac = r.querySelector(".ac"), eb = hEl("button", "dvb sm"), db2 = hEl("button", "dvb sm del"); eb.type = db2.type = "button"; eb.textContent = "Ubah"; db2.textContent = "Hapus";
@@ -4027,7 +4084,7 @@ function renderInfo(){
         ? "Sponsored content is a promotion from a third party working with Satu Titik. The content is the sponsor's responsibility and is not a recommendation or guarantee from Satu Titik. Links open in your browser only after you tap the button. Satu Titik does not send your personal data to sponsors."
         : "Konten bersponsor adalah promosi dari pihak ketiga yang bekerja sama dengan Satu Titik. Isinya menjadi tanggung jawab sponsor dan bukan rekomendasi atau jaminan dari Satu Titik. Tautan baru dibuka di browser setelah kamu mengetuk tombolnya. Satu Titik tidak mengirim data pribadimu ke sponsor.";
       L.appendChild(nt);
-      sp.forEach(it => { const g = spnImgGet(it.rid); L.appendChild(spnCard(it, it.img && g ? g.d : "")); });
+      sp.forEach(it => { const g = spnImgGet(it.rid); if(it.mode === "full" && !g) return; L.appendChild(spnCard(it, it.img && g ? g.d : "")); });
     }
   });
   const h = hHead(sec, HI.mega, en ? "Info & updates" : "Informasi & Pembaruan", (items.length || act.length) ? (en ? "See all" : "Lihat Semua") : "", all);
@@ -4037,8 +4094,9 @@ function renderInfo(){
     const hl = h.querySelector(".hl"); if(hl){ h.insertBefore(w2, hl); h.insertBefore(w, w2); } else { h.appendChild(w); h.appendChild(w2); }
   }
   /* isi slider (maksimal 5): 2 pengumuman pembaruan (selalu), 1 banner ajakan kerja sama (selalu), lalu maksimal 2 iklan kerja sama/endorse (hanya bila ada yang tayang) */
-  const rot = act.length > 2 ? homeDay() % act.length : 0;
-  const ads = act.slice(rot).concat(act.slice(0, rot)).slice(0, 2).map(it => ({ k: "s", it: it }));
+  const actOk = act.filter(it => it.mode !== "full" || spnImgGet(it.rid));   /* banner gambar saja tanpa gambar tidak ditampilkan (menunggu gambar terunduh) */
+  const rot = actOk.length > 2 ? homeDay() % actOk.length : 0;
+  const ads = actOk.slice(rot).concat(actOk.slice(0, rot)).slice(0, 2).map(it => ({ k: "s", it: it }));
   const news = items.slice(0, 2).map(it => ({ k: "a", it: it }));
   const promo = [{ k: "c" }].concat(ads), slides = [];
   for(let i = 0; i < Math.max(news.length, promo.length); i++){ if(news[i]) slides.push(news[i]); if(promo[i]) slides.push(promo[i]); }   /* selang-seling: pengumuman, promo, pengumuman, promo, promo */
