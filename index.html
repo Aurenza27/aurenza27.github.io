@@ -20,6 +20,8 @@ if(!SHOW_DUKUNG){ const st = document.createElement("style"); st.textContent = "
 }catch(e){}})();
 </script>
 <style>#alock{display:none}html.alk #alock{display:flex}html.alk body>*:not(#alock){visibility:hidden!important}html.alk{overflow:hidden}</style>
+<style id="noCopyCss">*{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}input,textarea,[contenteditable="true"],[contenteditable=""]{-webkit-user-select:text!important;user-select:text!important}</style>
+<script>(function(){var ok=function(t){if(t&&t.nodeType===3)t=t.parentElement;return t&&t.closest&&t.closest('input,textarea,[contenteditable="true"],[contenteditable=""]')};["contextmenu","selectstart"].forEach(function(n){document.addEventListener(n,function(e){if(!ok(e.target))e.preventDefault()},true)})})();</script>
 <meta name="theme-color" content="#0b0d12">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3034,8 +3036,9 @@ function stShareHelper(){
   }catch(e){}
 }
 const ST_SHARE = "<scr" + "ipt>(" + stShareHelper.toString() + ")();<\/scr" + "ipt>";
+const NOCOPY = "<style id='noCopyCss'>*{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}input,textarea,[contenteditable=true],[contenteditable='']{-webkit-user-select:text!important;user-select:text!important}</style><scr" + "ipt>(function(){var ok=function(t){if(t&&t.nodeType===3)t=t.parentElement;return t&&t.closest&&t.closest('input,textarea,[contenteditable=true]')};['contextmenu','selectstart'].forEach(function(n){document.addEventListener(n,function(e){if(!ok(e.target))e.preventDefault()},true)})})();</scr" + "ipt>";
 function menuSrc(m){
-  const s = unesc($(m.src).textContent), css = "<style>.side,.scrollchip{display:none!important}/* lebar isi menu mengikuti layar HP (tablet dibatasi 560px); panel bawah dan bilah otomatis ikut selebar isi */ body:not(.stage) .app{max-width:min(100%,560px)!important}#inPanel,.autobar,.quickadd{max-width:min(calc(100% - 24px),536px)!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK + ST_TUTFIX + (m.id === "turnamen" || m.id === "stopwatch" || m.id === "sholat" || m.id === "catatan" ? "" : ST_SHARE), i = s.indexOf("</head>");
+  const s = unesc($(m.src).textContent), css = NOCOPY + "<style>.side,.scrollchip{display:none!important}/* lebar isi menu mengikuti layar HP (tablet dibatasi 560px); panel bawah dan bilah otomatis ikut selebar isi */ body:not(.stage) .app{max-width:min(100%,560px)!important}#inPanel,.autobar,.quickadd{max-width:min(calc(100% - 24px),536px)!important}</style><style id=\"thAp\">" + apCSS(S) + "</style>" + ST_HELPER + ST_BACK + ST_TUTFIX + (m.id === "turnamen" || m.id === "stopwatch" || m.id === "sholat" || m.id === "catatan" ? "" : ST_SHARE), i = s.indexOf("</head>");
   return i < 0 ? css + s : s.slice(0, i) + css + s.slice(i);
 }
 writeKeys(S); paintPanel();
@@ -14244,8 +14247,8 @@ function rlSecs(){
       "<ul><li>Turnamen lokal hanya tersimpan di perangkat ini. Di layar awal, <b>Ekspor</b> menyimpan cadangan dan <b>Impor</b> mengembalikannya. Muncul peringatan bila perubahan belum dicadangkan lebih dari 3 hari.</li><li>Di aplikasi Android ada <b>cadangan otomatis ke Dokumen</b>. Aplikasi juga menyimpan beberapa <b>versi sebelumnya</b> secara otomatis, tapi itu tidak menggantikan Ekspor.</li><li>Tab <b>Lainnya</b>: ekspor turnamen ini, <b>Kosongkan semua skor</b> (tim dan jadwal tetap), atau <b>Hapus turnamen</b>. Keduanya meminta konfirmasi.</li></ul>",
       "<ul><li>Local tournaments live on this device only. On the start screen, <b>Export</b> saves a backup and <b>Import</b> restores it. A warning appears when changes have gone un-backed-up for more than 3 days.</li><li>The Android app offers <b>auto backup to Documents</b>. The app also keeps a few <b>previous versions</b> automatically, but that does not replace Export.</li><li>The <b>More</b> tab: export this tournament, <b>Clear all scores</b> (teams and fixtures stay), or <b>Delete tournament</b>. Both ask for confirmation.</li></ul>")],
     [L("11. Panel pengaturan", "11. Settings panel"), L(
-      "<ul><li>🔊 <b>Suara</b> dan 🎵 <b>Musik</b>: efek suara dan musik latar, dengan pengatur volume.</li><li>🗣️ <b>Bacakan</b>: hasil pertandingan dibacakan dengan suara perangkat.</li><li>⏭️ <b>Auto-next</b>: setelah jeda, layar menyorot dan menggulir ke pertandingan berikutnya yang belum ada hasilnya. <b>⏱️ Jeda</b> mengatur lamanya.</li><li>Tombol bahasa mengganti Indonesia dan English.</li></ul>",
-      "<ul><li>🔊 <b>Sound</b> and 🎵 <b>Music</b>: sound effects and background music, with volume controls.</li><li>🗣️ <b>Read aloud</b>: match results are read out with the device voice.</li><li>⏭️ <b>Auto-next</b>: after a gap, the screen highlights and scrolls to the next match without a result. <b>⏱️ Gap</b> sets the length.</li><li>The language button switches Indonesia and English.</li></ul>")],
+      "<ul><li>Tombol bahasa mengganti Indonesia dan English.</li></ul>",
+      "<ul><li>The language button switches Indonesia and English.</li></ul>")],
     [L("12. Tips pemula", "12. Beginner tips"), L(
       "<ul><li>Coba dulu lewat <b>🎓 Ulangi tutorial</b> yang memakai turnamen contoh dan tidak menyimpan apa pun.</li><li>Pilih format <b>Liga</b> untuk turnamen kecil, <b>Gugur</b> untuk cepat selesai, <b>Grup + Gugur</b> untuk turnamen besar.</li><li>Ekspor cadangan setelah turnamen selesai atau sebelum membersihkan data aplikasi.</li></ul>",
       "<ul><li>Try the <b>🎓 Replay tutorial</b> first. It uses a sample tournament and saves nothing.</li><li>Pick <b>League</b> for small tournaments, <b>Knockout</b> to finish fast, and <b>Groups + Knockout</b> for big ones.</li><li>Export a backup when a tournament ends or before clearing the app data.</li></ul>")]
