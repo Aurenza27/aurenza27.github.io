@@ -919,9 +919,11 @@ h1{font-size:26px;line-height:1.15}
 #stSheet .dvcz{display:flex;align-items:center;gap:8px;width:100%;max-width:240px;font-size:11.5px;color:var(--muted)}
 #stSheet .dvcz input{flex:1;min-width:0;accent-color:#d4a94f}
 /* Sponsor format "Banner saja": gambar memenuhi seluruh panel, tanpa judul/deskripsi/tombol; seluruh banner bisa diketuk */
-.spc.spfull{position:relative;display:block;width:100%;margin:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;background:#0d1017;aspect-ratio:16/7;-webkit-tap-highlight-color:transparent}
+.spc.spfull{position:relative;display:block;width:100%;margin:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;background:#0d1017;aspect-ratio:10/3;-webkit-tap-highlight-color:transparent}
 #infc .spc.spfull{aspect-ratio:auto}
-#infc .spc.spfull img{object-fit:contain}   /* tinggi slide diatur lewat JS (--sh = lebar x 0.3); gambar mengisi penuh tanpa area kosong */   /* panel slide tetap; gambar banner diperkecil agar utuh (tidak terpotong) */
+#infc .spc.spfull img{object-fit:contain}
+.spc.spfull{overflow:hidden}
+.spc.spfull img.spbg{object-fit:cover;filter:blur(16px) brightness(.65);transform:scale(1.25)}   /* tinggi slide diatur lewat JS (--sh = lebar x 0.3); gambar mengisi penuh tanpa area kosong */   /* panel slide tetap; gambar banner diperkecil agar utuh (tidak terpotong) */
 .spc.spfull img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover}
 .spc.spfull .spp{position:absolute;top:8px;left:8px;z-index:1;padding:2px 7px;font-size:9.5px;background:rgba(13,16,23,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .spc.spfull:focus-visible{outline:2px solid #9fbcf5;outline-offset:2px}
@@ -933,8 +935,8 @@ h1{font-size:26px;line-height:1.15}
 #stSheet .dvmo small{font-size:11px;line-height:1.35;color:var(--muted)}
 #stSheet .dvmo[aria-checked=true]{border-color:rgba(143,180,255,.7);background:rgba(143,180,255,.12)}
 #stSheet .dvmo:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
-#stSheet .dvcv.wide{max-width:100%;aspect-ratio:16/7}
-#stSheet .dvimgp.wide img{width:100%;height:auto;aspect-ratio:16/7;margin:8px 0}
+#stSheet .dvcv.wide{max-width:100%;aspect-ratio:10/3}
+#stSheet .dvimgp.wide img{width:100%;height:auto;aspect-ratio:10/3;margin:8px 0}
 #stSheet .dvimga{display:flex;gap:8px;flex-wrap:wrap}
 #stSheet .dvimga [hidden]{display:none}
 #stSheet .dvprev{margin:0 0 4px}
@@ -3662,7 +3664,7 @@ window.stVer = (function(){
 })();
 /* ===== Konten Sponsor (iklan atau endorse dari pihak luar, bukan AdMob) =====
    Data: Firestore "sponsors/{id}" = {mode:"card"|"full", name, title:{id,en}, text:{id,en}, url, cta, from, until, img, iv, by, t}
-         mode "card" = banner + deskripsi (gambar persegi 400x400 + judul, isi, tombol); mode "full" = banner gambar saja (800x350, memenuhi panel, title/text/cta kosong, seluruh banner bisa diketuk).
+         mode "card" = banner + deskripsi (gambar persegi 400x400 + judul, isi, tombol); mode "full" = banner gambar saja (1000x300, rasio 10:3 sama dengan panel slider, memenuhi panel, title/text/cta kosong, seluruh banner bisa diketuk).
          Dokumen lama tanpa field mode dianggap "card".
          dan "sponsorImg/{id}" = {d, iv}: gambar JPEG persegi 400x400 sebagai teks base64, hanya diunduh bila versinya (iv) berubah.
    Semua orang boleh membaca; hanya akun developer yang boleh menulis (aturan database). Tayang bila from <= hari ini <= until menurut jam server (nowMs).
@@ -3714,7 +3716,7 @@ function spnCard(it, img, preview){
   const en = tdEn(), tx = o => o ? (o[en ? "en" : "id"] || o.id || "") : "", lbl = it.cta || (en ? "Visit" : "Kunjungi");
   if(it.mode === "full"){
     const f = hEl("button", "spc spfull"); f.type = "button";
-    if(img && /^data:image\/jpeg;base64,/.test(img)){ const im = document.createElement("img"); im.alt = ""; im.decoding = "async"; im.src = img; f.appendChild(im); }
+    if(img && /^data:image\/jpeg;base64,/.test(img)){ const bg = document.createElement("img"); bg.alt = ""; bg.setAttribute("aria-hidden", "true"); bg.className = "spbg"; bg.src = img; f.appendChild(bg); const im = document.createElement("img"); im.alt = ""; im.decoding = "async"; im.src = img; f.appendChild(im); }   /* bg = salinan buram pengisi sisi kosong bila rasio gambar berbeda dari panel */
     const sp = hEl("span", "spp", HI.tag + "<span></span>"); sp.lastChild.textContent = en ? "Sponsored" : "Bersponsor"; f.appendChild(sp);
     f.setAttribute("aria-label", (it.name || "") + " · " + (en ? "Sponsored" : "Bersponsor") + (en ? " (opens in browser)" : " (dibuka di browser)"));
     if(!preview) f.addEventListener("click", () => spnOpen(it.url));
@@ -3804,17 +3806,17 @@ function spnReadImg(file){
     im.src = url;
   });
 }
-/* gambar jendela (st.sx, st.sy, lebar st.side, dalam piksel sumber; tinggi mengikuti rasio kanvas: persegi untuk kartu, 16:7 untuk banner) ke kanvas; bagian di luar gambar diisi warna gelap */
+/* gambar jendela (st.sx, st.sy, lebar st.side, dalam piksel sumber; tinggi mengikuti rasio kanvas: persegi untuk kartu, 10:3 untuk banner) ke kanvas; bagian di luar gambar diisi warna gelap */
 function spnDraw(c, im, st){
   const W = c.width, H = c.height, x = c.getContext("2d"), w = im.naturalWidth, h = im.naturalHeight, k = W / st.side, sh = st.side * H / W;
   x.fillStyle = "#0d1017"; x.fillRect(0, 0, W, H);
   const x0 = Math.max(st.sx, 0), y0 = Math.max(st.sy, 0), x1 = Math.min(st.sx + st.side, w), y1 = Math.min(st.sy + sh, h);
   if(x1 > x0 && y1 > y0) x.drawImage(im, x0, y0, x1 - x0, y1 - y0, (x0 - st.sx) * k, (y0 - st.sy) * k, (x1 - x0) * k, (y1 - y0) * k);
 }
-/* kompres hasil potongan ke JPEG di bawah ±90 KB (kartu: 400x400, cadangan 300x300; banner: 800x350, cadangan 640x280 dan 480x210) */
+/* kompres hasil potongan ke JPEG di bawah ±90 KB (kartu: 400x400, cadangan 300x300; banner: 1000x300, cadangan 800x240 dan 640x192) */
 function spnExport(c, im, st){
   const r = c.height / c.width;
-  for(const W of (r < 1 ? [800, 640, 480] : [400, 300])){
+  for(const W of (r < 1 ? [1000, 800, 640] : [400, 300])){
     let cv = c; if(c.width !== W){ cv = document.createElement("canvas"); cv.width = W; cv.height = Math.round(W * r); spnDraw(cv, im, st); }
     let q = .86, d = cv.toDataURL("image/jpeg", q);
     while(d.length > 90000 && q > .42){ q -= .06; d = cv.toDataURL("image/jpeg", q); }
@@ -3840,7 +3842,7 @@ function spnDevOpen(edit){
     fi.type = "file"; fi.accept = "image/*"; fi.hidden = true;
     const pick = hEl("button", "dvb sm"), clr = hEl("button", "dvb sm del"); pick.type = clr.type = "button"; pick.textContent = "Pilih gambar dari galeri"; clr.textContent = "Hapus gambar";
     const HINT_CARD = "Ukuran saran 400×400 px (persegi). Gambar yang lebih besar bisa digeser dan di-zoom dulu sebelum diterbitkan. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
-    const HINT_FULL = "Ukuran saran 800×350 px (melebar, rasio 16:7). Gambar otomatis diperkecil agar tampil utuh (tidak terpotong); zoom untuk memperbesar bila perlu. Tanpa judul, deskripsi, atau tombol: seluruh banner bisa diketuk untuk membuka link. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
+    const HINT_FULL = "Ukuran saran 1000×300 px (melebar, rasio 10:3). Pratinjau dan potongan memakai rasio yang sama dengan panel di beranda, jadi gambar tampil persis seperti di sini, tanpa area kosong. Tanpa judul, deskripsi, atau tombol: seluruh banner bisa diketuk untuk membuka link. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
     const hint = hEl("p", "dvh sub");
     const prev = hEl("div", "dvprev");
     const msg = hEl("p", "dvm"), say = (t, bad) => { msg.textContent = t; msg.className = "dvm" + (bad ? " bad" : ""); };
@@ -3858,12 +3860,12 @@ function spnDevOpen(edit){
     };
     /* pemotong gambar: geser untuk mengatur posisi, slider untuk memperbesar atau memperkecil */
     const startCrop = im => {
-      const ar = mode === "full" ? 800 / 350 : 1;   /* lebar : tinggi jendela potong */
+      const ar = mode === "full" ? 1000 / 300 : 1;   /* lebar : tinggi jendela potong */
       const w = im.naturalWidth, h = im.naturalHeight, base = Math.min(w, h * ar), maxSide = Math.max(w, h * ar), zmin = Math.min(1, base / maxSide);
       const z0 = ar === 1 ? 1 : zmin, side0 = base / z0;   /* banner: awal diperkecil agar seluruh gambar terlihat (tidak terpotong), sisa ruang diisi warna gelap */
       const st = { side: side0, sx: (w - side0) / 2, sy: (h - side0 / ar) / 2 };
       const clamp = () => { const sh = st.side / ar; st.sx = Math.max(Math.min(0, w - st.side), Math.min(Math.max(0, w - st.side), st.sx)); st.sy = Math.max(Math.min(0, h - sh), Math.min(Math.max(0, h - sh), st.sy)); };
-      const wrap = hEl("div", "dvcrop"), cv = document.createElement("canvas"); cv.width = ar === 1 ? 400 : 800; cv.height = ar === 1 ? 400 : 350; cv.className = "dvcv" + (ar === 1 ? "" : " wide"); cv.tabIndex = 0;
+      const wrap = hEl("div", "dvcrop"), cv = document.createElement("canvas"); cv.width = ar === 1 ? 400 : 1000; cv.height = ar === 1 ? 400 : 300; cv.className = "dvcv" + (ar === 1 ? "" : " wide"); cv.tabIndex = 0;
       cv.setAttribute("role", "img"); cv.setAttribute("aria-label", "Pratinjau potongan gambar. Geser atau pakai tombol panah untuk mengatur posisi.");
       const zw = hEl("label", "dvcz", "<span></span>"), zr = document.createElement("input"); zr.type = "range"; zr.min = String(zmin); zr.max = "3"; zr.step = "0.01"; zr.value = String(z0);
       zw.firstChild.textContent = "Zoom"; zw.appendChild(zr);
@@ -4121,7 +4123,7 @@ function renderInfo(){
   slides.forEach((o, i) => sld.appendChild(mk(o, i, false)));
   if(n > 1) sld.appendChild(mk(slides[0], 0, true));
   sec.appendChild(sld);
-  /* bila ada slide banner 16:7: tinggi semua slide = lebar x 0.3 (rasio ~10:3, sama rata, panel tetap); gambar 16:7 mengisi penuh, tepi atas/bawah terpotong sedikit */
+  /* bila ada slide banner 10:3: tinggi semua slide = lebar x 0.3 (sama rata, panel tetap); banner 10:3 mengisi penuh */
   if(slides.some(o => o.k === "s" && o.it.mode === "full")){
     const fitH = () => { const wd = sld.clientWidth; if(wd > 0) sld.style.setProperty("--sh", (wd * 0.3).toFixed(1) + "px"); };
     fitH(); requestAnimationFrame(fitH); setTimeout(fitH, 300); window.addEventListener("resize", fitH);
