@@ -827,17 +827,19 @@ h1{font-size:26px;line-height:1.15}
 #stSheet .dvhint{font-size:11px;line-height:1.4;color:var(--muted)}
 #stSheet .dvs{margin:10px 2px 0;padding-top:12px;border-top:1px solid var(--line)}
 #stSheet .dvs:first-child{margin-top:0;padding-top:0;border-top:0}
-#stSheet .dvpk{display:flex;flex-direction:column;gap:8px}
-#stSheet .dvk{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:8px 12px 8px 8px;font:inherit;color:var(--text);text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-#stSheet .dvk .iart{width:64px;min-height:58px;border-radius:8px;overflow:hidden}
-#stSheet .dvkt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-#stSheet .dvkt b{font:600 13.5px/1.25 var(--head);color:var(--text)}
-#stSheet .dvkt small{font-size:11.5px;line-height:1.35;color:var(--muted)}
-#stSheet .dvk::after{content:"";flex:none;width:20px;height:20px;box-sizing:border-box;border-radius:50%;border:2px solid var(--line)}
-#stSheet .dvk.on{border-color:var(--gold2);background:rgba(240,207,134,.08)}
-#stSheet .dvk.on .dvkt b{color:var(--gold2)}
-#stSheet .dvk.on::after{border-color:var(--gold2);background:radial-gradient(circle,var(--gold2) 0 4px,transparent 5px)}
-#stSheet .dvk:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#stSheet .dvcb{position:relative}
+#stSheet .dvcbt{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;min-height:42px;padding:6px 12px 6px 8px;font:inherit;font-size:14px;color:var(--text);text-align:left;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;cursor:pointer}
+#stSheet .dvcbt .cv{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#stSheet .dvcbt::after{content:"";flex:none;width:8px;height:8px;margin:0 3px 3px 0;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s}
+#stSheet .dvcbt[aria-expanded="true"]{border-color:var(--gold)}
+#stSheet .dvcbt[aria-expanded="true"]::after{transform:rotate(-135deg);margin:3px 3px 0 0}
+#stSheet .dvcbt:focus-visible,#stSheet .dvcbo:focus-visible{outline:2px solid var(--gold2);outline-offset:1px}
+#stSheet .dvcbl{margin:6px 0 0;border:1px solid var(--gold);border-radius:12px;overflow:hidden;background:rgba(10,16,34,.55)}
+#stSheet .dvcbo{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;box-sizing:border-box;padding:4px 12px 4px 8px;font:inherit;font-size:14px;text-align:left;color:var(--text);background:transparent;border:0;cursor:pointer}
+#stSheet .dvcbo:hover{background:rgba(255,255,255,.06)}
+#stSheet .dvcbo[aria-selected="true"]{color:var(--gold2)}
+#stSheet .dvth{flex:none;display:block;width:28px;height:26px;border-radius:6px;overflow:hidden}
+#stSheet .dvth .iart{width:100%;min-height:0;height:100%}
 #stSheet .dvpv{margin:0}
 #stSheet .dvpv .it p{word-break:break-word}
 #stSheet .dvri{flex:none;display:block;width:44px;height:40px;border-radius:8px;overflow:hidden}
@@ -3936,26 +3938,37 @@ function infoDevOpen(edit){
     /* gambar ikon dengan id gradien unik supaya tidak bentrok dengan kartu lain di layar */
     const art = (k, n) => infoArt(k).replace(/id="ig"/g, 'id="ig' + n + '"').replace(/url\(#ig\)/g, "url(#ig" + n + ")");
     const KINDS = [["megaphone", "Pengumuman", "Kabar umum, jadwal, atau pemberitahuan"], ["star", "Fitur unggulan", "Menyorot fitur andalan aplikasi"], ["sparkle", "Fitur baru", "Menu atau pembaruan yang baru dirilis"]];
-    const pv = hEl("div", "inr dvpv"), pk = hEl("div", "dvpk");
-    pk.setAttribute("role", "radiogroup"); pk.setAttribute("aria-label", "Jenis ikon");
+    const pv = hEl("div", "inr dvpv");
     const drawPv = () => {
       pv.innerHTML = art(ic.value, "pv") + '<div class="it"><b></b><small></small><p></p></div>';
       pv.querySelector("b").textContent = ti.value.trim() || "Judul pengumuman";
       pv.querySelector("small").textContent = infoDate(dt.value);
       pv.querySelector("p").textContent = xi.value.trim() || "Isi pengumuman akan tampil seperti ini.";
     };
-    const mark = () => pk.querySelectorAll(".dvk").forEach(b => { const on = b.dataset.k === ic.value; b.classList.toggle("on", on); b.setAttribute("aria-checked", on ? "true" : "false"); });
+    /* pilihan jenis ikon: dropdown ringkas (tertutup bawaannya), gambar kecil + nama */
+    const cb = hEl("div", "dvcb"), tg = hEl("button", "dvcbt"), ls = hEl("div", "dvcbl");
+    tg.type = "button"; tg.setAttribute("aria-haspopup", "listbox"); tg.setAttribute("aria-expanded", "false"); tg.setAttribute("aria-label", "Jenis ikon");
+    ls.hidden = true; ls.setAttribute("role", "listbox");
+    const mark = () => {
+      const k = KINDS.find(x => x[0] === ic.value) || KINDS[0];
+      tg.innerHTML = '<span class="dvth">' + art(k[0], "t") + '</span><span class="cv"></span>'; tg.lastChild.textContent = k[1];
+      ls.querySelectorAll(".dvcbo").forEach(b => b.setAttribute("aria-selected", String(b.dataset.k === ic.value)));
+    };
+    const toggle = o => { o = o === undefined ? ls.hidden : o; ls.hidden = !o; tg.setAttribute("aria-expanded", String(o)); };
     KINDS.forEach(k => {
-      const b = hEl("button", "dvk", art(k[0], "k" + k[0]) + '<span class="dvkt"><b></b><small></small></span>'); b.type = "button"; b.setAttribute("role", "radio"); b.dataset.k = k[0];
-      b.querySelector("b").textContent = k[1]; b.querySelector("small").textContent = k[2];
-      b.addEventListener("click", () => { ic.value = k[0]; mark(); drawPv(); }); pk.appendChild(b);
+      const b = hEl("button", "dvcbo", '<span class="dvth">' + art(k[0], "o" + k[0]) + '</span><span></span>'); b.type = "button"; b.setAttribute("role", "option"); b.dataset.k = k[0];
+      b.lastChild.textContent = k[1];
+      b.addEventListener("click", () => { ic.value = k[0]; mark(); drawPv(); toggle(false); tg.focus(); }); ls.appendChild(b);
     });
+    tg.addEventListener("click", () => toggle());
+    cb.addEventListener("keydown", e => { if(e.key === "Escape" && !ls.hidden){ e.stopPropagation(); toggle(false); tg.focus(); } });
+    cb.append(tg, ls);
     [dt, ti, xi].forEach(e => e.addEventListener("input", drawPv)); mark(); drawPv();
     const sec = t => { const h = hEl("p", "dvh dvs"); h.textContent = t; return h; };
     const msg = hEl("p", "dvm"), say = (t, bad) => { msg.textContent = t; msg.className = "dvm" + (bad ? " bad" : ""); };
     const go = hEl("button", "dvb pri"); go.type = "button"; go.textContent = edit ? "Simpan perubahan" : "Terbitkan";
     const cl = hEl("button", "dvb"); cl.type = "button"; cl.textContent = "Tutup panel"; cl.addEventListener("click", stClose);
-    f.append(sec("1 · Jenis ikon"), pk, sec("2 · Tanggal"), fld("Tanggal terbit", dt), sec("3 · Isi pengumuman (Indonesia)"), fld("Judul", ti, "Singkat dan jelas."), fld("Isi", xi, "Cukup 1–2 kalimat."), sec("4 · English (opsional)"), fld("Title", te), fld("Text", xe, "Boleh dikosongkan. Pengguna English akan melihat versi Indonesia."), sec("Pratinjau kartu"), pv, msg, go, cl);
+    f.append(sec("1 · Jenis ikon"), cb, sec("2 · Tanggal"), fld("Tanggal terbit", dt), sec("3 · Isi pengumuman (Indonesia)"), fld("Judul", ti, "Singkat dan jelas."), fld("Isi", xi, "Cukup 1–2 kalimat."), sec("4 · English (opsional)"), fld("Title", te), fld("Text", xe, "Boleh dikosongkan. Pengguna English akan melihat versi Indonesia."), sec("Pratinjau kartu"), pv, msg, go, cl);
     if(edit){ const cb = hEl("button", "dvb"); cb.type = "button"; cb.textContent = "Batal ubah"; cb.addEventListener("click", () => infoDevOpen()); f.append(cb); }
     go.addEventListener("click", async () => {
       const d = { date: dt.value, icon: ic.value, title:{ id: ti.value.trim(), en: te.value.trim() }, text:{ id: xi.value.trim(), en: xe.value.trim() } };
