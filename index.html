@@ -920,8 +920,8 @@ h1{font-size:26px;line-height:1.15}
 #stSheet .dvcz input{flex:1;min-width:0;accent-color:#d4a94f}
 /* Sponsor format "Banner saja": gambar memenuhi seluruh panel, tanpa judul/deskripsi/tombol; seluruh banner bisa diketuk */
 .spc.spfull{position:relative;display:block;width:100%;margin:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;background:#0d1017;aspect-ratio:16/7;-webkit-tap-highlight-color:transparent}
-#infc .spc.spfull{aspect-ratio:16/7;flex:none}
-#infc .sl:has(>.spfull){height:auto}   /* slide banner: tinggi mengikuti rasio 16:7 agar gambar utuh, sama dengan pratinjau */
+#infc .spc.spfull{aspect-ratio:auto}
+#infc .spc.spfull img{object-fit:contain}   /* panel slide tetap; gambar banner diperkecil agar utuh (tidak terpotong) */
 .spc.spfull img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover}
 .spc.spfull .spp{position:absolute;top:8px;left:8px;z-index:1;padding:2px 7px;font-size:9.5px;background:rgba(13,16,23,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .spc.spfull:focus-visible{outline:2px solid #9fbcf5;outline-offset:2px}
