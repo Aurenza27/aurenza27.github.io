@@ -17749,6 +17749,9 @@ function settingsPanel(){
    f = daftar uid teman yang boleh membaca (aturan database: pemilik atau uid ada di f). Dihitung: aktivitas tidak ditandai, bukan input manual, bukan impor.
    Tampilan hanya memuat dokumen milik akun yang ada di daftar temanku (uid lain diabaikan). Urutan: filter satu olahraga = jarak, filter Semua = waktu. */
 const LBC = "sport_week";
+/* Hemat kuota Firestore (Spark): tombol Muat ulang diberi jeda 45 dtk agar tidak memicu pembacaan berulang */
+let rfT = 0; const rfGate = () => { const n = Date.now(); if(n - rfT < 45000){ toast(L("Baru saja dimuat. Coba lagi sebentar.", "Just refreshed. Try again in a moment.")); return false; } rfT = n; return true; };
+let lbSig = "", fdWr = null, fdWrU = "", sgWr = null, sgWrU = "";
 let lbList = null, lbBusy = false, lbSp = "all", lbCat = "dist", lbT = 0, lbErr = "", lbUnsub = null;
 const lbAuth = () => { try{ return (window.parent && window.parent !== window) ? (window.parent.satuTitikAuth || null) : null; }catch(e){ return null; } };
 const lbFr = () => { try{ return (window.parent && window.parent !== window) ? (window.parent.satuTitikFriends || null) : null; }catch(e){ return null; } };
@@ -17787,13 +17790,15 @@ async function lbPublish(){
   try{ if(fr && fr.ready && fr.ready()) f = fr.list().map(x => String(x.uid || "")).filter(Boolean).slice(0, 300); }catch(e){}
   const { m, db } = await a.getDb(), wk = lbWk(Date.now());
   const mn = lbMine(), ref = m.doc(db, LBC, u.uid + "_" + wk), base = { uid:u.uid, wk:wk, f:f, t:mn.t, ad:mn.ad, p:mn.p, ts:Date.now() };
+  /* lewati bila isinya sama dengan yang terakhir terkirim (hemat tulis); ts tidak ikut dibandingkan */
+  const sg = JSON.stringify([u.uid, wk, f, mn.t, mn.ad, mn.p, lbMonth()]); if(sg === lbSig) return true;
   /* mo = total bulan berjalan (untuk Tantangan bulanan). Bila aturan database lama menolak field baru ini, kirim ulang tanpa mo agar peringkat mingguan tetap jalan. */
   if(!lbNoMo){
-    try{ await m.setDoc(ref, lbPO(Object.assign({}, base, { mo:lbMonth() }))); return true; }
+    try{ await m.setDoc(ref, lbPO(Object.assign({}, base, { mo:lbMonth() }))); lbSig = sg; return true; }
     catch(e){ if(!/permission/i.test(String((e && (e.code || e.message)) || ""))) throw e; lbNoMo = true; }
   }
   await m.setDoc(ref, lbPO(base));
-  return true;
+  lbSig = sg; return true;
 }
 function lbSoon(){ if(DEMO || !(lbOn() || fdOn() || sgOn())) return; clearTimeout(lbT); lbT = setTimeout(() => { if(lbOn()) lbPublish().catch(() => {}); if(fdOn()) fdPublish().catch(() => {}); if(sgOn()) sgPublish().catch(() => {}); }, 2500); }
 function lbWatch(){
@@ -17819,7 +17824,7 @@ async function lbWipe(){
   const u = lbMe(), a = lbAuth(); if(!u || !a || !a.getDb) return;
   const { m, db } = await a.getDb();
   const sn = await m.getDocs(m.query(m.collection(db, LBC), m.where("uid", "==", u.uid)));
-  const jobs = []; sn.forEach(d => jobs.push(m.deleteDoc(d.ref))); await Promise.all(jobs);
+  const jobs = []; sn.forEach(d => jobs.push(m.deleteDoc(d.ref))); await Promise.all(jobs); lbSig = "";
 }
 function lbErrMsg(e){
   const c = String((e && (e.code || e.message)) || "");
@@ -17917,7 +17922,7 @@ function renderLb(){
   else if(lbList.length === 0) box.append(el("p", "tiny", L("Belum ada teman yang ikut minggu ini. Ajak temanmu membuka tab ini dan menekan Ikut peringkat teman.", "No friends have joined this week. Ask them to open this tab and tap Join friends ranking.")));
   const left = Math.max(1, Math.ceil((weekStart(Date.now()) + 7 * 86400000 - Date.now()) / 86400000));
   box.append(el("p", "tiny", lbNote() + " " + L("Peringkat diatur ulang setiap Senin (" + left + " hari lagi).", "Ranking resets every Monday (" + left + " days left).")));
-  const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { lbList = null; lbErr = ""; renderLb(); }; box.append(rf);
+  const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { if(!rfGate()) return; lbList = null; lbErr = ""; renderLb(); }; box.append(rf);
 }
 
 /* ===== FEED AKTIVITAS TEMAN (opsional) =====
@@ -17938,16 +17943,33 @@ function fdAgo(ts){
   if(s < 86400){ const n = Math.floor(s / 3600); return L(n + " jam lalu", n + " h ago"); }
   const n = Math.floor(s / 86400); return L(n + " hari lalu", n + " d ago");
 }
+/* Tulis hanya dokumen yang baru atau berubah (bukan semua 20 tiap kali). Sekali per sesi membaca dokumen milik sendiri untuk membandingkan. Saat aktivitas dihapus, apresiasi dan komentar miliknya ikut dibersihkan. */
 async function fdPublish(){
   if(DEMO || !fdOn()) return false;
   const u = lbMe(), a = lbAuth(); if(!u || !a || !a.getDb) return false;
   const f = fdF(), mine = fdMine(), sig = f.join(",") + "|" + mine.map(x => x.id).join(",");
   if(sig === fdSig) return true;
-  const { m, db } = await a.getDb(), keep = {};
-  await Promise.all(mine.map(x => { const pid = fdPid(u.uid, x.id); keep[pid] = 1; return m.setDoc(m.doc(db, FDP, pid), lbPO({ uid:u.uid, f:f, sp:x.sp, d:Math.round(x.dist), s:Math.round(x.dur), ts:x.ts, pu:Date.now() })); }));
-  const sn = await m.getDocs(m.query(m.collection(db, FDP), m.where("uid", "==", u.uid))), jobs = [];
-  sn.forEach(d => { if(!keep[d.id]) jobs.push(m.deleteDoc(d.ref)); }); await Promise.all(jobs);
-  fdSig = sig; return true;
+  const { m, db } = await a.getDb(), fk = f.join(",");
+  if(!fdWr || fdWrU !== u.uid){
+    const sn = await m.getDocs(m.query(m.collection(db, FDP), m.where("uid", "==", u.uid))), cur = {};
+    sn.forEach(d => { const v = d.data() || {}; cur[d.id] = (Array.isArray(v.f) ? v.f.join(",") : "") + "|" + v.d + "|" + v.s + "|" + v.ts; });
+    fdWr = cur; fdWrU = u.uid;
+  }
+  const want = {}, jobs = [];
+  mine.forEach(x => {
+    const pid = fdPid(u.uid, x.id), dd = Math.round(x.dist), ss = Math.round(x.dur), sg = fk + "|" + dd + "|" + ss + "|" + x.ts; want[pid] = sg;
+    if(fdWr[pid] !== sg) jobs.push(m.setDoc(m.doc(db, FDP, pid), lbPO({ uid:u.uid, f:f, sp:x.sp, d:dd, s:ss, ts:x.ts, pu:Date.now() })));
+  });
+  await Promise.all(jobs);
+  const gone = Object.keys(fdWr).filter(pid => !(pid in want));
+  for(const pid of gone){
+    await m.deleteDoc(m.doc(db, FDP, pid));
+    for(const c of [FDR, FDM]){
+      const sn = await m.getDocs(m.query(m.collection(db, c), m.where("pid", "==", pid), m.where("o", "==", u.uid))), dj = [];
+      sn.forEach(d => dj.push(m.deleteDoc(d.ref))); await Promise.all(dj);
+    }
+  }
+  fdWr = want; fdSig = sig; return true;
 }
 async function fdLoad(){
   const u = lbMe(), a = lbAuth(); if(!u || !a || !a.getDb) throw new Error("login");
@@ -17967,7 +17989,7 @@ async function fdWipe(){
   for(const c of [[FDP, "uid"], [FDR, "uid"], [FDR, "o"], [FDM, "uid"], [FDM, "o"]]){
     const sn = await m.getDocs(m.query(m.collection(db, c[0]), m.where(c[1], "==", u.uid))); sn.forEach(d => jobs.push(m.deleteDoc(d.ref)));
   }
-  await Promise.all(jobs);
+  await Promise.all(jobs); fdWr = null;
 }
 async function fdReact(x, u){
   const { m, db } = await lbAuth().getDb(), ref = m.doc(db, FDR, x.pid + "_" + u.uid), r = fdData.rx[x.pid] = fdData.rx[x.pid] || {};
@@ -18081,7 +18103,7 @@ function renderFeed(v, u){
   if(fdErr) box.append(el("p", "tiny", fdErr));
   else if(!items.length) box.append(el("p", "tiny", L("Belum ada aktivitas. Rekam aktivitas GPS atau ajak temanmu ikut membagikan aktivitasnya ke Feed.", "No activities yet. Record a GPS activity or ask your friends to share theirs to the Feed.")));
   box.append(el("p", "tiny", L("Hanya aktivitas GPS valid (bukan bertanda ⚠, input manual, atau impor) dalam 14 hari terakhir. Pemilik aktivitas dan penulis bisa menghapus komentar. Dilarang spam, tautan, dan kata kasar.", "Only valid GPS activities (not flagged ⚠, manual, or imported) from the last 14 days. The activity owner and the author can delete a comment. No spam, links, or rude words.")));
-  if(!DEMO){ const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { fdData = null; fdErr = ""; fdSig = ""; renderLb(); }; box.append(rf); }
+  if(!DEMO){ const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { if(!rfGate()) return; fdData = null; fdErr = ""; fdSig = ""; renderLb(); }; box.append(rf); }
 }
 
 /* ===== TANTANGAN ANTARTEMAN (kompetisi mingguan / bulanan dengan target dan papan peringkat) =====
@@ -18172,7 +18194,7 @@ function renderChal(v, u){
   if(miss > 0) box.append(el("p", "tiny", L(miss + " teman belum punya data " + (c.pd === "m" ? "bulanan" : "mingguan") + " dan tidak ikut dihitung. Minta mereka membuka tab Teman agar datanya diperbarui.", miss + " friend(s) have no " + (c.pd === "m" ? "monthly" : "weekly") + " data yet and are not counted. Ask them to open the Friends tab to refresh their data.")));
   if(c.pd === "m" && lbNoMo) box.append(el("p", "tiny", L("Server belum menerima data bulanan, jadi hanya progresmu sendiri yang tampil. Aturan database peringkat perlu diperbarui.", "The server does not accept monthly data yet, so only your own progress shows. The ranking database rules need an update.")));
   box.append(el("p", "tiny", L("Dihitung dari aktivitas GPS yang valid: aktivitas bertanda ⚠, input manual, dan impor tidak dihitung. " + (c.pd === "m" ? "Diatur ulang tiap tanggal 1" : "Diatur ulang tiap Senin") + " (" + chLeft(c.pd) + " hari lagi).", "Counted from valid GPS activities: flagged ⚠, manual, and imported ones are not counted. " + (c.pd === "m" ? "Resets on the 1st of each month" : "Resets every Monday") + " (" + chLeft(c.pd) + " days left).")));
-  const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { lbList = null; lbErr = ""; renderLb(); }; box.append(rf);
+  const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { if(!rfGate()) return; lbList = null; lbErr = ""; renderLb(); }; box.append(rf);
 }
 /* ===== SEGMENT LEADERBOARD (adu kecepatan dengan teman di rute atau jalur yang sama; opsional) =====
    Segmen = potongan rute sebuah aktivitas GPS valid (titik awal sampai akhir yang dipilih pengguna). Dibuat dari halaman detail aktivitas.
@@ -18258,29 +18280,36 @@ function sgClean(v, gid){
   return {id:id, o:o, nm:String(v.nm || "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 30) || "?", sp:v.sp, len:Math.round(len), pts:pts};
 }
 /* ----- server ----- */
+/* Sama seperti Feed: tulis hanya segmen atau waktu terbaik yang baru atau berubah; hapus yang sudah tidak ada. */
 async function sgPublish(){
   if(DEMO || !sgOn()) return false;
   const u = lbMe(), a = lbAuth(); if(!u || !a || !a.getDb) return false;
   const f = fdF(), list = sgList(), sig = f.join(",") + "|" + list.map(s => sgKey(s) + ":" + (s.bt || 0)).join(",");
   if(sig === sgSig) return true;
-  const { m, db } = await a.getDb(), keepS = {}, keepE = {}, jobs = [];
+  const { m, db } = await a.getDb(), fk = f.join(",");
+  if(!sgWr || sgWrU !== u.uid){
+    const cur = {};
+    for(const c of [SGS, SGE]){
+      const sn = await m.getDocs(m.query(m.collection(db, c), m.where("uid", "==", u.uid)));
+      sn.forEach(d => { const v = d.data() || {}, ff = Array.isArray(v.f) ? v.f.join(",") : ""; cur[c + "/" + d.id] = c === SGS ? ff + "|" + v.nm + "|" + v.len + "|" + (Array.isArray(v.pts) ? v.pts.length : 0) : ff + "|" + v.tm + "|" + v.ts; });
+    }
+    sgWr = cur; sgWrU = u.uid;
+  }
+  const want = {}, jobs = [];
   list.forEach(s => {
     const gid = sgGid(s, u);
-    if(!s.o){ keepS[gid] = 1; jobs.push(m.setDoc(m.doc(db, SGS, gid), lbPO({ uid:u.uid, id:s.id, nm:s.nm, sp:s.sp, len:s.len, pts:s.pts, f:f, pu:Date.now() }))); }
-    if(s.bt > 0){ const id = gid + "_" + u.uid; keepE[id] = 1; jobs.push(m.setDoc(m.doc(db, SGE, id), lbPO({ uid:u.uid, g:gid, sp:s.sp, tm:s.bt, ts:s.bs || 0, f:f, pu:Date.now() }))); }
+    if(!s.o){ const k = SGS + "/" + gid, sg = fk + "|" + s.nm + "|" + s.len + "|" + s.pts.length; want[k] = sg; if(sgWr[k] !== sg) jobs.push(m.setDoc(m.doc(db, SGS, gid), lbPO({ uid:u.uid, id:s.id, nm:s.nm, sp:s.sp, len:s.len, pts:s.pts, f:f, pu:Date.now() }))); }
+    if(s.bt > 0){ const id = gid + "_" + u.uid, k = SGE + "/" + id, sg = fk + "|" + s.bt + "|" + (s.bs || 0); want[k] = sg; if(sgWr[k] !== sg) jobs.push(m.setDoc(m.doc(db, SGE, id), lbPO({ uid:u.uid, g:gid, sp:s.sp, tm:s.bt, ts:s.bs || 0, f:f, pu:Date.now() }))); }
   });
   await Promise.all(jobs);
-  const del = [];
-  for(const c of [[SGS, keepS], [SGE, keepE]]){
-    const sn = await m.getDocs(m.query(m.collection(db, c[0]), m.where("uid", "==", u.uid))); sn.forEach(d => { if(!c[1][d.id]) del.push(m.deleteDoc(d.ref)); });
-  }
-  await Promise.all(del); sgSig = sig; return true;
+  const del = []; Object.keys(sgWr).forEach(k => { if(!(k in want)){ const i = k.indexOf("/"); del.push(m.deleteDoc(m.doc(db, k.slice(0, i), k.slice(i + 1)))); } });
+  await Promise.all(del); sgWr = want; sgSig = sig; return true;
 }
 async function sgWipe(){
   const u = lbMe(), a = lbAuth(); if(!u || !a || !a.getDb) return;
   const { m, db } = await a.getDb(), jobs = [];
   for(const c of [SGS, SGE]){ const sn = await m.getDocs(m.query(m.collection(db, c), m.where("uid", "==", u.uid))); sn.forEach(d => jobs.push(m.deleteDoc(d.ref))); }
-  await Promise.all(jobs);
+  await Promise.all(jobs); sgWr = null;
 }
 function sgFriends(){ const by = {}, fr = lbFr(); try{ if(fr && fr.ready && fr.ready()) fr.list().forEach(x => { by[String(x.uid)] = x; }); }catch(e){} return by; }
 async function sgLoad(){
@@ -18404,7 +18433,7 @@ function sgView(v, u, s, on){
     return;
   }
   sgBoardView(v, s, sgBoard.rows, u, sgBoard.err);
-  const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { sgBoard = null; sgSig = ""; renderLb(); }; v.append(rf);
+  const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { if(!rfGate()) return; sgBoard = null; sgSig = ""; renderLb(); }; v.append(rf);
   del.style.marginTop = "14px"; v.append(del);
 }
 function renderSeg(v, u){
@@ -18467,7 +18496,7 @@ function renderSeg(v, u){
   });
   if(sgErr) fb.append(el("p", "tiny", sgErr));
   else if(!fresh.length) fb.append(el("p", "tiny", L("Belum ada segmen baru dari temanmu. Ajak temanmu membuat segmen dan ikut Segment Leaderboard.", "No new segments from your friends. Ask them to create a segment and join the Segment Leaderboard.")));
-  const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { sgData = null; sgErr = ""; sgSig = ""; renderLb(); }; fb.append(rf);
+  const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { if(!rfGate()) return; sgData = null; sgErr = ""; sgSig = ""; renderLb(); }; fb.append(rf);
 }
 if(lbOn() || fdOn() || sgOn()){ lbWatch(); lbSoon(); }
 
