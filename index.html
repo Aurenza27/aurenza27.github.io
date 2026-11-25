@@ -3839,7 +3839,7 @@ function spnDevOpen(edit){
     fi.type = "file"; fi.accept = "image/*"; fi.hidden = true;
     const pick = hEl("button", "dvb sm"), clr = hEl("button", "dvb sm del"); pick.type = clr.type = "button"; pick.textContent = "Pilih gambar dari galeri"; clr.textContent = "Hapus gambar";
     const HINT_CARD = "Ukuran saran 400×400 px (persegi). Gambar yang lebih besar bisa digeser dan di-zoom dulu sebelum diterbitkan. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
-    const HINT_FULL = "Ukuran saran 800×350 px (melebar, rasio 16:7). Gambar memenuhi seluruh panel sponsor, jadi letakkan teks dan logo penting di tengah. Tanpa judul, deskripsi, atau tombol: seluruh banner bisa diketuk untuk membuka link. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
+    const HINT_FULL = "Ukuran saran 800×350 px (melebar, rasio 16:7). Gambar otomatis diperkecil agar tampil utuh (tidak terpotong); zoom untuk memperbesar bila perlu. Tanpa judul, deskripsi, atau tombol: seluruh banner bisa diketuk untuk membuka link. Hasilnya dikompres di bawah ±90 KB. Gunakan gambar milik sponsor atau yang sudah mereka izinkan.";
     const hint = hEl("p", "dvh sub");
     const prev = hEl("div", "dvprev");
     const msg = hEl("p", "dvm"), say = (t, bad) => { msg.textContent = t; msg.className = "dvm" + (bad ? " bad" : ""); };
@@ -3859,11 +3859,12 @@ function spnDevOpen(edit){
     const startCrop = im => {
       const ar = mode === "full" ? 800 / 350 : 1;   /* lebar : tinggi jendela potong */
       const w = im.naturalWidth, h = im.naturalHeight, base = Math.min(w, h * ar), maxSide = Math.max(w, h * ar), zmin = Math.min(1, base / maxSide);
-      const st = { side: base, sx: (w - base) / 2, sy: (h - base / ar) / 2 };
+      const z0 = ar === 1 ? 1 : zmin, side0 = base / z0;   /* banner: awal diperkecil agar seluruh gambar terlihat (tidak terpotong), sisa ruang diisi warna gelap */
+      const st = { side: side0, sx: (w - side0) / 2, sy: (h - side0 / ar) / 2 };
       const clamp = () => { const sh = st.side / ar; st.sx = Math.max(Math.min(0, w - st.side), Math.min(Math.max(0, w - st.side), st.sx)); st.sy = Math.max(Math.min(0, h - sh), Math.min(Math.max(0, h - sh), st.sy)); };
       const wrap = hEl("div", "dvcrop"), cv = document.createElement("canvas"); cv.width = ar === 1 ? 400 : 800; cv.height = ar === 1 ? 400 : 350; cv.className = "dvcv" + (ar === 1 ? "" : " wide"); cv.tabIndex = 0;
       cv.setAttribute("role", "img"); cv.setAttribute("aria-label", "Pratinjau potongan gambar. Geser atau pakai tombol panah untuk mengatur posisi.");
-      const zw = hEl("label", "dvcz", "<span></span>"), zr = document.createElement("input"); zr.type = "range"; zr.min = String(zmin); zr.max = "3"; zr.step = "0.01"; zr.value = "1";
+      const zw = hEl("label", "dvcz", "<span></span>"), zr = document.createElement("input"); zr.type = "range"; zr.min = String(zmin); zr.max = "3"; zr.step = "0.01"; zr.value = String(z0);
       zw.firstChild.textContent = "Zoom"; zw.appendChild(zr);
       const rs = hEl("button", "dvb sm"); rs.type = "button"; rs.textContent = "Reset posisi";
       const note = hEl("p", "dvh sub"); note.textContent = "Geser gambar untuk mencari posisi yang pas. Pakai slider untuk memperbesar atau memperkecil.";
@@ -3884,7 +3885,7 @@ function spnDevOpen(edit){
       });
       zr.addEventListener("input", () => { const cx = st.sx + st.side / 2, cy = st.sy + st.side / ar / 2; st.side = base / (+zr.value || 1); st.sx = cx - st.side / 2; st.sy = cy - st.side / ar / 2; clamp(); draw(); });
       zr.addEventListener("change", commit);
-      rs.addEventListener("click", () => { st.side = base; st.sx = (w - base) / 2; st.sy = (h - base / ar) / 2; zr.value = "1"; commit(); });
+      rs.addEventListener("click", () => { st.side = side0; st.sx = (w - side0) / 2; st.sy = (h - side0 / ar) / 2; zr.value = String(z0); commit(); });
       commit(); return wrap;
     };
     [nm, ti, te, xi, xe, ct].forEach(e => e.addEventListener("input", refreshPrev));
