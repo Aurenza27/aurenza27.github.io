@@ -2510,14 +2510,14 @@ window.satuTitikNative = {
       if(cfg.banner !== false){
         /* Sisakan ruang di bawah halaman setinggi banner, supaya tulisan kaki beranda dan menu tidak tertutup iklan */
         const st = document.createElement("style");
-        st.textContent = "#home{padding-bottom:calc(96px + var(--adh,0px) + env(safe-area-inset-bottom,0px))!important}#view,#about,#privacy,#stTerms{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - env(safe-area-inset-top,0px) - var(--adh,0px) - env(safe-area-inset-bottom,0px))!important}#glList{padding-bottom:12px}";
+        st.textContent = ":root{--adg:calc(max(env(safe-area-inset-bottom,0px),14px) + 6px)}#home{padding-bottom:calc(96px + var(--adh,0px) + env(safe-area-inset-bottom,0px))!important}#view,#about,#privacy,#stTerms{bottom:var(--adh,0px)!important}#spanel{max-height:calc(100% - 70px - env(safe-area-inset-top,0px) - var(--adh,0px) - env(safe-area-inset-bottom,0px))!important}#glList{padding-bottom:12px}";
         document.head.appendChild(st);
-        const setH = h => { h = Math.round(+h || 0); if(h > 0) document.documentElement.style.setProperty("--adh", h + "px"); };
+        const setH = h => { h = Math.round(+h || 0); if(h > 0) document.documentElement.style.setProperty("--adh", "calc((" + h + "px + var(--adg,20px)) * var(--tz,1))"); };   /* tinggi banner + celah bilah navigasi, supaya konten tidak pernah tertimpa iklan */
         try{ AdMob.addListener("bannerAdSizeChanged", e => setH(e && e.height)); }catch(e){}
         /* banner gagal (mis. offline) tidak boleh menghentikan iklan layar penuh */
         try{
           await AdMob.showBanner({ adId: cfg.adBanner, adSize: "ADAPTIVE_BANNER", position: "BOTTOM_CENTER", margin: 0, isTesting: !!cfg.testMode });
-          setTimeout(() => { if(!document.documentElement.style.getPropertyValue("--adh")) setH(60); }, 2500);
+          setTimeout(() => { if(!document.documentElement.style.getPropertyValue("--adh")) setH(60); }, 1200);
         }catch(e){ console.warn("Banner tidak dapat dimuat:", e); }
       }
       if(cfg.interstitial !== false) initInterstitial(AdMob, cfg);
@@ -2607,10 +2607,52 @@ function tutFixHelper(){
       if(raf) return;
       raf = requestAnimationFrame(function(){ raf = 0; try{ W.dispatchEvent(new Event("resize")); }catch(e){} });
     }
+    function prog(){ try{ var c = d.getElementById("tutC"); if(!c) return; var m = /(\d+)\s*\/\s*(\d+)/.exec((c.querySelector(".tutf small") || {}).textContent || ""); if(m) c.style.setProperty("--p", String(m[1] / m[2])); }catch(e){} }
+    function hook(n){ try{ var c = n.querySelector && n.querySelector("#tutC"), hh = n.querySelector && n.querySelector("#tutH"); if(c){ prog(); new MutationObserver(function(){ prog(); gsafe(); }).observe(c, {childList:true, attributes:true, attributeFilter:["style"]}); if(hh) new MutationObserver(gsafe).observe(hh, {attributes:true, attributeFilter:["style"]}); setTimeout(gsafe, 30); setTimeout(gsafe, 250); } }catch(e){} }
+
+    /* Penjaga posisi kartu: kartu memilih sisi yang lebih lega, menyusut bila perlu (isinya bisa digulir, tombol tetap terlihat), dan target digulir ke area aman supaya tidak tertutup kartu di layar kecil maupun saat ukuran huruf besar */
+    var gk = "", gn = 0, gl = "";
+    function target(h, o, vh){
+      try{
+        var r = h.getBoundingClientRect(), cx = (r.left + r.right) / 2, cy = Math.min(Math.max((r.top + r.bottom) / 2, 2), vh - 2), e;
+        o.style.display = "none"; e = d.elementFromPoint(cx, cy); o.style.display = "";
+        while(e && e !== d.body && e !== root){ var q = e.getBoundingClientRect(); if(q.width >= r.width - 16 && q.height >= r.height - 16) return q.height <= r.height + 60 ? e : null; e = e.parentElement; }
+      }catch(x){ try{ o.style.display = ""; }catch(y){} }
+      return null;
+    }
+    function guard(){
+      var o = d.getElementById("tutO"), h = d.getElementById("tutH"), c = d.getElementById("tutC"); if(!o || !h || !c) return;
+      if(getComputedStyle(h).display === "none") return;
+      var vw = W.innerWidth, vh = W.innerHeight, M = 8, G = 12, sm = c.querySelector(".tutf small"), key = sm ? sm.textContent : "";
+      if(key !== gk){ gk = key; gn = 0; }
+      var ch = c.scrollHeight + 2, hr = h.getBoundingClientRect();   /* tinggi alami kartu (tanpa mengubah gaya, supaya tidak memicu pengamat berulang) */
+      var below = vh - hr.bottom - G, above = hr.top - G, need = Math.min(ch, Math.max(190, vh * 0.4));
+      var outv = hr.top < M || hr.bottom > vh - M;
+      if(gn < 3 && hr.height < vh * 0.7 && (outv || Math.max(below, above) < need)){
+        var e = target(h, o, vh);
+        if(e){
+          gn++; var pm = e.style.scrollMarginTop; e.style.scrollMarginTop = "18px";
+          try{ e.scrollIntoView({block: outv && Math.max(below, above) >= need ? "center" : "start", inline:"nearest"}); }catch(x){}
+          e.style.scrollMarginTop = pm;
+          try{ W.dispatchEvent(new Event("resize")); }catch(x){}
+          hr = h.getBoundingClientRect(); below = vh - hr.bottom - G; above = hr.top - G;
+        }
+      }
+      var top, mh;
+      if(Math.max(below, above) < 120){ mh = vh - 2 * M; top = (hr.top + hr.height / 2 > vh / 2) ? M : Math.max(M, vh - Math.min(ch, mh) - M); }
+      else if(below >= Math.min(ch, need) || below >= above){ mh = Math.min(ch, Math.max(120, below)); top = hr.bottom + G; if(top + mh > vh - M) top = Math.max(M, vh - mh - M); }
+      else { mh = Math.min(ch, Math.max(120, above)); top = Math.max(M, hr.top - G - mh); }
+      var left = Math.max(12, (vw - c.offsetWidth) / 2), sig = Math.round(top) + "|" + Math.round(mh) + "|" + Math.round(left);
+      if(c.style.maxHeight !== Math.round(mh) + "px") c.style.maxHeight = Math.round(mh) + "px";
+      if(c.style.top !== Math.round(top) + "px") c.style.top = Math.round(top) + "px";
+      if(c.style.left !== Math.round(left) + "px") c.style.left = Math.round(left) + "px";
+    }
+    var gbusy = false;
+    function gsafe(){ if(gbusy) return; gbusy = true; try{ guard(); }catch(e){} gbusy = false; }
     function boot(){
       sync();
       try{ var ap = d.getElementById("thAp"); if(ap) new MutationObserver(sync).observe(ap, {childList:true, characterData:true, subtree:true}); }catch(e){}
-      try{ if(d.body) new MutationObserver(function(ms){ for(var i = 0; i < ms.length; i++) for(var j = 0; j < ms[i].addedNodes.length; j++){ var n = ms[i].addedNodes[j]; if(n.id === "tutO" || n.id === "tutP" || n.id === "tutB"){ sync(); return; } } }).observe(d.body, {childList:true}); }catch(e){}
+      try{ if(d.body) new MutationObserver(function(ms){ for(var i = 0; i < ms.length; i++) for(var j = 0; j < ms[i].addedNodes.length; j++){ var n = ms[i].addedNodes[j]; if(n.id === "tutO" || n.id === "tutP" || n.id === "tutB"){ sync(); hook(n); return; } } }).observe(d.body, {childList:true}); }catch(e){}
     }
     W.addEventListener("resize", sync);
     W.addEventListener("load", sync);
@@ -2618,7 +2660,7 @@ function tutFixHelper(){
     if(d.readyState === "loading") d.addEventListener("DOMContentLoaded", boot); else boot();
   }catch(e){}
 }
-const ST_TUTFIX = "<style>#tutO,#tutP,#tutB{zoom:var(--tz,1)}</style><scr" + "ipt>(" + tutFixHelper.toString() + ")();<\/scr" + "ipt>";
+const ST_TUTFIX = "<style>#tutO,#tutP,#tutB{zoom:var(--tz,1)}html #tutC,html #hTutC{box-sizing:border-box;width:min(344px,calc(100vw - 24px));display:flex;flex-direction:column;gap:10px;padding:18px 16px 0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:20px;border:1px solid rgba(240,207,134,.4);background:linear-gradient(160deg,#1d1a13 0%,#141720 55%,#10131a 100%);box-shadow:0 20px 56px rgba(0,0,0,.72),0 0 0 1px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.07)}html #tutC > b,html #hTutC > b{display:block;font:700 17px/1.3 var(--head,inherit);letter-spacing:.01em;color:var(--gold2,#f0cf86)}html #tutC p,html #hTutC p{margin:0;font-size:14px;line-height:1.6;color:var(--text,#ece7da);opacity:.94}html #tutC p b,html #hTutC p b{color:var(--gold2,#f0cf86)}html #tutC .tutf,html #hTutC .tutf{position:sticky;bottom:0;z-index:2;display:flex;align-items:center;gap:8px;margin:6px -16px 0;padding:16px 16px 14px;background:linear-gradient(180deg,rgba(16,19,26,0) 0,#10131a 14px)}html #tutC .tutf::before,html #hTutC .tutf::before{content:\"\";position:absolute;left:16px;right:16px;top:7px;height:3px;border-radius:3px;background:rgba(240,207,134,.16)}html #tutC .tutf::after,html #hTutC .tutf::after{content:\"\";position:absolute;left:16px;top:7px;height:3px;border-radius:3px;width:calc((100% - 32px) * var(--p,0));background:linear-gradient(90deg,var(--gold,#d4a94f),var(--gold2,#f0cf86));transition:width .3s ease}html #tutC .tutf small,html #hTutC .tutf small{flex:1;min-width:0;font-size:12px;letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--muted,#9aa0ad)}html #tutC .tutf button,html #hTutC .tutf button{box-sizing:border-box;width:auto;min-width:44px;min-height:44px;margin:0;padding:0 12px;font:inherit;font-size:14px;font-weight:700;letter-spacing:0;line-height:1;white-space:nowrap;border-radius:12px;border:1px solid rgba(240,207,134,.28);background:rgba(255,255,255,.04);color:var(--text,#ece7da);cursor:pointer;-webkit-tap-highlight-color:transparent}html #tutC .tutf button:last-of-type,html #hTutC .tutf button:last-of-type{min-width:96px;padding:0 20px;border:0;background:linear-gradient(180deg,var(--gold2,#f0cf86),var(--gold,#d4a94f));color:#1a1405;font-weight:800;box-shadow:0 6px 18px rgba(212,169,79,.3)}html #tutC .tutf button:active,html #hTutC .tutf button:active{transform:scale(.97)}html #tutC .tutf .sk,html #hTutC .tutf .sk,html #tutC .tutf .tsk,html #hTutC .tutf .tsk{border-color:transparent;background:transparent;color:var(--muted,#9aa0ad);font-weight:500;padding:0 10px}html #tutC .tutf button:focus-visible,html #hTutC .tutf button:focus-visible{outline:2px solid var(--gold2,#f0cf86);outline-offset:2px}@media (max-width:340px){html #tutC .tutf small,html #hTutC .tutf small{display:none}html #tutC .tutf,html #hTutC .tutf{justify-content:flex-end}html #tutC .tutf .sk,html #hTutC .tutf .tsk{margin-right:auto}}@media (max-width:340px){html #tutC .tutf small,html #hTutC .tutf small{display:none}html #tutC .tutf,html #hTutC .tutf{justify-content:flex-end}html #tutC .tutf .sk,html #hTutC .tutf .tsk{margin-right:auto}}html #tutB{box-sizing:border-box;margin-bottom:12px;padding:12px 14px;gap:10px;border-radius:16px;border:1px solid rgba(240,207,134,.5);background:linear-gradient(160deg,#1d1a13,#10131a);box-shadow:0 14px 36px rgba(0,0,0,.65);font-size:13.5px;line-height:1.5;color:var(--text,#ece7da)}html #tutB button{min-height:40px;padding:0 14px;border-radius:12px;border:1px solid rgba(240,207,134,.45);background:rgba(240,207,134,.08);color:var(--gold2,#f0cf86);font-weight:600}html #tutC{max-height:calc((100vh - 24px)/var(--tz,1))}</style><scr" + "ipt>(" + tutFixHelper.toString() + ")();<\/scr" + "ipt>";
 /* Bagikan gambar di aplikasi Android (Capacitor): WebView tidak punya navigator.share untuk file, jadi gambar disimpan ke cache
    lewat plugin Filesystem lalu dibuka di lembar bagikan lewat plugin Share. Di web/PWA fungsi ini mengembalikan false dan jalur biasa dipakai. */
 /* Lembar pilihan "Bagikan" (gambar atau PDF): satu tombol saja di menu, pilihannya muncul di lembar dari bawah. Dipakai semua menu dan Turnamen. */
@@ -18563,7 +18605,7 @@ paint();
 /* ===== TUTORIAL PEMULA (offline, gaya Gems Arena) =====
    Pertama kali membuka menu Olahraga: sorotan langkah demi langkah dengan DATA CONTOH di memori (DEMO), tanpa GPS, tanpa internet, tanpa login.
    Semua baca/tulis data dialihkan ke MEM, jadi tidak ada yang tersimpan atau tersinkron. Latihan: mencatat satu aktivitas lewat Input manual.
-   Penanda selesai: kunci ol_tut (tur fitur baru: ol_tut_lb, ol_tut_ch, ol_tut_fd, ol_tut_sg). Tombol "📖 Panduan" membuka aturan tertulis dan tombol "Ulangi tutorial". */
+   Penanda selesai: kunci ol_tut (tur fitur Teman: ol_tut_lb, ol_tut_ch, ol_tut_fd, ol_tut_sg). Tombol "📖 Panduan" membuka aturan tertulis dan tombol "Ulangi tutorial". */
 (function(){
   const TK = "ol_tut", TL = "ol_tut_lb", TC = "ol_tut_ch", TF = "ol_tut_fd", TS = "ol_tut_sg"; let T = null, S0 = null;
   const tdone = () => { try{ return !!localStorage.getItem(TK); }catch(e){ return false; } };
@@ -18609,10 +18651,10 @@ paint();
       return (!(gv > 0) || gv === T.n0) ? ["#vStat > .panel:last-child .field input", L("Ubah <b>Target mingguan</b> menjadi 15.", "Change the <b>Weekly goal</b> to 15.")] : ["#vStat > .panel:last-child .btn", L("Ketuk <b>Simpan pengaturan</b>.", "Tap <b>Save settings</b>.")]; }}
   };
 
-  /* Tur fitur baru: Peringkat teman (tab Teman). pre = awalan nomor langkah bila dipakai di tutorial utama. Tidak mengubah data apa pun. */
+  /* Tur fitur Teman: Peringkat teman (tab Teman). pre = awalan nomor langkah bila dipakai di tutorial utama. Tidak mengubah data apa pun. */
   const lbSteps = pre => {
-    const me = !!lbMe(), on = !DEMO && lbOn(), s = [
-      {scr:"rec", q:"#tabs .tab:nth-child(4)", t:pre + L("Peringkat teman", "Friends ranking"), d:L("Di tab <b>Teman</b>, kamu bisa membandingkan total olahragamu minggu ini dengan teman-temanmu. Fitur ini <b>opsional</b> dan bisa kamu matikan kapan saja.", "In the <b>Friends</b> tab, you can compare this week's exercise totals with your friends. It is <b>optional</b> and you can turn it off any time.")},
+    const full = !!pre, me = !!lbMe(), on = !DEMO && lbOn(), s = [
+      {scr:"rec", q:"#tabs .tab:nth-child(4)", t:pre + L("Peringkat teman", "Friends ranking"), d:L("Di tab <b>Teman</b>, kamu bisa membandingkan total olahragamu minggu ini dengan teman-temanmu.", "In the <b>Friends</b> tab, you can compare this week's exercise totals with your friends.")},
       {scr:"lb", q:"#vLb > .panel", t:pre + L("Cara kerjanya", "How it works"), d: me
         ? L("Yang dibagikan hanya <b>total jarak, waktu, jumlah aktivitas, dan hari aktif</b> per olahraga untuk minggu ini, minggu lalu, dan bulan ini. <b>Peta rute GPS tidak pernah dikirim</b>, dan totalnya hanya bisa dilihat temanmu.", "Only your <b>total distance, time, number of activities, and active days</b> per sport for this week, last week, and this month are shared. <b>GPS route maps are never sent</b>, and only your friends can see the totals.")
         : L("Peringkat teman butuh akun. Masuk akun di <b>Beranda</b> dan tambahkan teman di menu Teman, lalu kembali ke tab ini.", "The friends ranking needs an account. Sign in on the <b>Home</b> screen and add friends in the Friends menu, then come back to this tab.")}
@@ -18621,63 +18663,63 @@ paint();
       ? L("Kamu sudah ikut. Ketuk <b>Berhenti ikut</b> kapan saja, dan datamu langsung <b>dihapus dari server</b>.", "You have joined. Tap <b>Stop sharing</b> any time and your data is <b>removed from the server</b> right away.")
       : L("Bawaannya <b>mati</b>, jadi tidak ada yang dibagikan sebelum kamu ikut. Ketuk <b>Ikut peringkat teman</b> bila mau. Ingin berhenti? Ketuk <b>Berhenti ikut</b> dan datamu dihapus dari server.", "It is <b>off</b> by default, so nothing is shared until you join. Tap <b>Join friends ranking</b> if you want in. Want to stop? Tap <b>Stop sharing</b> and your data is removed from the server.")});
     s.push({scr:"lb", q:on ? "#vLb .lbcat" : "", t:pre + L("4 kategori", "4 categories"), d:L("Pilih kategori: <b>Jarak</b> (total terjauh), <b>Kecepatan</b> (pace atau kecepatan rata-rata, ada jarak minimal), <b>Konsistensi</b> (paling banyak hari aktif dalam seminggu), dan <b>Peningkatan</b> (naik berapa persen dibanding minggu lalu).", "Pick a category: <b>Distance</b> (farthest total), <b>Speed</b> (average pace or speed, with a minimum distance), <b>Consistency</b> (most active days in a week), and <b>Improvement</b> (how many percent up from last week).")});
-    s.push({scr:"lb", t:pre + L("Membaca peringkat", "Reading the ranking"), d:L("Setelah kamu dan temanmu ikut, daftar muncul dengan 🥇🥈🥉 dan barismu bertanda <b>Kamu</b>. Saring lagi per olahraga lewat tombol di bawah kategori (Kecepatan butuh satu olahraga). Diatur ulang tiap <b>Senin</b>. Aktivitas bertanda ⚠, input manual, dan impor <b>tidak dihitung</b>. Ajak temanmu ikut supaya daftarnya terisi.", "Once you and your friends join, the list appears with 🥇🥈🥉 and your row marked <b>You</b>. Filter by sport with the buttons under the categories (Speed needs one sport). It resets every <b>Monday</b>. Flagged ⚠ activities, manual entries, and imports <b>do not count</b>. Ask your friends to join so the list fills up.")});
+    s.push({scr:"lb", t:pre + L("Membaca peringkat", "Reading the ranking"), d:L("Setelah kamu dan temanmu ikut, daftar muncul dengan 🥇🥈🥉 dan barismu bertanda <b>Kamu</b>. Saring lagi per olahraga lewat tombol di bawah kategori (Kecepatan butuh satu olahraga). Diatur ulang tiap <b>Senin</b>. Aktivitas bertanda ⚠, input manual, dan impor <b>tidak dihitung</b>.", "Once you and your friends join, the list appears with 🥇🥈🥉 and your row marked <b>You</b>. Filter by sport with the buttons under the categories (Speed needs one sport). It resets every <b>Monday</b>. Flagged ⚠ activities, manual entries, and imports <b>do not count</b>.")});
     return s;
   };
   const stepsLb = () => lbSteps("").concat([{c:1, scr:"lb", t:L("Siap! 🚀", "All set! 🚀"), d:L("Tur ini bisa diulang kapan saja lewat <b>📖 Panduan</b> lalu <b>Tur Peringkat teman</b>.", "You can replay this tour any time from <b>📖 Guide</b> and then <b>Friends ranking tour</b>."), nl:L("Mengerti ✓", "Got it ✓")}]);
 
-  /* Tur fitur baru: Tantangan Antarteman (tab Teman > Tantangan). Tidak mengubah data apa pun. */
+  /* Tur fitur Teman: Tantangan Antarteman (tab Teman > Tantangan). Tidak mengubah data apa pun. */
   const chSteps = pre => {
-    const me = !!lbMe(), on = !DEMO && lbOn(), s = [
-      {scr:"rec", q:"#tabs .tab:nth-child(4)", t:pre + L("Tantangan Antarteman", "Friends Challenge"), d:L("Fitur baru di tab <b>Teman</b>: kompetisi olahraga <b>mingguan dan bulanan</b> dengan <b>target</b> dan <b>papan peringkat</b> bersama temanmu.", "New in the <b>Friends</b> tab: <b>weekly and monthly</b> sports contests with a <b>target</b> and a <b>leaderboard</b> among your friends.")},
+    const full = !!pre, me = !!lbMe(), on = !DEMO && lbOn(), s = [
+      {scr:"rec", q:"#tabs .tab:nth-child(4)", t:pre + L("Tantangan Antarteman", "Friends Challenge"), d:L("Kompetisi olahraga <b>mingguan dan bulanan</b> dengan <b>target</b> dan <b>papan peringkat</b> bersama temanmu di tab <b>Teman</b>.", "<b>Weekly and monthly</b> sports contests with a <b>target</b> and a <b>leaderboard</b> among your friends in the <b>Friends</b> tab.")},
       {scr:"lb", lbm:"chal", q:on ? "#vLb .chmode" : "#vLb > .panel", t:pre + L("Buka tab Tantangan", "Open the Challenge tab"), d: !me
-        ? L("Tantangan butuh akun. Masuk akun di <b>Beranda</b> dan tambahkan teman, lalu ikut peringkat teman di tab ini.", "The challenge needs an account. Sign in on the <b>Home</b> screen and add friends, then join the friends ranking in this tab.")
+        ? (full ? L("Tantangan juga butuh akun dan ikut peringkat teman.", "The challenge also needs an account and joining the friends ranking.") : L("Tantangan butuh akun. Masuk akun di <b>Beranda</b> dan tambahkan teman, lalu ikut peringkat teman di tab ini.", "The challenge needs an account. Sign in on the <b>Home</b> screen and add friends, then join the friends ranking in this tab."))
         : on ? L("Ketuk <b>🎯 Tantangan</b> untuk pindah dari Peringkat. Datanya sama dengan peringkat teman, ditambah total bulan ini.", "Tap <b>🎯 Challenge</b> to switch from Ranking. It uses the same data as the friends ranking, plus this month's totals.")
         : L("Tantangan aktif setelah kamu menekan <b>Ikut peringkat teman</b> (bawaannya mati). Setelah itu tab <b>🎯 Tantangan</b> bisa dipakai.", "The challenge turns on after you tap <b>Join friends ranking</b> (off by default). After that, the <b>🎯 Challenge</b> tab can be used.")},
       {scr:"lb", lbm:"chal", q:on ? "#vLb .chset" : "", t:pre + L("Atur tantangan", "Set up the challenge"), d:L("Pilih <b>Mingguan</b> atau <b>Bulanan</b>, ukurannya (<b>Jarak, Waktu, atau Hari aktif</b>), olahraganya, lalu isi <b>target</b> dan ketuk <b>Simpan target</b>. Semua orang di papan diukur dengan target yang sama, jadi sepakati pengaturannya dengan temanmu.", "Pick <b>Weekly</b> or <b>Monthly</b>, the measure (<b>Distance, Time, or Active days</b>), the sport, then enter the <b>target</b> and tap <b>Save target</b>. Everyone on the board is measured against the same target, so agree on the settings with your friends.")},
       {scr:"lb", lbm:"chal", q:on ? "#vLb .chme" : "", t:pre + L("Progresmu", "Your progress"), d:L("Bar menunjukkan seberapa dekat kamu ke target, sisa yang dibutuhkan, dan sisa harinya. Saat target tercapai, bar berubah hijau 🎯.", "The bar shows how close you are to the target, what is left, and the days remaining. When you hit the target, the bar turns green 🎯.")},
-      {scr:"lb", lbm:"chal", q:on ? "#vLb .chboard" : "", t:pre + L("Papan peringkat", "Leaderboard"), d:L("Teman yang ikut tampil berurutan dengan 🥇🥈🥉, lengkap dengan persen target. Hanya aktivitas GPS valid yang dihitung (bukan bertanda ⚠, input manual, atau impor). Mingguan diatur ulang tiap <b>Senin</b>, bulanan tiap <b>tanggal 1</b>.", "Joined friends are listed with 🥇🥈🥉 and their percent of the target. Only valid GPS activities count (not flagged ⚠, manual, or imported ones). Weekly resets every <b>Monday</b>, monthly on the <b>1st</b>.")}
+      {scr:"lb", lbm:"chal", q:on ? "#vLb .chboard" : "", t:pre + L("Papan peringkat", "Leaderboard"), d:L("Teman yang ikut tampil berurutan dengan 🥇🥈🥉, lengkap dengan persen target. " + (full ? "Aktivitas yang dihitung sama seperti peringkat teman. " : "Hanya aktivitas GPS valid yang dihitung (bukan bertanda ⚠, input manual, atau impor). ") + "Mingguan diatur ulang tiap <b>Senin</b>, bulanan tiap <b>tanggal 1</b>.", "Joined friends are listed with 🥇🥈🥉 and their percent of the target. " + (full ? "The same activities count as in the friends ranking. " : "Only valid GPS activities count (not flagged ⚠, manual, or imported ones). ") + "Weekly resets every <b>Monday</b>, monthly on the <b>1st</b>.")}
     ];
     return s;
   };
   const stepsCh = () => chSteps("").concat([{c:1, scr:"lb", lbm:"chal", t:L("Siap! 🚀", "All set! 🚀"), d:L("Tur ini bisa diulang kapan saja lewat <b>📖 Panduan</b> lalu <b>Tur Tantangan</b>.", "You can replay this tour any time from <b>📖 Guide</b> and then <b>Challenge tour</b>."), nl:L("Mengerti ✓", "Got it ✓")}]);
-  /* Tur fitur baru: Feed Aktivitas Teman (tab Teman > Feed). Tidak mengubah data apa pun. */
+  /* Tur fitur Teman: Feed Aktivitas Teman (tab Teman > Feed). Tidak mengubah data apa pun. */
   const fdSteps = pre => {
-    const me = !!lbMe(), on = DEMO || (me && fdOn());
+    const full = !!pre, me = !!lbMe(), on = DEMO || (me && fdOn());
     return [
-      {scr:"rec", q:"#tabs .tab:nth-child(4)", t:pre + L("Feed Aktivitas Teman", "Friends Activity Feed"), d:L("Fitur baru di tab <b>Teman</b>: lihat aktivitas olahraga temanmu, beri <b>apresiasi 👏</b>, dan tulis <b>komentar</b>.", "New in the <b>Friends</b> tab: see your friends' workouts, give <b>kudos 👏</b>, and write <b>comments</b>.")},
+      {scr:"rec", q:"#tabs .tab:nth-child(4)", t:pre + L("Feed Aktivitas Teman", "Friends Activity Feed"), d:L("Lihat aktivitas olahraga temanmu di tab <b>Teman</b>, beri <b>apresiasi 👏</b>, dan tulis <b>komentar</b>.", "See your friends' workouts in the <b>Friends</b> tab, give <b>kudos 👏</b>, and write <b>comments</b>.")},
       {scr:"lb", lbm:"feed", q:(DEMO || me) ? "#vLb .chmode" : "", t:pre + L("Buka tab Feed", "Open the Feed tab"), d: (DEMO || me)
         ? L("Ketuk <b>📰 Feed</b> di sebelah Peringkat dan Tantangan. Feed tidak butuh ikut peringkat teman.", "Tap <b>📰 Feed</b> next to Ranking and Challenge. The Feed does not need the friends ranking.")
-        : L("Feed butuh akun. Masuk akun di <b>Beranda</b> dan tambahkan teman, lalu kembali ke tab ini.", "The Feed needs an account. Sign in on the <b>Home</b> screen and add friends, then come back to this tab.")},
+        : (full ? L("Feed juga butuh akun.", "The Feed also needs an account.") : L("Feed butuh akun. Masuk akun di <b>Beranda</b> dan tambahkan teman, lalu kembali ke tab ini.", "The Feed needs an account. Sign in on the <b>Home</b> screen and add friends, then come back to this tab."))},
       {scr:"lb", lbm:"feed", q:(DEMO || me) ? "#vLb .fdhead" : "", t:pre + L("Ikut membagikan", "Share to the Feed"), d:L("Bawaannya <b>mati</b>. Ketuk <b>Bagikan aktivitasku ke Feed</b> bila mau. Yang dibagikan hanya jenis olahraga, jarak, durasi, dan waktu, tanpa peta rute, dan hanya terlihat temanmu. Ketuk <b>Berhenti membagikan</b> untuk menghapusnya dari server.", "It is <b>off</b> by default. Tap <b>Share my activities to the Feed</b> if you want. Only the sport, distance, duration, and time are shared, with no route map, and only your friends can see them. Tap <b>Stop sharing</b> to remove them from the server.")},
       {scr:"lb", lbm:"feed", q:() => on ? document.querySelector("#vLb .fdcard") : null, t:pre + L("Membaca feed", "Reading the feed"), d:L("Tiap kartu menampilkan siapa, olahraga apa, jarak, waktu, dan pace atau kecepatan. Aktivitasmu sendiri juga muncul di sini setelah kamu ikut.", "Each card shows who, which sport, distance, time, and pace or speed. Your own activities also appear here once you have joined.")},
       {scr:"lb", lbm:"feed", q:() => on ? document.querySelector("#vLb .fdact") : null, t:pre + L("Apresiasi dan komentar", "Kudos and comments"), d:L("Ketuk <b>👏 Apresiasi</b> untuk memberi apresiasi (ketuk lagi untuk membatalkan). Ketuk <b>💬 Komentar</b> untuk membaca dan menulis komentar. Dilarang spam, tautan, dan kata kasar.", "Tap <b>👏 Kudos</b> to give kudos (tap again to undo). Tap <b>💬 Comments</b> to read and write comments. No spam, links, or rude words.")}
     ];
   };
   const stepsFd = () => fdSteps("").concat([{c:1, scr:"lb", lbm:"feed", t:L("Siap! 🚀", "All set! 🚀"), d:L("Tur ini bisa diulang kapan saja lewat <b>📖 Panduan</b> lalu <b>Tur Feed</b>.", "You can replay this tour any time from <b>📖 Guide</b> and then <b>Feed tour</b>."), nl:L("Mengerti ✓", "Got it ✓")}]);
-  /* Tur fitur baru: Segment Leaderboard (tab Teman > Segmen). Tidak mengubah data apa pun. */
+  /* Tur fitur Teman: Segment Leaderboard (tab Teman > Segmen). Tidak mengubah data apa pun. */
   const sgSteps = pre => {
-    const me = !!lbMe(), ui = DEMO || me, on = DEMO || (me && sgOn());
+    const full = !!pre, me = !!lbMe(), ui = DEMO || me, on = DEMO || (me && sgOn());
     return [
-      {scr:"rec", q:"#tabs .tab:nth-child(4)", t:pre + L("Segment Leaderboard", "Segment Leaderboard"), d:L("Fitur baru di tab <b>Teman</b>: adu kecepatan dengan temanmu di <b>rute atau jalur yang sama</b>.", "New in the <b>Friends</b> tab: race your friends on the <b>same route or path</b>.")},
+      {scr:"rec", q:"#tabs .tab:nth-child(4)", t:pre + L("Segment Leaderboard", "Segment Leaderboard"), d:L("Adu kecepatan dengan temanmu di <b>rute atau jalur yang sama</b> lewat tab <b>Teman</b>.", "Race your friends on the <b>same route or path</b> in the <b>Friends</b> tab.")},
       {scr:"rec", q:"#tabs .tab:nth-child(2)", t:pre + L("Buat segmen", "Create a segment"), d:L("Segmen dibuat dari aktivitas GPS-mu. Buka <b>Riwayat</b>, ketuk aktivitas yang punya rute, lalu ketuk <b>🏁 Buat segmen</b>. Geser penanda <b>Awal</b> dan <b>Akhir</b> untuk memilih bagian rute, beri nama, lalu simpan. Waktumu di segmen itu terhitung otomatis dari aktivitas GPS valid yang melewatinya, bahkan aktivitas lamamu yang rutenya masih tersimpan.", "A segment is made from your GPS activity. Open <b>History</b>, tap an activity that has a route, then tap <b>🏁 Create segment</b>. Drag the <b>Start</b> and <b>End</b> markers to choose a part of the route, name it, and save. Your time on it is counted automatically from valid GPS activities that pass through, even older ones whose route is still stored.")},
       {scr:"lb", lbm:"seg", q:ui ? "#vLb .chmode" : "", t:pre + L("Buka tab Segmen", "Open the Segments tab"), d: ui
         ? L("Ketuk <b>🏁 Segmen</b> di sebelah Peringkat, Tantangan, dan Feed. Segmen tidak butuh ikut peringkat teman.", "Tap <b>🏁 Segments</b> next to Ranking, Challenge, and Feed. Segments do not need the friends ranking.")
-        : L("Segmen butuh akun. Masuk akun di <b>Beranda</b> dan tambahkan teman, lalu kembali ke tab ini.", "Segments need an account. Sign in on the <b>Home</b> screen and add friends, then come back to this tab.")},
+        : (full ? L("Segmen juga butuh akun.", "Segments also need an account.") : L("Segmen butuh akun. Masuk akun di <b>Beranda</b> dan tambahkan teman, lalu kembali ke tab ini.", "Segments need an account. Sign in on the <b>Home</b> screen and add friends, then come back to this tab."))},
       {scr:"lb", lbm:"seg", q:ui ? "#vLb .sghead" : "", t:pre + L("Ikut atau berhenti", "Join or stop"), d: on
         ? L("Kamu sudah ikut. Ketuk <b>Berhenti ikut</b> kapan saja, dan segmen serta waktumu langsung <b>dihapus dari server</b>.", "You have joined. Tap <b>Stop sharing</b> any time and your segments and times are <b>removed from the server</b> right away.")
         : L("Bawaannya <b>mati</b>, jadi tidak ada yang dibagikan sebelum kamu ikut. Yang dibagikan hanya <b>nama, titik jalur segmen yang kamu pilih, panjang, dan waktu terbaikmu</b>, bukan rute lengkap, dan hanya bisa dilihat temanmu. Hindari memilih titik di depan rumahmu.", "It is <b>off</b> by default, so nothing is shared until you join. Only the <b>name, the path points you chose, the length, and your best time</b> are shared, not the full route, and only your friends can see them. Avoid picking points in front of your home.")},
       {scr:"lb", lbm:"seg", q:ui ? "#vLb .sglist" : "", t:pre + L("Daftar segmenmu", "Your segments"), d:L("Di sini ada segmen buatanmu dan segmen yang kamu ikuti dari teman, lengkap dengan waktu terbaikmu. Setelah ikut, segmen buatan teman muncul di bawah dengan tombol <b>＋ Ikut</b>.", "Your own segments and the ones you follow from friends are listed here with your best time. After you join, your friends' segments appear below with a <b>＋ Follow</b> button.")},
-      {scr:"lb", lbm:"seg", q:DEMO ? "#vLb .sgboard" : "", t:pre + L("Papan waktu", "Time board"), d:L("Ketuk sebuah segmen untuk melihat papan waktunya: teman yang ikut tampil berurutan dari yang tercepat dengan 🥇🥈🥉, lengkap dengan pace atau kecepatan dan selisihnya. Hanya aktivitas GPS valid yang dihitung (bukan bertanda ⚠, input manual, atau impor), dan waktunya adalah waktu bergerak.", "Tap a segment to see its time board: joined friends are listed from fastest with 🥇🥈🥉, with pace or speed and the gap. Only valid GPS activities count (not flagged ⚠, manual, or imported), and the time is moving time.")}
+      {scr:"lb", lbm:"seg", q:DEMO ? "#vLb .sgboard" : "", t:pre + L("Papan waktu", "Time board"), d:L("Ketuk sebuah segmen untuk melihat papan waktunya: teman yang ikut tampil berurutan dari yang tercepat dengan 🥇🥈🥉, lengkap dengan pace atau kecepatan dan selisihnya. " + (full ? "Aktivitas yang dihitung sama seperti peringkat teman, dan waktunya adalah waktu bergerak." : "Hanya aktivitas GPS valid yang dihitung (bukan bertanda ⚠, input manual, atau impor), dan waktunya adalah waktu bergerak."), "Tap a segment to see its time board: joined friends are listed from fastest with 🥇🥈🥉, with pace or speed and the gap. " + (full ? "The same activities count as in the friends ranking, and the time is moving time." : "Only valid GPS activities count (not flagged ⚠, manual, or imported), and the time is moving time."))}
     ];
   };
   const stepsSg = () => sgSteps("").concat([{c:1, scr:"lb", lbm:"seg", t:L("Siap! 🚀", "All set! 🚀"), d:L("Tur ini bisa diulang kapan saja lewat <b>📖 Panduan</b> lalu <b>Tur Segmen</b>.", "You can replay this tour any time from <b>📖 Guide</b> and then <b>Segments tour</b>."), nl:L("Mengerti ✓", "Got it ✓")}]);
   const stepsA = () => { const a = [
     {c:1, scr:"rec", t:L("👋 Selamat datang!", "👋 Welcome!"), d:L("Kita latihan dulu dengan <b>data contoh</b>, tanpa GPS dan internet. <b>Tidak ada yang tersimpan</b> di HP-mu. Sekitar satu menit.", "Let's practice with <b>sample data</b>, with no GPS or internet. <b>Nothing is saved</b> on your phone. About one minute.")},
     {scr:"rec", q:"#vRec .chips", t:L("1. Jenis olahraga", "1. Sport type"), d:L("Pilih <b>Lari, Jalan, Sepeda, atau Hiking</b> sebelum mulai merekam.", "Pick <b>Run, Walk, Ride, or Hike</b> before you start recording.")},
-    {scr:"rec", q:"#vRec .btn.go", t:L("2. ▶ MULAI", "2. ▶ START"), d:L("Ketuk di lapangan untuk merekam jarak, waktu, pace, dan kalori (perkiraan). Jam berjalan setelah <b>GPS siap</b> (titik hijau). Simpan dengan <b>■ SELESAI</b>. Di tutorial ini GPS tidak dijalankan.", "Tap outdoors to record distance, time, pace, and calories (estimate). The clock starts once <b>GPS is ready</b> (green dot). Save with <b>■ FINISH</b>. GPS is not started in this tutorial.")},
-    {scr:"rec", sp:"walk", q:BG, t:L("3. ＋ Input manual", "3. ＋ Manual entry"), d:L("Lupa merekam atau pakai treadmill? Isi tanggal, jarak, dan durasi sendiri. Sekarang coba sendiri.", "Forgot to record or used a treadmill? Enter the date, distance, and duration yourself. Now try it yourself.")},
-    {c:1, prac:"man", scr:"rec", sp:"walk", t:L("Giliranmu! 🏃", "Your turn! 🏃"), d:L("Catat satu aktivitas lewat Input manual. Aku akan menyorot yang perlu diketuk. Ini data contoh, jadi aman.", "Log one activity with Manual entry. I'll highlight what to tap. This is sample data, so it's safe."), nl:L("Mulai latihan ›", "Start practice ›")},
+    {scr:"rec", q:"#vRec .btn.go", t:L("2. ▶ MULAI", "2. ▶ START"), d:L("Ketuk di lapangan untuk merekam jarak, waktu, pace, dan kalori (perkiraan). Jam berjalan setelah <b>GPS siap</b> (titik hijau). Simpan dengan <b>■ SELESAI</b>.", "Tap outdoors to record distance, time, pace, and calories (estimate). The clock starts once <b>GPS is ready</b> (green dot). Save with <b>■ FINISH</b>.")},
+    {scr:"rec", sp:"walk", q:BG, t:L("3. ＋ Input manual", "3. ＋ Manual entry"), d:L("Lupa merekam atau pakai treadmill? Isi tanggal, jarak, dan durasi sendiri.", "Forgot to record or used a treadmill? Enter the date, distance, and duration yourself.")},
+    {c:1, prac:"man", scr:"rec", sp:"walk", t:L("Giliranmu! 🏃", "Your turn! 🏃"), d:L("Catat satu aktivitas lewat Input manual. Aku akan menyorot yang perlu diketuk.", "Log one activity with Manual entry. I'll highlight what to tap."), nl:L("Mulai latihan ›", "Start practice ›")},
     {scr:"detail", id:"new", q:"#vDet .tiles", t:L("🎉 Aktivitas pertamamu!", "🎉 Your first activity!"), d:L("Ini halaman detail: jarak, waktu, pace, kalori, dan kecepatan. Ketuk judul untuk mengganti nama, dan tombol hapus ada di bawah. Rekaman GPS juga punya rute di peta dan split per km.", "This is the detail page: distance, time, pace, calories, and speed. Tap the title to rename, and the delete button is below. GPS recordings also have a route map and per-km splits.")},
     {scr:"hist", q:"#vHist .chips", t:L("4. Riwayat", "4. History"), d:L("Semua aktivitas ada di tab <b>Riwayat</b>. Saring per jenis, lalu ketuk item untuk detail. Tanda <b>⚠</b> berarti aktivitas terdeteksi janggal dan tidak masuk rekor.", "All activities are in the <b>History</b> tab. Filter by type, then tap an item for details. The <b>⚠</b> mark means the activity looks unusual and doesn't count toward records.")},
     {scr:"stat", q:"#vStat .chips", t:L("5. Statistik", "5. Stats"), d:L("Ringkasan per minggu, bulan, atau tahun, lengkap dengan grafik dan rekor pribadi.", "A summary by week, month, or year, with a chart and personal records.")},
@@ -18899,7 +18941,7 @@ paint();
       if(acts().length || load("draft", null) || rec.st !== "idle") tmark();
       else{ start(false); return; }
     }
-    if(!ldone()){ startLb(false); return; }   /* pengguna lama: tampilkan tur fitur baru satu kali */
+    if(!ldone()){ startLb(false); return; }   /* pengguna lama: tampilkan tur fitur Teman satu kali */
     if(!cdone()){ startCh(false); return; }
     if(!fdone()){ startFd(false); return; }   /* tur Feed Aktivitas Teman: satu kali untuk pengguna lama */
     startSg(false);   /* tur Segment Leaderboard: satu kali untuk pengguna lama */
@@ -29008,18 +29050,12 @@ if(navigator.onLine !== false) init().catch(() => {});
 #hTutBtn{font:inherit;font-size:13px;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--gold2);cursor:pointer}
 #hTutBtn:active{border-color:var(--gold)}
 #hTutBtn:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
-#hTutO{position:fixed;top:0;left:0;right:0;bottom:calc(var(--adh,0px) + env(safe-area-inset-bottom,0px));z-index:70;touch-action:none}
+#hTutO{position:fixed;top:0;left:0;right:0;bottom:calc(var(--adh,0px) / var(--tz,1));z-index:70;touch-action:none;zoom:var(--tz,1)}
 #hTutO.dim{background:rgba(5,7,12,.8)}
 #hTutH{position:fixed;display:none;border-radius:14px;border:2px solid var(--gold);box-shadow:0 0 0 100vmax rgba(5,7,12,.8);pointer-events:none;transition:left .22s,top .22s,width .22s,height .22s}
-#hTutC{position:fixed;width:min(320px,calc(100vw - 24px));max-height:calc(100vh - 16px - var(--adh,0px) - env(safe-area-inset-bottom,0px));overflow:auto;display:flex;flex-direction:column;gap:8px;padding:14px;background:var(--bg2);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.6);animation:hTutRise .25s ease-out}
-#hTutC b.hTt{font-size:15px;color:var(--gold2)}
-#hTutC p{margin:0;font-size:13.5px;line-height:1.5;color:var(--text)}
-#hTutC .tutf{display:flex;align-items:center;gap:8px;margin-top:4px}
-#hTutC .tutf small{flex:1;color:var(--muted);font-size:12px}
-#hTutC .tutf button{font:inherit;font-size:13px;font-weight:700;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer}
-#hTutC .tutf .tnx{border:0;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405}
-#hTutC .tutf .tsk{border-color:rgba(240,207,134,.6);color:var(--gold2);font-weight:500;padding:8px 12px}
-#hTutC .tutf button:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#hTutC{position:fixed;animation:hTutRise .25s ease-out}
+/* kartu tutorial (dipakai bersama dengan tutorial di semua menu): tombol Lanjut selalu terlihat di bawah kartu, di atas banner iklan */
+html #tutC,html #hTutC{box-sizing:border-box;width:min(344px,calc(100vw - 24px));display:flex;flex-direction:column;gap:10px;padding:18px 16px 0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:20px;border:1px solid rgba(240,207,134,.4);background:linear-gradient(160deg,#1d1a13 0%,#141720 55%,#10131a 100%);box-shadow:0 20px 56px rgba(0,0,0,.72),0 0 0 1px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.07)}html #tutC > b,html #hTutC > b{display:block;font:700 17px/1.3 var(--head,inherit);letter-spacing:.01em;color:var(--gold2,#f0cf86)}html #tutC p,html #hTutC p{margin:0;font-size:14px;line-height:1.6;color:var(--text,#ece7da);opacity:.94}html #tutC p b,html #hTutC p b{color:var(--gold2,#f0cf86)}html #tutC .tutf,html #hTutC .tutf{position:sticky;bottom:0;z-index:2;display:flex;align-items:center;gap:8px;margin:6px -16px 0;padding:16px 16px 14px;background:linear-gradient(180deg,rgba(16,19,26,0) 0,#10131a 14px)}html #tutC .tutf::before,html #hTutC .tutf::before{content:"";position:absolute;left:16px;right:16px;top:7px;height:3px;border-radius:3px;background:rgba(240,207,134,.16)}html #tutC .tutf::after,html #hTutC .tutf::after{content:"";position:absolute;left:16px;top:7px;height:3px;border-radius:3px;width:calc((100% - 32px) * var(--p,0));background:linear-gradient(90deg,var(--gold,#d4a94f),var(--gold2,#f0cf86));transition:width .3s ease}html #tutC .tutf small,html #hTutC .tutf small{flex:1;min-width:0;font-size:12px;letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--muted,#9aa0ad)}html #tutC .tutf button,html #hTutC .tutf button{box-sizing:border-box;width:auto;min-width:44px;min-height:44px;margin:0;padding:0 12px;font:inherit;font-size:14px;font-weight:700;letter-spacing:0;line-height:1;white-space:nowrap;border-radius:12px;border:1px solid rgba(240,207,134,.28);background:rgba(255,255,255,.04);color:var(--text,#ece7da);cursor:pointer;-webkit-tap-highlight-color:transparent}html #tutC .tutf button:last-of-type,html #hTutC .tutf button:last-of-type{min-width:96px;padding:0 20px;border:0;background:linear-gradient(180deg,var(--gold2,#f0cf86),var(--gold,#d4a94f));color:#1a1405;font-weight:800;box-shadow:0 6px 18px rgba(212,169,79,.3)}html #tutC .tutf button:active,html #hTutC .tutf button:active{transform:scale(.97)}html #tutC .tutf .sk,html #hTutC .tutf .sk,html #tutC .tutf .tsk,html #hTutC .tutf .tsk{border-color:transparent;background:transparent;color:var(--muted,#9aa0ad);font-weight:500;padding:0 10px}html #tutC .tutf button:focus-visible,html #hTutC .tutf button:focus-visible{outline:2px solid var(--gold2,#f0cf86);outline-offset:2px}@media (max-width:340px){html #tutC .tutf small,html #hTutC .tutf small{display:none}html #tutC .tutf,html #hTutC .tutf{justify-content:flex-end}html #tutC .tutf .sk,html #hTutC .tutf .tsk{margin-right:auto}}@media (max-width:340px){html #tutC .tutf small,html #hTutC .tutf small{display:none}html #tutC .tutf,html #hTutC .tutf{justify-content:flex-end}html #tutC .tutf .sk,html #hTutC .tutf .tsk{margin-right:auto}}html #tutB{box-sizing:border-box;margin-bottom:12px;padding:12px 14px;gap:10px;border-radius:16px;border:1px solid rgba(240,207,134,.5);background:linear-gradient(160deg,#1d1a13,#10131a);box-shadow:0 14px 36px rgba(0,0,0,.65);font-size:13.5px;line-height:1.5;color:var(--text,#ece7da)}html #tutB button{min-height:40px;padding:0 14px;border-radius:12px;border:1px solid rgba(240,207,134,.45);background:rgba(240,207,134,.08);color:var(--gold2,#f0cf86);font-weight:600}html #hTutC{max-height:calc(100vh - 16px)}
 /* ===== Aman dari banner AdMob: panel, sheet, dan lapisan layar penuh di beranda berhenti tepat di atas banner (--adh = tinggi banner, 0 bila tanpa banner) ===== */
 #favSheet,#stSheet{bottom:var(--adh,0px)}
 #favSheet .fsp,#stSheet .fsp{max-height:calc(84vh - var(--adh,0px))}
@@ -29028,6 +29064,9 @@ if(navigator.onLine !== false) init().catch(() => {});
 .frlb{bottom:var(--adh,0px)}
 #alock,#alVerify{bottom:var(--adh,0px)}
 #alToast{bottom:calc(28px + var(--adh,0px) + env(safe-area-inset-bottom,0px))}
+/* panel tidak pernah lebih lebar dari layar di semua ukuran huruf (zoom html mengalikan lebar) */
+#spanel,#frpanel,#bellPanel,#view > #bellPanel{max-width:calc((100vw - 20px) * var(--tz,1))!important}
+#spanel{max-height:calc(100% - 70px - env(safe-area-inset-top,0px) - var(--adh,0px) - env(safe-area-inset-bottom,0px))!important}
 @keyframes hTutRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media (prefers-reduced-motion:reduce){#hTutC{animation:none}#hTutH{transition:none}}
 </style>
@@ -29208,8 +29247,20 @@ var STEPS = [
         "Pick a category and tap a menu to get started. You can replay this tutorial any time from <b>Settings > How to use the app</b>.") }
 ];
 
+/* (zsync juga dipanggil global di bawah) ---------- faktor zoom "Ukuran huruf" (html{zoom}): lapisan tutorial dibatalkan zoom-nya agar sorotan tepat di semua ukuran huruf ---------- */
+function zsync(){
+  try{
+    var p = document.createElement("div"), w = 0, r = document.documentElement;
+    p.style.cssText = "position:absolute;left:0;top:0;width:100px;height:1px;visibility:hidden;pointer-events:none";
+    document.body.appendChild(p); w = p.getBoundingClientRect().width; p.remove();
+    var z = w > 0 ? w / 100 : 1; if(Math.abs(z - 1) < 0.005) z = 1;
+    r.style.setProperty("--tz", String(1 / z));
+  }catch(e){}
+}
+(function(){ zsync(); window.addEventListener("resize", zsync); window.addEventListener("load", zsync); try{ var ap = document.getElementById("thAp"); if(ap) new MutationObserver(zsync).observe(ap, {childList:true, characterData:true, subtree:true}); }catch(e){} })();
 /* ---------- tampilan kartu dan sorotan ---------- */
 function mount(){
+  zsync();
   if($("hTutO")) return;
   var o = mk("div"), h = mk("div"), c = mk("div");
   o.id = "hTutO"; h.id = "hTutH"; c.id = "hTutC";
@@ -29219,19 +29270,37 @@ function mount(){
 function target(s){ return s && s.q ? document.querySelector(s.q) : null; }
 function place(){
   if(!tu) return;
+  zsync();
   var s = tu.s[tu.i], o = $("hTutO"), h = $("hTutH"), c = $("hTutC"); if(!o || !h || !c) return;
-  var vw = o.clientWidth || window.innerWidth, vh = o.clientHeight || window.innerHeight, cw = c.offsetWidth, ch = c.offsetHeight, y, e = target(s);   /* tinggi area tersedia = layar dikurangi banner AdMob (overlay berhenti tepat di atas banner) */
+  var vw = o.clientWidth || window.innerWidth, vh = o.clientHeight || window.innerHeight, e = target(s), y, G = 12, M = 8;   /* vh = layar dikurangi banner AdMob: overlay berhenti tepat di atas banner */
+  c.style.maxHeight = Math.max(160, vh - 2 * M) + "px";
+  var cw = c.offsetWidth, ch = c.offsetHeight;
   if(e && vis(e)){
     var r = e.getBoundingClientRect(), p = 6; o.className = ""; h.style.display = "block";
-    /* target berada di bawah batas banner: gulir sekali ke tengah area yang terlihat, lalu ukur ulang */
-    if(r.bottom + p > vh && r.height < vh * 0.8 && tu.fx !== tu.i){ tu.fx = tu.i; try{ e.scrollIntoView({ block:"center", inline:"nearest" }); }catch(x){} r = e.getBoundingClientRect(); }
-    h.style.left = (r.left - p) + "px"; h.style.top = (r.top - p) + "px"; h.style.width = (r.width + p * 2) + "px"; h.style.height = (r.height + p * 2) + "px";
-    if(s.pos === "bot") y = Math.max(8, vh - ch - 8);
-    else if(vh - (r.bottom + p) - 12 >= ch) y = r.bottom + p + 12;
-    else if(r.top - p - 12 >= ch) y = r.top - p - 12 - ch;
-    else y = Math.max(8, vh - ch - 8);
-  } else { o.className = "dim"; h.style.display = "none"; y = Math.max(8, (vh - ch) / 2); }
-  c.style.left = Math.max(12, (vw - cw) / 2) + "px"; c.style.top = y + "px";
+    var need = Math.min(ch, Math.max(190, vh * 0.4));
+    /* sorotan keluar dari area terlihat, atau tidak ada sisi yang cukup lega untuk kartu: gulir target ke posisi yang pas (sekali per langkah, hasil diukur ulang) */
+    var below = vh - (r.bottom + p) - G, above = r.top - p - G;
+    if(tu.fi !== tu.i){ tu.fi = tu.i; tu.fn = 0; }
+    if(r.height < vh * 0.6 && tu.fn < 4 && (r.bottom + p > vh || r.top - p < 0 || Math.max(below, above) < need)){
+      tu.fn++;
+      try{ e.scrollIntoView({ block:(r.bottom + p > vh || r.top - p < 0) && Math.max(below, above) >= need ? "center" : "start", inline:"nearest" }); }catch(x){}
+      r = e.getBoundingClientRect();
+      if(r.top < p + M){ try{ var sc = nearestScroll(e); (sc === window ? window : sc).scrollBy(0, r.top - p - M); }catch(x){} r = e.getBoundingClientRect(); }
+      below = vh - (r.bottom + p) - G; above = r.top - p - G;
+    }
+    var hx = Math.max(2, r.left - p), hy = Math.max(2, r.top - p), hx2 = Math.min(vw - 2, r.right + p), hy2 = Math.min(vh - 2, r.bottom + p);   /* bingkai tidak pernah melewati tepi layar */
+    h.style.left = hx + "px"; h.style.top = hy + "px"; h.style.width = Math.max(8, hx2 - hx) + "px"; h.style.height = Math.max(8, hy2 - hy) + "px";
+    var useBelow = s.pos === "bot" ? false : (below >= Math.min(ch, need) || below >= above);
+    if(s.pos === "bot"){ y = Math.max(M, vh - ch - M); }
+    else if(Math.max(below, above) < 120){ /* target sangat tinggi: kartu menempel di sisi layar yang berlawanan dengan pusat target */ y = (r.top + r.height / 2 > vh / 2) ? M : Math.max(M, vh - ch - M); }
+    else if(useBelow){ var hb = Math.min(ch, Math.max(120, below)); c.style.maxHeight = hb + "px"; y = r.bottom + p + G; if(y + hb > vh - M) y = Math.max(M, vh - hb - M); }
+    else { var ha = Math.min(ch, Math.max(120, above)); c.style.maxHeight = ha + "px"; y = Math.max(M, r.top - p - G - ha); }
+  } else { o.className = "dim"; h.style.display = "none"; y = Math.max(M, (vh - ch) / 2); }
+  c.style.left = Math.max(12, (vw - c.offsetWidth) / 2) + "px"; c.style.top = y + "px";
+}
+function nearestScroll(el){
+  for(var n = el.parentElement; n && n !== document.body; n = n.parentElement){ var cs = getComputedStyle(n); if(/(auto|scroll)/.test(cs.overflowY) && n.scrollHeight > n.clientHeight + 2) return n; }
+  return window;
 }
 function scrollTo(s){
   var e = target(s); if(e && vis(e)){ try{ e.scrollIntoView({ block:s.sc || "center", inline:"nearest" }); }catch(x){} }
@@ -29248,6 +29317,7 @@ function render(){
   var nx = mk("button", "tnx", s.nl ? X(s.nl) : (last ? u.fin : u.next)); nx.type = "button"; nx.setAttribute("data-a", "next");
   if(!last) f.appendChild(sk);
   f.appendChild(sm); f.appendChild(pv); f.appendChild(nx); c.appendChild(f);
+  c.style.setProperty("--p", String((tu.i + 1) / n)); c.scrollTop = 0;
   scrollTo(s); place(); requestAnimationFrame(place);
   /* kategori dan panel masih beranimasi: ukur ulang setelah selesai */
   var cur = s;
