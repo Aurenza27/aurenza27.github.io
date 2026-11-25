@@ -2062,6 +2062,7 @@ const PV = {
     {p:["Setelah masuk akun:"], l:["Nama tampilan, alamat email, dan foto dari akun yang kamu pakai masuk.","ID Akun (ST-xxxxxxxx) yang dibuat sistem, username dan foto profil Satu Titik yang kamu atur sendiri, serta waktu masuk terakhir. Nama dan foto profilmu dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui ID Akunmu (misalnya saat mereka menambah teman); di aplikasi, foto itu hanya bisa dibuka oleh temanmu. Status online dan waktu terakhir aktifmu hanya bisa dilihat temanmu. Alamat emailmu tidak terlihat pengguna lain.","Salinan data aplikasi (pengaturan, riwayat, hasil menu, rute GPS olahraga, serta data Keuangan dan Arisan) agar bisa tersinkron antarperangkat.","Untuk turnamen online: data turnamen, kode turnamen, nama (username) admin, moderator, atau pengikut, serta suara dan komentar yang kamu kirim (isi komentar, username, ID Akun, dan waktu) yang dapat dilihat pengguna lain yang sudah masuk akun dan mengetahui kode turnamen tersebut.","Catatan persetujuan: versi Syarat Penggunaan yang kamu setujui dan waktunya, sebagai bukti persetujuan. Dihapus saat kamu menghapus akun.","Data kesehatan (BMI, kehamilan, AKG) dan data keuangan termasuk data yang disalin ke akunmu bila sinkronisasi aktif. Dengan menyetujui syarat saat masuk, kamu memberi persetujuan untuk penyalinan itu. Kamu bisa menariknya kapan saja lewat Reset data atau Hapus akun di Pengaturan, yang menghapus salinan di server.","Daftar teman: pasangan ID Akun dan status permintaan pertemanan, serta waktu terakhir aplikasi aktif (untuk lampu status online; hanya bisa dilihat temanmu).","Pesan pribadi antarteman (isi, pengirim, dan waktu). Pesan hanya bisa dibaca kamu dan temanmu, ditandai kedaluwarsa setelah 30 hari, dan dihapus saat pertemanan dihapus.","Tanda dibaca: waktu terakhir kamu membuka chat dengan temanmu. Hanya bisa dilihat temanmu (untuk menandai pesan sudah dibaca) dan dihapus saat pertemanan dihapus."]},
     {p:["Ruangan game online (Main bersama lewat kode ruang):"], l:["Hanya untuk pengguna yang masuk akun. Pada Tebak Inisial dan Gems Arena, kode ruang, nama host dan pemain, jawaban, skor atau hasil permainan (serta chat ruangan di Tebak Inisial dan Gems Arena) disimpan di server selama ruangan dipakai dan dihapus saat host menutup ruangan. Chat ditandai kedaluwarsa setelah 24 jam. Ruangan yang tidak ditutup dengan benar (misalnya aplikasi dihentikan paksa) dapat tersimpan lebih lama. Siapa pun yang sudah masuk akun dan mengetahui kode ruangan dapat melihat isi ruangan, termasuk chatnya."]},
     {p:["Notifikasi push (hanya aplikasi Android, setelah masuk akun):"], l:["Aplikasi menyimpan token perangkat dari layanan notifikasi push bersama ID penggunamu, jenis platform, dan waktu, supaya notifikasi tetap muncul walau aplikasi ditutup. Izin notifikasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Notifikasi dikirim untuk pesan teman, permintaan dan persetujuan pertemanan, serta undangan (moderator turnamen, pengikut turnamen, atau ruangan permainan) beserta balasannya. Saat kejadian itu terjadi, aplikasi mengirim jenis kejadian dan pengenal terkait ke server pengirim notifikasi (server kami) bersama token masuk akunmu untuk verifikasi. Server memeriksa kejadian itu, membaca data yang dibutuhkan dari akun (nama pengirim dan, untuk pesan teman, 100 huruf pertama isi pesan), lalu meneruskannya sebagai isi notifikasi lewat layanan notifikasi push. Isi notifikasi dapat tampil di layar kunci sesuai pengaturan notifikasi HP-mu; matikan notifikasi aplikasi bila kamu tidak menghendakinya.","Token perangkat dihapus saat kamu keluar dari akun (perangkat itu) atau menghapus akun (semua perangkat)."]},
+    {p:["Peringkat teman di menu Olahraga (opsional):"], l:["Hanya untuk pengguna yang masuk akun dan mengaktifkannya sendiri di tab Teman menu Olahraga (bawaannya mati). Yang disimpan di server: ID penggunamu, total jarak, waktu, dan jumlah aktivitas per olahraga untuk minggu berjalan, daftar ID pengguna temanmu yang boleh melihatnya, dan waktu pembaruan. Rute GPS tidak dikirim. Total itu hanya bisa dilihat temanmu.","Data dihapus saat kamu menekan Berhenti ikut atau menghapus akun."]},
     {p:["Blokir dan laporan:"], l:["Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.","Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan dan catatan tambahan (bila kamu menulisnya). Laporan hanya dibaca pengelola untuk meninjau pelanggaran."]},
     {p:["Senyapkan notifikasi pesan:"], l:["Kamu bisa menyenyapkan notifikasi pesan dari satu teman (lewat menu teman) atau dari semua teman (lewat Pengaturan). Pilihan ini disimpan di akunmu, berupa ID Akunmu, ID Akun teman yang disenyapkan (atau penanda semua teman), dan waktunya, agar berlaku di semua perangkatmu.","Saat disenyapkan, server pengirim notifikasi tidak meminta notifikasi push untuk pesan itu ke HP-mu. Pesan tetap masuk dan bisa dibaca di chat. Temanmu tidak diberi tahu bahwa kamu menyenyapkannya.","Data senyap dihapus saat kamu mematikan senyap, memakai Reset data di Pengaturan, atau menghapus akun."]},
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan formulir pihak ketiga. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif. Bila sedang offline, pesan disimpan sementara di perangkatmu sampai berhasil terkirim."]},
@@ -2087,6 +2088,7 @@ const PV = {
     {p:["After signing in:"], l:["The display name, email address, and photo of the account you sign in with.","The system-generated Account ID (ST-xxxxxxxx), the Satu Titik username and profile photo you set yourself, and your last sign-in time. Your name and profile photo can be seen by other signed-in users who know your Account ID (for example when they add a friend); in the app, the photo can only be opened by your friends. Your online status and last-active time can only be seen by your friends. Your email address is not visible to other users.","A copy of your app data (settings, history, menu results, sports GPS routes, and Finance and Arisan data) so it can sync across devices.","For online tournaments: tournament data, tournament codes, the names (usernames) of admins, moderators, and followers, and the votes and comments you submit (comment text, username, Account ID, and time), which can be seen by other signed-in users who know that tournament’s code.","Consent record: the version of the Terms of Use you agreed to and the time, as proof of consent. Deleted when you delete your account.","Health data (BMI, pregnancy, RDA) and finance data are among the data copied to your account when sync is on. By agreeing to the terms when you sign in, you consent to that copying. You can withdraw it at any time through Reset data or Delete account in Settings, which deletes the copy on the server.","Friend list: pairs of Account IDs and the status of friend requests, plus the time the app was last active (for the online status light; visible only to your friends).","Private messages between friends (content, sender, and time). Messages can only be read by you and your friend, are marked to expire after 30 days, and are deleted when the friendship is removed.","Read receipts: the time you last opened the chat with your friend. Only your friend can see it (to mark messages as read), and it is deleted when the friendship is removed."]},
     {p:["Online game rooms (Play together via room code):"], l:["Only for users signed in. In Tebak Inisial and Gems Arena, the room code, host and player names, answers, scores or game results (and the room chat in Tebak Inisial and Gems Arena) are stored on a server while the room is in use and deleted when the host closes the room. Chat is marked to expire after 24 hours. A room that is not closed properly (for example if the app is force-stopped) may be kept longer. Anyone signed in who knows the room code can see the room contents, including the chat."]},
     {p:["Push notifications (Android app only, after signing in):"], l:["The app stores a device token from the push notification service together with your user ID, the platform type, and a timestamp, so notifications still appear when the app is closed. Notification permission is requested by your device and you can revoke it at any time.","Notifications are sent for friend messages, friend requests and acceptances, and invitations (tournament moderator, tournament follower, or game room) and their replies. When such an event happens, the app sends the event type and related identifiers to the notification server (our server) together with your sign-in token for verification. The server checks the event, reads the data it needs from your account (the sender’s name and, for friend messages, the first 100 characters of the message), and passes it on as the notification text through the push notification service. The notification text may appear on your lock screen depending on your phone’s notification settings; turn off the app’s notifications if you do not want this.","The device token is deleted when you sign out (that device) or delete your account (all devices)."]},
+    {p:["Friends ranking in the Exercise menu (optional):"], l:["Only for signed-in users who turn it on themselves in the Friends tab of the Exercise menu (off by default). Stored on a server: your user ID, total distance, time, and number of activities per sport for the current week, the list of your friends’ user IDs who may view it, and the update time. GPS routes are not sent. Only your friends can see these totals.","The data is deleted when you tap Stop sharing or delete your account."]},
     {p:["Blocking and reports:"], l:["The list of users you block is stored in your account so blocking applies on all your devices.","When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, a copy of the reported text, and your optional note. Reports are read only by the maintainer to review violations."]},
     {p:["Mute message notifications:"], l:["You can mute message notifications from one friend (in the friend menu) or from all friends (in Settings). This choice is stored in your account as your Account ID, the muted friend’s Account ID (or an all-friends marker), and the time, so it applies on all your devices.","While muted, the notification server does not request a push notification for that message to your phone. The message still arrives and can be read in the chat. Your friend is not told that you muted them.","Mute data is deleted when you turn mute off, use Reset data in Settings, or delete your account."]},
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through a third-party form service. You do not need to sign in, and you should avoid writing sensitive personal data. While offline, the message is kept temporarily on your device until it is sent."]},
@@ -16235,6 +16237,12 @@ svg.ch{display:block;width:100%;height:auto}.ch .b{fill:var(--gold)}.ch .b.cur{f
 #tutB span{flex:1}
 #tutB button{pointer-events:auto;flex:none;padding:9px 12px;font-size:12px;background:transparent;border:1px solid rgba(240,207,134,.6);border-radius:10px;color:var(--gold2)}
 @media (prefers-reduced-motion:reduce){#tutP{animation:none}#tutH{transition:none}}
+.lbrow{align-items:center}.lbrow.me{border-color:var(--gold);background:rgba(212,169,79,.1)}
+.lbrow .rk{flex:none;width:28px;text-align:center;font-weight:700;color:var(--gold2);font-size:16px}
+.lbrow .av{flex:none;width:38px;height:38px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);font-weight:700;color:var(--gold2)}
+.lbrow .av img{width:100%;height:100%;object-fit:cover;display:block}
+.lbrow .tx small{display:block;font-size:12px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.lbrow .val{flex:none;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;color:var(--text)}
 </style>
 </head>
 <body>
@@ -16246,6 +16254,7 @@ svg.ch{display:block;width:100%;height:auto}.ch .b{fill:var(--gold)}.ch .b.cur{f
 <section id="vRec"></section>
 <section id="vHist" hidden></section>
 <section id="vStat" hidden></section>
+<section id="vLb" hidden></section>
 <section id="vDet" hidden></section>
 <p class="tiny" id="note"></p>
 <div class="toast" id="toast" role="status"></div>
@@ -16352,6 +16361,7 @@ function putActs(a){
     if(ok || keep === 0) break;
     keep = keep > 10 ? 10 : keep > 1 ? 1 : 0;
   }
+  if(ok){ try{ lbSoon(); }catch(e){} }
   return ok;
 }
 
@@ -17586,10 +17596,139 @@ function settingsPanel(){
   return p;
 }
 
+/* ===== PERINGKAT TEMAN (opsional) =====
+   Firestore: sport_week/{uid}_{tanggal Senin}. Isi dokumen hanya total minggu ini per olahraga (jarak m, waktu detik, jumlah); rute tidak pernah dikirim.
+   f = daftar uid teman yang boleh membaca (aturan database: pemilik atau uid ada di f). Dihitung: aktivitas tidak ditandai, bukan input manual, bukan impor.
+   Tampilan hanya memuat dokumen milik akun yang ada di daftar temanku (uid lain diabaikan). Urutan: filter satu olahraga = jarak, filter Semua = waktu. */
+const LBC = "sport_week";
+let lbList = null, lbBusy = false, lbSp = "all", lbT = 0, lbErr = "", lbUnsub = null;
+const lbAuth = () => { try{ return (window.parent && window.parent !== window) ? (window.parent.satuTitikAuth || null) : null; }catch(e){ return null; } };
+const lbFr = () => { try{ return (window.parent && window.parent !== window) ? (window.parent.satuTitikFriends || null) : null; }catch(e){ return null; } };
+const lbOn = () => +load("lb", 0) === 1;
+const lbMe = () => { const a = lbAuth(); return (a && a.user) || null; };
+const lbWk = ts => { const d = new Date(weekStart(ts)); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); };
+/* Firestore dimuat di Beranda: objek data harus dibuat dari Object/Array milik induk */
+function lbPO(src){
+  let P = window; try{ if(window.parent && window.parent !== window && window.parent.Object) P = window.parent; }catch(e){}
+  const cv = v => {
+    if(Array.isArray(v)){ const a = new P.Array(); v.forEach(x => a.push(cv(x))); return a; }
+    if(v && typeof v === "object" && Object.getPrototypeOf(v) === Object.prototype){ const o = new P.Object(); Object.keys(v).forEach(k => { o[k] = cv(v[k]); }); return o; }
+    return v;
+  };
+  return cv(src);
+}
+function lbTotals(){
+  const ws = weekStart(Date.now()), t = {};
+  SPORTS.forEach(k => { t[k] = {d:0, s:0, n:0}; });
+  acts().forEach(a => { if(a.ts >= ws && okAct(a) && !a.imp && t[a.sp]){ const x = t[a.sp]; x.d += Math.round(a.dist); x.s += Math.round(a.dur); x.n++; } });
+  SPORTS.forEach(k => { t[k].d = Math.min(t[k].d, 2000000); t[k].s = Math.min(t[k].s, 604800); t[k].n = Math.min(t[k].n, 500); });
+  return t;
+}
+async function lbPublish(){
+  if(DEMO || !lbOn()) return false;
+  const u = lbMe(), a = lbAuth(); if(!u || !a || !a.getDb) return false;
+  const fr = lbFr(); let f = [];
+  try{ if(fr && fr.ready && fr.ready()) f = fr.list().map(x => String(x.uid || "")).filter(Boolean).slice(0, 300); }catch(e){}
+  const { m, db } = await a.getDb(), wk = lbWk(Date.now());
+  await m.setDoc(m.doc(db, LBC, u.uid + "_" + wk), lbPO({ uid:u.uid, wk:wk, f:f, t:lbTotals(), ts:Date.now() }));
+  return true;
+}
+function lbSoon(){ if(DEMO || !lbOn()) return; clearTimeout(lbT); lbT = setTimeout(() => { lbPublish().catch(() => {}); }, 2500); }
+function lbWatch(){
+  if(lbUnsub || DEMO) return; const fr = lbFr();
+  try{ if(fr && fr.onChange) lbUnsub = fr.onChange(() => lbSoon()); }catch(e){}
+}
+window.addEventListener("pagehide", () => { try{ if(lbUnsub) lbUnsub(); }catch(e){} lbUnsub = null; });
+async function lbLoad(){
+  const u = lbMe(), a = lbAuth(); if(!u || !a || !a.getDb) throw new Error("login");
+  const fr = lbFr(), by = {};
+  try{ if(fr && fr.ready && fr.ready()) fr.list().forEach(x => { by[String(x.uid)] = x; }); }catch(e){}
+  const { m, db } = await a.getDb();
+  const sn = await m.getDocs(m.query(m.collection(db, LBC), m.where("f", "array-contains", u.uid), m.where("wk", "==", lbWk(Date.now()))));
+  const out = [];
+  sn.forEach(d => {
+    const v = d.data() || {}, id = String(v.uid || "");
+    if(!by[id] || id === u.uid) return;
+    out.push({ uid:id, name:String(by[id].name || "?").slice(0, 24), photo:String(by[id].photo || ""), t:(v.t && typeof v.t === "object") ? v.t : {} });
+  });
+  return out;
+}
+async function lbWipe(){
+  const u = lbMe(), a = lbAuth(); if(!u || !a || !a.getDb) return;
+  const { m, db } = await a.getDb();
+  const sn = await m.getDocs(m.query(m.collection(db, LBC), m.where("uid", "==", u.uid)));
+  const jobs = []; sn.forEach(d => jobs.push(m.deleteDoc(d.ref))); await Promise.all(jobs);
+}
+function lbErrMsg(e){
+  const c = String((e && (e.code || e.message)) || "");
+  if(/permission/i.test(c)) return L("Izin ditolak server. Aturan database peringkat belum dipasang.", "Permission denied. The ranking database rules are not installed yet.");
+  if(/offline|network|unavailable/i.test(c) || navigator.onLine === false) return L("Tidak ada koneksi internet.", "No internet connection.");
+  if(/login/i.test(c)) return L("Masuk akun dulu di Beranda.", "Sign in on the Home screen first.");
+  return L("Gagal. Coba lagi.", "Failed. Try again.");
+}
+const lbNum = x => { x = +x; return isFinite(x) && x > 0 ? x : 0; };
+const lbD = (t, sp) => sp === "all" ? SPORTS.reduce((s, k) => s + lbNum(t[k] && t[k].d), 0) : lbNum(t[sp] && t[sp].d);
+const lbS = (t, sp) => sp === "all" ? SPORTS.reduce((s, k) => s + lbNum(t[k] && t[k].s), 0) : lbNum(t[sp] && t[sp].s);
+const lbScore = (t, sp) => sp === "all" ? lbS(t, sp) : lbD(t, sp);
+function lbAvatar(r){
+  const d = el("div", "av", r.me ? "★" : ((r.name || "?").trim().charAt(0).toUpperCase() || "?"));
+  if(!r.me && /^https:\/\//.test(r.photo)){ const im = new Image(); im.alt = ""; im.referrerPolicy = "no-referrer"; im.onload = () => { d.textContent = ""; d.append(im); }; im.src = r.photo; }
+  return d;
+}
+function renderLb(){
+  const v = $("vLb"); v.textContent = "";
+  const u = lbMe(), p = el("div", "panel");
+  p.append(el("span", "label", L("Peringkat teman", "Friends ranking")));
+  if(!u){ p.append(el("p", "tiny", L("Masuk akun di Beranda untuk memakai peringkat teman.", "Sign in on the Home screen to use the friends ranking."))); v.append(p); return; }
+  p.append(el("p", "tiny", L("Bandingkan total minggu ini dengan temanmu. Yang dibagikan hanya total jarak, waktu, dan jumlah aktivitas per olahraga, tanpa rute, dan hanya bisa dilihat temanmu. Hanya teman yang ikut yang muncul. Aktivitas bertanda, input manual, dan impor tidak dihitung.", "Compare this week's totals with your friends. Only total distance, time, and number of activities per sport are shared, with no routes, and only your friends can see them. Only friends who joined appear. Flagged, manual, and imported activities do not count.")));
+  const on = lbOn(), tg = el("button", "btn" + (on ? " ghost" : ""), on ? L("Berhenti ikut", "Stop sharing") : L("Ikut peringkat teman", "Join friends ranking")); tg.type = "button"; tg.style.marginTop = "12px";
+  tg.onclick = async () => {
+    if(lbBusy) return; lbBusy = true; tg.disabled = true;
+    try{
+      if(on){ await lbWipe(); save("lb", 0); lbList = null; toast(L("Data peringkatmu dihapus dari server.", "Your ranking data was removed from the server.")); }
+      else { save("lb", 1); try{ await lbPublish(); }catch(e){ save("lb", 0); throw e; } lbList = null; toast(L("Kamu ikut peringkat teman.", "You joined the friends ranking.")); }
+    }catch(e){ toast(lbErrMsg(e), 3600); }
+    lbBusy = false; if(tab === "lb" && view === "tab") renderLb();
+  };
+  p.append(tg); v.append(p);
+  if(!on) return;
+  lbWatch();
+  const chips = el("div", "chips"); chips.style.margin = "14px 0";
+  [["all", L("Semua", "All")]].concat(SPORTS.map(k => [k, SP[k].ic + " " + (lang === "en" ? SP[k].en : SP[k].id)])).forEach(r => {
+    const b = el("button", "chip" + (lbSp === r[0] ? " on" : ""), r[1]); b.type = "button"; b.onclick = () => { lbSp = r[0]; renderLb(); }; chips.append(b);
+  });
+  v.append(chips);
+  const box = el("div"); v.append(box);
+  if(lbList === null){
+    box.append(el("p", "empty", L("Memuat peringkat…", "Loading ranking…")));
+    if(!lbBusy){
+      lbBusy = true;
+      (async () => { try{ await lbPublish().catch(() => {}); lbList = await lbLoad(); lbErr = ""; }catch(e){ lbList = []; lbErr = lbErrMsg(e); } lbBusy = false; if(tab === "lb" && view === "tab") renderLb(); })();
+    }
+    return;
+  }
+  const me = { uid:u.uid, name:"", photo:"", t:lbTotals(), me:true };
+  const rows = lbList.concat([me]).map(r => ({ r:r, s:lbScore(r.t, lbSp) })).filter(x => x.s > 0 || x.r.me).sort((a, b) => b.s - a.s);
+  rows.forEach((x, i) => {
+    const r = x.r, it = el("div", "item lbrow" + (r.me ? " me" : "")), t = r.t;
+    const prim = lbSp === "all" ? fmtDur(lbS(t, lbSp)) : fmtKm(lbD(t, lbSp)) + " km";
+    const sec = lbSp === "all" ? fmtKm(lbD(t, lbSp)) + " km" : fmtDur(lbS(t, lbSp));
+    const tx = el("div", "tx"); tx.append(el("b", "", r.me ? L("Kamu", "You") : r.name), el("small", "", sec));
+    it.append(el("span", "rk", (i < 3 && x.s > 0) ? ["🥇", "🥈", "🥉"][i] : String(i + 1)), lbAvatar(r), tx, el("span", "val", prim));
+    box.append(it);
+  });
+  if(lbErr) box.append(el("p", "tiny", lbErr));
+  else if(lbList.length === 0) box.append(el("p", "tiny", L("Belum ada teman yang ikut minggu ini. Ajak temanmu membuka tab ini dan menekan Ikut peringkat teman.", "No friends have joined this week. Ask them to open this tab and tap Join friends ranking.")));
+  const left = Math.max(1, Math.ceil((weekStart(Date.now()) + 7 * 86400000 - Date.now()) / 86400000));
+  box.append(el("p", "tiny", L("Peringkat diatur ulang setiap Senin (" + left + " hari lagi). Urutan: jarak untuk satu olahraga, waktu untuk Semua.", "Ranking resets every Monday (" + left + " days left). Sorted by distance for one sport, by time for All.")));
+  const rf = el("button", "btn ghost sm", L("↻ Muat ulang", "↻ Refresh")); rf.type = "button"; rf.style.marginTop = "8px"; rf.onclick = () => { lbList = null; lbErr = ""; renderLb(); }; box.append(rf);
+}
+if(lbOn()){ lbWatch(); lbSoon(); }
+
 /* ===== kerangka ===== */
 function renderTabs(){
   const n = $("tabs"); n.textContent = "";
-  [["rec", L("Rekam", "Record")], ["hist", L("Riwayat", "History")], ["stat", L("Statistik", "Stats")]].forEach(r => {
+  [["rec", L("Rekam", "Record")], ["hist", L("Riwayat", "History")], ["stat", L("Statistik", "Stats")], ["lb", L("Teman", "Friends")]].forEach(r => {
     const b = el("button", "tab" + (tab === r[0] && view === "tab" ? " on" : ""), r[1]); b.type = "button";
     b.onclick = () => { tab = r[0]; view = "tab"; detId = null; save("tab", tab); paint(); }; n.append(b);
   });
@@ -17604,10 +17743,11 @@ function paint(){
   renderTabs();
   $("tabs").hidden = view === "detail";
   $("vRec").hidden = !(view === "tab" && tab === "rec"); $("vHist").hidden = !(view === "tab" && tab === "hist");
-  $("vStat").hidden = !(view === "tab" && tab === "stat"); $("vDet").hidden = view !== "detail";
+  $("vStat").hidden = !(view === "tab" && tab === "stat"); $("vLb").hidden = !(view === "tab" && tab === "lb"); $("vDet").hidden = view !== "detail";
   if(view === "detail") renderDetail();
   else if(tab === "rec") renderRec();
   else if(tab === "hist") renderHist();
+  else if(tab === "lb") renderLb();
   else renderStat();
 }
 /* tombol back HP: tutup detail atau form manual dulu sebelum keluar menu */
@@ -25974,6 +26114,7 @@ A.deleteAccount = async () => {
   if(acc) await soft(() => m.deleteDoc(m.doc(db, "accountIds", acc)));
   await soft(() => m.deleteDoc(m.doc(db, "presence", uid)));
   await soft(() => m.deleteDoc(m.doc(db, "consents", uid)));
+  await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "sport_week"), m.where("uid", "==", uid))); await Promise.all(sn.docs.map(d => m.deleteDoc(d.ref))); });
   await soft(() => m.deleteDoc(m.doc(db, "users", uid)));
   /* 3) hapus akun dari Firebase Authentication */
   try{ await auth.deleteUser(u); }
