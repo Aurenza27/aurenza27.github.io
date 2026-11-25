@@ -108,6 +108,31 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #spanel .sc[aria-pressed="true"]{border-color:var(--gold)}
 #srMsg{display:block;width:100%;box-sizing:border-box;margin:8px 0 4px;padding:10px 12px;font:inherit;font-size:14px;line-height:1.5;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:12px;resize:vertical;min-height:110px}
 #srMsg:focus{outline:none;border-color:var(--gold)}
+#spanel .bl{display:block;margin:14px 0 6px;font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--gold2)}
+#spanel .bl i{font-style:normal;font-weight:400;color:var(--muted)}
+#spanel .bf{display:block;width:100%;box-sizing:border-box;margin:0 0 4px;padding:10px 12px;min-height:42px;font:inherit;font-size:14px;line-height:1.5;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:12px}
+#spanel textarea.bf{resize:vertical;min-height:110px}
+#spanel .bf:focus{outline:none;border-color:var(--gold)}
+#spanel .bf.bad{border-color:#c0564f}
+#spanel .cb{position:relative}
+#spanel .cbt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer}
+#spanel .cbt .cv{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#spanel .cbt::after{content:"";width:8px;height:8px;margin:0 3px 3px 0;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;flex:none}
+#spanel .cbt[aria-expanded="true"]{border-color:var(--gold)}
+#spanel .cbt[aria-expanded="true"]::after{transform:rotate(-135deg);margin:3px 3px 0 0}
+#spanel .cbl{margin:6px 0 4px;border:1px solid var(--gold);border-radius:12px;overflow:hidden;background:rgba(10,16,34,.55)}
+#spanel .cbq{display:block;width:100%;box-sizing:border-box;padding:10px 12px;font:inherit;font-size:14px;color:var(--text);background:transparent;border:0;border-bottom:1px solid var(--line);outline:none}
+#bugMenuOpts{max-height:248px;overflow-y:auto;overscroll-behavior:contain;padding:4px 0}
+#spanel .cbg{margin:0;padding:10px 14px 4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+#spanel .cbo{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 14px;font:inherit;font-size:14px;text-align:left;color:var(--text);background:transparent;border:0;cursor:pointer}
+#spanel .cbo:hover,#spanel .cbo:focus-visible{background:rgba(255,255,255,.06);outline:none}
+#spanel .cbo[aria-selected="true"]{color:var(--gold2)}
+#spanel .cbo[aria-selected="true"]::after{content:"✓";margin-left:auto;font-size:14px}
+#spanel .cbo .ic{display:inline-flex;width:20px;height:20px;flex:none;align-items:center;justify-content:center;font-size:15px;color:var(--gold2)}
+#spanel .cbo .ic svg,#spanel .cbt .ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#spanel .cbt .ic{display:inline-flex;width:20px;height:20px;flex:none;align-items:center;justify-content:center;font-size:15px;color:var(--gold2)}
+#bugType .sg,#bugFreq .sg{min-height:42px;line-height:1.25;padding:6px 8px}
+#bugForm #bugSend{margin-top:14px}
 #spN{display:none!important}
 #srCnt{display:block;text-align:right;margin:0 0 6px;font-size:11.5px}
 #spanel label{display:block;margin:10px 0;font-size:13px;color:var(--muted)}
@@ -424,6 +449,7 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 #spT{flex:1}
 /* tombol "Pemutaran" dan "Animasi" disembunyikan dari menu pengaturan (pengaturannya tetap memakai nilai bawaan) */
 #gPlay,#sbAnim{display:none!important}
+#spanel .sc.gfirst{margin-top:18px}
 #spanel .grp::after{content:"›";margin-left:auto;color:var(--muted);font-size:20px;line-height:1}
 #spAbt{white-space:pre-line}
 #spanel.wide{width:min(420px,calc(100vw - 20px))}
@@ -795,6 +821,27 @@ h1{font-size:26px;line-height:1.15}
 #stSheet .dvr .dt b{display:block;font:600 13.5px/1.3 var(--head);color:var(--text)}
 #stSheet .dvr .dt small{font-size:11px;color:var(--muted)}
 #stSheet .dvr .ac{flex:none;display:flex;gap:6px}
+/* form pengumuman developer: pilihan ikon bergambar, bagian berjudul, penghitung huruf, pratinjau */
+#stSheet .dvlt{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+#stSheet .dvc{font-style:normal;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+#stSheet .dvhint{font-size:11px;line-height:1.4;color:var(--muted)}
+#stSheet .dvs{margin:10px 2px 0;padding-top:12px;border-top:1px solid var(--line)}
+#stSheet .dvs:first-child{margin-top:0;padding-top:0;border-top:0}
+#stSheet .dvpk{display:flex;flex-direction:column;gap:8px}
+#stSheet .dvk{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:8px 12px 8px 8px;font:inherit;color:var(--text);text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#stSheet .dvk .iart{width:64px;min-height:58px;border-radius:8px;overflow:hidden}
+#stSheet .dvkt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#stSheet .dvkt b{font:600 13.5px/1.25 var(--head);color:var(--text)}
+#stSheet .dvkt small{font-size:11.5px;line-height:1.35;color:var(--muted)}
+#stSheet .dvk::after{content:"";flex:none;width:20px;height:20px;box-sizing:border-box;border-radius:50%;border:2px solid var(--line)}
+#stSheet .dvk.on{border-color:var(--gold2);background:rgba(240,207,134,.08)}
+#stSheet .dvk.on .dvkt b{color:var(--gold2)}
+#stSheet .dvk.on::after{border-color:var(--gold2);background:radial-gradient(circle,var(--gold2) 0 4px,transparent 5px)}
+#stSheet .dvk:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+#stSheet .dvpv{margin:0}
+#stSheet .dvpv .it p{word-break:break-word}
+#stSheet .dvri{flex:none;display:block;width:44px;height:40px;border-radius:8px;overflow:hidden}
+#stSheet .dvri .iart{width:100%;min-height:0;height:100%}
 #stSheet .empty{padding:24px 8px;text-align:center;font-size:13px;color:var(--muted)}
 /* Konten Sponsor: aksen biru keabu-abuan supaya jelas berbeda dari emas khas aplikasi */
 /* Slider Informasi & Sponsor: maksimal 5 slide (3 iklan + 2 pengumuman) */
@@ -1046,20 +1093,18 @@ h1{font-size:26px;line-height:1.15}
   <div class="sh"><button class="gear" id="spB" type="button" hidden></button><b id="spT"></b></div>
   <div id="sv0">
     <section id="spAcc" aria-labelledby="spAccT"><p class="atl" id="spAccT">Akun</p><div id="spAccBody"></div></section>
-    <button class="sc" id="gTut" type="button"></button>
-    <button class="sc grp" id="gSound" data-g="sound" type="button"></button>
-    <button class="sc grp" id="gPlay" data-g="play" type="button"></button>
     <button class="sc grp" id="gLook" data-g="look" type="button"></button>
     <button class="sc grp" id="gLang" data-g="lang" type="button"></button>
-    <button class="sc grp" id="gAppLock" data-g="applock" type="button"></button>
-    <button class="sc grp" id="gGloss" data-g="gloss" type="button"></button>
-    <button class="sc grp" id="gSaran" data-g="saran" type="button"></button>
-    <button class="sc grp" id="gAbout" data-g="about" type="button"></button>
+    <button class="sc grp" id="gSound" data-g="sound" type="button"></button>
+    <button class="sc grp" id="gPlay" data-g="play" type="button"></button>
+    <button class="sc grp gfirst" id="gAppLock" data-g="applock" type="button"></button>
     <button class="sc grp" id="gBackup" data-g="backup" type="button"></button>
-    <button class="sc grp" id="gReset" data-g="reset" type="button"></button>
     <button class="sc grp" id="gCache" data-g="cache" type="button"></button>
+    <button class="sc grp" id="gReset" data-g="reset" type="button"></button>
+    <button class="sc grp gfirst" id="gHelp" data-g="help" type="button"></button>
+    <button class="sc grp" id="gAbout" data-g="about" type="button"></button>
     <button class="sc grp" id="gDukung" data-g="dukung" type="button"></button>
-    <p class="abp" id="dukungNote"></p>
+<p class="abp" id="dukungNote"></p>
   </div>
   <div id="svSound" hidden>
     <button class="sc" id="sbSound" type="button"></button>
@@ -1132,6 +1177,35 @@ h1{font-size:26px;line-height:1.15}
     <button class="sc" id="chBtn" type="button"></button>
     <p class="abp" id="chNote"></p>
     <p class="abp" id="chStat" role="status" hidden></p>
+  </div>
+  <div id="svHelp" hidden>
+    <button class="sc" id="gTut" type="button"></button>
+    <button class="sc grp" id="gGloss" data-g="gloss" type="button"></button>
+    <button class="sc grp" id="gBug" data-g="bug" type="button"></button>
+    <button class="sc grp" id="gSaran" data-g="saran" type="button"></button>
+  </div>
+  <div id="svBug" hidden>
+    <p class="abp" id="bugInfo"></p>
+    <form id="bugForm" novalidate autocomplete="off">
+      <label class="bl" id="bgLType"></label>
+      <div class="seg" id="bugType" role="group" aria-labelledby="bgLType"><button class="sg" data-v="crash" type="button"></button><button class="sg" data-v="ui" type="button"></button><button class="sg" data-v="func" type="button"></button><button class="sg" data-v="other" type="button"></button></div>
+      <label class="bl" id="bgLMenu" for="bugMenuBtn"></label>
+      <div class="cb" id="bugMenuBox"><button type="button" class="bf cbt" id="bugMenuBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="bugMenuList"></button>
+        <div class="cbl" id="bugMenuList" hidden><input type="search" class="cbq" id="bugMenuQ" autocomplete="off" spellcheck="false"><div id="bugMenuOpts" role="listbox" aria-labelledby="bgLMenu"></div><p class="abp" id="bugMenuEmpty" hidden></p></div></div>
+      <input type="hidden" id="bugMenu" value="">
+      <label class="bl" id="bgLSum" for="bugSum"></label>
+      <input id="bugSum" class="bf" type="text" maxlength="100">
+      <label class="bl" id="bgLMsg" for="bugMsg"></label>
+      <textarea id="bugMsg" class="bf" maxlength="1500" rows="7"></textarea>
+      <small id="bugCnt" class="abp"></small>
+      <label class="bl" id="bgLFreq"></label>
+      <div class="seg s3" id="bugFreq" role="group" aria-labelledby="bgLFreq"><button class="sg" data-v="once" type="button"></button><button class="sg" data-v="some" type="button"></button><button class="sg" data-v="always" type="button"></button></div>
+      <label class="bl" id="bgLMail" for="bugMail"></label>
+      <input id="bugMail" class="bf" type="email" maxlength="120" inputmode="email" autocapitalize="off" spellcheck="false">
+      <p class="abp" id="bugNote"></p>
+      <button class="sc" id="bugSend" type="button"></button>
+      <p class="abp" id="bugStat" role="status" hidden></p>
+    </form>
   </div>
   <div id="svSaran" hidden>
     <p class="abp" id="srInfo"></p>
@@ -1358,22 +1432,22 @@ const Net = {
   QK: "sp_saran_queue",
   readQ(){ try{ const q = JSON.parse(localStorage.getItem(this.QK) || "[]"); return Array.isArray(q) ? q : []; }catch(e){ return []; } },
   writeQ(q){ try{ localStorage.setItem(this.QK, JSON.stringify(q)); }catch(e){} },
-  queue(m){ const q = this.readQ(); q.push({m:m, lang:(typeof S !== "undefined" && S.lang === "en") ? "en" : "id", t:Date.now()}); this.writeQ(q.slice(-20)); },
+  queue(m, k, sj){ const q = this.readQ(); q.push({m:m, k:k || "", sj:sj || "", lang:(typeof S !== "undefined" && S.lang === "en") ? "en" : "id", t:Date.now()}); this.writeQ(q.slice(-20)); },
   async flush(){
     if(this.busy || !this.on()) return; this.busy = true;
     try{
-      let q = this.readQ(), sent = 0;
+      let q = this.readQ(), sent = 0, bugs = 0;
       while(q.length && this.on()){
         const it = q[0];
         try{
           const res = await fetch("https://api.web3forms.com/submit", {method:"POST", headers:{"Content-Type":"application/json", "Accept":"application/json"},
-            body:JSON.stringify({access_key:SARAN_KEY, subject:SR[it.lang].subj, from_name:"Satu Titik", message:it.m})});
+            body:JSON.stringify({access_key:SARAN_KEY, subject:(it.k === "bug" ? BG : SR)[it.lang].subj + (it.sj ? ": " + it.sj : ""), from_name:"Satu Titik", message:it.m})});
           const j = await res.json();
           if(!(j && j.success)) break;
         }catch(e){ break; }
-        q.shift(); sent++; this.writeQ(q);
+        q.shift(); sent++; if(it.k === "bug") bugs++; this.writeQ(q);
       }
-      if(sent){ const en = typeof S !== "undefined" && S.lang === "en"; this.say(en ? "Suggestion sent" : "Saran terkirim", en ? "Your saved suggestion was delivered. Thank you!" : "Saran yang tertunda sudah terkirim. Terima kasih!", "on", "check"); }
+      if(sent){ const en = typeof S !== "undefined" && S.lang === "en"; if(bugs === sent) this.say(BG[en ? "en" : "id"].sent, BG[en ? "en" : "id"].sent2, "on", "check"); else this.say(en ? "Suggestion sent" : "Saran terkirim", en ? "Your saved suggestion was delivered. Thank you!" : "Saran yang tertunda sudah terkirim. Terima kasih!", "on", "check"); }
     }finally{ this.busy = false; }
   },
   async sync(){
@@ -1710,6 +1784,8 @@ PIC.trash = GI('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')
 PIC.alert = GI('<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>');
 PIC.cache = GI('<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/>');
 PIC.heart = GI('<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>');
+PIC.bug = GI('<rect x="8" y="8" width="8" height="11" rx="4"/><path d="M9 8a3 3 0 0 1 6 0M4 13h4M16 13h4M5 7l3 2.5M19 7l-3 2.5M5 19l3-2.5M19 19l-3-2.5M12 12v7"/>');
+PIC.help = GI('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1.9-1.1 1.6M12 16.5h.01"/>');
 PIC.info = GI('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>');
 PIC.lock = GI('<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>');
 PIC.finger = GI('<path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>');
@@ -1863,8 +1939,8 @@ const AP = {
   id:{theme:"Tema", themes:["Biru malam","Hitam pekat","Kabut asap","Kabut laut","Langit berbintang","Asap sinematik"], size:"Ukuran huruf", sizes:["Kecil","Sedang","Besar"], font:"Mode font", fonts:["Serif klasik","Sans-serif"], anim:["Animasi: nyala","Animasi: mati"]},
   en:{theme:"Theme", themes:["Midnight blue","Pure black","Smoke","Sea fog","Starry sky","Cinematic smoke"], size:"Font size", sizes:["Small","Medium","Large"], font:"Font mode", fonts:["Classic serif","Sans-serif"], anim:["Animation: on","Animation: off"]}
 };
-Object.assign(TT.id, {bk:"Kembali", glq:"Cari istilah…", gle:"Istilah tidak ditemukan.", g:{sound:"Mode", play:"Pemutaran", lang:"Bahasa", about:"Tentang", look:"Tampilan", gloss:"Istilah", saran:"Kotak Saran", profile:"Profil", reset:"Reset", cache:"Hapus cache", applock:"Kunci Aplikasi"}});
-Object.assign(TT.en, {bk:"Back", glq:"Search terms…", gle:"No terms found.", g:{sound:"Mode", play:"Playback", lang:"Language", about:"About", look:"Appearance", gloss:"Glossary", saran:"Suggestion Box", profile:"Profile", reset:"Reset", cache:"Clear cache", applock:"App Lock"}});
+Object.assign(TT.id, {bk:"Kembali", glq:"Cari istilah…", gle:"Istilah tidak ditemukan.", g:{sound:"Mode", play:"Pemutaran", lang:"Bahasa", about:"Tentang", look:"Tampilan", gloss:"Istilah", help:"Pusat Bantuan", bug:"Laporkan Bug", saran:"Kotak Saran", profile:"Profil", reset:"Reset", cache:"Hapus cache", applock:"Kunci Aplikasi"}});
+Object.assign(TT.en, {bk:"Back", glq:"Search terms…", gle:"No terms found.", g:{sound:"Mode", play:"Playback", lang:"Language", about:"About", look:"Appearance", gloss:"Glossary", help:"Help Center", bug:"Report a Bug", saran:"Suggestion Box", profile:"Profile", reset:"Reset", cache:"Clear cache", applock:"App Lock"}});
 Object.assign(TT.id, {
   rx:{info:"Pilih apa yang ingin direset.", data:["Reset data","Hapus riwayat dan hasil semua menu di perangkat dan di server (bila masuk akun). Pengaturan dan akun tetap."], set:["Reset pengaturan","Kembalikan suara, musik, tampilan, dan bahasa ke bawaan. Ikut tersinkron ke akunmu. Data tetap."], all:["Kembali ke setelan awal","Reset data dan reset pengaturan sekaligus, di perangkat dan di server. Akun tetap masuk."],
     q:{data:"Reset data? Riwayat dan hasil semua menu akan dihapus dan tidak bisa dikembalikan.", set:"Reset pengaturan? Semua pengaturan kembali ke bawaan. Data tidak berubah.", all:"Kembali ke setelan awal? Semua data dan pengaturan akan dihapus dan tidak bisa dikembalikan."},
@@ -1930,8 +2006,53 @@ const SR = {
   id:{info:"Punya saran, kritik, atau ide menu baru? Tulis di bawah, lalu kirim. Tidak perlu login.", ph:"Tulis sarannya di sini…", send:"Kirim saran", subj:"Saran untuk Satu Titik", empty:"Tulis sarannya dulu ya.", sending:"Mengirim…", queued:"Sedang offline. Saranmu disimpan dan akan terkirim otomatis saat internet tersambung.", ok:"Terima kasih! Saranmu sudah terkirim.", fail:"Gagal mengirim (cek koneksi internet). Coba lagi, atau kirim lewat aplikasi email.", mail:"Kirim lewat aplikasi email"},
   en:{info:"Got a suggestion, feedback, or a menu idea? Write it below and send it. No login needed.", ph:"Write your suggestion here…", send:"Send suggestion", subj:"Suggestion for Satu Titik", empty:"Please write your suggestion first.", sending:"Sending…", queued:"You are offline. Your suggestion is saved and will be sent automatically once you are back online.", ok:"Thank you! Your suggestion has been sent.", fail:"Could not send (check your internet connection). Try again, or send via your email app.", mail:"Send via email app"}
 };
+const BG = {
+  id:{info:"Bantu kami memperbaiki aplikasi. Isi formulir di bawah selengkap mungkin. Tidak perlu login.", lt:"Jenis masalah", types:["Aplikasi error atau berhenti","Tampilan rusak","Fitur tidak berfungsi","Lainnya"], lm:"Menu terkait", all:"Umum / seluruh aplikasi", ps:"Cari menu…", pe:"Menu tidak ditemukan.", ls:"Ringkasan masalah", phs:"Contoh: Tombol Hitung tidak merespons", lmsg:"Detail dan langkah-langkah", ph:"Apa yang terjadi? Langkah apa yang kamu lakukan sebelumnya, dan apa yang seharusnya terjadi?", lf:"Seberapa sering terjadi?", freqs:["Sekali","Kadang-kadang","Selalu"], lmail:"Email untuk dihubungi", opt:"opsional", phm:"nama@email.com", note:"Info perangkat (versi aplikasi, platform, ukuran layar, bahasa, dan browser) ikut terkirim otomatis untuk membantu kami menelusuri masalah. Jangan menulis kata sandi atau data pribadi yang sensitif.", send:"Kirim laporan", subj:"Laporan Bug Satu Titik", eType:"Pilih jenis masalah.", eSum:"Tulis ringkasan masalah.", eMsg:"Jelaskan detail masalahnya.", eMail:"Format email belum benar.", sending:"Mengirim…", queued:"Sedang offline. Laporanmu disimpan dan akan terkirim otomatis saat internet tersambung.", ok:"Terima kasih! Laporan bug sudah terkirim.", fail:"Gagal mengirim (cek koneksi internet). Coba lagi, atau kirim lewat aplikasi email.", mail:"Kirim lewat aplikasi email", sent:"Laporan bug terkirim", sent2:"Laporan tertunda sudah terkirim. Terima kasih!", lbl:"Info perangkat"},
+  en:{info:"Help us improve the app. Fill in the form below as completely as you can. No login needed.", lt:"Type of problem", types:["App error or stops","Broken layout","Feature not working","Other"], lm:"Related menu", all:"General / whole app", ps:"Search menus…", pe:"No menus found.", ls:"Summary", phs:"Example: The Calculate button does nothing", lmsg:"Details and steps", ph:"What happened? What steps did you take before it, and what should have happened?", lf:"How often does it happen?", freqs:["Once","Sometimes","Always"], lmail:"Contact email", opt:"optional", phm:"name@email.com", note:"Device info (app version, platform, screen size, language, and browser) is sent automatically to help us trace the problem. Do not write passwords or sensitive personal data.", send:"Send report", subj:"Satu Titik Bug Report", eType:"Choose the type of problem.", eSum:"Write a short summary.", eMsg:"Describe the problem in detail.", eMail:"The email format is not valid.", sending:"Sending…", queued:"You are offline. Your report is saved and will be sent automatically once you are back online.", ok:"Thank you! Your bug report has been sent.", fail:"Could not send (check your internet connection). Try again, or send via your email app.", mail:"Send via email app", sent:"Bug report sent", sent2:"Your saved report was delivered. Thank you!", lbl:"Device info"}
+};
+const BGID = {types:["Aplikasi error / berhenti","Tampilan rusak","Fitur tidak berfungsi","Lainnya"], freqs:["Sekali","Kadang-kadang","Selalu"], all:"Umum / seluruh aplikasi"};
+const bgSel = {type:-1, freq:-1};
+const bgIc = id => { const m = MENUS.find(x => x.id === id); return m ? (ICONS[m.id] || m.icon) : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>'; };
+function bgMenuBuild(){
+  const r = BG[S.lang], en = S.lang === "en", cur = $("bugMenu").value, box = $("bugMenuOpts"), q = $("bugMenuQ").value.trim().toLowerCase();
+  box.innerHTML = "";
+  let n = 0;
+  const opt = (id, label) => { const b = document.createElement("button"); b.type = "button"; b.className = "cbo"; b.setAttribute("role", "option"); b.dataset.v = id; b.setAttribute("aria-selected", String(id === cur)); b.innerHTML = '<span class="ic">' + bgIc(id) + '</span><span></span>'; b.lastChild.textContent = label; box.appendChild(b); n++; };
+  const head = t => { const h = document.createElement("p"); h.className = "cbg"; h.textContent = t; box.appendChild(h); };
+  if(!q || r.all.toLowerCase().includes(q)) opt("", r.all);
+  CATS.filter(c => !c.fav).forEach(c => {
+    const ms = MENUS.filter(m => m.cat === c.id && (!q || mTitle(m).toLowerCase().includes(q)));
+    if(!ms.length) return;
+    head(en ? c.titleEn : c.title); ms.forEach(m => opt(m.id, mTitle(m)));
+  });
+  $("bugMenuEmpty").textContent = r.pe; $("bugMenuEmpty").hidden = n > 0;
+  $("bugMenuQ").placeholder = r.ps;
+  const m = MENUS.find(x => x.id === cur);
+  $("bugMenuBtn").innerHTML = '<span class="ic">' + bgIc(cur) + '</span><span class="cv"></span>'; $("bugMenuBtn").lastChild.textContent = m ? mTitle(m) : r.all;
+}
+function bgMenuToggle(open){
+  const l = $("bugMenuList"), btn = $("bugMenuBtn"); open = open === undefined ? l.hidden : open;
+  l.hidden = !open; btn.setAttribute("aria-expanded", String(open));
+  if(open){ $("bugMenuQ").value = ""; bgMenuBuild(); const sel = $("bugMenuOpts").querySelector('[aria-selected="true"]'); if(sel) sel.scrollIntoView({block:"nearest"}); }
+}
+$("bugMenuBtn").addEventListener("click", () => bgMenuToggle());
+$("bugMenuQ").addEventListener("input", bgMenuBuild);
+$("bugMenuOpts").addEventListener("click", e => { const b = e.target.closest(".cbo"); if(!b) return; $("bugMenu").value = b.dataset.v; bgMenuToggle(false); bgMenuBuild(); $("bugMenuBtn").focus(); });
+$("bugMenuBox").addEventListener("keydown", e => { if(e.key === "Escape" && !$("bugMenuList").hidden){ e.stopPropagation(); bgMenuToggle(false); $("bugMenuBtn").focus(); } });
+document.addEventListener("click", e => { if(!$("bugMenuList").hidden && !e.composedPath().includes($("bugMenuBox"))) bgMenuToggle(false); });
+function bgBuild(){
+  const r = BG[S.lang];
+  bgMenuBuild();
+  const L = (id, t, opt) => { const e = $(id); e.textContent = t; if(opt){ const i = document.createElement("i"); i.textContent = " (" + r.opt + ")"; e.appendChild(i); } };
+  L("bgLType", r.lt); L("bgLMenu", r.lm); L("bgLSum", r.ls); L("bgLMsg", r.lmsg); L("bgLFreq", r.lf, 1); L("bgLMail", r.lmail, 1);
+  $("bugInfo").textContent = r.info; $("bugSum").placeholder = r.phs; $("bugMsg").placeholder = r.ph; $("bugMail").placeholder = r.phm; $("bugNote").textContent = r.note;
+  $("bugType").querySelectorAll(".sg").forEach((b, i) => { b.textContent = r.types[i]; b.setAttribute("aria-pressed", String(bgSel.type === i)); });
+  $("bugFreq").querySelectorAll(".sg").forEach((b, i) => { b.textContent = r.freqs[i]; b.setAttribute("aria-pressed", String(bgSel.freq === i)); });
+}
+const bgInfo = () => { let sc = ""; try{ sc = screen.width + "x" + screen.height + " @" + (window.devicePixelRatio || 1); }catch(e){} const cap = window.Capacitor; let pf = "web"; try{ if(cap && cap.getPlatform) pf = cap.getPlatform(); }catch(e){} return "\n\n---\n" + BG[S.lang].lbl + "\nApp: " + (window.satuTitikVer || "1.0.0") + "\nPlatform: " + pf + "\nLayar: " + sc + "\nBahasa: " + S.lang + "\nOnline: " + Net.on() + "\nUA: " + navigator.userAgent; };
 let spView = "", rPend = null, chBytes = null, buMode = "", buFile = null;
-const SPV = {"":"sv0", sound:"svSound", play:"svPlay", lang:"svLang", about:"svAbout", look:"svLook", gloss:"svGloss", saran:"svSaran", profile:"svProfile", backup:"svBackup", reset:"svReset", cache:"svCache", applock:"svAppLock"}, SPI = {sound:"mode", play:"auto", look:"look", lang:"lang", about:"info", gloss:"book", saran:"mail", profile:"user", backup:"backup", reset:"reset", cache:"cache", applock:"lock"};
+const SPP = {saran:"help", gloss:"help", bug:"help"};
+const SPV = {"":"sv0", sound:"svSound", play:"svPlay", lang:"svLang", about:"svAbout", look:"svLook", gloss:"svGloss", help:"svHelp", bug:"svBug", saran:"svSaran", profile:"svProfile", backup:"svBackup", reset:"svReset", cache:"svCache", applock:"svAppLock"}, SPI = {sound:"mode", play:"auto", look:"look", lang:"lang", about:"info", gloss:"book", help:"help", bug:"bug", saran:"mail", profile:"user", backup:"backup", reset:"reset", cache:"cache", applock:"lock"};
 function showView(v){ spView = v; rPend = null; buMode = ""; buFile = null; $("buStat").hidden = true; $("rStat").hidden = true; $("chStat").hidden = true; paintPanel(); if(v === "cache") cacheUse(); }
 function paintPanel(){
   const t = TT[S.lang], pb = (id, k, on, a) => { put(id, k, on ? a[0] : a[1]); $(id).setAttribute("aria-pressed", String(!!on)); };
@@ -1942,7 +2063,8 @@ function paintPanel(){
   Object.keys(SPV).forEach(k => { $(SPV[k]).hidden = k !== spView; });
   $("spB").hidden = !spView; $("spB").setAttribute("aria-label", t.bk); $("spB").title = t.bk;
   put("gSound", "mode", t.g.sound); put("gPlay", "auto", t.g.play); put("gLang", "lang", t.g.lang); put("gAbout", "info", t.g.about); put("gLook", "look", t.g.look);
-  put("gSaran", "mail", t.g.saran); put("gDukung", "heart", S.lang === "en" ? "Support Us" : "Dukung Kami"); $("dukungNote").textContent = S.lang === "en" ? "Voluntary support. It does not unlock any features." : "Dukungan sukarela, tidak membuka fitur apa pun.";
+  put("gHelp", "help", t.g.help); put("gBug", "bug", t.g.bug); put("gSaran", "mail", t.g.saran); put("gDukung", "heart", S.lang === "en" ? "Support Us" : "Dukung Kami"); $("dukungNote").textContent = S.lang === "en" ? "Voluntary support. It does not unlock any features." : "Dukungan sukarela, tidak membuka fitur apa pun.";
+  bgBuild(); put("bugSend", "bug", BG[S.lang].send); $("bugCnt").textContent = $("bugMsg").value.length + " / 1500";
   { const r = SR[S.lang]; $("srInfo").textContent = r.info; $("srMsg").placeholder = r.ph; put("srSend", "mail", r.send); $("srCnt").textContent = $("srMsg").value.length + " / 1500"; }
   put("gAppLock", "lock", t.g.applock); if(window.stAppLock) window.stAppLock.paint();
   put("gGloss", "book", t.g.gloss); $("glQ").placeholder = t.glq; $("glEmpty").textContent = t.gle; $("spanel").classList.toggle("wide", spView === "gloss"); if(glLang !== S.lang) buildGloss();
@@ -2084,6 +2206,7 @@ const PV = {
     {p:["Jelajahi Rute di menu Olahraga (opsional):"], l:["Menjelajahi rute hanya untuk pengguna yang masuk akun. Saat kamu mengetuk Cari rute di sekitarku, lokasi perangkat dibaca sekali, tidak disimpan, dan tidak dikirim; yang dikirim ke server hanya kode sel area (kotak sekitar 5 km) untuk mencari rute di sekitarnya.","Membagikan rute sepenuhnya pilihanmu, per aktivitas, dan bawaannya tidak ada yang dibagikan. Rekaman GPS-mu tidak pernah dipublikasikan otomatis. Aktivitas input manual, impor, dan bertanda ⚠ tidak bisa dibagikan.","Yang disimpan di server untuk rute yang kamu bagikan: ID penggunamu, nama rute yang kamu tulis, jenis olahraga, panjang, estimasi durasi, total tanjakan, maksimal 80 titik koordinat rute yang sudah dipangkas 300 meter atau lebih di awal dan akhir (supaya rumah atau tempat pribadimu tidak terlihat), kode sel area, dan waktu. Tidak disimpan: waktu dan ketinggian tiap titik, judul aktivitas, dan rute aslimu. Rute dapat dilihat semua pengguna yang masuk akun, termasuk yang bukan temanmu; namamu dan fotomu tidak ditampilkan pada rute.","Tanda selesai (ID penggunamu, ID rute, jenis olahraga, dan waktu) serta bintang dan ulasan (isi maksimal 200 karakter, username-mu, ID penggunamu, dan waktu) juga dapat dilihat pengguna yang masuk akun. Kecocokan aktivitasmu dengan rute dicek di perangkatmu; yang dikirim adalah tanda selesai beserta bukti singkat (jarak, durasi, waktu mulai aktivitas, dan 8 titik koordinat di jalur rute, bukan seluruh rekamanmu) serta waktu tanda selesai terakhirmu untuk membatasi frekuensi. Server menolak bukti yang tidak cocok dengan rute atau tidak wajar, dan tanda selesai dibatasi satu kali per 5 menit. Laporan rute menyimpan ID rute, ID penggunamu, dan waktu, dan hanya dibaca pengelola.","Rute Panduan yang kamu pakai dan daftar rute yang kamu bagikan tersimpan di perangkatmu.","Kamu bisa menghapus satu rute lewat Hapus dari Jelajahi Rute di detail aktivitas, atau menghapus semua rute, tanda selesai, ulasan, dan laporanmu lewat tombol di tab Rute, atau dengan menghapus akun. Tanda selesai dan ulasan yang ditulis pengguna lain di rutemu tetap milik mereka dan dihapus saat mereka menghapusnya atau menghapus akun."]},
     {p:["Blokir dan laporan:"], l:["Daftar pengguna yang kamu blokir disimpan di akunmu agar blokir berlaku di semua perangkat.","Saat kamu melapor, kami menyimpan alasan, ID Akun pelapor dan yang dilaporkan, waktu, serta salinan teks yang dilaporkan dan catatan tambahan (bila kamu menulisnya). Laporan hanya dibaca pengelola untuk meninjau pelanggaran."]},
     {p:["Senyapkan notifikasi pesan:"], l:["Kamu bisa menyenyapkan notifikasi pesan dari satu teman (lewat menu teman) atau dari semua teman (lewat Pengaturan). Pilihan ini disimpan di akunmu, berupa ID Akunmu, ID Akun teman yang disenyapkan (atau penanda semua teman), dan waktunya, agar berlaku di semua perangkatmu.","Saat disenyapkan, server pengirim notifikasi tidak meminta notifikasi push untuk pesan itu ke HP-mu. Pesan tetap masuk dan bisa dibaca di chat. Temanmu tidak diberi tahu bahwa kamu menyenyapkannya.","Data senyap dihapus saat kamu mematikan senyap, memakai Reset data di Pengaturan, atau menghapus akun."]},
+    {p:["Laporkan Bug:"], l:["Laporan yang kamu tulis dikirim ke pengelola lewat layanan formulir pihak ketiga yang sama dengan Kotak Saran, bersama info perangkat (versi aplikasi, platform, ukuran layar, bahasa, status online, dan jenis browser). Tidak perlu masuk akun, dan jangan menulis kata sandi atau data pribadi yang sensitif. Bila sedang offline, laporan disimpan sementara di perangkatmu sampai berhasil terkirim."]},
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan formulir pihak ketiga. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif. Bila sedang offline, pesan disimpan sementara di perangkatmu sampai berhasil terkirim."]},
     {p:["Pengecekan koneksi dan waktu:"], l:["Aplikasi mengirim permintaan sederhana ke server publik (beberapa penyedia layanan waktu dan jaringan) untuk mengecek koneksi internet dan jam. Permintaan ini tidak berisi data pribadimu, tetapi seperti permintaan internet lainnya, alamat IP perangkat terlihat oleh server tersebut."]},
     {p:["Iklan (aplikasi Android):"], l:["Aplikasi Android (APK maupun Google Play) menampilkan iklan banner dan iklan layar penuh dari Google AdMob. Versi web tidak menampilkan iklan.","Jaringan iklan dapat memproses ID iklan perangkat, alamat IP, jenis perangkat, dan interaksi dengan iklan untuk menampilkan serta mengukur iklan. Pada wilayah yang mewajibkan, kamu akan diminta persetujuan terlebih dahulu.","Kamu dapat mengatur atau mereset ID iklan, dan membatasi personalisasi iklan, lewat pengaturan perangkat."]},
@@ -2095,7 +2218,7 @@ const PV = {
     {h:"7. Anak-anak", p:["Fitur akun dan sosial Satu Titik (masuk akun, teman, pesan pribadi, komentar, dan ruangan online) hanya untuk pengguna berusia 16 tahun ke atas. Pengguna di bawah 18 tahun harus mendapat izin orang tua atau wali sebelum masuk dengan akun. Menu yang tidak memerlukan akun menyimpan datanya hanya di perangkat; anak di bawah 13 tahun sebaiknya didampingi orang tua. Kami tidak dengan sengaja mengumpulkan data anak di bawah 16 tahun, dan kami berusaha tidak melakukan profiling terhadap pengguna di bawah 18 tahun. Iklan di aplikasi Android ditampilkan oleh Google AdMob; kamu atau orang tuamu dapat membatasi personalisasi iklan lewat pengaturan perangkat. Bila kamu orang tua dan menemukan data anak di aplikasi ini, hubungi kami lewat email di bagian Kontak atau Kotak Saran, dan kami akan menghapusnya."]},
     {h:"8. Hasil menu", p:["Hasil menu primbon, ramalan, dan hiburan hanya untuk hiburan dan kepercayaan tradisional, bukan kepastian atau dasar untuk keputusan penting. Hasil BMI, kalori, kehamilan, kandungan gizi makanan, kalkulator AKG, dan data olahraga adalah informasi umum, bukan diagnosis, nasihat medis atau gizi, atau pengganti pemeriksaan tenaga kesehatan; konsultasikan kondisimu dengan dokter, bidan, atau ahli gizi. Waktu sholat dan arah kiblat dihitung otomatis dari lokasi yang kamu pilih, dan bisa berbeda 1 sampai 2 menit atau sedikit derajat dari jadwal masjid atau kompas lain; ikuti adzan dan ketentuan di tempatmu."]},
     {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Perubahan penting akan diumumkan di aplikasi."]},
-    {h:"10. Kontak", p:["Pertanyaan tentang privasi, permintaan penghapusan data, atau pengaduan dapat dikirim ke email di bawah ini atau lewat Kotak Saran di Pengaturan."]}
+    {h:"10. Kontak", p:["Pertanyaan tentang privasi, permintaan penghapusan data, atau pengaduan dapat dikirim ke email di bawah ini atau lewat Kotak Saran di Pengaturan > Pusat Bantuan."]}
   ]},
   en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 25 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. Aurenza27 acts as the personal data controller for this app. We process your data based on your consent and to run the features you choose, in line with the personal data protection rules that apply in Indonesia, including the Personal Data Protection Law (UU PDP). By using the app, you agree to this policy."]},
@@ -2114,6 +2237,7 @@ const PV = {
     {p:["Explore Routes in the Exercise menu (optional):"], l:["Exploring routes is only for signed-in users. When you tap Find routes near me, your device location is read once, is not stored, and is not sent; only an area cell code (a box of about 5 km) is sent to the server to look up nearby routes.","Sharing a route is entirely your choice, per activity, and nothing is shared by default. Your GPS recordings are never published automatically. Manual, imported, and ⚠ flagged activities cannot be shared.","Stored on the server for a route you share: your user ID, the route name you write, sport, length, estimated duration, total elevation gain, up to 80 route coordinates trimmed by 300 meters or more at the start and end (so your home or private places are not visible), the area cell code, and the time. Not stored: the time and altitude of each point, the activity title, and your original route. The route can be seen by all signed-in users, including people who are not your friends; your name and photo are not shown on the route.","Completion marks (your user ID, route ID, sport, and time) and star ratings and reviews (text up to 200 characters, your username, your user ID, and the time) can also be seen by signed-in users. Whether your activity matches a route is checked on your device; what is sent is the completion mark plus brief proof (distance, duration, activity start time, and 8 coordinates on the route path, not your whole recording) and the time of your last completion to limit frequency. The server rejects proof that does not match the route or is implausible, and completions are limited to one per 5 minutes. A route report stores the route ID, your user ID, and the time, and is read only by the maintainer.","The Guide route you use and the list of routes you shared are stored on your device.","You can delete one route with Remove from Explore Routes in the activity detail, or delete all your routes, completion marks, reviews, and reports with the button in the Routes tab, or by deleting your account. Completion marks and reviews other users wrote on your route remain theirs and are removed when they delete them or delete their account."]},
     {p:["Blocking and reports:"], l:["The list of users you block is stored in your account so blocking applies on all your devices.","When you report, we store the reason, the Account IDs of the reporter and the reported user, the time, a copy of the reported text, and your optional note. Reports are read only by the maintainer to review violations."]},
     {p:["Mute message notifications:"], l:["You can mute message notifications from one friend (in the friend menu) or from all friends (in Settings). This choice is stored in your account as your Account ID, the muted friend’s Account ID (or an all-friends marker), and the time, so it applies on all your devices.","While muted, the notification server does not request a push notification for that message to your phone. The message still arrives and can be read in the chat. Your friend is not told that you muted them.","Mute data is deleted when you turn mute off, use Reset data in Settings, or delete your account."]},
+    {p:["Report a Bug:"], l:["The report you write is sent to the maintainer through the same third-party form service as the Suggestion Box, together with device info (app version, platform, screen size, language, online status, and browser type). You do not need to sign in, and you should not write passwords or sensitive personal data. While offline, the report is kept temporarily on your device until it is sent."]},
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through a third-party form service. You do not need to sign in, and you should avoid writing sensitive personal data. While offline, the message is kept temporarily on your device until it is sent."]},
     {p:["Connection and time checks:"], l:["The app sends simple requests to public servers (several time and network service providers) to check your internet connection and the time. These requests do not contain your personal data, but as with any internet request, your device’s IP address is visible to those servers."]},
     {p:["Ads (Android app):"], l:["The Android app (APK and Google Play) shows banner and full-screen ads from Google AdMob. The web version shows no ads.","Ad networks may process the device advertising ID, IP address, device type, and your interactions with ads to serve and measure ads. Where required, you will be asked for consent first.","You can reset your advertising ID, and limit ad personalization, in your device settings."]},
@@ -2125,7 +2249,7 @@ const PV = {
     {h:"7. Children", p:["Satu Titik’s account and social features (signing in, friends, private messages, comments, and online rooms) are only for users aged 16 and over. Users under 18 must have a parent’s or guardian’s permission before signing in with an account. Menus that do not need an account keep their data only on your device; children under 13 should be accompanied by a parent. We do not knowingly collect data from children under 16, and we aim not to profile users under 18. Ads in the Android app are shown by Google AdMob; you or your parent can limit ad personalization in your device settings. If you are a parent and find a child’s data in this app, contact us through the email in the Contact section or the Suggestion Box, and we will delete it."]},
     {h:"8. Menu results", p:["Primbon, fortune, and entertainment menu results are for entertainment and traditional belief only, not a certainty or a basis for important decisions. BMI, calorie, pregnancy, food nutrition, RDA calculator, and exercise results are general information, not a diagnosis, medical or nutritional advice, or a substitute for an examination by a health professional; consult a doctor, midwife, or dietitian about your condition. Prayer times and the Qibla direction are calculated automatically from the location you choose, and may differ by 1 to 2 minutes or a few degrees from a local mosque’s schedule or another compass; follow the adhan and rulings in your area."]},
     {h:"9. Changes to this policy", p:["This policy may be updated. The date of the latest update is shown at the top of this page. Important changes will be announced in the app."]},
-    {h:"10. Contact", p:["Privacy questions, data deletion requests, or complaints can be sent to the email below or through the Suggestion Box in Settings."]}
+    {h:"10. Contact", p:["Privacy questions, data deletion requests, or complaints can be sent to the email below or through the Suggestion Box in Settings > Help Center."]}
   ]}
 };
 function paintPrivacy(){
@@ -2156,7 +2280,7 @@ function closePrivacy(){ $("privacy").hidden = true; if(pvFrom && pvFrom.focus) 
 (function(){var hp=document.querySelector(".hft .hfp");if(hp){hp.setAttribute("role","button");hp.tabIndex=0;hp.style.cursor="pointer";hp.setAttribute("aria-label","Powered by Aurenza27 — Tentang");hp.addEventListener("click",openAbout);hp.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openAbout()}})}})();
 $("privLink").addEventListener("click", openPrivacy); $("pvBack").addEventListener("click", closePrivacy);
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("privacy").hidden) closePrivacy(); });
-document.querySelectorAll("#spanel .grp").forEach(b => b.addEventListener("click", () => b.dataset.g === "about" ? openAbout() : b.dataset.g === "dukung" ? (SHOW_DUKUNG && window.open("https://saweria.co/AURENZA", "_blank", "noopener,noreferrer")) : showView(b.dataset.g))); $("spB").addEventListener("click", () => showView(""));
+document.querySelectorAll("#spanel .grp").forEach(b => b.addEventListener("click", () => b.dataset.g === "about" ? openAbout() : b.dataset.g === "dukung" ? (SHOW_DUKUNG && window.open("https://saweria.co/AURENZA", "_blank", "noopener,noreferrer")) : showView(b.dataset.g))); $("spB").addEventListener("click", () => showView(SPP[spView] || ""));
 $("svLook").addEventListener("click", e => { const b = e.target.closest(".sg"); if(!b) return; const k = b.parentElement.dataset.k; setS({[k]: k === "fsize" ? +b.dataset.v : b.dataset.v}); });
 $("sbAnim").addEventListener("click", () => setS({anim:!S.anim}));
 /* tombol Mode = pengaturan utama: diam mematikan efek suara, musik, dan getar sekaligus; aktif menghidupkan semuanya kembali */
@@ -2211,6 +2335,40 @@ function srStatus(t, mailFallback){
   const e = $("srStat"); e.hidden = !t; e.textContent = t || "";
   if(mailFallback){ const a = document.createElement("button"); a.type = "button"; a.className = "sc"; a.textContent = SR[S.lang].mail; a.addEventListener("click", () => srMail($("srMsg").value.trim())); e.appendChild(a); }
 }
+$("bugMsg").addEventListener("input", () => { $("bugCnt").textContent = $("bugMsg").value.length + " / 1500"; });
+[["bugType", "type"], ["bugFreq", "freq"]].forEach(([id, k]) => $(id).addEventListener("click", e => { const b = e.target.closest(".sg"); if(!b) return; const i = [...$(id).children].indexOf(b); bgSel[k] = bgSel[k] === i && k === "freq" ? -1 : i; $(id).classList.remove("bad"); bgBuild(); }));
+["bugSum", "bugMsg", "bugMail"].forEach(id => $(id).addEventListener("input", () => $(id).classList.remove("bad")));
+function bugCompose(){
+  const mid = $("bugMenu").value, mn = mid ? (MENUS.find(m => m.id === mid) ? mTitle(MENUS.find(m => m.id === mid)) : mid) : BGID.all, mail = $("bugMail").value.trim();
+  return "JENIS MASALAH : " + BGID.types[bgSel.type] + "\nMENU TERKAIT  : " + mn + "\nFREKUENSI     : " + (bgSel.freq > -1 ? BGID.freqs[bgSel.freq] : "-") + "\nKONTAK        : " + (mail || "-") +
+    "\n\nRINGKASAN\n" + $("bugSum").value.trim() + "\n\nDETAIL & LANGKAH\n" + $("bugMsg").value.trim() + bgInfo();
+}
+function bugStatus(t, mailFallback){
+  const e = $("bugStat"); e.hidden = !t; e.textContent = t || "";
+  if(mailFallback){ const a = document.createElement("button"); a.type = "button"; a.className = "sc"; a.textContent = BG[S.lang].mail; a.addEventListener("click", () => { location.href = "mailto:" + SARAN_EMAIL + "?subject=" + encodeURIComponent(BG[S.lang].subj + ": " + $("bugSum").value.trim()) + "&body=" + encodeURIComponent(bugCompose()); }); e.appendChild(a); }
+}
+function bugReset(){ $("bugForm").reset(); $("bugMenu").value = ""; bgMenuToggle(false); bgSel.type = bgSel.freq = -1; $("bugCnt").textContent = "0 / 1500"; bgBuild(); }
+$("bugSend").addEventListener("click", async () => {
+  const r = BG[S.lang], b = $("bugSend");
+  ["bugType", "bugSum", "bugMsg", "bugMail"].forEach(id => $(id).classList.remove("bad"));
+  const sum = $("bugSum").value.trim(), msg = $("bugMsg").value.trim(), mail = $("bugMail").value.trim();
+  let bad = null, err = "";
+  if(bgSel.type < 0){ bad = $("bugType"); err = r.eType; }
+  else if(!sum){ bad = $("bugSum"); err = r.eSum; }
+  else if(!msg){ bad = $("bugMsg"); err = r.eMsg; }
+  else if(mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ bad = $("bugMail"); err = r.eMail; }
+  if(bad){ bad.classList.add("bad"); if(bad.focus && bad.tagName !== "DIV") bad.focus(); else bad.scrollIntoView({block:"center"}); bugStatus(err); return; }
+  const full = bugCompose();
+  if(!Net.on()){ Net.queue(full, "bug", sum); bugReset(); bugStatus(r.queued); return; }
+  b.disabled = true; bugStatus(r.sending);
+  try{
+    const res = await fetch("https://api.web3forms.com/submit", {method:"POST", headers:{"Content-Type":"application/json", "Accept":"application/json"},
+      body:JSON.stringify(Object.assign({access_key:SARAN_KEY, subject:r.subj + ": " + sum, from_name:"Satu Titik", message:full}, mail ? {replyto:mail} : {}))});
+    const j = await res.json();
+    if(j && j.success){ bugReset(); bugStatus(r.ok); } else throw 0;
+  }catch(e){ bugStatus(r.fail, true); }
+  b.disabled = false;
+});
 $("srSend").addEventListener("click", async () => {
   const r = SR[S.lang], m = $("srMsg").value.trim(), b = $("srSend");
   if(!m){ $("srMsg").focus(); srStatus(r.empty); return; }
@@ -3766,17 +3924,38 @@ function spnDevOpen(edit){
 function infoDevOpen(edit){
   stOpen("Kelola Informasi & Pembaruan", "Mode developer. Isinya tampil ke semua pengguna.", L => {
     const cur = edit || {}, f = hEl("div", "dvf");
-    const fld = (lab, el) => { const w = hEl("label", "dvl"); const sp = hEl("span"); sp.textContent = lab; w.append(sp, el); return w; };
+    const fld = (lab, el, hint) => { const w = hEl("label", "dvl"), top = hEl("div", "dvlt"), sp = hEl("span"); sp.textContent = lab; top.appendChild(sp);
+      if(el.maxLength > 0){ const c = hEl("em", "dvc"), u = () => { c.textContent = el.value.length + "/" + el.maxLength; }; el.addEventListener("input", u); u(); top.appendChild(c); }
+      w.append(top, el); if(hint){ const h = hEl("small", "dvhint"); h.textContent = hint; w.appendChild(h); } return w; };
     const inp = (ta, val, max, ph) => { const e = hEl(ta ? "textarea" : "input", "dvi"); if(!ta) e.type = "text"; else e.rows = 3; e.value = val || ""; e.maxLength = max; if(ph) e.placeholder = ph; return e; };
     const n0 = new Date(), today = n0.getFullYear() + "-" + String(n0.getMonth() + 1).padStart(2, "0") + "-" + String(n0.getDate()).padStart(2, "0");
     const dt = hEl("input", "dvi"); dt.type = "date"; dt.value = cur.date || today;
-    const ic = hEl("select", "dvi", '<option value="megaphone">Pengumuman</option><option value="star">Fitur unggulan</option><option value="sparkle">Menu / fitur baru</option>'); ic.value = cur.icon || "megaphone";
+    const ic = { value: INFO_ICONS.indexOf(cur.icon) >= 0 ? cur.icon : "megaphone" };
     const ti = inp(false, cur.title && cur.title.id, 80, "Judul singkat"), te = inp(false, cur.title && cur.title.en, 80, "Title (English, opsional)");
     const xi = inp(true, cur.text && cur.text.id, 300, "Isi 1-2 kalimat"), xe = inp(true, cur.text && cur.text.en, 300, "Text (English, optional)");
+    /* gambar ikon dengan id gradien unik supaya tidak bentrok dengan kartu lain di layar */
+    const art = (k, n) => infoArt(k).replace(/id="ig"/g, 'id="ig' + n + '"').replace(/url\(#ig\)/g, "url(#ig" + n + ")");
+    const KINDS = [["megaphone", "Pengumuman", "Kabar umum, jadwal, atau pemberitahuan"], ["star", "Fitur unggulan", "Menyorot fitur andalan aplikasi"], ["sparkle", "Fitur baru", "Menu atau pembaruan yang baru dirilis"]];
+    const pv = hEl("div", "inr dvpv"), pk = hEl("div", "dvpk");
+    pk.setAttribute("role", "radiogroup"); pk.setAttribute("aria-label", "Jenis ikon");
+    const drawPv = () => {
+      pv.innerHTML = art(ic.value, "pv") + '<div class="it"><b></b><small></small><p></p></div>';
+      pv.querySelector("b").textContent = ti.value.trim() || "Judul pengumuman";
+      pv.querySelector("small").textContent = infoDate(dt.value);
+      pv.querySelector("p").textContent = xi.value.trim() || "Isi pengumuman akan tampil seperti ini.";
+    };
+    const mark = () => pk.querySelectorAll(".dvk").forEach(b => { const on = b.dataset.k === ic.value; b.classList.toggle("on", on); b.setAttribute("aria-checked", on ? "true" : "false"); });
+    KINDS.forEach(k => {
+      const b = hEl("button", "dvk", art(k[0], "k" + k[0]) + '<span class="dvkt"><b></b><small></small></span>'); b.type = "button"; b.setAttribute("role", "radio"); b.dataset.k = k[0];
+      b.querySelector("b").textContent = k[1]; b.querySelector("small").textContent = k[2];
+      b.addEventListener("click", () => { ic.value = k[0]; mark(); drawPv(); }); pk.appendChild(b);
+    });
+    [dt, ti, xi].forEach(e => e.addEventListener("input", drawPv)); mark(); drawPv();
+    const sec = t => { const h = hEl("p", "dvh dvs"); h.textContent = t; return h; };
     const msg = hEl("p", "dvm"), say = (t, bad) => { msg.textContent = t; msg.className = "dvm" + (bad ? " bad" : ""); };
     const go = hEl("button", "dvb pri"); go.type = "button"; go.textContent = edit ? "Simpan perubahan" : "Terbitkan";
     const cl = hEl("button", "dvb"); cl.type = "button"; cl.textContent = "Tutup panel"; cl.addEventListener("click", stClose);
-    f.append(fld("Tanggal", dt), fld("Jenis ikon", ic), fld("Judul (Indonesia)", ti), fld("Judul (English)", te), fld("Isi (Indonesia)", xi), fld("Isi (English)", xe), msg, go, cl);
+    f.append(sec("1 · Jenis ikon"), pk, sec("2 · Tanggal"), fld("Tanggal terbit", dt), sec("3 · Isi pengumuman (Indonesia)"), fld("Judul", ti, "Singkat dan jelas."), fld("Isi", xi, "Cukup 1–2 kalimat."), sec("4 · English (opsional)"), fld("Title", te), fld("Text", xe, "Boleh dikosongkan. Pengguna English akan melihat versi Indonesia."), sec("Pratinjau kartu"), pv, msg, go, cl);
     if(edit){ const cb = hEl("button", "dvb"); cb.type = "button"; cb.textContent = "Batal ubah"; cb.addEventListener("click", () => infoDevOpen()); f.append(cb); }
     go.addEventListener("click", async () => {
       const d = { date: dt.value, icon: ic.value, title:{ id: ti.value.trim(), en: te.value.trim() }, text:{ id: xi.value.trim(), en: xe.value.trim() } };
@@ -3793,8 +3972,8 @@ function infoDevOpen(edit){
     L.appendChild(f);
     const mine = INFO_REMOTE.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)) || (b.ts || 0) - (a.ts || 0));
     const hd = hEl("p", "dvh"); hd.textContent = mine.length ? "Pengumuman di server (" + mine.length + ")" : "Belum ada pengumuman di server."; L.appendChild(hd);
-    mine.forEach(it => {
-      const r = hEl("div", "dvr", '<div class="dt"><b></b><small></small></div><div class="ac"></div>');
+    mine.forEach((it, ix) => {
+      const r = hEl("div", "dvr", '<span class="dvri">' + art(it.icon, "r" + ix) + '</span><div class="dt"><b></b><small></small></div><div class="ac"></div>');
       r.querySelector("b").textContent = it.title.id; r.querySelector("small").textContent = infoDate(it.date);
       const ac = r.querySelector(".ac"), eb = hEl("button", "dvb sm"), db2 = hEl("button", "dvb sm del"); eb.type = db2.type = "button"; eb.textContent = "Ubah"; db2.textContent = "Hapus";
       eb.addEventListener("click", () => infoDevOpen(it));
@@ -29042,7 +29221,7 @@ if(navigator.onLine !== false) init().catch(() => {});
     const fp = $("frpanel"); if(fp && !fp.hidden) L.push(() => { try{ window.satuTitikFriends.close(); }catch(e){ fp.hidden = true; } });
     if(typeof spOpen === "function" && spOpen()){
       L.push(() => togglePanel(false));
-      if(typeof spView !== "undefined" && spView) L.push(() => showView(""));
+      if(typeof spView !== "undefined" && spView) L.push(() => showView(SPP[spView] || ""));
     }
     const ab = $("about"); if(ab && !ab.hidden) L.push(() => closeAbout());
     const pv = $("privacy"); if(pv && !pv.hidden) L.push(() => closePrivacy());
@@ -29453,7 +29632,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       {h:"20. Layanan apa adanya", p:["Satu Titik diberikan apa adanya. Kami berusaha menjaganya tetap berjalan, tetapi tidak menjamin layanan selalu tersedia, bebas gangguan, atau bebas kesalahan. Kami dapat mengubah, membatasi, atau menghentikan fitur kapan saja. Sejauh diizinkan hukum, kami tidak bertanggung jawab atas kerugian tidak langsung, kehilangan data akibat perangkat, penghapusan data aplikasi, atau reset yang kamu lakukan, alarm yang tidak berbunyi tepat waktu, maupun keputusan yang kamu ambil berdasarkan hasil menu, kerugian keuangan, atau cedera yang timbul saat memakai aplikasi (termasuk saat berolahraga). Syarat ini tidak menghapus hak konsumen yang tidak dapat dikesampingkan menurut hukum."]},
       {h:"21. Hukum yang berlaku", p:["Syarat ini tunduk pada hukum Republik Indonesia. Kami mengutamakan penyelesaian perselisihan secara musyawarah."]},
       {h:"22. Perubahan syarat", p:["Syarat ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Bila ada perubahan penting, kamu akan diminta menyetujui lagi."]},
-      {h:"23. Kontak", p:["Pertanyaan tentang syarat ini dapat dikirim lewat Kotak Saran di Pengaturan atau ke email titikhilangs27@gmail.com."]}
+      {h:"23. Kontak", p:["Pertanyaan tentang syarat ini dapat dikirim lewat Kotak Saran di Pengaturan > Pusat Bantuan atau ke email titikhilangs27@gmail.com."]}
     ]},
     en:{ t:"Terms of Use", sub:"Satu Titik", upd:"Last updated: 25 November 2026", back:"‹ Back", secs:[
       {h:"1. Acceptance", p:["By signing in and using Satu Titik’s social features (friends, private messages, tournament comments, the Friends Activity Feed, the Segment Leaderboard, Explore Routes, online game and arisan rooms, and room chat), you agree to these Terms of Use and the Privacy Policy. If you do not agree, do not sign in. Menus that do not need an account remain available."]},
@@ -29478,7 +29657,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       {h:"20. Service as is", p:["Satu Titik is provided as is. We try to keep it running but do not guarantee that the service will always be available, uninterrupted, or error-free. We may change, restrict, or discontinue features at any time. To the extent permitted by law, we are not liable for indirect losses, for data lost through your device, clearing app data, or resets you perform, alarms that do not sound on time, or for decisions you make based on menu results, financial losses, or injuries that occur while using the app (including while exercising). These terms do not remove consumer rights that cannot be waived under the law."]},
       {h:"21. Governing law", p:["These terms are governed by the laws of the Republic of Indonesia. We prefer to settle disputes through discussion."]},
       {h:"22. Changes to these terms", p:["These terms may be updated. The date of the latest update is shown at the top of this page. For important changes you will be asked to agree again."]},
-      {h:"23. Contact", p:["Questions about these terms can be sent through the Suggestion Box in Settings or to titikhilangs27@gmail.com."]}
+      {h:"23. Contact", p:["Questions about these terms can be sent through the Suggestion Box in Settings > Help Center or to titikhilangs27@gmail.com."]}
     ]}
   };
   let tmFrom = null;
