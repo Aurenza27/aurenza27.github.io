@@ -923,6 +923,7 @@ h1{font-size:26px;line-height:1.15}
 #infc .spc.spfull{aspect-ratio:auto}
 #infc .spc.spfull img{object-fit:contain}
 .spc.spfull{overflow:hidden}
+.spc.spfull .spt.spfc{position:absolute;top:8px;right:8px;z-index:1;flex:none;display:inline-flex;align-items:center;padding:2px 8px;font-size:10.5px;font-weight:600;letter-spacing:.02em;color:#dbe7ff;background:rgba(13,16,23,.72);border:1px solid rgba(143,180,255,.4);border-radius:999px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);pointer-events:none}
 .spc.spfull img.spbg{object-fit:cover;filter:blur(16px) brightness(.65);transform:scale(1.25)}   /* tinggi slide diatur lewat JS (--sh = lebar x 0.3); gambar mengisi penuh tanpa area kosong */   /* panel slide tetap; gambar banner diperkecil agar utuh (tidak terpotong) */
 .spc.spfull img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover}
 .spc.spfull .spp{position:absolute;top:8px;left:8px;z-index:1;padding:2px 7px;font-size:9.5px;background:rgba(13,16,23,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
@@ -3718,6 +3719,8 @@ function spnCard(it, img, preview){
     const f = hEl("button", "spc spfull"); f.type = "button";
     if(img && /^data:image\/jpeg;base64,/.test(img)){ const bg = document.createElement("img"); bg.alt = ""; bg.setAttribute("aria-hidden", "true"); bg.className = "spbg"; bg.src = img; f.appendChild(bg); const im = document.createElement("img"); im.alt = ""; im.decoding = "async"; im.src = img; f.appendChild(im); }   /* bg = salinan buram pengisi sisi kosong bila rasio gambar berbeda dari panel */
     const sp = hEl("span", "spp", HI.tag + "<span></span>"); sp.lastChild.textContent = en ? "Sponsored" : "Bersponsor"; f.appendChild(sp);
+    const endMs = spnEndMs(it.until);   /* hitung mundur masa tayang: lencana di pojok kanan atas, sejajar dengan lencana "Bersponsor" */
+    if(endMs){ const t = hEl("span", "spt spfc"); t.dataset.end = String(endMs); t.setAttribute("role", "timer"); f.appendChild(t); spnTickOne(t); }
     f.setAttribute("aria-label", (it.name || "") + " · " + (en ? "Sponsored" : "Bersponsor") + (en ? " (opens in browser)" : " (dibuka di browser)"));
     if(!preview) f.addEventListener("click", () => spnOpen(it.url));
     return f;
@@ -3849,7 +3852,7 @@ function spnDevOpen(edit){
     let crop = null;
     const refreshPrev = () => {
       prev.innerHTML = "";
-      prev.appendChild(spnCard({ mode: mode, name: nm.value.trim() || "Nama sponsor", title:{ id: ti.value.trim() || "Judul penawaran", en: te.value.trim() }, text:{ id: xi.value.trim() || "Isi penawaran singkat.", en: xe.value.trim() }, url: "https://contoh.com", cta: ct.value.trim() }, img, true));
+      prev.appendChild(spnCard({ mode: mode, name: nm.value.trim() || "Nama sponsor", title:{ id: ti.value.trim() || "Judul penawaran", en: te.value.trim() }, text:{ id: xi.value.trim() || "Isi penawaran singkat.", en: xe.value.trim() }, url: "https://contoh.com", cta: ct.value.trim(), until: du.value }, img, true));
     };
     const refresh = () => {
       pvw.innerHTML = ""; pvw.classList.toggle("crop", !!crop); pvw.classList.toggle("wide", mode === "full");
@@ -3891,7 +3894,7 @@ function spnDevOpen(edit){
       rs.addEventListener("click", () => { st.side = side0; st.sx = (w - side0) / 2; st.sy = (h - side0 / ar) / 2; zr.value = String(z0); commit(); });
       commit(); return wrap;
     };
-    [nm, ti, te, xi, xe, ct].forEach(e => e.addEventListener("input", refreshPrev));
+    [nm, ti, te, xi, xe, ct, du].forEach(e => e.addEventListener("input", refreshPrev)); du.addEventListener("change", refreshPrev);
     pick.addEventListener("click", () => fi.click());
     fi.addEventListener("change", async () => {
       const file = fi.files && fi.files[0]; fi.value = ""; if(!file) return;
