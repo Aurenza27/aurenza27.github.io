@@ -1136,7 +1136,7 @@ h1{font-size:26px;line-height:1.15}
 
 <div id="netbar" role="status" aria-live="polite"></div>
 <div id="view" hidden>
-  <header class="bar"><button id="back" type="button">‹ Beranda</button><span id="vt"></span><button class="gear" id="frBar" type="button" aria-controls="frpanel" aria-expanded="false" aria-haspopup="true" hidden></button><button class="gear" id="gear" type="button" aria-controls="spanel" aria-expanded="false"></button></header>
+  <header class="bar"><button id="back" type="button">‹ Beranda</button><span id="vt"></span><button class="gear" id="shBtn" type="button" aria-label="Bagikan" title="Bagikan"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button><button class="gear" id="frBar" type="button" aria-controls="frpanel" aria-expanded="false" aria-haspopup="true" hidden></button><button class="gear" id="gear" type="button" aria-controls="spanel" aria-expanded="false"></button></header>
   <p id="vwarn" hidden></p>
 </div>
 
@@ -3638,6 +3638,8 @@ function closeMenu(){
   try{ $("frame").contentWindow.speechSynthesis.cancel(); }catch(e){}
   try{ speechSynthesis.cancel(); }catch(e){}
   try{ const fd = $("frame").contentWindow.document, ae = fd.activeElement; if(ae && ae !== fd.body && ae.blur) ae.blur(); }catch(e){}   /* simpan isian yang sedang diketik (mis. skor) sebelum menu dibuang */
+  { const b = document.getElementById("appBanner"); if(b) b.remove(); }
+  try{ roomBarHide(); }catch(e){}
   $("frame").remove();   /* musik dan suara AI ikut berhenti */
   curMenu = null; try{ paintWarn(); }catch(e){} $("view").hidden = true; $("view").classList.remove("vin"); $("home").hidden = false;
   { const h = $("home"); h.classList.remove("hin"); void h.offsetWidth; h.classList.add("hin"); }
@@ -4567,15 +4569,204 @@ function ttLinkTake(url){
     return true;
   }catch(e){ return false; }
 }
-if(ttLinkTake(location.href)){
-  try{ const u = new URL(location.href); u.searchParams.delete("turnamen"); history.replaceState(null, "", u.pathname + u.search + "#turnamen"); }catch(e){ location.hash = "turnamen"; }
+/* ===== SARAN UNDUH APLIKASI: hanya di website Android, saat dibuka lewat link berbagi menu =====
+   BELUM AKTIF selama PLAY_URL kosong. Setelah aplikasi terbit di Play Store, isi menjadi:
+   "https://play.google.com/store/apps/details?id=com.aurenza27.satutitik" */
+const PLAY_URL = "";
+/* Format link berbagi: ?turnamen=KODE (turnamen) atau ?menu=ID (menu lain, mis. ?menu=keuangan).
+   Mengembalikan ID menu yang harus dibuka, atau "" bila bukan link berbagi. */
+function menuLinkTake(url){
+  if(ttLinkTake(url)) return "turnamen";
+  try{
+    const u = new URL(String(url || ""), "https://" + TT_LINK_HOST + "/");
+    if(u.hostname !== TT_LINK_HOST && u.hostname !== "aurenza27.github.io" && u.hostname !== location.hostname) return "";
+    for(const k in ROOM_LINKS){
+      const code = (u.searchParams.get(k) || "").trim().toUpperCase();
+      if(/^[A-Z0-9]{5}$/.test(code)){ roomLinkSave({ k, code, at:Date.now() }); return ROOM_LINKS[k].menu; }
+    }
+    const id = u.searchParams.get("menu");
+    return MENUS.some(m => m.id === id) ? id : "";
+  }catch(e){ return ""; }
+}
+function appBanner(){
+  try{
+    const C = window.Capacitor;
+    if(!PLAY_URL || (C && C.isNativePlatform && C.isNativePlatform()) || !/Android/i.test(navigator.userAgent) || document.getElementById("appBanner")) return;
+    let en = false; try{ en = S.lang === "en"; }catch(e){}
+    const mk = (tag, css, txt) => { const x = document.createElement(tag); x.style.cssText = css; if(txt) x.textContent = txt; return x; };
+    const box = mk("div", "order:1;flex:none;display:flex;align-items:center;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg2);border-top:1px solid var(--gold);color:var(--text);font:13px/1.4 var(--ui)");
+    box.id = "appBanner";
+    const info = mk("div", "flex:1;min-width:0");
+    info.append(mk("b", "display:block;font-size:14px", en ? "Get the Satu Titik app" : "Unduh aplikasi Satu Titik"),
+      mk("span", "color:var(--muted)", en ? "After installing, tap the shared link again." : "Setelah dipasang, ketuk lagi link yang dibagikan."));
+    const get = mk("a", "flex:none;padding:10px 14px;border-radius:999px;background:var(--gold);color:#0b0d12;font-weight:700;text-decoration:none", "Play Store");
+    get.href = PLAY_URL; get.target = "_blank"; get.rel = "noopener noreferrer";
+    const x = mk("button", "flex:none;width:36px;height:36px;border:0;background:transparent;color:var(--muted);font:22px/1 var(--ui);cursor:pointer", "\u00d7");
+    x.type = "button"; x.setAttribute("aria-label", en ? "Close" : "Tutup"); x.onclick = () => box.remove();
+    box.append(info, get, x);
+    document.getElementById("view").appendChild(box);
+  }catch(e){}
+}
+/* ===== LINK RUANGAN: ?arisan=KODE (menonton), ?tebak=KODE dan ?arena=KODE (bergabung) =====
+   Kode dititipkan sampai 30 menit. Setelah akun masuk, kode diteruskan ke menu lewat __xxPendingRoom
+   (jalur yang sama dengan undangan teman). Awalan st_sync_ = tidak ikut sinkron/cadangan. */
+const ROOM_LINKS = {
+  arisan:{ menu:"acak-nama", pend:"__anPendingRoom" },
+  tebak:{ menu:"tebak-inisial", pend:"__tiPendingRoom" },
+  arena:{ menu:"duel-puzzle", pend:"__dpPendingRoom" }
+};
+const ROOM_KEY = "st_sync_room_link";
+let roomMem = null, roomT = 0, roomSince = 0;
+function roomLinkSave(v){ roomMem = v; try{ localStorage.setItem(ROOM_KEY, JSON.stringify(v)); }catch(e){} roomWatch(); }
+function roomLinkGet(){
+  let v = roomMem;
+  try{ v = JSON.parse(localStorage.getItem(ROOM_KEY) || "null") || v; }catch(e){}
+  return v && ROOM_LINKS[v.k] && /^[A-Z0-9]{5}$/.test(v.code) && Date.now() - (+v.at || 0) < 1800000 ? v : null;
+}
+function roomBarHide(){ const b = document.getElementById("roomBar"); if(b) b.remove(); }
+function roomLinkClear(){ roomMem = null; try{ localStorage.removeItem(ROOM_KEY); }catch(e){} roomBarHide(); if(roomT){ clearInterval(roomT); roomT = 0; } }
+function roomWatch(){ if(roomT) return; roomSince = Date.now(); roomT = setInterval(roomTick, 800); }
+function roomTick(){
+  const v = roomLinkGet();
+  if(!v) return roomLinkClear();
+  const r = ROOM_LINKS[v.k], view = document.getElementById("view");
+  if(location.hash !== "#" + r.menu || !view || view.hidden) return roomBarHide();
+  const A = window.satuTitikAuth;
+  if(A && A.user){ window[r.pend] = { code:v.code, at:Date.now() }; return roomLinkClear(); }
+  if(document.getElementById("roomBar") || (!(A && A.ready) && Date.now() - roomSince < 4000)) return;
+  let en = false; try{ en = S.lang === "en"; }catch(e){}
+  const box = document.createElement("div"), txt = document.createElement("span"), btn = document.createElement("button");
+  box.id = "roomBar"; box.style.cssText = "order:1;flex:none;display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border-top:1px solid var(--gold);color:var(--text);font:13px/1.4 var(--ui)";
+  txt.style.cssText = "flex:1;min-width:0"; txt.textContent = (en ? "Sign in to enter room " : "Masuk akun untuk masuk ke ruangan ") + v.code;
+  btn.type = "button"; btn.style.cssText = "flex:none;padding:10px 14px;border:0;border-radius:999px;background:var(--gold);color:#0b0d12;font:700 13px var(--ui);cursor:pointer";
+  btn.textContent = en ? "Sign in" : "Masuk akun";
+  btn.onclick = () => { const a = window.satuTitikAuth; if(a && a.login) a.login(); };
+  box.append(txt, btn); view.insertBefore(box, document.getElementById("appBanner"));
+  try{ if(A && A.getDb) A.getDb().catch(() => {}); }catch(e){}
+}
+
+/* ===== TOMBOL BAGIKAN di setiap menu. Hanya ajakan + link, tidak pernah membawa data pribadi. ===== */
+const SHARE_TEXT = {
+  "turnamen":["Atur turnamen, skor, dan klasemen di Satu Titik.", "Run tournaments, scores and standings on Satu Titik."],
+  "acak-nama":["Kelola arisan dengan rapi di Satu Titik.", "Manage your arisan on Satu Titik."],
+  "tebak-inisial":["Ayo adu cepat tebak kata di Tebak Inisial!", "Race to guess words in Tebak Inisial!"],
+  "duel-puzzle":["Berani lawan aku? Main Gems Arena!", "Dare to challenge me? Play Gems Arena!"],
+  "versus":["Adu dua nama apa pun. Coba adu versimu!", "Pit any two names against each other. Try yours!"],
+  "th-analytics":["Uji instingmu di Insting Detektif!", "Test your instincts in Detective Instinct!"],
+  "cek-khodam":["Cek khodam yang menemanimu. Kamu dapat apa?", "Check your spirit companion. What do you get?"],
+  "hari-hoki":["Cek hari baik dan angka hokimu.", "Check your lucky day and numbers."],
+  "cek-watak":["Cek watakmu. Hasilmu apa?", "Check your character. What do you get?"],
+  "cek-jodoh":["Cek kecocokanmu juga!", "Check your match too!"],
+  "keuangan":["Catat uang masuk dan keluar dengan rapi.", "Track your income and spending."],
+  "catatan":["Simpan catatan singkat di sini.", "Keep quick notes here."],
+  "cek-bmi":["Hitung BMI dan kebutuhan kalori di Satu Titik.", "Calculate BMI and calories on Satu Titik."],
+  "cek-hamil":["Hitung usia kehamilan dan HPL di Satu Titik.", "Calculate pregnancy age and due date on Satu Titik."],
+  "info-makanan":["Cek kandungan makananmu.", "Check what is in your food."],
+  "olahraga":["Ayo olahraga bareng! Catat aktivitasmu di Satu Titik.", "Let's exercise! Log your activity on Satu Titik."],
+  "stopwatch":["Atur beberapa timer sekaligus di Satu Titik.", "Run several timers at once on Satu Titik."],
+  "sholat":["Lihat waktu sholat dan hitung mundurnya di Satu Titik.", "See prayer times and countdown on Satu Titik."]
+};
+/* Ringkasan hasil untuk tombol Bagikan. Diambil dari tampilan menu yang sedang terbuka. Tidak membawa nama atau tanggal lahir pengguna
+   (kecuali Versus: dua nama yang diadu memang isi hasilnya). Bila belum ada hasil di layar, mengembalikan "" dan yang dibagikan tetap ajakan + link. */
+function resultShareText(id, en){
+  try{
+    const f = $("frame"); if(!f || !f.contentWindow) return "";
+    const d = f.contentWindow.document, L2 = (a, b) => en ? b : a;
+    const q = sel => d.querySelector(sel);
+    const shown = e => !!(e && !e.hidden && e.getClientRects().length > 0);
+    const tx = e => shown(e) ? (e.textContent || "").replace(/\s+/g, " ").trim() : "";
+    const big = () => {   /* kartu Watak dan Tri Hoki: judul besar + keterangan kecil di dalamnya */
+      const b = q("#card .big"); if(!shown(b)) return null;
+      const sm = b.querySelector("small"), main = ((b.firstChild && b.firstChild.textContent) || "").replace(/\s+/g, " ").trim();
+      return { main, sm: sm ? (sm.textContent || "").replace(/\s+/g, " ").trim() : "" };
+    };
+    if(id === "cek-khodam"){
+      const kh = tx(q("#cKh")); if(!kh) return "";
+      const rar = tx(q("#cRar")), ttl = tx(q("#cTtl")), pw = tx(q("#cPw"));
+      return "👻 " + L2("Khodamku: ", "My khodam: ") + kh + (rar ? " (" + rar + ")" : "") + (ttl ? ", " + ttl : "") + (pw ? " · " + pw : "");
+    }
+    if(id === "cek-watak"){
+      const b = big(); if(!b || !b.main || /Profil Nama|Name Profile/.test(b.main)) return "";
+      return "🔮 " + L2("Wataku: ", "My character: ") + b.main + (b.sm ? " (" + b.sm + ")" : "");
+    }
+    if(id === "hari-hoki"){
+      const b = big(); if(!b || !b.main) return "";
+      const t = tx(q("#card .today"));
+      return "🍀 " + b.main + (t ? "\n" + t : "");
+    }
+    if(id === "cek-jodoh"){
+      const pc = tx(q("#out .score .big")); if(!pc) return "";
+      const vd = tx(q("#out .score .vd"));
+      return "💞 " + L2("Kecocokan kami: ", "Our compatibility: ") + pc + (vd ? " · " + vd : "");
+    }
+    if(id === "versus"){
+      const r = q("#rR"); if(!r || !/\b(win|lose|draw)\b/.test(r.className)) return "";
+      const a = tx(q("#nA")), b = tx(q("#nB")), v = tx(q("#vd")), c = tx(q("#cm"));
+      if(!a || !b || !v) return "";
+      return "⚔️ " + a + " vs " + b + ": " + v + (c ? "\n" + c : "");
+    }
+    if(id === "th-analytics"){
+      const sc = tx(q("#rFinal")); if(!sc || sc === "0") return "";
+      const rk = tx(q("#rRank"));
+      return "🕵️ " + L2("Skor Insting Detektifku: ", "My Detective Instinct score: ") + sc + "/100" + (rk ? " · " + rk : "");
+    }
+  }catch(e){}
+  return "";
+}
+function shareData(){
+  const id = curMenu; if(!id) return null;
+  let en = false; try{ en = S.lang === "en"; }catch(e){}
+  const L2 = (a, b) => en ? b : a, ctx = fn => { try{ const w = $("frame").contentWindow; return typeof w[fn] === "function" ? w[fn]() : null; }catch(e){ return null; } };
+  const base = "https://" + TT_LINK_HOST + "/";
+  const roomMenu = { "acak-nama":["__anShareCtx", "arisan", "Saksikan kocokan arisan kita!", "Watch our arisan draw!"],
+    "tebak-inisial":["__tiInviteCtx", "tebak", "Ayo adu cepat tebak kata. Gabung ruanganku!", "Race to guess words. Join my room!"],
+    "duel-puzzle":["__dpShareCtx", "arena", "Berani lawan aku? Masuk ke arena!", "Dare to challenge me? Enter the arena!"] }[id];
+  const head = (SHARE_TEXT[id] || ["Coba menu ini di Satu Titik.", "Try this on Satu Titik."]);
+  if(id === "turnamen"){
+    const c = ctx("__ttShareCtx");
+    if(c) return { text:L2("Pantau turnamen \"" + c.name + "\" secara langsung!", "Follow the tournament \"" + c.name + "\" live!"), url:base + "?turnamen=" + encodeURIComponent(c.oid), code:c.oid };
+  }
+  if(roomMenu){
+    const c = ctx(roomMenu[0]);
+    if(c && c.code) return { text:L2(roomMenu[2], roomMenu[3]), url:base + "?" + roomMenu[1] + "=" + encodeURIComponent(c.code), code:c.code };
+  }
+  const rs = roomMenu ? "" : resultShareText(id, en);
+  return { text:(rs ? rs + "\n\n" : "") + L2(head[0], head[1]), url:base + "?menu=" + encodeURIComponent(id), hint:roomMenu ? L2("Yang dibagikan link menu. Untuk mengajak ke ruangan, buat atau masuk ruangan dulu.", "Sharing the menu link. Create or join a room first to invite people.") : "" };
+}
+function shNote(m){
+  let t = document.getElementById("shNote");
+  if(!t){ t = document.createElement("div"); t.id = "shNote"; t.setAttribute("role", "status"); t.style.cssText = "position:fixed;left:16px;right:16px;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:9999;padding:12px 14px;border-radius:14px;background:var(--card);border:1px solid var(--gold);color:var(--text);font:13px/1.45 var(--ui);text-align:center;overflow-wrap:anywhere"; document.body.appendChild(t); }
+  t.textContent = m; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => { t.hidden = true; }, 4500);
+}
+async function shareMenu(){
+  const d = shareData(); if(!d) return;
+  let en = false; try{ en = S.lang === "en"; }catch(e){}
+  const msg = d.text + "\n" + d.url + (d.code ? "\n\n" + (en ? "Code: " : "Kode: ") + d.code : ""), title = "Satu Titik";
+  if(d.hint) shNote(d.hint);
+  try{
+    const C = window.Capacitor;
+    if(C && C.isNativePlatform && C.isNativePlatform()){
+      const SH = (C.Plugins && C.Plugins.Share) || (C.registerPlugin ? C.registerPlugin("Share") : null);
+      if(SH && SH.share){ await SH.share({ title, text:msg, dialogTitle:title }); return; }
+    }
+  }catch(e){ if(/cancel|dismiss/i.test(String((e && e.message) || e))) return; }
+  try{ if(navigator.share){ await navigator.share({ title, text:msg }); return; } }catch(e){ if(e && e.name === "AbortError") return; }
+  try{ await navigator.clipboard.writeText(msg); shNote(en ? "Message and link copied." : "Pesan dan link disalin."); }catch(e){ shNote(msg); }
+}
+{ const b = document.getElementById("shBtn"); if(b) b.addEventListener("click", shareMenu); }
+$("back").addEventListener("click", () => { const v = document.getElementById("view"); if(v && v.hidden) roomLinkClear(); });
+if(roomLinkGet()) roomWatch(); else roomLinkClear();
+const linkMenu = menuLinkTake(location.href);
+if(linkMenu){
+  try{ const u = new URL(location.href); ["turnamen", "menu"].concat(Object.keys(ROOM_LINKS)).forEach(k => u.searchParams.delete(k)); history.replaceState(null, "", u.pathname + u.search + "#" + linkMenu); }catch(e){ location.hash = linkMenu; }
+  appBanner();
 }
 (function(){
   try{
     const C = window.Capacitor; if(!C || !(C.isNativePlatform && C.isNativePlatform())) return;
     const A = (C.Plugins && C.Plugins.App) || (C.registerPlugin ? C.registerPlugin("App") : null);
     if(!A) return;
-    const got = u => { if(ttLinkTake(u)) location.hash = "turnamen"; };
+    const got = u => { const id = menuLinkTake(u); if(id) location.hash = id; };
     if(A.addListener) A.addListener("appUrlOpen", e => got(e && e.url));
     if(A.getLaunchUrl) A.getLaunchUrl().then(r => { if(r && r.url) got(r.url); }).catch(() => {});
   }catch(e){ console.warn("link turnamen gagal dipasang:", e && (e.message || e)); }
@@ -13743,6 +13934,10 @@ async function cancelInvite(t, id, kind){
   try{ const {m, db:f} = await ON.lib(); await m.deleteDoc(m.doc(f, "invites", invDocId(t, id, kind))); }catch(e){ toast(errTxt(e)); }
 }
 /* ----- dipakai panel Teman di halaman induk: undang teman dari daftar teman saat detail turnamen online (admin) terbuka ----- */
+/* turnamen online yang sedang dibuka, untuk tombol Bagikan di Beranda */
+window.__ttShareCtx = function(){
+  try{ if(view !== "detail") return null; const t = cur(); return t && t.oid ? {oid:String(t.oid), name:String(t.name || "")} : null; }catch(e){ return null; }
+};
 window.__stInviteCtx = function(){
   try{
     if(view !== "detail") return null;
@@ -22484,6 +22679,7 @@ body.inroom .app{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   /* otomatis saat pertama kali menu dibuka (kecuali sedang diarahkan ke ruang lewat undangan) */
   (function auto(n){
     if(tu || tuRd().o) return;
+    try{ if(localStorage.getItem("st_sync_room_link")) return; }catch(e){}
     try{ var v = parent.__tiPendingRoom; if(v && v.code) return; }catch(e){}
     if(!tuVis($("goBtn"))){ if(n < 300) setTimeout(function(){ auto(n + 1); }, 1000); return; }
     setTimeout(function(){ tuStart(false); }, 700);
@@ -24386,6 +24582,7 @@ function startCpu(mode,lv){clearInterval(BT);OFF=true;CP.mode=mode;CP.lv=lv;R.co
     paintOpp();check()},k[0])}
 $("bCpu").onclick=function(){paintC();show("sC")};$("bBk").onclick=function(){show("sM")};$("bGo").onclick=function(){startCpu(CP.mode,CP.lv)};
 window.__dpInviteCtx=function(){try{if(OFF||!R.code||R.code==="CPU"||!R.d||!isHost())return null;if(R.d.st&&R.d.st!=="lobby")return null;var pl=Object.keys(R.ps);return{g:"dp",code:R.code,cap:capOf(R.d.mode),pl:pl,n:pl.length}}catch(e){return null}};
+window.__dpShareCtx=function(){try{return !OFF&&R.code&&R.code!=="CPU"&&R.d&&(!R.d.st||R.d.st==="lobby")?{code:R.code}:null}catch(e){return null}};
 window.__dpJoin=async function(code){
   code=String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,5);
   if(code.length!==5)return "stop";
@@ -24512,6 +24709,7 @@ window.__dpTutScr=function(s){
 /* otomatis saat pertama kali menu Gems Arena dibuka (kecuali sedang diarahkan langsung ke ruang lewat undangan) */
 function init(){setTimeout(function(){
   if(OFF||T||rd().m||rd().o||!$("sM")||$("sM").hidden)return;
+  try{ if(localStorage.getItem("st_sync_room_link")) return; }catch(e){}
   try{var v=parent.__dpPendingRoom;if(v&&v.code)return}catch(e){}
   start("o")},700)}
 if(document.readyState==="complete")init();else window.addEventListener("load",init);
@@ -27209,6 +27407,10 @@ input:focus,textarea:focus,.money:focus-within{border-color:var(--gold);box-shad
   }
 
   /* undangan teman dari panel Teman di Beranda */
+  /* ruangan arisan yang sedang dibuka (tuan rumah atau penonton), untuk tombol Bagikan */
+  window.__anShareCtx = function(){
+    try{ return mode === "on" && ON.code && (ON.role === "host" || ON.role === "guest") ? { code:ON.code } : null; }catch(e){ return null; }
+  };
   window.__anInviteCtx = function(){
     try{
       if(mode !== "on" || ON.role !== "host" || !ON.code || !meU()) return null;
@@ -28081,6 +28283,7 @@ input:focus,textarea:focus,.money:focus-within{border-color:var(--gold);box-shad
   /* otomatis hanya untuk pengguna baru (belum punya arisan), kecuali sedang diarahkan ke ruang lewat undangan */
   (function auto(n){
     if(tu || tuRd().o || AL.items.length) return;
+    try{ if(localStorage.getItem("st_sync_room_link")) return; }catch(e){}
     try{ var v = parent.__anPendingRoom; if(v && v.code) return; }catch(e){}
     if(ON.role || scr !== "M") return;
     if(!tuVis($("nmRow"))){ if(n < 300) setTimeout(function(){ auto(n + 1); }, 1000); return; }

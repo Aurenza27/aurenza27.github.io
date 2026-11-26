@@ -4,7 +4,7 @@
    - Musik (folder media/) diunduh di latar belakang setelah aplikasi terbuka
      (halaman mengirim pesan "precache-media"), lalu dibaca dari cache saat offline.
    - Naikkan VERSION setiap kali file inti atau daftar media berubah. */
-const VERSION = "v5";
+const VERSION = "v7";
 const CORE = "satutitik-core-" + VERSION;
 const MEDIA = "satutitik-media-" + VERSION;
 const SDK = "satutitik-sdk-" + VERSION;
@@ -93,7 +93,10 @@ async function pageFetch(req){
     const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 5000);
     const r = await fetch(req, {signal: ctl.signal});
     clearTimeout(t);
-    if(r && r.status === 200 && new URL(req.url).origin === self.location.origin) c.put(req, r.clone());
+    if(r && r.status === 200 && new URL(req.url).origin === self.location.origin){
+      const u = new URL(req.url); u.search = ""; u.hash = "";
+      c.put(u.href, r.clone());   /* satu salinan saja, apa pun parameter link-nya (?menu=, ?turnamen=, dst.) supaya cache tidak membengkak */
+    }
     return r;
   }catch(err){
     return (await c.match(req, {ignoreSearch: true}))
