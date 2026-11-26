@@ -1772,7 +1772,7 @@ const unesc = s => s.split("</scr@@" + "ipt").join("</scr" + "ipt").split("<!@@"
    Disimpan di satu kunci, lalu ditulis ke kunci tiap menu sebelum menu dibuka dan diterapkan langsung bila menu sedang terbuka.
    Panel ⚙️ di dalam tiap menu disembunyikan. Menu baru: tambahkan kunci & id tombolnya di writeKeys, TOG, dan RNG. */
 const SKEY = "titikhilangs_settings", GAPS = [3, 5, 8, 12, 20, 30];
-const DEF = {sound:true, music:true, read:true, auto:false, scroll:true, mvol:70, aivol:100, gap:8, lang:"id", theme:"navy", fsize:100, fmode:"serif", anim:true, vibe:true, vlevel:"mid", alsnd:"classic", alvol:100, alarm:true, mmute:false, cc:{}};
+const DEF = {sound:true, music:true, read:true, auto:false, scroll:true, mvol:70, aivol:100, gap:8, lang:"id", theme:"navy", fsize:100, fmode:"serif", anim:true, vibe:true, vlevel:"mid", alsnd:"classic", alvol:15, alarm:true, mmute:false, cc:{}};
 let S = Object.assign({}, DEF), curMenu = null;
 try{ Object.assign(S, JSON.parse(localStorage.getItem(SKEY) || "{}")); }catch(e){}
 if(!GAPS.includes(S.gap)) S.gap = 8;
@@ -1786,7 +1786,7 @@ S.mvol = Math.min(100, Math.max(0, +S.mvol || 0)); S.aivol = Math.min(100, Math.
 /* ===== Alarm Timer: pilihan suara + volume (dipakai panel Pengaturan, menu Timer, dan alarm native Android) ===== */
 const ALARMS = [["classic","Sirene dua nada","Two-tone siren"],["beep","Bip-bip-bip","Triple beep"],["bell","Lonceng","Bell"],["melody","Nada naik","Rising notes"],["siren","Darurat (sapuan)","Emergency sweep"]];
 if(!ALARMS.some(a => a[0] === S.alsnd)) S.alsnd = "classic";
-S.alvol = Math.min(100, Math.max(10, Math.round(+S.alvol || 100))); S.alarm = S.alarm !== false; S.mmute = S.mmute === true;
+S.alvol = Math.min(100, Math.max(10, Math.round(+S.alvol || 15))); S.alarm = S.alarm !== false; S.mmute = S.mmute === true;
 window.stAlarmList = ALARMS;
 window.stAlarmCfg = () => ({snd:S.alarm ? S.alsnd : "off", vol:S.alvol, on:S.alarm});
 /* satu putaran bunyi (~0,9 dtk) digambar ke node "out" mulai waktu t; dipakai menu Timer (di iframe) dan tombol Coba suara */
