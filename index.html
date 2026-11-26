@@ -3371,6 +3371,10 @@ window.stNativeAlarm = (function(){
   /* plugin native StopwatchAlarm (alarm 5 menit + notifikasi permanen); bila APK belum memilikinya, dipakai LocalNotifications seperti sebelumnya */
   function sw(){ var C = cap(); if(!C) return null; try{ if(C.isPluginAvailable && !C.isPluginAvailable("StopwatchAlarm")) return null; return (C.Plugins && C.Plugins.StopwatchAlarm) || (C.registerPlugin ? C.registerPlugin("StopwatchAlarm") : null); }catch(e){ return null; } }
   function one(id){ return {notifications:[{id:id}]}; }
+  /* Android 14+: izin "Alarm & pengingat" (alarm tepat waktu) tidak aktif bawaan. Tanpa izin ini alarm native jatuh ke alarm kurang tepat dan bisa terlambat atau tidak berbunyi.
+     Halaman pengaturannya dibuka sekali per sesi; setelah pengguna mengaktifkan dan kembali ke aplikasi, timer yang berjalan dijadwalkan ulang (lihat resched di menu Timer). */
+  var exAsked = false;
+  async function exactOk(S){ try{ var r = await S.canExact(); if(r && r.exact === false && !exAsked){ exAsked = true; await S.openExactSettings(); } }catch(e){} }
   function cfg(){ try{ return window.stAlarmCfg(); }catch(e){ return {snd:"classic", vol:100}; } }
   function label(key){ if(key === "off") return "Senyap"; try{ var l = window.stAlarmList; for(var i = 0; i < l.length; i++) if(l[i][0] === key) return l[i][1]; }catch(e){} return key; }
   async function setVol(){ var V = vplug(); if(!V) return; try{ await V.set({percent:cfg().vol}); }catch(e){} }
@@ -3389,12 +3393,14 @@ window.stNativeAlarm = (function(){
     /* id = nomor notifikasi unik per timer; menjadwalkan ulang id yang sama otomatis menggantikan yang lama (dipakai saat rename / ganti suara) */
     service: function(){ return !!sw(); },
     stopAlarm: async function(){ var S = sw(); if(S){ try{ await S.stopAlarm(); }catch(e){} } },
+    /* true bila alarm native benar-benar sedang berbunyi (dipakai menu Timer untuk memastikan suara tidak hilang saat aplikasi terbuka) */
+    ringing: async function(){ var S = sw(); if(!S) return false; try{ var r = await S.isRinging(); return !!(r && r.ringing); }catch(e){ return false; } },
     schedule: async function(id, at, title, body, opts){
       var P = plug(), S = sw();
       if(S){
         try{
           if(P){ var q = await P.checkPermissions(); if(q.display !== "granted"){ q = await P.requestPermissions(); if(q.display !== "granted") return false; } }
-          var cf = cfg(); if(opts && opts.snd) cf = {snd:opts.snd, vol:cf.vol}; await S.schedule({id:id, at:at, title:title, body:body, snd:cf.snd, vol:cf.vol}); return true;
+          var cf = cfg(); if(opts && opts.snd) cf = {snd:opts.snd, vol:cf.vol}; await exactOk(S); await S.schedule({id:id, at:Math.round(at), title:title, body:body, snd:cf.snd, vol:cf.vol}); return true;
         }catch(e){ return false; }
       }
       if(!P) return false;
@@ -3419,7 +3425,7 @@ window.stNativeAlarm = (function(){
     },
     /* penanda "timer sedang berjalan" di beranda HP (senyap, kanal terpisah). at = waktu mulai (ms) bila belum mulai, 0 = tampil sekarang */
     run: async function(id, at, title, body){
-      var S = sw(); if(S){ try{ await S.run({id:id, at:at || 0, title:title, body:body}); return true; }catch(e){ return false; } }
+      var S = sw(); if(S){ try{ await S.run({id:id, at:Math.round(at || 0), title:title, body:body}); return true; }catch(e){ return false; } }
       var P = plug(); if(!P) return false;
       try{
         var p = await P.checkPermissions(); if(p.display !== "granted") return false;
@@ -15820,6 +15826,25 @@ function clk(){
     if($("mcdT").textContent!==mt)$("mcdT").textContent=mt;
     $("mcdB").style.width=((60000-ms)/600).toFixed(1)+"%"}}
 }
+/* Aplikasi terbuka saat timer habis: layar alarm tampil dan suara diserahkan ke alarm native. Bila 2,5 detik kemudian alarm native tidak berbunyi
+   (izin alarm tepat waktu mati, terlambat, gagal), bunyikan alarm di halaman dan batalkan alarm native supaya tidak berbunyi ganda belakangan. */
+function guard(it,n){
+  setTimeout(function(){
+    if(DEMO||Q.indexOf(it.id)<0||!n.ringing)return;
+    n.ringing().then(function(on){
+      if(on||Q.indexOf(it.id)<0)return;
+      try{n.cancel(nid(it))}catch(e){}
+      if(!rt){initAudio();beep();rt=setInterval(beep,900)}
+    }).catch(function(){})
+  },2500)
+}
+/* jadwalkan ulang timer yang masih berjalan saat aplikasi kembali dibuka (mis. setelah izin alarm tepat waktu diaktifkan) */
+function resched(){
+  var n=nat();if(!n||DEMO)return;var now=T();
+  D.items.forEach(function(it){
+    if(!it.done&&it.n&&it.en>now+3000){try{n.schedule(nid(it),it.en-OFF(),ttl(it),body(it)).catch(function(){})}catch(e){}}
+  })
+}
 function tick(){
   var now=T(),ch=false;clk();
   if(TS){TS.sync();TE.sync();liveForm()}
@@ -15829,7 +15854,7 @@ function tick(){
       var n=nat(),bg=document.hidden;
       if(now-it.en<120000){
         if(n&&it.n&&bg){/* di latar belakang: alarm native (suara 5 menit + notifikasi) jalan sendiri */}
-        else if(n&&it.n&&n.service&&n.service()){ringOn(it.id,true)}   /* aplikasi terbuka: tampilkan layar alarm, suara dari alarm native */
+        else if(n&&it.n&&n.service&&n.service()){ringOn(it.id,true);if(now-it.en<5000)guard(it,n)}   /* aplikasi terbuka: tampilkan layar alarm, suara dari alarm native */
         else{ringOn(it.id);if(n){try{n.cancel(nid(it))}catch(e){}}}
         if(!n&&bg)wnShow(ttl(it),body(it),"st-end-"+it.id,{requireInteraction:true,vibrate:[400,150,400,150,400]})
       }
@@ -15871,7 +15896,7 @@ window.addEventListener("storage",function(e){
   if(!DEMO&&(!e.key||e.key===KEY)){load();build()}
   if(!e.key||e.key==="titikhilangs_settings"){syncSnd()}
 });
-document.addEventListener("visibilitychange",function(){if(!document.hidden)tick();webRun()});
+document.addEventListener("visibilitychange",function(){if(!document.hidden){tick();resched()}webRun()});
 rl();rf();load();
 try{mode=String(localStorage.getItem("sw_mode")||"dur").replace(/"/g,"")==="clock"?"clock":"dur"}catch(e){}
 $("modeBox").addEventListener("click",function(e){
