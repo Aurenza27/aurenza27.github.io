@@ -8,9 +8,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          channelId: live
-          projectId: satu-titik
+
+      # Merapikan isi secret (baris baru yang terselip saat disalin dari HP).
+      # Isi kunci tidak pernah dicetak ke log, dan disimpan di luar folder website.
+      - name: Siapkan kunci
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, sys, textwrap
+          raw = os.environ.get("SA", "")
+          clean = "".join(c for c in raw if c >= " ")
+          try:
+              data = json.loads(clean)
+              head, foot = "-----BEGIN PRIVATE KEY-----", "-----END PRIVATE KEY-----"
+              key = data["private_key"].strip()
+              assert key.startswith(head) and key.endswith(foot)
+              body = "".join(key[len(head):-len(foot)].split())
+              data["private_key"] = "\n".join([head, *textwrap.wrap(body, 64), foot]) + "\n"
+          except Exception:
+              sys.exit("Isi secret FIREBASE_SERVICE_ACCOUNT tidak utuh. Salin ulang seluruh file JSON.")
+          path = os.path.join(os.environ["RUNNER_TEMP"], "sa.json")
+          with open(path, "w") as f:
+              json.dump(data, f)
+          print("Kunci siap.")
+          EOF
+
+      - name: Deploy
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+        run: npx -y firebase-tools@latest deploy --only hosting --project satu-titik --non-interactive
