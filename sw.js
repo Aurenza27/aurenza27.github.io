@@ -4,7 +4,7 @@
    - Musik (folder media/) diunduh di latar belakang setelah aplikasi terbuka
      (halaman mengirim pesan "precache-media"), lalu dibaca dari cache saat offline.
    - Naikkan VERSION setiap kali file inti atau daftar media berubah. */
-const VERSION = "v4";
+const VERSION = "v5";
 const CORE = "satutitik-core-" + VERSION;
 const MEDIA = "satutitik-media-" + VERSION;
 const SDK = "satutitik-sdk-" + VERSION;

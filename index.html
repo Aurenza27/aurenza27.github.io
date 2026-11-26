@@ -478,14 +478,127 @@ h1{margin:0;font:600 28px/1.1 var(--head);letter-spacing:.02em}
 .seg.s3{grid-template-columns:repeat(3,1fr)}
 .sg{min-height:40px;padding:0 8px;font:inherit;font-size:13px;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:10px;cursor:pointer}
 .sg[aria-pressed="true"]{border-color:var(--gold);color:var(--gold2)}
-.seg[data-k="theme"] .sg:last-child:nth-child(odd){grid-column:1/-1}
-#svLook .clrh{margin-top:18px;font-weight:700;color:var(--gold2)}#svLook .clrs{margin-top:2px}
-.cpre{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 10px}
-.csw{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
-.csw[aria-pressed="true"]{border-color:var(--text);box-shadow:0 0 0 2px var(--bg2),0 0 0 4px var(--gold)}
-.crows{display:grid;gap:6px;margin-bottom:8px}
-.crow{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:4px 10px 4px 12px;border:1px solid var(--line);border-radius:12px;font-size:14px;color:var(--text)}
-.crow input[type=color]{flex:none;width:44px;height:32px;padding:0;border:1px solid var(--line);border-radius:8px;background:none;cursor:pointer}
+/* ===== transisi halus saat ganti tema / font ===== */
+::view-transition-old(root),::view-transition-new(root){animation-duration:.5s;animation-timing-function:cubic-bezier(.4,0,.2,1)}
+html.thx,html.thx *{transition:background-color .45s ease,color .45s ease,border-color .45s ease,box-shadow .45s ease,fill .45s ease,stroke .45s ease!important}
+@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}html.thx,html.thx *{transition:none!important}}
+/* ===== pratinjau langsung (menempel di atas panel saat digulir) ===== */
+.pvs{position:sticky;top:-12px;z-index:4;isolation:isolate;margin:0 -12px 8px;padding:16px 12px 6px}
+.pvs::before,.pvs::after{content:"";position:absolute;inset:0;z-index:-1;opacity:0;pointer-events:none;transition:opacity .2s}
+.pvs::before{background:var(--bg)}
+.pvs::after{background:var(--sk-pn,var(--bg2));box-shadow:0 8px 14px -8px rgba(0,0,0,.6);border-bottom:1px solid var(--line)}
+.pvs.stk::before,.pvs.stk::after{opacity:1}
+.pvm{position:relative;padding:14px 10px 10px;border-radius:var(--tr,12px);background:var(--tb);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);transition:border-radius .3s}
+.pvt{position:absolute;top:-8px;left:12px;padding:1px 9px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;line-height:1.5;color:var(--muted);background:var(--bg2);border:1px solid var(--line);border-radius:999px}
+.pvc{padding:10px 12px;border-radius:min(var(--sk-r,14px),18px);background:var(--card);border:1.5px solid var(--gold);transition:border-color .2s,background-color .2s}
+.pvr{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pvr b{min-width:0;font:700 15px/1.3 var(--head);color:var(--gold2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pvr i{flex:none;padding:3px 10px;border-radius:999px;font-style:normal;font-size:11.5px;font-weight:600;color:var(--gold2);border:1px solid var(--gold);background:rgba(var(--gr,86,162,210),.16)}
+.pvc>span{display:block;margin-top:4px;font:12.5px/1.45 Georgia,"Times New Roman",serif;color:var(--text)}
+@media (prefers-reduced-motion:reduce){.pvs::before,.pvs::after,.pvm,.pvc{transition:none}}
+/* ===== Tampilan: bagian yang bisa dilipat (accordion) ===== */
+#spanel.mid{width:min(350px,calc(100vw - 20px))}
+.lks{display:grid;gap:10px;margin:2px 0 6px}
+.lk{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025);overflow:hidden;transition:border-color .2s,background-color .2s}
+.lk[data-o="1"]{border-color:var(--gold);background:rgba(var(--gr,86,162,210),.05)}
+.lkh{display:flex;align-items:center;gap:12px;width:100%;min-height:68px;padding:12px 14px;font:inherit;color:var(--text);background:transparent;border:0;text-align:left;cursor:pointer}
+.lkh:focus-visible{outline:2px solid var(--gold2);outline-offset:-2px}
+.lki{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;color:var(--gold2);background:rgba(var(--gr,86,162,210),.14)}
+.lki svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.lkt{flex:1;min-width:0}
+.lkt b{display:block;font-size:15px;font-weight:600;line-height:1.3}
+.lkt small{display:block;margin-top:2px;font-size:12px;line-height:1.4;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lkd{display:flex;gap:4px;flex:none}
+.lkd i{width:12px;height:12px;border-radius:50%;box-shadow:0 0 0 1px rgba(255,255,255,.28)}
+.lkc{flex:none;display:grid;place-items:center;width:22px;height:22px;color:var(--muted);transition:transform .25s,color .2s}
+.lkc::before{content:"\203A";font-size:22px;line-height:1}
+.lk[data-o="1"] .lkc{transform:rotate(90deg);color:var(--gold2)}
+.lkb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.3,.8,.3,1)}
+.lk[data-o="1"] .lkb{grid-template-rows:1fr}
+.lkw{overflow:hidden;min-height:0}
+.lkin{padding:2px 14px 18px;border-top:1px solid var(--line)}
+.lkl{margin:18px 2px 8px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lkin>.lkl:first-child{margin-top:16px}
+.lkn{margin:14px 2px 0;font-size:12.5px;line-height:1.6;color:var(--muted)}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+#svLook .tc{display:flex;flex-direction:column;gap:10px;min-height:0;padding:8px 8px 11px;text-align:left;color:var(--text);background:transparent;border:1.5px solid var(--line);border-radius:14px;transition:border-color .15s,background-color .15s}
+#svLook .tc[aria-pressed="true"]{border-color:var(--gold);color:var(--text);background:rgba(var(--gr,86,162,210),.1);box-shadow:inset 0 0 0 1px var(--gold)}
+#svLook .tc .tp{position:relative;display:block;height:56px;border-radius:var(--tr,9px);background:var(--tb);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+#svLook .tc .tp::before{content:"";position:absolute;left:10px;top:11px;width:44%;height:7px;border-radius:4px;background:var(--ta)}
+#svLook .tc .tp::after{content:"";position:absolute;left:10px;right:10px;top:26px;height:5px;border-radius:3px;background:rgba(255,255,255,.2);box-shadow:0 10px 0 rgba(255,255,255,.1)}
+#svLook .tc .tn{display:flex;align-items:center;gap:6px;padding:0 3px;font-size:13px;font-weight:600;line-height:1.25}
+#svLook .tc .tn::after{content:"";flex:none;margin-left:auto;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line)}
+#svLook .tc[aria-pressed="true"] .tn{color:var(--gold2)}
+#svLook .tc[aria-pressed="true"] .tn::after{border-color:var(--gold2);background:radial-gradient(circle,var(--gold2) 0 4px,transparent 4.5px)}
+#svLook .tc[data-v="navy"],#lkPv[data-th="navy"]{--tb:linear-gradient(160deg,#1a2330,#10151c);--ta:#56a2d2;--tr:9px}
+#svLook .tc[data-v="black"],#lkPv[data-th="black"]{--tb:#000;--ta:#2ee6a6;--tr:3px}
+#svLook .tc[data-v="smoke"],#lkPv[data-th="smoke"]{--tb:linear-gradient(160deg,#2c2c34,#1a1a1f);--ta:#d6dbe4;--tr:16px}
+#svLook .tc[data-v="fog"],#lkPv[data-th="fog"]{--tb:linear-gradient(160deg,#0f3340,#07131a);--ta:#3fc1c9;--tr:22px}
+#svLook .tc[data-v="stars"],#lkPv[data-th="stars"]{--tb:radial-gradient(circle at 78% 20%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 62% 72%,#fff 0 .8px,transparent 1.4px),radial-gradient(circle at 90% 58%,#fff 0 .8px,transparent 1.4px),linear-gradient(160deg,#0b1030,#050816);--ta:#a78bfa;--tr:14px}
+#svLook .tc[data-v="video"],#lkPv[data-th="video"]{--tb:linear-gradient(160deg,#1c1510,#04060b);--ta:#ffb347;--tr:5px}
+#svLook .seg{gap:4px;padding:4px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px}
+#svLook .seg .sg{min-height:44px;color:var(--muted);font-weight:600;background:transparent;border:0;border-radius:10px;transition:background-color .15s,color .15s}
+#svLook .seg .sg[aria-pressed="true"]{color:var(--gold2);background:rgba(var(--gr,86,162,210),.2);box-shadow:inset 0 0 0 1px var(--gold)}
+#svLook .seg .sg[data-v="90"]{font-size:12px}#svLook .seg .sg[data-v="100"]{font-size:14px}#svLook .seg .sg[data-v="115"]{font-size:16px}
+.flist{display:grid;gap:8px}
+#svLook .fc{display:flex;align-items:center;gap:12px;min-height:0;padding:10px 12px;text-align:left;color:var(--text);background:transparent;border:1.5px solid var(--line);border-radius:14px;transition:border-color .15s,background-color .15s}
+#svLook .fc[aria-pressed="true"]{border-color:var(--gold);color:var(--text);background:rgba(var(--gr,86,162,210),.1);box-shadow:inset 0 0 0 1px var(--gold)}
+#svLook .fc .fa{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:12px;font-size:22px;line-height:1;color:var(--gold2);background:rgba(var(--gr,86,162,210),.14)}
+#svLook .fc .fx{flex:1;min-width:0}
+#svLook .fc .fx b{display:block;font-size:14px;font-weight:600;line-height:1.3}
+#svLook .fc .fx small{display:block;margin-top:2px;font-size:12px;line-height:1.4;color:var(--muted)}
+#svLook .fc[aria-pressed="true"] .ft b{color:var(--gold2)}
+#svLook .fc::after{content:"";flex:none;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line)}
+#svLook .fc[aria-pressed="true"]::after{border-color:var(--gold2);background:radial-gradient(circle,var(--gold2) 0 4px,transparent 4.5px)}
+/* pratinjau font memakai !important supaya tidak ikut berubah saat mode font aktif */
+#svLook .fc[data-v="serif"] .fa,#svLook .fc[data-v="serif"] .fx b{font-family:Georgia,"Times New Roman",serif!important}
+#svLook .fc[data-v="sans"] .fa,#svLook .fc[data-v="sans"] .fx b{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif!important}
+#svLook .fc[data-v="humanist"] .fa,#svLook .fc[data-v="humanist"] .fx b{font-family:Seravek,"Gill Sans Nova",Ubuntu,Calibri,"DejaVu Sans",source-sans-pro,sans-serif!important}
+#svLook .fc[data-v="neutral"] .fa,#svLook .fc[data-v="neutral"] .fx b{font-family:"Helvetica Neue",Helvetica,"Arial Nova",Arial,"Nimbus Sans",Roboto,sans-serif!important}
+#svLook .fc[data-v="book"] .fa,#svLook .fc[data-v="book"] .fx b{font-family:Charter,"Bitstream Charter","Sitka Text",Cambria,"Noto Serif",serif!important}
+#svLook .fc[data-v="elegant"] .fa,#svLook .fc[data-v="elegant"] .fx b{font-family:"Iowan Old Style","Palatino Linotype",Palatino,"URW Palladio L",P052,"Noto Serif",serif!important}
+#svLook .fc[data-v="tech"] .fa,#svLook .fc[data-v="tech"] .fx b{font-family:ui-monospace,"Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono","Roboto Mono",monospace!important}
+#svLook .lkin .sc{margin-top:14px}
+@media (prefers-reduced-motion:reduce){.lk,.lkb,.lkc,#svLook .tc,#svLook .fc,#svLook .seg .sg{transition:none}}
+#svLook .cck{margin:0 0 12px;font-size:12px;line-height:1.5;color:var(--muted);font-variant-numeric:tabular-nums}
+#svLook .cck[data-s="low"]{color:rgb(255,157,148)}
+.cpre{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px;margin:6px 0 16px}
+.csw{display:flex;flex-direction:column;gap:6px;padding:6px;font:inherit;font-size:12px;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:10px;cursor:pointer;text-align:left;transition:border-color .15s}
+.csw .cbar{display:block;height:18px;border-radius:6px}
+.csw .cnm{display:block;padding:0 2px 1px}
+.csw[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.crows{display:grid;gap:8px;margin-bottom:6px}
+.crow{border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:border-color .15s}
+.crow[data-o="1"]{border-color:var(--gold)}
+.crow .chd{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:6px 12px 6px 10px;font:inherit;color:var(--text);background:transparent;border:0;text-align:left;cursor:pointer}
+.crow .chd::after{content:"\203A";font-size:20px;line-height:1;color:var(--muted);transition:transform .2s}
+.crow[data-o="1"] .chd::after{transform:rotate(90deg);color:var(--gold2)}
+.crow .csq{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:var(--c)}
+.crow .ctx{flex:1;min-width:0}
+.crow .ctx b{display:block;font-size:14px;font-weight:600}
+.crow .ctx small{display:block;margin:1px 0 0;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.crow .cbody{display:none;padding:2px 12px 12px;border-top:1px solid var(--line)}
+.crow[data-o="1"] .cbody{display:block}
+.crow .chn{margin:8px 0 0;font-size:12px;line-height:1.5;color:var(--muted)}
+.crow .cch{display:grid;grid-template-columns:14px 1fr 52px;gap:10px;align-items:center;margin-top:12px}
+.crow .cch span{font-size:12px;font-weight:700;color:var(--muted)}
+.crow input[type=number],.crow .hx{width:100%;min-height:34px;padding:0 6px;font:inherit;font-size:13px;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:8px;text-align:center;-moz-appearance:textfield;appearance:textfield}
+.crow input[type=number]::-webkit-inner-spin-button,.crow input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.crow input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:14px;margin:0;padding:0;border-radius:7px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);cursor:pointer}
+.crow input[type=range].r{background:linear-gradient(90deg,rgb(0,var(--g),var(--b)),rgb(255,var(--g),var(--b)))}
+.crow input[type=range].g{background:linear-gradient(90deg,rgb(var(--r),0,var(--b)),rgb(var(--r),255,var(--b)))}
+.crow input[type=range].b{background:linear-gradient(90deg,rgb(var(--r),var(--g),0),rgb(var(--r),var(--g),255))}
+.crow input[type=range]::-webkit-slider-runnable-track{height:14px;background:transparent}
+.crow input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;box-sizing:border-box;width:22px;height:22px;margin-top:-4px;border-radius:50%;background:rgb(255,255,255);border:2px solid rgba(0,0,0,.6);box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.crow input[type=range]::-moz-range-track{height:14px;background:transparent}
+.crow input[type=range]::-moz-range-thumb{box-sizing:border-box;width:22px;height:22px;border-radius:50%;background:rgb(255,255,255);border:2px solid rgba(0,0,0,.6)}
+.crow .chx{display:grid;grid-template-columns:34px 1fr 44px;gap:10px;align-items:center;margin-top:14px}
+.crow .chx span{font-size:12px;font-weight:700;color:var(--muted)}
+.crow .hx{text-transform:uppercase;letter-spacing:.06em}
+.crow .hx[aria-invalid="true"]{border-color:rgb(224,69,58)}
+.crow .cp{width:44px;height:34px;padding:0;border:1px solid var(--line);border-radius:8px;background:none;cursor:pointer}
+.crow .chd:focus-visible,.csw:focus-visible,.crow input:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.csw,.crow,.crow .chd::after{transition:none}}
 #clrReset:disabled{opacity:.45}
 .sa{min-height:40px;padding:0 8px;font:inherit;font-size:13px;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:10px;cursor:pointer}
 .sa[aria-pressed="true"]{border-color:var(--gold);color:var(--gold2)}
@@ -1153,19 +1266,36 @@ h1{font-size:26px;line-height:1.15}
     <button class="sc" id="sbGap" type="button"></button>
   </div>
   <div id="svLook" hidden>
-    <p class="abp" id="lbTheme"></p>
-    <div class="seg" data-k="theme"><button class="sg" data-v="navy" type="button"></button><button class="sg" data-v="black" type="button"></button><button class="sg" data-v="smoke" type="button"></button><button class="sg" data-v="fog" type="button"></button><button class="sg" data-v="stars" type="button"></button><button class="sg" data-v="video" type="button"></button></div>
-    <p class="abp" id="lbSize"></p>
-    <div class="seg s3" data-k="fsize"><button class="sg" data-v="90" type="button"></button><button class="sg" data-v="100" type="button"></button><button class="sg" data-v="115" type="button"></button></div>
-    <p class="abp" id="lbFont"></p>
-    <div class="seg" data-k="fmode"><button class="sg" data-v="serif" type="button"></button><button class="sg" data-v="sans" type="button"></button></div>
-    <button class="sc" id="sbAnim" type="button" style="margin-top:12px"></button>
-    <p class="abp clrh" id="lbClr"></p>
-    <p class="abp clrs" id="lbClrSub"></p>
-    <p class="abp clrs" id="lbPre"></p>
-    <div class="cpre" id="clrPre"></div>
-    <div class="crows" id="clrRows"></div>
-    <button class="sc" id="clrReset" type="button"></button>
+    <div class="pvs" id="lkPvBar"><div class="pvm" id="lkPv" data-th="navy" role="img" aria-labelledby="lbPv"><span class="pvt" id="lbPv"></span><div class="pvc"><div class="pvr"><b id="cvT"></b><i id="cvC"></i></div><span id="cvB"></span></div></div></div>
+    <div class="lks" id="lkAcc">
+      <section class="lk" data-s="theme" data-o="1">
+        <button class="lkh" type="button" aria-expanded="true" aria-controls="lkbTheme"><span class="lki"></span><span class="lkt"><b id="lbTheme"></b><small id="lsTheme"></small></span><span class="lkc" aria-hidden="true"></span></button>
+        <div class="lkb" id="lkbTheme"><div class="lkw"><div class="lkin">
+          <div class="tgrid" data-k="theme"><button class="sg tc" data-v="navy" type="button"></button><button class="sg tc" data-v="black" type="button"></button><button class="sg tc" data-v="smoke" type="button"></button><button class="sg tc" data-v="fog" type="button"></button><button class="sg tc" data-v="stars" type="button"></button><button class="sg tc" data-v="video" type="button"></button></div>
+        </div></div></div>
+      </section>
+      <section class="lk" data-s="text" data-o="0">
+        <button class="lkh" type="button" aria-expanded="false" aria-controls="lkbText"><span class="lki"></span><span class="lkt"><b id="lbText"></b><small id="lsText"></small></span><span class="lkc" aria-hidden="true"></span></button>
+        <div class="lkb" id="lkbText"><div class="lkw"><div class="lkin">
+          <p class="lkl" id="lbSize"></p>
+          <div class="seg s3" data-k="fsize"><button class="sg" data-v="90" type="button"></button><button class="sg" data-v="100" type="button"></button><button class="sg" data-v="115" type="button"></button></div>
+          <p class="lkl" id="lbFont"></p>
+          <div class="flist" data-k="fmode"><button class="sg fc" data-v="serif" type="button"></button><button class="sg fc" data-v="sans" type="button"></button><button class="sg fc" data-v="humanist" type="button"></button><button class="sg fc" data-v="neutral" type="button"></button><button class="sg fc" data-v="book" type="button"></button><button class="sg fc" data-v="elegant" type="button"></button><button class="sg fc" data-v="tech" type="button"></button></div>
+          <button class="sc" id="sbAnim" type="button" style="margin-top:12px"></button>
+        </div></div></div>
+      </section>
+      <section class="lk" data-s="color" data-o="0">
+        <button class="lkh" type="button" aria-expanded="false" aria-controls="lkbColor"><span class="lki"></span><span class="lkt"><b id="lbClr"></b><small id="lsColor"></small></span><span class="lkd" id="lkDots" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="lkc" aria-hidden="true"></span></button>
+        <div class="lkb" id="lkbColor"><div class="lkw"><div class="lkin">
+          <p class="lkn" id="lbClrSub"></p>
+          <p class="cck" id="cvChk" role="status" aria-live="polite"></p>
+          <p class="lkl" id="lbPre"></p>
+          <div class="cpre" id="clrPre"></div>
+          <div class="crows" id="clrRows"></div>
+          <button class="sc" id="clrReset" type="button"></button>
+        </div></div></div>
+      </section>
+    </div>
   </div>
   <div id="svLang" hidden>
     <button class="sc" id="sbLang" type="button"></button>
@@ -1502,7 +1632,7 @@ const Net = {
           const H = cap.Plugins && cap.Plugins.CapacitorHttp;
           if(H && H.get){
             const t0 = Date.now();
-            const r = await Promise.race([H.get({url:"https://aurenza27.github.io/?_st=" + t0, connectTimeout:4000, readTimeout:4000}), new Promise((_, no) => setTimeout(() => no(new Error("timeout")), 5000))]);
+            const r = await Promise.race([H.get({url:"https://satutitik.web.app/?_st=" + t0, connectTimeout:4000, readTimeout:4000}), new Promise((_, no) => setTimeout(() => no(new Error("timeout")), 5000))]);
             const rtt = Date.now() - t0, hs = (r && r.headers) || {}, hv = k => { for(const x in hs){ if(x.toLowerCase() === k) return hs[x]; } return null; };
             const d = Date.parse(hv("date")), age = Math.max(0, +hv("age") || 0);
             if(d) t = d + age * 1000 + 500 + rtt / 2;
@@ -1652,7 +1782,7 @@ if(!GAPS.includes(S.gap)) S.gap = 8;
 if(S.lang !== "en") S.lang = "id";
 if(!["navy","black","smoke","fog","stars","video"].includes(S.theme)) S.theme = "navy";
 S.fsize = [90,100,115].includes(+S.fsize) ? +S.fsize : 100;
-if(S.fmode !== "sans") S.fmode = "serif";
+const FONT_IDS = ["serif", "sans", "humanist", "neutral", "book", "elegant", "tech"]; if(!FONT_IDS.includes(S.fmode)) S.fmode = "serif";
 { const cc = {}; ["frame","title","text","card"].forEach(k => { const v = S.cc && S.cc[k]; if(typeof v === "string" && /^#[0-9a-f]{6}$/i.test(v)) cc[k] = v.toLowerCase(); }); S.cc = cc; }
 S.anim = S.anim !== false; S.vibe = S.vibe !== false; if(!["low","mid","high"].includes(S.vlevel)) S.vlevel = "mid";
 S.mvol = Math.min(100, Math.max(0, +S.mvol || 0)); S.aivol = Math.min(100, Math.max(0, +S.aivol || 0));
@@ -1791,10 +1921,17 @@ function watchFrame(){
   for(const k in RNG[curMenu]){ const r = d.getElementById(RNG[curMenu][k]); if(r){ r.addEventListener("input", later); r.addEventListener("change", later); } }
   syncFromFrame();
 }
+/* Ganti tema, mode font, atau ukuran huruf: berpindah dengan crossfade halus (View Transitions). Cadangan untuk WebView lama: transisi warna singkat.
+   Tidak dipakai bila Animasi dimatikan atau perangkat meminta gerak dikurangi. Geser slider warna tidak dianimasikan agar tetap ringan. */
 function setS(patch){
   S = Object.assign({}, S, patch);
-  try{ applyToFrame(); }catch(e){}
-  writeKeys(S); paintPanel();
+  const paint = () => { try{ applyToFrame(); }catch(e){} writeKeys(S); paintPanel(); };
+  let calm = false; try{ calm = matchMedia("(prefers-reduced-motion:reduce)").matches; }catch(e){}
+  if(!calm && S.anim !== false && ["theme","fmode","fsize"].some(k => k in patch) && !document.hidden){
+    if(document.startViewTransition){ try{ document.startViewTransition(paint); return; }catch(e){} }
+    try{ const h = document.documentElement; h.classList.add("thx"); clearTimeout(setS.t); setS.t = setTimeout(() => h.classList.remove("thx"), 650); }catch(e){}
+  }
+  paint();
 }
 const GI = d => '<svg viewBox="0 0 24 24" aria-hidden="true">' + d + '</svg>';
 const PIC = {
@@ -1838,6 +1975,8 @@ const TT = {
 };
 /* ===== TAMPILAN: tema, ukuran huruf, mode font, animasi. CSS yang sama dipasang di beranda dan di tiap menu ===== */
 const FONT_SANS = 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+/* mode font: memakai font bawaan perangkat (tanpa unduhan), jadi tetap jalan offline */
+const FONT_STACKS = {sans:'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',humanist:'Seravek,"Gill Sans Nova",Ubuntu,Calibri,"DejaVu Sans",source-sans-pro,sans-serif',neutral:'"Helvetica Neue",Helvetica,"Arial Nova",Arial,"Nimbus Sans",Roboto,sans-serif',book:'Charter,"Bitstream Charter","Sitka Text",Cambria,"Noto Serif",serif',elegant:'"Iowan Old Style","Palatino Linotype",Palatino,"URW Palladio L",P052,"Noto Serif",serif',tech:'ui-monospace,"Cascadia Code","Source Code Pro",Menlo,Consolas,"DejaVu Sans Mono","Roboto Mono",monospace'};
 const TH_VARS = {
   navy:":root{--bg:#10151c;--bg2:#161d25;--card:#1b232c;--line:#2b3541}",
   black:":root{--bg:#000;--bg2:#070a09;--card:#0a0e0d;--line:#1d2b26;--text:#e6fff5;--muted:#7d968c;--gold:#2ee6a6;--gold2:#8dffd3;--gr:46,230,166;--gr2:141,255,211}",
@@ -1897,21 +2036,15 @@ const TH_SK_BASE =
   "html #spanel,html #frpanel,html #bellPanel{background:var(--sk-pn);border-radius:var(--sk-r);box-shadow:var(--sk-psh)}" +
   "html .cat h2,html #recent h2,html .hsec .hh b{font-family:var(--head)}";
 /* pratinjau kecil di tombol pilihan tema (titik warna + bentuk sudut tiap tema) */
-const TH_STATIC =
-  ".seg[data-k=\"theme\"] .sg::before{content:\"\";display:inline-block;width:11px;height:11px;margin-right:7px;border-radius:50%;vertical-align:-1px;background:var(--sw)}" +
-  ".seg[data-k=\"theme\"] .sg[data-v=\"navy\"]{--sw:linear-gradient(135deg,#56a2d2 50%,#10151c 50%)}" +
-  ".seg[data-k=\"theme\"] .sg[data-v=\"black\"]{--sw:linear-gradient(135deg,#2ee6a6 50%,#000 50%);border-radius:3px}" +
-  ".seg[data-k=\"theme\"] .sg[data-v=\"smoke\"]{--sw:linear-gradient(135deg,#d6dbe4 50%,#1a1a1f 50%);border-radius:16px}" +
-  ".seg[data-k=\"theme\"] .sg[data-v=\"fog\"]{--sw:linear-gradient(135deg,#3fc1c9 50%,#07131a 50%);border-radius:999px}" +
-  ".seg[data-k=\"theme\"] .sg[data-v=\"stars\"]{--sw:linear-gradient(135deg,#a78bfa 50%,#050816 50%);border-radius:14px}" +
-  ".seg[data-k=\"theme\"] .sg[data-v=\"video\"]{--sw:linear-gradient(135deg,#ffb347 50%,#04060b 50%);border-radius:5px}";
+/* pratinjau tema kini dibuat oleh kartu tema di panel Tampilan (CSS di head) */
+const TH_STATIC = "";
 function skinCSS(s){
   const k = TH_SK[s.theme]; if(!k) return "";
   let c = ":root{" + k.v + "}" + TH_SK_BASE + k.x;
   if(!s.anim) c += "html .ic{animation:none!important}";
   c += "@media (prefers-reduced-motion:reduce){html .ic,html .item{animation:none!important;transition:none!important}}";
   /* judul di dalam menu ikut font tema, kecuali pengguna memilih Sans-serif */
-  if(s.fmode !== "sans") c += "html h1,html h2,html h3{font-family:var(--head)!important}";
+  if(!FONT_STACKS[s.fmode]) c += "html h1,html h2,html h3{font-family:var(--head)!important}";
   return c;
 }
 function ccCSS(cc){
@@ -1939,7 +2072,7 @@ function apCSS(s){
   }
   c += TH_STATIC + skinCSS(s);
   if(s.fsize !== 100) c += "html{zoom:" + (s.fsize / 100) + "}";
-  if(s.fmode === "sans") c += ":root{--head:" + FONT_SANS + "}*{font-family:" + FONT_SANS + "!important}";
+  const fst = FONT_STACKS[s.fmode]; if(fst) c += ":root{--head:" + fst + "}*{font-family:" + fst + "!important}";
   return c;
 }
 /* Latar "Asap sinematik": asap animasi buatan kode (WebGL shader). Tajam di layar berapa pun, tanpa file video.
@@ -2041,8 +2174,8 @@ PIC.look = GI('<circle cx="12" cy="12" r="9"/><path d="M12 3v18M12 8a4 4 0 0 1 0
 PIC.book = GI('<path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2z"/><path d="M4 20a2 2 0 0 0 2 1h13v-3"/><path d="M9 8h6"/>');
 PIC.anim = GI('<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>');
 const AP = {
-  id:{theme:"Background", clr:"Warna tampilan", clrSub:"Ubah warna frame, judul, tulisan, dan kartu.", pre:"Pilihan cepat", rows:["Frame / garis","Judul & aksen","Warna tulisan","Latar kartu"], presets:["Biru","Emas","Hijau","Ungu","Merah","Pink","Putih"], rst:"Kembalikan warna awal", themes:["Biru malam","Hitam pekat","Kabut asap","Kabut laut","Langit berbintang","Asap sinematik"], size:"Ukuran huruf", sizes:["Kecil","Sedang","Besar"], font:"Mode font", fonts:["Serif klasik","Sans-serif"], anim:["Animasi: nyala","Animasi: mati"]},
-  en:{theme:"Background", clr:"Display colors", clrSub:"Change the colors of frames, titles, text, and cards.", pre:"Quick picks", rows:["Frame / border","Titles & accent","Text color","Card background"], presets:["Blue","Gold","Green","Purple","Red","Pink","White"], rst:"Restore default colors", themes:["Midnight blue","Pure black","Smoke","Sea fog","Starry sky","Cinematic smoke"], size:"Font size", sizes:["Small","Medium","Large"], font:"Font mode", fonts:["Classic serif","Sans-serif"], anim:["Animation: on","Animation: off"]}
+  id:{theme:"Tema", prev:"Pratinjau", txt:"Teks & huruf", cust:"Kustom", def:"Bawaan", clr:"Warna tampilan", clrSub:"Atur warna frame, judul, tulisan, dan kartu. Ketuk salah satu baris untuk mengatur nilai RGB-nya.", cvT:"Judul kartu", cvB:"Beginilah tulisan isi tampil di dalam kartu.", cvC:"Tombol aktif", hints:["Garis tepi kartu, tombol aktif, dan pemisah.","Judul, ikon, dan teks penekanan.","Teks utama di semua menu.","Latar kartu dan panel."], ckOk:"Keterbacaan baik", ckLow:"Kontras rendah, tulisan bisa sulit dibaca. Sesuaikan warna tulisan atau latar kartu.", pick:"Pilih dari palet", pre:"Pilihan cepat", rows:["Frame / garis","Judul & aksen","Warna tulisan","Latar kartu"], presets:["Biru","Emas","Hijau","Ungu","Merah","Pink","Putih"], rst:"Kembalikan warna awal", themes:["Biru malam","Hitam pekat","Kabut asap","Kabut laut","Langit berbintang","Asap sinematik"], size:"Ukuran huruf", sizes:["Kecil","Sedang","Besar"], font:"Mode font", fonts:["Serif klasik","Sans-serif","Humanis","Netral","Buku","Elegan","Teknis"], fontd:["Formal dan berkarakter","Modern dan bersih, font bawaan perangkat","Ramah dan mudah dibaca","Lugas dan rapi, gaya Helvetica","Nyaman untuk bacaan panjang","Anggun, gaya buku klasik","Lebar huruf sama, kesan teknis"], anim:["Animasi: nyala","Animasi: mati"]},
+  en:{theme:"Theme", prev:"Preview", txt:"Text & font", cust:"Custom", def:"Default", clr:"Display colors", clrSub:"Set the colors of frames, titles, text, and cards. Tap a row to adjust its RGB values.", cvT:"Card title", cvB:"This is how body text looks inside a card.", cvC:"Active button", hints:["Card borders, active buttons, and dividers.","Titles, icons, and emphasis text.","Main text in every menu.","Card and panel background."], ckOk:"Good readability", ckLow:"Low contrast, text may be hard to read. Adjust the text color or the card background.", pick:"Pick from palette", pre:"Quick picks", rows:["Frame / border","Titles & accent","Text color","Card background"], presets:["Blue","Gold","Green","Purple","Red","Pink","White"], rst:"Restore default colors", themes:["Midnight blue","Pure black","Smoke","Sea fog","Starry sky","Cinematic smoke"], size:"Font size", sizes:["Small","Medium","Large"], font:"Font mode", fonts:["Classic serif","Sans-serif","Humanist","Neutral","Book","Elegant","Technical"], fontd:["Formal and characterful","Modern and clean, the device font","Friendly and easy to read","Plain and tidy, Helvetica style","Comfortable for long reading","Graceful, classic book style","Fixed width, technical feel"], anim:["Animation: on","Animation: off"]}
 };
 Object.assign(TT.id, {bk:"Kembali", glq:"Cari istilah…", gle:"Istilah tidak ditemukan.", g:{sound:"Mode", play:"Pemutaran", lang:"Bahasa", about:"Tentang", look:"Tampilan", gloss:"Istilah", help:"Pusat Bantuan", bug:"Laporkan Bug", saran:"Kotak Saran", profile:"Profil", reset:"Reset", cache:"Hapus cache", applock:"Kunci Aplikasi"}});
 Object.assign(TT.en, {bk:"Back", glq:"Search terms…", gle:"No terms found.", g:{sound:"Mode", play:"Playback", lang:"Language", about:"About", look:"Appearance", gloss:"Glossary", help:"Help Center", bug:"Report a Bug", saran:"Suggestion Box", profile:"Profile", reset:"Reset", cache:"Clear cache", applock:"App Lock"}});
@@ -2172,11 +2305,11 @@ function paintPanel(){
   bgBuild(); put("bugSend", "bug", BG[S.lang].send); $("bugCnt").textContent = $("bugMsg").value.length + " / 1500";
   { const r = SR[S.lang]; $("srInfo").textContent = r.info; $("srMsg").placeholder = r.ph; put("srSend", "mail", r.send); $("srCnt").textContent = $("srMsg").value.length + " / 1500"; }
   put("gAppLock", "lock", t.g.applock); if(window.stAppLock) window.stAppLock.paint();
-  put("gGloss", "book", t.g.gloss); $("glQ").placeholder = t.glq; $("glEmpty").textContent = t.gle; $("spanel").classList.toggle("wide", spView === "gloss"); if(glLang !== S.lang) buildGloss();
+  put("gGloss", "book", t.g.gloss); $("glQ").placeholder = t.glq; $("glEmpty").textContent = t.gle; $("spanel").classList.toggle("wide", spView === "gloss"); $("spanel").classList.toggle("mid", spView === "look"); if(glLang !== S.lang) buildGloss();
   const A = AP[S.lang];
   $("lbTheme").textContent = A.theme; $("lbSize").textContent = A.size; $("lbFont").textContent = A.font;
   const lists = {theme:A.themes, fsize:A.sizes, fmode:A.fonts};
-  document.querySelectorAll("#svLook .seg").forEach(g => { const k = g.dataset.k; g.querySelectorAll(".sg").forEach((b, i) => { b.textContent = lists[k][i]; b.setAttribute("aria-pressed", String(String(S[k]) === b.dataset.v)); }); });
+  document.querySelectorAll("#svLook [data-k]").forEach(g => { const k = g.dataset.k; g.querySelectorAll(".sg").forEach((b, i) => { if(k === "theme"){ if(!b.firstChild || b.lastChild.textContent !== lists[k][i]) b.innerHTML = '<span class="tp"></span><span class="tn">' + lists[k][i] + '</span>'; } else if(k === "fmode"){ const nm = lists[k][i], ds = A.fontd[i]; if(!b.firstChild || b.querySelector("b").textContent !== nm || b.querySelector("small").textContent !== ds) b.innerHTML = '<span class="fa">Aa</span><span class="fx"><b>' + nm + '</b><small>' + ds + '</small></span>'; } else b.textContent = lists[k][i]; b.setAttribute("aria-pressed", String(String(S[k]) === b.dataset.v)); }); });
   pb("sbAnim", "anim", S.anim, A.anim);
   { const V = VB[S.lang];
     pb("sbVibe", "vibe", S.vibe, V.on);
@@ -2191,6 +2324,7 @@ function paintPanel(){
     const e = $("rlAlarm"); e.classList.toggle("open", !!S.alarm); e.inert = !S.alarm; $("sbAlarm").classList.toggle("rlon", !!S.alarm); }
   { const M = MMT[S.lang]; pb("sbMsgMute", "mute", S.mmute, M.on); $("mmNote").textContent = M.note; }
   paintClr(A);
+  paintLook(A);
   paintAp();
   paintHome();
 }
@@ -2320,7 +2454,7 @@ const PV = {
     {h:"3. Untuk apa data dipakai", l:["Menjalankan fitur aplikasi dan menampilkan hasil menu.","Memungkinkan masuk akun, sinkronisasi data, dan fitur turnamen online (undangan moderator memakai ID Akun).","Menampilkan profilmu, serta menerima dan membaca saran dari pengguna.","Menampilkan iklan di aplikasi Android, sebagai sumber pendanaan pengembangan."], p:["Kami tidak menjual data pribadimu. Kami juga tidak membagikan data akun, username, atau hasil menumu kepada pengiklan. Kami hanya mengungkapkan data bila diwajibkan oleh hukum atau perintah pihak berwenang yang sah."]},
     {h:"4. Layanan pihak ketiga", l:["Layanan akun dan basis data cloud (autentikasi dan penyimpanan data akun): untuk masuk akun dan menyimpan data akun.","Layanan formulir pihak ketiga: untuk mengirim pesan dari Kotak Saran.","Layanan notifikasi push dan server pengirim notifikasi: untuk mengirim notifikasi push (hanya aplikasi Android).","Pusat Kesehatan Perangkat / Health Connect (hanya aplikasi Android): sumber data impor latihan yang kamu izinkan; dibaca di perangkat dan tidak dikirim ke layanan lain.",...(SHOW_DUKUNG ? ["Layanan donasi: tautan Dukung Kami (hanya di versi web) membuka halaman eksternal yang punya kebijakan privasinya sendiri."] : []),"Layanan hosting web: menyajikan versi web aplikasi; alamat IP perangkatmu terlihat oleh penyedia hosting saat kamu membuka versi web.","Server publik (penyedia layanan waktu dan jaringan): untuk pengecekan koneksi dan waktu.","Jaringan iklan (Google AdMob): hanya di aplikasi Android.","Konten sponsor langsung (mitra pihak ketiga): promosi di kartu Informasi & Pembaruan; tautannya membuka situs mitra yang punya kebijakan privasinya sendiri."], p:["Layanan-layanan ini punya kebijakan privasi sendiri yang berlaku saat data diproses oleh mereka."]},
     {h:"5. Penyimpanan dan keamanan", p:["Data lokal tersimpan di perangkatmu dan hilang bila data aplikasi atau browser dihapus. Data akun disimpan di layanan cloud dan dikirim lewat koneksi terenkripsi (HTTPS). Tidak ada metode penyimpanan atau pengiriman data yang sepenuhnya bebas risiko, jadi kami tidak dapat menjamin keamanan mutlak. Kunci menu dan Kunci Aplikasi (PIN/pola dan sidik jari) hanya mengunci tampilan, bukan enkripsi: data di perangkat dan di akunmu (termasuk Memo) tidak dienkripsi tambahan oleh aplikasi. Fitur Cadangkan data di Pengaturan membuat satu file berisi data semua menu (misalnya riwayat, catatan, keuangan, dan arisan) yang kamu simpan di perangkat atau bagikan lewat lembar Bagikan sesuai pilihanmu. File itu tidak dienkripsi, tidak berisi PIN, pola, akun, maupun pengaturan, dan menjadi tanggung jawabmu: kamu yang menentukan ke mana file disimpan atau dibagikan. Memulihkan file mengganti data di perangkat yang kuncinya sama dengan isi file dan, bila kamu masuk akun dan sinkronisasi aktif, hasilnya ikut tersalin ke akunmu. Lama penyimpanan: pesan pribadi 30 hari; chat ruangan online 24 jam (ditandai kedaluwarsa, lalu dihapus otomatis oleh server, yang bisa memerlukan waktu); data ruangan sampai host menutupnya; laporan selama diperlukan untuk keamanan; data akun sampai kamu menghapus akunmu. Di aplikasi Android, cadangan otomatis Android dinonaktifkan (data lokal tidak ikut cadangan otomatis) dan pratinjau aplikasi di Recent apps dikosongkan. Versi web menyimpan salinan aplikasi di cache browser agar bisa dibuka offline; isinya kode aplikasi, bukan data pribadimu. Server layanan cloud dan server notifikasi kami dapat berada di luar Indonesia, sehingga data akunmu dapat diproses di negara lain; kami hanya memakai penyedia yang menerapkan pengamanan standar industri."]},
-    {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk akun, data di server ikut dihapus).","Hapus riwayat BMI dan Kehamilan per catatan atau sekaligus lewat panel Riwayat di menu masing-masing. File cadangan yang sudah kamu simpan atau bagikan tidak ikut terhapus oleh Reset dan harus kamu hapus sendiri.","Reset semua catatan keuangan dan hapus arisan meminta verifikasi (sidik jari, PIN/pola layar HP, PIN menu lama, atau Kunci Aplikasi) dan tidak bisa dibatalkan. Bila kamu masuk akun, salinan di akun ikut terhapus saat sinkronisasi berjalan. Bila lupa PIN dan tidak punya kode pemulihan, satu-satunya jalan adalah menghapus data Keuangan atau Arisan di perangkat itu. Bila lupa PIN atau pola Kunci Aplikasi dan tidak punya kode pemulihan, satu-satunya jalan adalah menghapus data aplikasi atau memasangnya ulang, yang menghapus data lokal di perangkat itu.","Tarik persetujuanmu kapan saja dengan berhenti memakai fitur akun, memakai Reset data, atau menghapus akun. Penarikan tidak memengaruhi pemrosesan yang sudah dilakukan sebelumnya.","Minta akses, koreksi, atau penghapusan data pribadimu lewat email di bagian Kontak. Kami berusaha menanggapi permintaanmu dalam 14 hari.","Hapus akun dan data cloud kapan saja lewat Pengaturan > Akun > Lihat profil > Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri.","Penghapusan akun menghapus ID Akun, username, foto profil, daftar teman dan pesan pribadi, aktivitas, apresiasi, dan komentar di Feed Aktivitas Teman, segmen dan waktu di Segment Leaderboard, token notifikasi di semua perangkat, salinan data yang tersinkron, serta turnamen online yang kamu buat. Laporan yang pernah kamu kirim dapat tetap disimpan pengelola untuk keperluan keamanan. Komentar yang kamu tulis di turnamen milik orang lain dianonimkan (nama diganti “Pengguna dihapus” dan ID Akun dilepas) tetapi isinya tetap tampil, dan balasan orang lain yang menyebut namamu dapat tetap menampilkannya. Data ruangan online hilang saat ruangan ditutup. Ruangan yang kamu buat sebagai host dan belum ditutup tidak ikut terhapus otomatis saat akun dihapus, jadi tutup ruangannya lebih dulu; bila akun sudah terhapus, minta penghapusannya lewat email di bagian Kontak. Minta penghapusan komentar lewat email di bagian Kontak.","Tanpa memasang aplikasi: buka https://aurenza27.github.io di browser, masuk akun, lalu pilih Hapus akun di halaman Profil. Bila tidak bisa masuk, kirim permintaan penghapusan lewat Kotak Saran di halaman yang sama dengan menyebut ID Akunmu (ST-xxxxxxxx)."]},
+    {h:"6. Pilihan dan hak kamu", l:["Ubah username dan foto profil kapan saja lewat Pengaturan > Akun > Lihat profil.","Keluar dari akun lewat halaman Profil; data lokal tetap ada di perangkat.","Hapus data lokal dengan menghapus data aplikasi atau browser, atau pakai menu Reset di Pengaturan (bila masuk akun, data di server ikut dihapus).","Hapus riwayat BMI dan Kehamilan per catatan atau sekaligus lewat panel Riwayat di menu masing-masing. File cadangan yang sudah kamu simpan atau bagikan tidak ikut terhapus oleh Reset dan harus kamu hapus sendiri.","Reset semua catatan keuangan dan hapus arisan meminta verifikasi (sidik jari, PIN/pola layar HP, PIN menu lama, atau Kunci Aplikasi) dan tidak bisa dibatalkan. Bila kamu masuk akun, salinan di akun ikut terhapus saat sinkronisasi berjalan. Bila lupa PIN dan tidak punya kode pemulihan, satu-satunya jalan adalah menghapus data Keuangan atau Arisan di perangkat itu. Bila lupa PIN atau pola Kunci Aplikasi dan tidak punya kode pemulihan, satu-satunya jalan adalah menghapus data aplikasi atau memasangnya ulang, yang menghapus data lokal di perangkat itu.","Tarik persetujuanmu kapan saja dengan berhenti memakai fitur akun, memakai Reset data, atau menghapus akun. Penarikan tidak memengaruhi pemrosesan yang sudah dilakukan sebelumnya.","Minta akses, koreksi, atau penghapusan data pribadimu lewat email di bagian Kontak. Kami berusaha menanggapi permintaanmu dalam 14 hari.","Hapus akun dan data cloud kapan saja lewat Pengaturan > Akun > Lihat profil > Hapus akun. Data di perangkat ini tetap ada sampai kamu menghapusnya sendiri.","Penghapusan akun menghapus ID Akun, username, foto profil, daftar teman dan pesan pribadi, aktivitas, apresiasi, dan komentar di Feed Aktivitas Teman, segmen dan waktu di Segment Leaderboard, token notifikasi di semua perangkat, salinan data yang tersinkron, serta turnamen online yang kamu buat. Laporan yang pernah kamu kirim dapat tetap disimpan pengelola untuk keperluan keamanan. Komentar yang kamu tulis di turnamen milik orang lain dianonimkan (nama diganti “Pengguna dihapus” dan ID Akun dilepas) tetapi isinya tetap tampil, dan balasan orang lain yang menyebut namamu dapat tetap menampilkannya. Data ruangan online hilang saat ruangan ditutup. Ruangan yang kamu buat sebagai host dan belum ditutup tidak ikut terhapus otomatis saat akun dihapus, jadi tutup ruangannya lebih dulu; bila akun sudah terhapus, minta penghapusannya lewat email di bagian Kontak. Minta penghapusan komentar lewat email di bagian Kontak.","Tanpa memasang aplikasi: buka https://satutitik.web.app di browser, masuk akun, lalu pilih Hapus akun di halaman Profil. Bila tidak bisa masuk, kirim permintaan penghapusan lewat Kotak Saran di halaman yang sama dengan menyebut ID Akunmu (ST-xxxxxxxx)."]},
     {h:"7. Anak-anak", p:["Fitur akun dan sosial Satu Titik (masuk akun, teman, pesan pribadi, komentar, dan ruangan online) hanya untuk pengguna berusia 16 tahun ke atas. Pengguna di bawah 18 tahun harus mendapat izin orang tua atau wali sebelum masuk dengan akun. Menu yang tidak memerlukan akun menyimpan datanya hanya di perangkat; anak di bawah 13 tahun sebaiknya didampingi orang tua. Kami tidak dengan sengaja mengumpulkan data anak di bawah 16 tahun, dan kami berusaha tidak melakukan profiling terhadap pengguna di bawah 18 tahun. Iklan di aplikasi Android ditampilkan oleh Google AdMob; kamu atau orang tuamu dapat membatasi personalisasi iklan lewat pengaturan perangkat. Bila kamu orang tua dan menemukan data anak di aplikasi ini, hubungi kami lewat email di bagian Kontak atau Kotak Saran, dan kami akan menghapusnya."]},
     {h:"8. Hasil menu", p:["Hasil menu primbon, ramalan, dan hiburan hanya untuk hiburan dan kepercayaan tradisional, bukan kepastian atau dasar untuk keputusan penting. Hasil BMI, kalori, kehamilan, kandungan gizi makanan, kalkulator AKG, dan data olahraga adalah informasi umum, bukan diagnosis, nasihat medis atau gizi, atau pengganti pemeriksaan tenaga kesehatan; konsultasikan kondisimu dengan dokter, bidan, atau ahli gizi. Waktu sholat dan arah kiblat dihitung otomatis dari lokasi yang kamu pilih, dan bisa berbeda 1 sampai 2 menit atau sedikit derajat dari jadwal masjid atau kompas lain; ikuti adzan dan ketentuan di tempatmu."]},
     {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Perubahan penting akan diumumkan di aplikasi."]},
@@ -2351,7 +2485,7 @@ const PV = {
     {h:"3. How data is used", l:["To run the app’s features and show menu results.","To enable sign-in, data sync, and online tournaments (moderator invitations use the Account ID).","To show your profile, and to receive and read user suggestions.","To show ads in the Android app, as a way to fund development."], p:["We do not sell your personal data. We also do not share your account data, username, or menu results with advertisers. We disclose data only when required by law or a valid order from the authorities."]},
     {h:"4. Third-party services", l:["Account and cloud database service (authentication and account data storage): for sign-in and storing account data.","Third-party form service: to deliver messages from the Suggestion Box.","Push notification service and notification-sending server: to deliver push notifications (Android app only).","Device Health Hub / Health Connect (Android app only): the source of workout imports you allow; it is read on your device and not sent to other services.",...(SHOW_DUKUNG ? ["Donation service: the Support Us link (web version only) opens an external page with its own privacy policy."] : []),"Web hosting service: serves the web version of the app; your device’s IP address is visible to the hosting provider when you open the web version.","Public servers (time and network service providers): for connection and time checks.","Ad network (Google AdMob): Android app only.","Direct sponsored content (third-party partners): promotions in the Info & updates card; links open the partner’s site, which has its own privacy policy."], p:["These services have their own privacy policies, which apply when they process data."]},
     {h:"5. Storage and security", p:["Local data stays on your device and is lost if you clear the app or browser data. Account data is stored in a cloud service and sent over encrypted connections (HTTPS). No method of storage or transmission is completely risk-free, so we cannot guarantee absolute security. The menu lock and App Lock (PIN/pattern and fingerprint) only lock the screen and are not encryption: data on your device and in your account (including Memo) is not additionally encrypted by the app. The Back up data feature in Settings creates one file with the data of every menu (for example history, notes, finance, and arisan), which you save on your device or send through the Share sheet as you choose. That file is not encrypted and does not contain your PIN, pattern, account, or settings, and it is your responsibility: you decide where it is saved or shared. Restoring a file replaces the data on the device that has the same keys as the file and, if you are signed in and sync is on, the result is also copied to your account. Retention: private messages 30 days; online room chat 24 hours (marked to expire, then deleted automatically by the server, which can take some time); room data until the host closes the room; reports as long as needed for safety; account data until you delete your account. In the Android app, Android automatic backup is disabled (local data is not included in automatic backups) and the app preview in Recent apps is blanked. The web version keeps a copy of the app in the browser cache so it can open offline; it contains the app’s code, not your personal data. The cloud service and our notification servers may be located outside Indonesia, so your account data may be processed in other countries; we only use providers that apply industry-standard security."]},
-    {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in, server data is deleted too).","Delete BMI and Pregnancy history one record at a time or all at once from the History panel in each menu. Backup files you have already saved or shared are not removed by Reset and must be deleted by you.","Resetting all financial records and deleting an arisan ask for verification (fingerprint, the phone's screen PIN/pattern, an old menu PIN, or the App Lock) and cannot be undone. If you are signed in, the copy in your account is deleted too once sync runs. If you forget the PIN and have no recovery code, the only way is to delete the Finance or Arisan data on that device. If you forget the App Lock PIN or pattern and have no recovery code, the only way is to clear the app data or reinstall the app, which deletes the local data on that device.","Withdraw your consent at any time by no longer using account features, using Reset data, or deleting your account. Withdrawal does not affect processing already carried out.","Request access, correction, or deletion of your personal data via the email in the Contact section. We aim to respond within 14 days.","Delete your account and cloud data at any time via Settings > Account > View profile > Delete account. Data on this device stays until you delete it yourself.","Deleting your account removes the Account ID, username, profile photo, friend list and private messages, Friends Activity Feed activities, kudos, and comments, Segment Leaderboard segments and times, push tokens on all devices, synced data, and the online tournaments you created. Reports you submitted may still be kept by the administrators for safety purposes. Comments you wrote in other people’s tournaments are anonymized (the name is replaced with “Pengguna dihapus” and the Account ID is detached) but their text stays visible, and other people’s replies that mention your name may still show it. Online room data disappears when the room is closed. Rooms you created as host and have not closed are not deleted automatically when the account is deleted, so close them first; if your account is already deleted, request their removal via the email in the Contact section. Request deletion of comments via the email in the Contact section.","Without installing the app: open https://aurenza27.github.io in a browser, sign in, and choose Delete account on the Profile page. If you cannot sign in, send a deletion request through the Suggestion Box on the same page, stating your Account ID (ST-xxxxxxxx)."]},
+    {h:"6. Your choices and rights", l:["Change your username and profile photo at any time via Settings > Account > View profile.","Sign out from the Profile page; local data stays on your device.","Delete local data by clearing the app or browser data, or use the Reset menu in Settings (if signed in, server data is deleted too).","Delete BMI and Pregnancy history one record at a time or all at once from the History panel in each menu. Backup files you have already saved or shared are not removed by Reset and must be deleted by you.","Resetting all financial records and deleting an arisan ask for verification (fingerprint, the phone's screen PIN/pattern, an old menu PIN, or the App Lock) and cannot be undone. If you are signed in, the copy in your account is deleted too once sync runs. If you forget the PIN and have no recovery code, the only way is to delete the Finance or Arisan data on that device. If you forget the App Lock PIN or pattern and have no recovery code, the only way is to clear the app data or reinstall the app, which deletes the local data on that device.","Withdraw your consent at any time by no longer using account features, using Reset data, or deleting your account. Withdrawal does not affect processing already carried out.","Request access, correction, or deletion of your personal data via the email in the Contact section. We aim to respond within 14 days.","Delete your account and cloud data at any time via Settings > Account > View profile > Delete account. Data on this device stays until you delete it yourself.","Deleting your account removes the Account ID, username, profile photo, friend list and private messages, Friends Activity Feed activities, kudos, and comments, Segment Leaderboard segments and times, push tokens on all devices, synced data, and the online tournaments you created. Reports you submitted may still be kept by the administrators for safety purposes. Comments you wrote in other people’s tournaments are anonymized (the name is replaced with “Pengguna dihapus” and the Account ID is detached) but their text stays visible, and other people’s replies that mention your name may still show it. Online room data disappears when the room is closed. Rooms you created as host and have not closed are not deleted automatically when the account is deleted, so close them first; if your account is already deleted, request their removal via the email in the Contact section. Request deletion of comments via the email in the Contact section.","Without installing the app: open https://satutitik.web.app in a browser, sign in, and choose Delete account on the Profile page. If you cannot sign in, send a deletion request through the Suggestion Box on the same page, stating your Account ID (ST-xxxxxxxx)."]},
     {h:"7. Children", p:["Satu Titik’s account and social features (signing in, friends, private messages, comments, and online rooms) are only for users aged 16 and over. Users under 18 must have a parent’s or guardian’s permission before signing in with an account. Menus that do not need an account keep their data only on your device; children under 13 should be accompanied by a parent. We do not knowingly collect data from children under 16, and we aim not to profile users under 18. Ads in the Android app are shown by Google AdMob; you or your parent can limit ad personalization in your device settings. If you are a parent and find a child’s data in this app, contact us through the email in the Contact section or the Suggestion Box, and we will delete it."]},
     {h:"8. Menu results", p:["Primbon, fortune, and entertainment menu results are for entertainment and traditional belief only, not a certainty or a basis for important decisions. BMI, calorie, pregnancy, food nutrition, RDA calculator, and exercise results are general information, not a diagnosis, medical or nutritional advice, or a substitute for an examination by a health professional; consult a doctor, midwife, or dietitian about your condition. Prayer times and the Qibla direction are calculated automatically from the location you choose, and may differ by 1 to 2 minutes or a few degrees from a local mosque’s schedule or another compass; follow the adhan and rulings in your area."]},
     {h:"9. Changes to this policy", p:["This policy may be updated. The date of the latest update is shown at the top of this page. Important changes will be announced in the app."]},
@@ -2387,6 +2521,33 @@ function closePrivacy(){ $("privacy").hidden = true; if(pvFrom && pvFrom.focus) 
 $("privLink").addEventListener("click", openPrivacy); $("pvBack").addEventListener("click", closePrivacy);
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("privacy").hidden) closePrivacy(); });
 document.querySelectorAll("#spanel .grp").forEach(b => b.addEventListener("click", () => b.dataset.g === "about" ? openAbout() : b.dataset.g === "dukung" ? (SHOW_DUKUNG && window.open("https://saweria.co/AURENZA", "_blank", "noopener,noreferrer")) : showView(b.dataset.g))); $("spB").addEventListener("click", () => showView(SPP[spView] || ""));
+/* ===== TAMPILAN: bagian yang bisa dilipat. Hanya satu bagian terbuka sekaligus; bawaan: Tema ===== */
+let lkOpen = "theme";
+PIC.lkTheme = GI('<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/>');
+PIC.lkText = GI('<path d="M3 18L8 5l5 13M5 14h6"/><path d="M14.5 18l3-7 3 7M15.7 15.5h3.6"/>');
+PIC.lkColor = GI('<path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/>');
+function paintLook(A){
+  $("lbText").textContent = A.txt; $("lbPv").textContent = A.prev; $("lkPv").dataset.th = S.theme;
+  const ti = ["navy","black","smoke","fog","stars","video"].indexOf(S.theme), si = ["90","100","115"].indexOf(String(S.fsize));
+  $("lsTheme").textContent = A.themes[ti < 0 ? 0 : ti];
+  $("lsText").textContent = A.sizes[si < 0 ? 1 : si] + " · " + A.fonts[Math.max(0, FONT_IDS.indexOf(S.fmode))];
+  $("lsColor").textContent = Object.keys(S.cc || {}).length ? A.cust : A.def;
+  $("lkDots").querySelectorAll("i").forEach((d, i) => { d.style.background = clrNow(CLR_KEYS[i]); });
+  document.querySelectorAll("#lkAcc .lk").forEach(s => {
+    const o = s.dataset.s === lkOpen, ic = s.querySelector(".lki");
+    s.dataset.o = o ? "1" : "0";
+    s.querySelector(".lkh").setAttribute("aria-expanded", String(o));
+    s.querySelector(".lkb").inert = !o;
+    const pk = {theme:"lkTheme", text:"lkText", color:"lkColor"}[s.dataset.s];
+    if(!ic.firstChild && PIC[pk]) ic.innerHTML = PIC[pk];
+  });
+}
+$("spanel").addEventListener("scroll", () => { $("lkPvBar").classList.toggle("stk", $("spanel").scrollTop > 6); }, {passive:true});
+$("lkAcc").addEventListener("click", e => {
+  const h = e.target.closest(".lkh"); if(!h) return;
+  const k = h.parentElement.dataset.s; lkOpen = lkOpen === k ? "" : k; paintLook(AP[S.lang]);
+  if(lkOpen) setTimeout(() => { try{ h.scrollIntoView({block:"nearest", behavior:"smooth"}); }catch(x){} }, 320);
+});
 const CLR_KEYS = ["frame","title","text","card"];
 const CLR_DEF = {frame:"#56a2d2", title:"#a8d1eb", text:"#e0e6eb", card:"#1b232c"};
 const CLR_PRE = [["#56a2d2","#a8d1eb"],["#d4a94f","#f0cf86"],["#3fae7b","#8fe0b5"],["#8a6bd0","#c4b0f5"],["#e0453a","#ff9d94"],["#e0709a","#ffb3cf"],["#cfd4de","#ffffff"]];
@@ -2398,30 +2559,53 @@ function clrNow(k){
   if(/^#[0-9a-f]{3}$/i.test(raw)) return "#" + raw.slice(1).split("").map(x => x + x).join("").toLowerCase();
   return CLR_DEF[k];
 }
+const clrH2R = h => [1,3,5].map(i => parseInt(h.slice(i, i + 2), 16));
+const clrR2H = a => "#" + a.map(n => Math.max(0, Math.min(255, Math.round(n) || 0)).toString(16).padStart(2, "0")).join("");
+const clrLum = h => clrH2R(h).reduce((s, v, i) => { v /= 255; v = v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); return s + v * [.2126, .7152, .0722][i]; }, 0);
+const clrRatio = (x, y) => { const p = clrLum(x), q = clrLum(y); return (Math.max(p, q) + .05) / (Math.min(p, q) + .05); };
+let clrOpen = -1, clrA = null;
+function clrSet(k, hex){ setS({cc:Object.assign({}, S.cc, {[k]:hex.toLowerCase()})}); }
 function clrBuild(){
   const pre = $("clrPre"), rows = $("clrRows");
   if(pre.childElementCount) return;
   CLR_PRE.forEach((p, i) => {
     const b = document.createElement("button"); b.type = "button"; b.className = "csw"; b.dataset.i = i;
-    b.style.background = "linear-gradient(135deg," + p[0] + " 50%," + p[1] + " 50%)"; pre.appendChild(b);
+    b.innerHTML = '<span class="cbar"></span><span class="cnm"></span>';
+    b.firstChild.style.background = "linear-gradient(90deg," + p[0] + " 50%," + p[1] + " 50%)"; pre.appendChild(b);
   });
   CLR_KEYS.forEach(k => {
-    const r = document.createElement("label"); r.className = "crow";
-    r.innerHTML = '<span></span><input type="color" data-k="' + k + '">'; rows.appendChild(r);
+    const r = document.createElement("div"); r.className = "crow"; r.dataset.k = k; r.dataset.o = "0";
+    r.innerHTML = '<button class="chd" type="button" aria-expanded="false"><span class="csq"></span><span class="ctx"><b></b><small></small></span></button>' +
+      '<div class="cbody"><p class="chn"></p>' +
+      ["r","g","b"].map((c, j) => '<div class="cch"><span>' + c.toUpperCase() + '</span><input class="' + c + '" type="range" min="0" max="255" step="1" data-c="' + j + '" aria-label="' + c.toUpperCase() + '"><input type="number" min="0" max="255" step="1" inputmode="numeric" data-c="' + j + '" aria-label="' + c.toUpperCase() + '"></div>').join("") +
+      '<div class="chx"><span>HEX</span><input class="hx" type="text" maxlength="7" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="HEX"><input class="cp" type="color"></div></div>';
+    rows.appendChild(r);
   });
 }
 function paintClr(A){
-  clrBuild();
+  clrA = A; clrBuild();
   $("lbClr").textContent = A.clr; $("lbClrSub").textContent = A.clrSub; $("lbPre").textContent = A.pre;
+  $("cvT").textContent = A.cvT; $("cvB").textContent = A.cvB; $("cvC").textContent = A.cvC;
   $("clrPre").querySelectorAll(".csw").forEach((b, i) => {
-    b.setAttribute("aria-label", A.presets[i]); b.title = A.presets[i];
+    b.lastChild.textContent = A.presets[i]; b.title = A.presets[i];
     b.setAttribute("aria-pressed", String(!!S.cc.frame && S.cc.frame === CLR_PRE[i][0] && S.cc.title === CLR_PRE[i][1]));
   });
+  const act = document.activeElement;
   $("clrRows").querySelectorAll(".crow").forEach((r, i) => {
-    r.firstChild.textContent = A.rows[i];
-    const inp = r.lastChild, v = clrNow(inp.dataset.k);
-    if(inp.value !== v && document.activeElement !== inp) inp.value = v;
+    const k = r.dataset.k, v = clrNow(k), c = clrH2R(v), open = clrOpen === i;
+    r.dataset.o = open ? "1" : "0"; r.firstChild.setAttribute("aria-expanded", String(open));
+    r.style.setProperty("--r", c[0]); r.style.setProperty("--g", c[1]); r.style.setProperty("--b", c[2]);
+    r.querySelector(".csq").style.setProperty("--c", v);
+    r.querySelector(".ctx b").textContent = A.rows[i];
+    r.querySelector(".ctx small").textContent = "rgb(" + c.join(", ") + ")";
+    r.querySelector(".chn").textContent = A.hints[i];
+    r.querySelectorAll("input[data-c]").forEach(inp => { if(inp !== act) inp.value = c[+inp.dataset.c]; });
+    const hx = r.querySelector(".hx"); if(hx !== act){ hx.value = v.toUpperCase(); hx.removeAttribute("aria-invalid"); }
+    const cp = r.querySelector(".cp"); cp.setAttribute("aria-label", A.pick); if(cp !== act) cp.value = v;
   });
+  const rt = clrRatio(clrNow("text"), clrNow("card")), rh = clrRatio(clrNow("title"), clrNow("card")), ok = rt >= 4.5 && rh >= 3;
+  const ck = $("cvChk"); ck.dataset.s = ok ? "ok" : "low";
+  ck.textContent = (ok ? A.ckOk : A.ckLow) + " (" + rt.toFixed(1).replace(".", S.lang === "en" ? "." : ",") + ":1)";
   $("clrReset").innerHTML = PIC.reset + "<span>" + A.rst + "</span>";
   $("clrReset").disabled = !Object.keys(S.cc).length;
 }
@@ -2429,9 +2613,24 @@ $("clrPre").addEventListener("click", e => {
   const b = e.target.closest(".csw"); if(!b) return; const p = CLR_PRE[+b.dataset.i];
   setS({cc:Object.assign({}, S.cc, {frame:p[0], title:p[1]})});
 });
+$("clrRows").addEventListener("click", e => {
+  const h = e.target.closest(".chd"); if(!h) return;
+  const i = CLR_KEYS.indexOf(h.parentElement.dataset.k); clrOpen = clrOpen === i ? -1 : i; paintClr(clrA);
+});
 $("clrRows").addEventListener("input", e => {
-  const inp = e.target.closest("input[type=color]"); if(!inp) return;
-  setS({cc:Object.assign({}, S.cc, {[inp.dataset.k]:inp.value.toLowerCase()})});
+  const inp = e.target, row = inp.closest(".crow"); if(!row) return; const k = row.dataset.k;
+  if(inp.dataset.c !== undefined){
+    const v = inp.value.trim(); if(v === "" || !/^\d{1,3}$/.test(v)) return;
+    const c = clrH2R(clrNow(k)); c[+inp.dataset.c] = Math.min(255, +v); clrSet(k, clrR2H(c));
+  } else if(inp.classList.contains("hx")){
+    const m = /^#?([0-9a-f]{6})$/i.exec(inp.value.trim());
+    if(m){ inp.removeAttribute("aria-invalid"); clrSet(k, "#" + m[1]); } else inp.setAttribute("aria-invalid", String(inp.value.length > 0));
+  } else if(inp.type === "color") clrSet(k, inp.value);
+});
+$("clrRows").addEventListener("change", e => {
+  const inp = e.target, row = inp.closest(".crow"); if(!row) return; const v = clrNow(row.dataset.k);
+  if(inp.dataset.c !== undefined) inp.value = clrH2R(v)[+inp.dataset.c];
+  else if(inp.classList.contains("hx")){ inp.value = v.toUpperCase(); inp.removeAttribute("aria-invalid"); }
 });
 $("clrReset").addEventListener("click", () => setS({cc:{}}));
 $("svLook").addEventListener("click", e => { const b = e.target.closest(".sg"); if(!b) return; const k = b.parentElement.dataset.k; setS({[k]: k === "fsize" ? +b.dataset.v : b.dataset.v}); });
@@ -4350,6 +4549,37 @@ $("back").addEventListener("click", () => {
   history.replaceState(null, "", location.pathname + location.search);
   closeMenu();
 });
+/* ===== LINK TURNAMEN: https://satutitik.web.app/?turnamen=KODE =====
+   Link dari WA/Telegram dsb. Kodenya dititipkan di localStorage (st_tt_link), lalu menu Turnamen dibuka. Menu Turnamen yang
+   memprosesnya setelah akun siap (ikuti bila perlu, lalu langsung membuka turnamennya). Web/PWA: parameter dibaca saat halaman
+   dimuat. Android (Capacitor): lewat plugin App (appUrlOpen + getLaunchUrl), perlu intent-filter App Links di AndroidManifest. */
+const TT_LINK_KEY = "st_tt_link", TT_LINK_HOST = "satutitik.web.app";
+let ttLinkLast = { c:"", t:0 };
+function ttLinkTake(url){
+  try{
+    const u = new URL(String(url || ""), "https://" + TT_LINK_HOST + "/");
+    if(u.hostname !== TT_LINK_HOST && u.hostname !== "aurenza27.github.io" && u.hostname !== location.hostname) return false;   /* host lama tetap diterima */
+    const c = (u.searchParams.get("turnamen") || "").trim().toLowerCase();
+    if(!/^[a-z0-9]{6,20}$/.test(c)) return false;
+    if(ttLinkLast.c === c && Date.now() - ttLinkLast.t < 4000) return true;   /* getLaunchUrl dan appUrlOpen bisa datang dua-duanya */
+    ttLinkLast = { c, t:Date.now() };
+    localStorage.setItem(TT_LINK_KEY, JSON.stringify({ code:c, at:Date.now() }));
+    return true;
+  }catch(e){ return false; }
+}
+if(ttLinkTake(location.href)){
+  try{ const u = new URL(location.href); u.searchParams.delete("turnamen"); history.replaceState(null, "", u.pathname + u.search + "#turnamen"); }catch(e){ location.hash = "turnamen"; }
+}
+(function(){
+  try{
+    const C = window.Capacitor; if(!C || !(C.isNativePlatform && C.isNativePlatform())) return;
+    const A = (C.Plugins && C.Plugins.App) || (C.registerPlugin ? C.registerPlugin("App") : null);
+    if(!A) return;
+    const got = u => { if(ttLinkTake(u)) location.hash = "turnamen"; };
+    if(A.addListener) A.addListener("appUrlOpen", e => got(e && e.url));
+    if(A.getLaunchUrl) A.getLaunchUrl().then(r => { if(r && r.url) got(r.url); }).catch(() => {});
+  }catch(e){ console.warn("link turnamen gagal dipasang:", e && (e.message || e)); }
+})();
 addEventListener("hashchange", route);
 /* blok sumber menu ada di bawah skrip ini; tunggu dokumen selesai dibaca agar reload di #menu tidak gagal */
 if(document.readyState === "loading") addEventListener("DOMContentLoaded", route); else route();
@@ -13533,6 +13763,20 @@ window.__ttFollowed = async function(oid){
     try{ const mm = $("main"); if(mm && mm.animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) mm.animate([{opacity:0, transform:"translateY(12px)"}, {opacity:1, transform:"none"}], {duration:340, easing:"cubic-bezier(.22,.7,.2,1)"}); }catch(e){}
   }catch(e){}
 };
+/* ----- link turnamen dari luar (WA, Telegram, dsb.): Beranda menitipkan kode di localStorage st_tt_link ----- */
+const TTL_KEY = "st_tt_link";
+function ttlGet(){ try{ const v = JSON.parse(localStorage.getItem(TTL_KEY) || "null"); if(v && typeof v.code === "string" && Date.now() - (+v.at || 0) < 1800000) return v; localStorage.removeItem(TTL_KEY); }catch(e){} return null; }
+function ttlClear(){ try{ localStorage.removeItem(TTL_KEY); }catch(e){} }
+async function ttlOpen(code){      /* ikuti bila belum (turnamen sendiri, moderator, dan yang sudah diikuti dilewati), lalu buka Beranda turnamennya */
+  const own = db.list.find(x => x.oid === code && vis(x));
+  if(own) curId = own.id;
+  else {
+    if(!REM[code] && !await followCode(code)) return false;
+    if(!REM[code]) return false;
+    curId = "r:" + code;
+  }
+  tab = "home"; view = "detail"; paint(); toTop(); return true;
+}
 window.__stInvite = async function(kind, fr){
   const t = cur(); if(!t || !t.oid || roleOf() !== "admin") throw new Error("e_noctx");
   if(fr.acc === ON.accountId()) throw new Error("e_invself");
@@ -13580,10 +13824,27 @@ function lockRO(box){
 }
 const mkBtn = (txt, cls, fn) => { const b = el("button", cls, txt); b.type = "button"; b.onclick = fn; return b; };
 const loginBtn = p => p.append(mkBtn(L("Masuk akun", "Sign in"), "btn sm keep", () => { const A = ON.A(); if(A && A.login) A.login(); else toast(L("Buka dari Beranda untuk masuk.", "Open from Home to sign in.")); }));
-function shareCode(t){
-  const msg = L("Ikuti turnamen \"" + t.name + "\" di Satu Titik. Menu Turnamen > Ikuti, kode: " + t.oid, "Follow the tournament \"" + t.name + "\" on Satu Titik. Tournament menu > Follow, code: " + t.oid);
-  if(navigator.share){ navigator.share({text:msg}).catch(() => {}); return; }
-  try{ navigator.clipboard.writeText(msg).then(() => toast(L("Pesan undangan disalin.", "Invite message copied."))); }catch(e){ toast(t.oid); }
+const TT_BASE = "https://satutitik.web.app/";
+const ttLink = oid => TT_BASE + "?turnamen=" + encodeURIComponent(oid);
+const ttMsg = t => L("Ikuti turnamen \"" + t.name + "\" secara langsung di Satu Titik. Buka link ini:\n" + ttLink(t.oid) + "\n\nAtau masukkan kode: " + t.oid, "Follow the tournament \"" + t.name + "\" live on Satu Titik. Open this link:\n" + ttLink(t.oid) + "\n\nOr enter the code: " + t.oid);
+function copyText(txt, okMsg){
+  try{ navigator.clipboard.writeText(txt).then(() => toast(okMsg), () => toast(txt)); }catch(e){ toast(txt); }
+}
+async function shareText(title, text){      /* true bila lembar bagikan terbuka atau dibatalkan pengguna */
+  try{
+    const C = (window.parent && window.parent.Capacitor) || window.Capacitor;
+    if(C && C.isNativePlatform && C.isNativePlatform()){
+      const SH = (C.Plugins && C.Plugins.Share) || (C.registerPlugin ? C.registerPlugin("Share") : null);
+      if(SH && SH.share){ await SH.share({ title, text, dialogTitle:title }); return true; }
+    }
+  }catch(e){ if(/cancel|dismiss/i.test(String((e && e.message) || e))) return true; }
+  try{ if(navigator.share){ await navigator.share({ title, text }); return true; } }catch(e){ if(e && e.name === "AbortError") return true; }
+  return false;
+}
+async function shareCode(t){
+  const msg = ttMsg(t);
+  if(await shareText(t.name || "Turnamen", msg)) return;
+  copyText(msg, L("Pesan undangan beserta link disalin.", "Invite message with the link copied."));
 }
 function paintOnline(box, t){
   const u = ON.user(), r = remOf(), role = roleOf(), p = el("div", "panel stack keep");
@@ -13606,8 +13867,10 @@ function paintOnline(box, t){
     { const A1 = ON.A(), un = A1 && A1.username && A1.usernameUid === (ON.user() || {}).uid ? A1.username : "";
       const dgx = el("p", "hint", L("Nama admin yang dilihat pengikut: ", "Admin name shown to followers: ") + (t.adm || L("(belum terkirim)", "(not sent yet)")) + " · " + L("username terdeteksi: ", "username detected: ") + (un || L("TIDAK", "NO")) + " · [" + ONVER + "]"); dgx.hidden = true; p.append(dgx); /* disembunyikan */ }
     const code = el("div", "code", t.oid); p.append(el("span", "label", L("KODE TURNAMEN", "TOURNAMENT CODE")), code);
-    const row = el("div", "row"); row.append(mkBtn(L("Salin kode", "Copy code"), "btn ghost sm grow", () => { try{ navigator.clipboard.writeText(t.oid).then(() => toast(L("Kode disalin.", "Code copied."))); }catch(e){ toast(t.oid); } }), mkBtn(L("Bagikan undangan", "Share invite"), "btn ghost sm grow", () => shareCode(t)));
+    const row = el("div", "row"); row.append(mkBtn(L("Salin kode", "Copy code"), "btn ghost sm grow", () => copyText(t.oid, L("Kode disalin.", "Code copied."))), mkBtn(L("Salin link", "Copy link"), "btn ghost sm grow", () => copyText(ttLink(t.oid), L("Link disalin.", "Link copied."))));
     p.append(row);
+    const row2 = el("div", "row"); row2.append(mkBtn(L("Bagikan link turnamen", "Share tournament link"), "btn sm grow", () => shareCode(t)));
+    p.append(row2);
     const fc = el("p", "hint", L("Pengikut: ", "Followers: ") + (ON.counts[t.oid] === undefined ? "…" : ON.counts[t.oid])); p.append(fc);
     ON.lib().then(({m, db:f}) => m.getCountFromServer(m.collection(f, "tournaments", t.oid, "followers"))).then(c => { ON.counts[t.oid] = c.data().count; fc.textContent = L("Pengikut: ", "Followers: ") + ON.counts[t.oid]; }).catch(() => {});
     { const fl = el("div", "stack"); fl.hidden = true;
@@ -13865,7 +14128,7 @@ function fillAct(){
     const fb = el("button", "hm-follow" + (HS.following ? " on" : "")); fb.type = "button"; fb.disabled = HS.following === null || HS.fBusy;
     fb.textContent = HS.following === null ? "…" : HS.following ? L("✓ Mengikuti", "✓ Following") : L("＋ Ikuti turnamen", "＋ Follow tournament");
     if(HS.following) fb.setAttribute("aria-label", L("Mengikuti. Ketuk untuk berhenti mengikuti", "Following. Tap to unfollow"));
-    fb.onclick = () => toggleFollow(t); fr.append(fb);
+    fb.onclick = () => toggleFollow(t); fr.append(fb, mkBtn(L("Bagikan", "Share"), "btn ghost sm", () => shareCode(t)));
   }
   box.append(fr);
   if(HS.following) box.append(el("small", "hm-sm", L("Ketuk tombol di atas untuk berhenti mengikuti.", "Tap the button above to unfollow.")));
@@ -14769,6 +15032,7 @@ function rlOpen(){
 
 function tutMaybe(){       /* otomatis hanya untuk pengguna baru: belum pernah melihat panduan dan belum punya turnamen */
   if(load("tut", false) === true) return;
+  if(ttlGet()) return;      /* dibuka lewat link turnamen: langsung ke turnamennya, tanpa panduan */
   if(db.list.some(vis)){ save("tut", true); return; }
   setTimeout(() => { if(!TUT.s && view === "list" && !db.list.some(vis)) tutOpen(true); }, 600);
 }
@@ -14776,6 +15040,27 @@ function tutMaybe(){       /* otomatis hanya untuk pengguna baru: belum pernah m
 $("langBtn").addEventListener("click", () => { lang = lang === "id" ? "en" : "id"; save("lang", lang); paint(); tutRender(); rlRender(); });
 musicSync();
 paint();
+/* pemantau link turnamen: baru bekerja setelah menu selesai dimuat dan akun siap; gagal 3 kali = kode dibuang */
+let ttlBusy = false, ttlTry = 0, ttlAsked = "";
+(function ttlPoll(){
+  try{
+    const v = ttlGet();
+    if(v && document.readyState === "complete" && !ON.busy && !(typeof TUT !== "undefined" && TUT.s)){
+      const A = ON.A();
+      if(!ON.user()){
+        if(A && A.ready && Date.now() - (+v.at || 0) > 4000 && ttlAsked !== v.code){
+          ttlAsked = v.code;
+          ask(L("Kamu membuka link turnamen. Masuk akun dulu agar turnamennya bisa dibuka.", "You opened a tournament link. Sign in first so it can be opened."), {title:L("Buka turnamen", "Open tournament"), yes:L("Masuk akun", "Sign in"), danger:false}).then(ok => { if(ok && A.login) A.login(); });
+        }
+      } else if(!ttlBusy){
+        ttlBusy = true;
+        const fail = () => { if(++ttlTry >= 3){ ttlClear(); ttlTry = 0; } };
+        ttlOpen(v.code).then(ok => { if(ok){ ttlClear(); ttlTry = 0; } else fail(); }, fail).then(() => { ttlBusy = false; });
+      }
+    }
+  }catch(e){}
+  setTimeout(ttlPoll, 800);
+})();
 try{ tutMaybe(); }catch(e){}
 try{ startOnline(); }catch(e){}
 </scr@@ipt>
@@ -28806,7 +29091,7 @@ if(navigator.onLine !== false) init().catch(() => {});
       pv.appendChild(db);
       /* tautan panduan hapus akun (halaman publik di situs) */
       const hl = mk("a", "dhelp", lang() === "en" ? "Need help? See the delete account guide" : "Butuh bantuan? Lihat panduan hapus akun");
-      hl.href = "https://aurenza27.github.io/hapus-akun.html"; hl.target = "_blank"; hl.rel = "noopener noreferrer";
+      hl.href = "https://satutitik.web.app/hapus-akun.html"; hl.target = "_blank"; hl.rel = "noopener noreferrer";
       hl.style.cssText = "display:block;margin:10px 0 0;padding:6px 4px;text-align:center;font-size:13px;color:var(--muted,#a3a9b8);text-decoration:underline;text-underline-offset:3px";
       pv.appendChild(hl);
     } else {
@@ -30237,8 +30522,8 @@ var STEPS = [
     d:L("Mematikan notifikasi pesan dari semua teman saat aplikasi di latar belakang atau HP terkunci. Pesan tetap masuk. Perlu internet untuk mengubahnya. Mau senyapkan satu teman saja? Ketuk nama temannya di panel Teman.",
         "Turns off notifications for messages from all friends while the app is in the background or the phone is locked. Messages still arrive. Internet is needed to change this. Want to mute just one friend? Tap their name in the Friends panel.") },
   { st:"s:look", q:"#svLook", t:L("Tampilan", "Appearance"),
-    d:L("<b>Tema</b>: Biru malam, Hitam pekat, Kabut asap, Kabut laut, Langit berbintang, atau Asap sinematik. <b>Ukuran huruf</b>: Kecil, Sedang, Besar. <b>Mode font</b>: Serif klasik atau Sans-serif. Berlaku di beranda dan semua menu.",
-        "<b>Theme</b>: Midnight blue, Pure black, Smoke, Sea fog, Starry sky, or Cinematic smoke. <b>Font size</b>: Small, Medium, Large. <b>Font mode</b>: Classic serif or Sans-serif. Applies to the home screen and every menu.") },
+    d:L("<b>Tema</b>: Biru malam, Hitam pekat, Kabut asap, Kabut laut, Langit berbintang, atau Asap sinematik. <b>Ukuran huruf</b>: Kecil, Sedang, Besar. <b>Mode font</b>: Serif klasik, Sans-serif, Humanis, Netral, Buku, Elegan, atau Teknis. Tiap bagian bisa dibuka dan dilipat. Berlaku di beranda dan semua menu.",
+        "<b>Theme</b>: Midnight blue, Pure black, Smoke, Sea fog, Starry sky, or Cinematic smoke. <b>Font size</b>: Small, Medium, Large. <b>Font mode</b>: Classic serif, Sans-serif, Humanist, Neutral, Book, Elegant, or Technical. Each section can be opened and collapsed. Applies to the home screen and every menu.") },
   { st:"s:lang", q:"#sbLang", t:L("Bahasa", "Language"),
     d:L("Ketuk untuk berganti antara <b>Indonesia</b> dan <b>English</b>. Beranda dan semua menu ikut berganti bahasa.",
         "Tap to switch between <b>Indonesia</b> and <b>English</b>. The home screen and every menu follow.") },
