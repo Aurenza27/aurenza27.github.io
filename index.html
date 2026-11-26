@@ -1425,9 +1425,6 @@ const INFO_ITEMS = [
   { date:"2026-11-25", icon:"sparkle",
     title:{id:"Tantangan Antarteman di menu Olahraga", en:"Friends Challenge in the Exercise menu"},
     text:{id:"Adu olahraga mingguan atau bulanan dengan temanmu: pasang target, pantau progres, dan lihat papan peringkatnya di tab Teman.", en:"Compete weekly or monthly with your friends: set a target, track your progress, and see the leaderboard in the Friends tab."} },
-  { date:"2026-11-24", icon:"star",
-    title:{id:"Fitur Unggulan kini bisa kamu ubah", en:"Featured menus are now yours to change"},
-    text:{id:"Ketuk ikon pensil di Fitur Unggulan untuk memilih sampai 3 menu pintasanmu sendiri.", en:"Tap the pencil icon in Featured to pick up to 3 shortcut menus of your own."} },
   { date:"2026-11-20", icon:"megaphone",
     title:{id:"Satu Titik Kini Lebih Lengkap!", en:"Satu Titik Is Now More Complete!"},
     text:{id:"Nikmati pengalaman baru dengan 18 menu dalam satu aplikasi.", en:"Enjoy a fresh experience with 18 menus in one app."} },
@@ -2429,7 +2426,7 @@ $("abBack").addEventListener("click", closeAbout);
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("about").hidden) closeAbout(); });
 /* ===== Kebijakan Privasi: halaman penuh seperti Tentang, dibuka dari tulisan di kaki beranda ===== */
 const PV = {
-  id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 25 November 2026", back:"‹ Beranda", secs:[
+  id:{ t:"Kebijakan Privasi", sub:"Satu Titik", upd:"Terakhir diperbarui: 26 November 2026", back:"‹ Beranda", secs:[
     {h:"1. Pendahuluan", p:["Satu Titik adalah aplikasi yang dikembangkan oleh Aurenza27 (“kami”). Kebijakan ini menjelaskan data apa yang diproses, untuk apa, dan pilihan yang kamu miliki saat memakai aplikasi ini. Aurenza27 bertindak sebagai pengendali data pribadi untuk aplikasi ini. Kami memproses datamu atas dasar persetujuanmu dan untuk menjalankan fitur yang kamu pilih, sesuai peraturan perlindungan data pribadi yang berlaku di Indonesia, termasuk Undang-Undang Pelindungan Data Pribadi (UU PDP). Dengan memakai aplikasi, kamu menyetujui kebijakan ini."]},
     {h:"2. Data yang kami proses", p:["Tanpa masuk akun:"], l:["Pengaturan, riwayat, dan hasil menu (misalnya nama dan tanggal lahir yang kamu ketik, data BMI dan kehamilan, data turnamen, serta aktivitas olahraga beserta rute GPS yang kamu rekam di menu Olahraga) disimpan di perangkatmu sendiri.","Data ini tidak dikirim ke server kami selama kamu tidak masuk akun."]},
     {p:["Lokasi (menu Olahraga):"], l:["Lokasi GPS hanya dibaca saat kamu menekan Mulai di menu Olahraga, termasuk ketika layar terkunci atau aplikasi berada di latar belakang (notifikasi tampil selama merekam), dan berhenti saat kamu menjeda, menyelesaikan, atau menutup menu. Izin lokasi diminta oleh perangkatmu dan bisa kamu cabut kapan saja.","Jumlah langkah dibaca dari sensor langkah HP (izin Aktivitas Fisik) hanya saat merekam di aplikasi Android, dan hanya dipakai untuk memeriksa kewajaran jarak. Angkanya tidak ditampilkan atau disimpan di riwayat aktivitas.","Rute disimpan di perangkatmu sebagai bagian riwayat aktivitas. Rute ikut tersalin ke akunmu hanya bila kamu masuk akun dan sinkronisasi aktif.","Impor GPX/TCX (opsional): kamu memilih sendiri file latihan dari perangkatmu, misalnya hasil ekspor dari jam olahraga atau aplikasi olahraga lain. File dibaca dan diproses di perangkat, tidak diunggah ke server, dan salinan filenya tidak disimpan. Yang tersimpan hanya aktivitas hasil impor (rute, waktu, jarak, dan untuk Hiking, ketinggian) di riwayat aktivitas, diperlakukan sama seperti rute hasil rekamanmu. Data detak jantung di dalam file tidak dibaca.","Pusat Kesehatan Perangkat / Health Connect (opsional, hanya aplikasi Android): hanya saat kamu menekan Impor dari Pusat Kesehatan Perangkat dan memberi izin, aplikasi membaca latihan lari, jalan, sepeda, dan hiking dari 30 hari terakhir (jenis, judul, waktu mulai dan selesai, serta rute GPS). Rute buatan aplikasi lain memerlukan persetujuanmu satu per satu lewat dialog sistem. Aplikasi hanya membaca dan tidak menulis ke Pusat Kesehatan Perangkat; aplikasi tidak membaca detak jantung, langkah, tidur, atau data kesehatan lain, dan tidak membaca di latar belakang. Data yang diimpor disimpan sebagai riwayat aktivitas di perangkatmu dan ikut tersalin ke akunmu hanya bila kamu masuk akun dan sinkronisasi aktif. Data dari Pusat Kesehatan Perangkat tidak dijual, tidak dipakai untuk iklan, dan tidak dibagikan kepada pihak lain selain penyimpanan akun cloud yang dijelaskan di sini. Kamu bisa mencabut izin kapan saja lewat pengaturan Pusat Kesehatan Perangkat atau pengaturan aplikasi, dan menghapus aktivitas hasil impor dari riwayat."]},
@@ -2450,7 +2447,7 @@ const PV = {
     {p:["Kotak Saran:"], l:["Pesan yang kamu tulis dikirim ke pengelola lewat layanan formulir pihak ketiga. Tidak perlu masuk akun, dan sebaiknya jangan menulis data pribadi yang sensitif. Bila sedang offline, pesan disimpan sementara di perangkatmu sampai berhasil terkirim."]},
     {p:["Pengecekan koneksi dan waktu:"], l:["Aplikasi mengirim permintaan sederhana ke server publik (beberapa penyedia layanan waktu dan jaringan) untuk mengecek koneksi internet dan jam. Permintaan ini tidak berisi data pribadimu, tetapi seperti permintaan internet lainnya, alamat IP perangkat terlihat oleh server tersebut."]},
     {p:["Iklan (aplikasi Android):"], l:["Aplikasi Android (APK maupun Google Play) menampilkan iklan banner dan iklan layar penuh dari Google AdMob. Versi web tidak menampilkan iklan.","Jaringan iklan dapat memproses ID iklan perangkat, alamat IP, jenis perangkat, dan interaksi dengan iklan untuk menampilkan serta mengukur iklan. Pada wilayah yang mewajibkan, kamu akan diminta persetujuan terlebih dahulu.","Kamu dapat mengatur atau mereset ID iklan, dan membatasi personalisasi iklan, lewat pengaturan perangkat."]},
-    {p:["Fitur beranda (Fitur Unggulan, Terakhir Digunakan, Rekomendasi Hari Ini, Informasi & Pembaruan, dan Konten Sponsor):"], l:["Fitur Unggulan dan Terakhir Digunakan: pilihan menu pintasanmu serta daftar sampai 10 menu yang terakhir kamu buka beserta waktu bukanya disimpan di perangkatmu. Data ini tidak dipakai untuk iklan atau profiling. Bila kamu masuk akun dan sinkronisasi aktif, data ini ikut tersalin ke akunmu dan masuk ke file Cadangkan data seperti data menu lain. Kamu bisa menghapusnya dengan menghapus data aplikasi atau browser.","Rekomendasi Hari Ini: menu pilihan berganti setiap hari menurut tanggal dan dihitung di perangkatmu tanpa internet. Pilihannya sama untuk semua pengguna dan tidak memakai data pribadimu.","Informasi & Pembaruan: pengumuman dari pengembang dibaca dari server kami (layanan basis data cloud), dan salinan terakhirnya disimpan di perangkatmu agar bisa dibaca saat offline. Salinan ini tidak ikut tersalin ke akun maupun file cadangan. Akun pengembang resmi diberi tanda centang biru; untuk itu ID Akun dan UID akun pengembang disimpan di daftar publik. Alamat emailnya tidak ditampilkan.","Konten Sponsor: promosi yang dipasang langsung oleh pihak ketiga (bukan dari Google AdMob) dibaca dari server kami beserta gambarnya, lalu disimpan di perangkatmu. Konten ini diberi label Bersponsor. Bila Satu Titik secara terbuka mendukung suatu produk, hal itu dinyatakan jelas pada kartunya; tanpa pernyataan itu, label Bersponsor berarti bukan rekomendasi kami. Kami tidak melacak klik dan tidak mengirim data pribadimu ke sponsor. Tautan baru dibuka di browser setelah kamu mengetuk tombolnya, dan sejak itu berlaku kebijakan privasi situs tujuan. Tombol Kerja Sama membuka aplikasi emailmu ke alamat kontak kami; tidak ada yang terkirim kecuali kamu sendiri yang mengirim emailnya."]},
+    {p:["Fitur beranda (Fitur Unggulan, Terakhir Digunakan, Rekomendasi Hari Ini, Informasi & Pembaruan, dan Konten Sponsor):"], l:["Fitur Unggulan: berisi menu pilihan pengembang, sama untuk semua pengguna. Untuk menentukan menu itu, bila kamu masuk akun, aplikasi mengirim hitungan berapa kali tiap menu kamu buka (hanya nama menu dan jumlahnya, tanpa isi atau data yang kamu masukkan di menu) paling banyak sekali sehari ke server. Hitungan dikelompokkan per bulan menurut waktu server (WIB) dan yang tersimpan hanya hitungan bulan berjalan. Hitungan ini hanya dapat dibaca akun pengembang, dilihat sebagai jumlah gabungan semua pengguna, tidak dipakai untuk iklan atau profiling, dan dihapus saat kamu menghapus akun atau memakai Reset data. Tiap awal bulan, server menjumlahkannya menjadi rekap gabungan tanpa identitas pengguna untuk memperbarui Fitur Unggulan, lalu hitungan per pengguna bulan sebelumnya dihapus, dan rekap gabungan itu dihapus otomatis setelah 3 bulan. Terakhir Digunakan: daftar sampai 10 menu yang terakhir kamu buka beserta waktu bukanya disimpan di perangkatmu. Data ini tidak dipakai untuk iklan atau profiling. Bila kamu masuk akun dan sinkronisasi aktif, data ini ikut tersalin ke akunmu dan masuk ke file Cadangkan data seperti data menu lain. Kamu bisa menghapusnya dengan menghapus data aplikasi atau browser.","Rekomendasi Hari Ini: menu pilihan berganti setiap hari menurut tanggal dan dihitung di perangkatmu tanpa internet. Pilihannya sama untuk semua pengguna dan tidak memakai data pribadimu.","Informasi & Pembaruan: pengumuman dari pengembang dibaca dari server kami (layanan basis data cloud), dan salinan terakhirnya disimpan di perangkatmu agar bisa dibaca saat offline. Salinan ini tidak ikut tersalin ke akun maupun file cadangan. Akun pengembang resmi diberi tanda centang biru; untuk itu ID Akun dan UID akun pengembang disimpan di daftar publik. Alamat emailnya tidak ditampilkan.","Konten Sponsor: promosi yang dipasang langsung oleh pihak ketiga (bukan dari Google AdMob) dibaca dari server kami beserta gambarnya, lalu disimpan di perangkatmu. Konten ini diberi label Bersponsor. Bila Satu Titik secara terbuka mendukung suatu produk, hal itu dinyatakan jelas pada kartunya; tanpa pernyataan itu, label Bersponsor berarti bukan rekomendasi kami. Kami tidak melacak klik dan tidak mengirim data pribadimu ke sponsor. Tautan baru dibuka di browser setelah kamu mengetuk tombolnya, dan sejak itu berlaku kebijakan privasi situs tujuan. Tombol Kerja Sama membuka aplikasi emailmu ke alamat kontak kami; tidak ada yang terkirim kecuali kamu sendiri yang mengirim emailnya."]},
     {h:"3. Untuk apa data dipakai", l:["Menjalankan fitur aplikasi dan menampilkan hasil menu.","Memungkinkan masuk akun, sinkronisasi data, dan fitur turnamen online (undangan moderator memakai ID Akun).","Menampilkan profilmu, serta menerima dan membaca saran dari pengguna.","Menampilkan iklan di aplikasi Android, sebagai sumber pendanaan pengembangan."], p:["Kami tidak menjual data pribadimu. Kami juga tidak membagikan data akun, username, atau hasil menumu kepada pengiklan. Kami hanya mengungkapkan data bila diwajibkan oleh hukum atau perintah pihak berwenang yang sah."]},
     {h:"4. Layanan pihak ketiga", l:["Layanan akun dan basis data cloud (autentikasi dan penyimpanan data akun): untuk masuk akun dan menyimpan data akun.","Layanan formulir pihak ketiga: untuk mengirim pesan dari Kotak Saran.","Layanan notifikasi push dan server pengirim notifikasi: untuk mengirim notifikasi push (hanya aplikasi Android).","Pusat Kesehatan Perangkat / Health Connect (hanya aplikasi Android): sumber data impor latihan yang kamu izinkan; dibaca di perangkat dan tidak dikirim ke layanan lain.",...(SHOW_DUKUNG ? ["Layanan donasi: tautan Dukung Kami (hanya di versi web) membuka halaman eksternal yang punya kebijakan privasinya sendiri."] : []),"Layanan hosting web: menyajikan versi web aplikasi; alamat IP perangkatmu terlihat oleh penyedia hosting saat kamu membuka versi web.","Server publik (penyedia layanan waktu dan jaringan): untuk pengecekan koneksi dan waktu.","Jaringan iklan (Google AdMob): hanya di aplikasi Android.","Konten sponsor langsung (mitra pihak ketiga): promosi di kartu Informasi & Pembaruan; tautannya membuka situs mitra yang punya kebijakan privasinya sendiri."], p:["Layanan-layanan ini punya kebijakan privasi sendiri yang berlaku saat data diproses oleh mereka."]},
     {h:"5. Penyimpanan dan keamanan", p:["Data lokal tersimpan di perangkatmu dan hilang bila data aplikasi atau browser dihapus. Data akun disimpan di layanan cloud dan dikirim lewat koneksi terenkripsi (HTTPS). Tidak ada metode penyimpanan atau pengiriman data yang sepenuhnya bebas risiko, jadi kami tidak dapat menjamin keamanan mutlak. Kunci menu dan Kunci Aplikasi (PIN/pola dan sidik jari) hanya mengunci tampilan, bukan enkripsi: data di perangkat dan di akunmu (termasuk Memo) tidak dienkripsi tambahan oleh aplikasi. Fitur Cadangkan data di Pengaturan membuat satu file berisi data semua menu (misalnya riwayat, catatan, keuangan, dan arisan) yang kamu simpan di perangkat atau bagikan lewat lembar Bagikan sesuai pilihanmu. File itu tidak dienkripsi, tidak berisi PIN, pola, akun, maupun pengaturan, dan menjadi tanggung jawabmu: kamu yang menentukan ke mana file disimpan atau dibagikan. Memulihkan file mengganti data di perangkat yang kuncinya sama dengan isi file dan, bila kamu masuk akun dan sinkronisasi aktif, hasilnya ikut tersalin ke akunmu. Lama penyimpanan: pesan pribadi 30 hari; chat ruangan online 24 jam (ditandai kedaluwarsa, lalu dihapus otomatis oleh server, yang bisa memerlukan waktu); data ruangan sampai host menutupnya; laporan selama diperlukan untuk keamanan; data akun sampai kamu menghapus akunmu. Di aplikasi Android, cadangan otomatis Android dinonaktifkan (data lokal tidak ikut cadangan otomatis) dan pratinjau aplikasi di Recent apps dikosongkan. Versi web menyimpan salinan aplikasi di cache browser agar bisa dibuka offline; isinya kode aplikasi, bukan data pribadimu. Server layanan cloud dan server notifikasi kami dapat berada di luar Indonesia, sehingga data akunmu dapat diproses di negara lain; kami hanya memakai penyedia yang menerapkan pengamanan standar industri."]},
@@ -2460,7 +2457,7 @@ const PV = {
     {h:"9. Perubahan kebijakan", p:["Kebijakan ini dapat diperbarui. Tanggal pembaruan terakhir tertera di bagian atas halaman ini. Perubahan penting akan diumumkan di aplikasi."]},
     {h:"10. Kontak", p:["Pertanyaan tentang privasi, permintaan penghapusan data, atau pengaduan dapat dikirim ke email di bawah ini atau lewat Kotak Saran di Pengaturan > Pusat Bantuan."]}
   ]},
-  en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 25 November 2026", back:"‹ Home", secs:[
+  en:{ t:"Privacy Policy", sub:"Satu Titik", upd:"Last updated: 26 November 2026", back:"‹ Home", secs:[
     {h:"1. Introduction", p:["Satu Titik is an app developed by Aurenza27 (“we”). This policy explains what data is processed, why, and the choices you have when using the app. Aurenza27 acts as the personal data controller for this app. We process your data based on your consent and to run the features you choose, in line with the personal data protection rules that apply in Indonesia, including the Personal Data Protection Law (UU PDP). By using the app, you agree to this policy."]},
     {h:"2. Data we process", p:["Without signing in:"], l:["Settings, history, and menu results (for example the names and birth dates you type, BMI and pregnancy data, tournament data, and the sports activities and GPS routes you record in the Sports menu) are stored on your own device.","This data is not sent to our servers unless you sign in with an account."]},
     {p:["Location (Sports menu):"], l:["GPS location is read only while you press Start in the Sports menu, including while the screen is locked or the app is in the background (a notification shows while recording), and stops when you pause, finish, or close the menu. Location permission is requested by your device and you can revoke it at any time.","The step count is read from your phone's step sensor (Physical activity permission) only while recording in the Android app, and is used only to check that the distance is plausible. It is not shown or stored in the activity history.","Routes are stored on your device as part of the activity history. They are copied to your account only if you sign in and sync is on.","GPX/TCX import (optional): you choose a workout file from your device yourself, for example one exported from a sports watch or another sports app. The file is read and processed on the device, is not uploaded to a server, and no copy of the file is kept. Only the imported activity (route, time, distance, and for Hiking, altitude) is stored in the activity history and treated like a route you recorded yourself. Heart-rate data inside the file is not read.","Device Health Hub / Health Connect (optional, Android app only): only when you press Import from Device Health Hub and grant permission, the app reads running, walking, cycling, and hiking workouts from the last 30 days (type, title, start and end time, and the GPS route). Routes created by other apps need your approval one by one through a system dialog. The app only reads and never writes to Device Health Hub; it does not read heart rate, steps, sleep, or other health data, and does not read in the background. Imported data is stored as activity history on your device and is copied to your account only if you sign in and sync is on. Device Health Hub data is not sold, not used for advertising, and not shared with anyone other than the cloud account storage described here. You can revoke the permission at any time in Device Health Hub settings or the app settings, and delete imported activities from the history."]},
@@ -2481,7 +2478,7 @@ const PV = {
     {p:["Suggestion Box:"], l:["The message you write is sent to the maintainer through a third-party form service. You do not need to sign in, and you should avoid writing sensitive personal data. While offline, the message is kept temporarily on your device until it is sent."]},
     {p:["Connection and time checks:"], l:["The app sends simple requests to public servers (several time and network service providers) to check your internet connection and the time. These requests do not contain your personal data, but as with any internet request, your device’s IP address is visible to those servers."]},
     {p:["Ads (Android app):"], l:["The Android app (APK and Google Play) shows banner and full-screen ads from Google AdMob. The web version shows no ads.","Ad networks may process the device advertising ID, IP address, device type, and your interactions with ads to serve and measure ads. Where required, you will be asked for consent first.","You can reset your advertising ID, and limit ad personalization, in your device settings."]},
-    {p:["Home features (Featured, Recently used, Today’s pick, Info & updates, and Sponsored content):"], l:["Featured and Recently used: your shortcut menus and the list of up to 10 menus you opened most recently, with the time you opened them, are stored on your device. This data is not used for ads or profiling. If you are signed in and sync is on, it is also copied to your account and included in the Back up data file like other menu data. You can delete it by clearing the app or browser data.","Today’s pick: the highlighted menu changes every day by date and is worked out on your device without internet. It is the same for every user and uses none of your personal data.","Info & updates: announcements from the developer are read from our server (the cloud database service), and the last copy is kept on your device so you can read it offline. That copy is not copied to your account or included in backups. The official developer account carries a blue check mark; for this, the developer account’s Account ID and UID are kept in a public list. The email address is not shown.","Sponsored content: promotions placed directly by third parties (not from Google AdMob) are read from our server together with their image and kept on your device. They carry a Sponsored label. If Satu Titik openly endorses a product, the card says so clearly; without such a statement, the Sponsored label means it is not our recommendation. We do not track clicks and do not send your personal data to sponsors. A link opens in your browser only after you tap its button, and from then on the destination site’s own privacy policy applies. The Partnership button opens your email app addressed to our contact; nothing is sent unless you send the email yourself."]},
+    {p:["Home features (Featured, Recently used, Today’s pick, Info & updates, and Sponsored content):"], l:["Featured: contains menus chosen by the developer, the same for all users. To choose those menus, if you are signed in, the app sends a count of how many times you opened each menu (menu name and number only, with no content or data you enter in a menu) at most once a day to a server. The counts are grouped by month using server time (WIB), and only the current month's count is kept. This count can only be read by the developer account, is viewed as a combined total of all users, is not used for ads or profiling, and is deleted when you delete your account or use Reset data. At the start of each month, the server adds the counts into a combined recap with no user identity to update Featured, then deletes the previous month's per-user counts, and that combined recap is deleted automatically after 3 months. Recently used: the list of up to 10 menus you opened most recently, with the time you opened them, is stored on your device. This data is not used for ads or profiling. If you are signed in and sync is on, it is also copied to your account and included in the Back up data file like other menu data. You can delete it by clearing the app or browser data.","Today’s pick: the highlighted menu changes every day by date and is worked out on your device without internet. It is the same for every user and uses none of your personal data.","Info & updates: announcements from the developer are read from our server (the cloud database service), and the last copy is kept on your device so you can read it offline. That copy is not copied to your account or included in backups. The official developer account carries a blue check mark; for this, the developer account’s Account ID and UID are kept in a public list. The email address is not shown.","Sponsored content: promotions placed directly by third parties (not from Google AdMob) are read from our server together with their image and kept on your device. They carry a Sponsored label. If Satu Titik openly endorses a product, the card says so clearly; without such a statement, the Sponsored label means it is not our recommendation. We do not track clicks and do not send your personal data to sponsors. A link opens in your browser only after you tap its button, and from then on the destination site’s own privacy policy applies. The Partnership button opens your email app addressed to our contact; nothing is sent unless you send the email yourself."]},
     {h:"3. How data is used", l:["To run the app’s features and show menu results.","To enable sign-in, data sync, and online tournaments (moderator invitations use the Account ID).","To show your profile, and to receive and read user suggestions.","To show ads in the Android app, as a way to fund development."], p:["We do not sell your personal data. We also do not share your account data, username, or menu results with advertisers. We disclose data only when required by law or a valid order from the authorities."]},
     {h:"4. Third-party services", l:["Account and cloud database service (authentication and account data storage): for sign-in and storing account data.","Third-party form service: to deliver messages from the Suggestion Box.","Push notification service and notification-sending server: to deliver push notifications (Android app only).","Device Health Hub / Health Connect (Android app only): the source of workout imports you allow; it is read on your device and not sent to other services.",...(SHOW_DUKUNG ? ["Donation service: the Support Us link (web version only) opens an external page with its own privacy policy."] : []),"Web hosting service: serves the web version of the app; your device’s IP address is visible to the hosting provider when you open the web version.","Public servers (time and network service providers): for connection and time checks.","Ad network (Google AdMob): Android app only.","Direct sponsored content (third-party partners): promotions in the Info & updates card; links open the partner’s site, which has its own privacy policy."], p:["These services have their own privacy policies, which apply when they process data."]},
     {h:"5. Storage and security", p:["Local data stays on your device and is lost if you clear the app or browser data. Account data is stored in a cloud service and sent over encrypted connections (HTTPS). No method of storage or transmission is completely risk-free, so we cannot guarantee absolute security. The menu lock and App Lock (PIN/pattern and fingerprint) only lock the screen and are not encryption: data on your device and in your account (including Memo) is not additionally encrypted by the app. The Back up data feature in Settings creates one file with the data of every menu (for example history, notes, finance, and arisan), which you save on your device or send through the Share sheet as you choose. That file is not encrypted and does not contain your PIN, pattern, account, or settings, and it is your responsibility: you decide where it is saved or shared. Restoring a file replaces the data on the device that has the same keys as the file and, if you are signed in and sync is on, the result is also copied to your account. Retention: private messages 30 days; online room chat 24 hours (marked to expire, then deleted automatically by the server, which can take some time); room data until the host closes the room; reports as long as needed for safety; account data until you delete your account. In the Android app, Android automatic backup is disabled (local data is not included in automatic backups) and the app preview in Recent apps is blanked. The web version keeps a copy of the app in the browser cache so it can open offline; it contains the app’s code, not your personal data. The cloud service and our notification servers may be located outside Indonesia, so your account data may be processed in other countries; we only use providers that apply industry-standard security."]},
@@ -2795,6 +2792,9 @@ async function wipeServer(A, joined){
   await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "blocks"), m.where("by", "==", uid))); await Promise.all(sn.docs.map(d => soft(() => m.deleteDoc(d.ref)))); });
   /* 2d) daftar senyap milik pengguna */
   await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "mutes"), m.where("by", "==", uid))); await Promise.all(sn.docs.map(d => soft(() => m.deleteDoc(d.ref)))); });
+  /* 2e) statistik pemakaian menu (hitungan) milik pengguna */
+  await soft(() => m.deleteDoc(m.doc(db, "menuStats", uid)));
+  try{ localStorage.removeItem("st_sync_mstat"); }catch(x){}
   /* 3) keluar dari turnamen orang lain: moderator, pengikut, suara */
   const cmtOids = new Set(joined);
   if(acc) await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "tournaments"), m.where("modIds", "array-contains", acc))); await Promise.all(sn.docs.filter(d => d.data().owner !== uid).map(d => { cmtOids.add(d.id); return soft(() => m.updateDoc(d.ref, { modIds: m.arrayRemove(acc) })); })); });
@@ -3622,6 +3622,7 @@ writeKeys(S); paintPanel();
 
 function openMenu(m){
   try{ rcAdd(m.id); }catch(e){}   /* beranda: simpan untuk kartu "Lanjutkan" */
+  try{ msCount(m.id); }catch(e){}   /* statistik pemakaian menu (hitungan saja) */
   window.satuTitikMenuOpenedAt = Date.now();   /* dipakai logika iklan: menu yang ditutup terlalu cepat tidak memicu iklan */
   $("vt").textContent = mTitle(m);
   const f = document.createElement("iframe");
@@ -3662,7 +3663,10 @@ const FAV_RK = "st_sync_fav_default";
 let FAV_REMOTE = (function(){ try{ const a = JSON.parse(localStorage.getItem(FAV_RK) || "null"); return Array.isArray(a) ? a : null; }catch(e){ return null; } })();
 function favClean(a){ return Array.isArray(a) ? a.filter((id, i) => typeof id === "string" && MENUS.some(m => m.id === id) && a.indexOf(id) === i).slice(0, FAV_MAX) : []; }
 function favDefault(){ const r = favClean(FAV_REMOTE); return r.length ? r : FAV_DEF.slice(); }
+/* Hanya akun developer yang boleh mengubah Fitur Unggulan. INFO_DEV dideklarasikan lebih bawah (let), jadi dibaca lewat try/catch. Penjagaan sebenarnya ada di aturan database (appConfig/featured: isDev). */
+function favCanEdit(){ try{ return !!INFO_DEV; }catch(e){ return false; } }
 function favIds(){
+  if(!favCanEdit()) return favDefault();   /* pengguna biasa: selalu pilihan developer */
   try{
     const raw = localStorage.getItem(FAV_KEY);
     if(raw !== null){ const a = JSON.parse(raw); if(Array.isArray(a)) return a.filter((id, i) => MENUS.some(m => m.id === id) && a.indexOf(id) === i).slice(0, FAV_MAX); }
@@ -3670,6 +3674,7 @@ function favIds(){
   return favDefault();
 }
 function favSave(a){
+  if(!favCanEdit()) return;
   try{ localStorage.setItem(FAV_KEY, JSON.stringify(a)); }catch(e){}
   try{ if(INFO_DEV) favPublish(a); }catch(e){}   /* akun developer: pilihan di beranda otomatis jadi default semua pengguna */
 }
@@ -3691,6 +3696,60 @@ async function favSync(m, db){
     FAV_REMOTE = ids; try{ localStorage.setItem(FAV_RK, JSON.stringify(ids)); }catch(e){}
     if(changed){ try{ renderFav(); }catch(e){} }
   }catch(e){}
+}
+/* ===== STATISTIK PEMAKAIAN MENU (hanya hitungan, tanpa isi atau data yang diketik di menu) =====
+   Tiap menu dibuka, hitungannya ditambah di perangkat (st_sync_mstat: awalan st_sync_ tidak ikut sinkron/cadangan).
+   Bila pengguna masuk akun, paling banyak sekali sehari seluruh hitungan dikirim ke Firestore "menuStats/{uid}" = {c:{idMenu:jumlah}, t}.
+   Hanya akun developer yang boleh membaca (aturan database); hasil dijumlahkan di lembar "Pilih Fitur Unggulan" milik developer. */
+const MS_KEY = "st_sync_mstat", MS_GAP = 24 * 3600 * 1000, MS_CAP = 2000;
+const MS_RETAIN_MONTHS = 3;   /* harus sama dengan RETAIN_MONTHS di Worker satutitik-rekap */
+function msMonth(){ let t = Date.now(); try{ if(window.stClock && window.stClock.now) t = window.stClock.now(); }catch(e){} return new Date(t + 7 * 3600000).toISOString().slice(0, 7); }   /* bulan menurut jam server, WIB (UTC+7) */
+function msLabel(mk, en){ try{ return new Date(mk + "-15T00:00:00Z").toLocaleDateString(en ? "en-US" : "id-ID", { month:"long", year:"numeric", timeZone:"UTC" }); }catch(e){ return mk; } }
+function msLoad(){
+  const mk = msMonth();
+  try{ const o = JSON.parse(localStorage.getItem(MS_KEY) || "null"); if(o && typeof o === "object" && o.c && typeof o.c === "object" && o.mk === mk) return o; }catch(e){}
+  return { c:{}, up:0, dirty:false, mk: mk };   /* ganti bulan (atau data lama tanpa bulan): hitungan mulai dari nol */
+}
+function msCount(id){
+  try{
+    if(!MENUS.some(m => m.id === id)) return;
+    const o = msLoad(); o.c[id] = Math.min(MS_CAP, (+o.c[id] || 0) + 1); o.dirty = true;
+    localStorage.setItem(MS_KEY, JSON.stringify(o));
+  }catch(e){}
+}
+async function msUpload(m, db){
+  try{
+    const A = window.satuTitikAuth; if(!A || !A.user || navigator.onLine === false) return;
+    const o = msLoad(); if(!o.dirty || Date.now() - (+o.up || 0) < MS_GAP) return;
+    const c = {}; for(const k in o.c){ if(MENUS.some(x => x.id === k) && +o.c[k] > 0) c[k] = Math.min(MS_CAP, Math.floor(+o.c[k])); }
+    if(!Object.keys(c).length) return;
+    await m.setDoc(m.doc(db, "menuStats", A.user.uid), { c: c, t: Date.now(), mk: o.mk, exp: m.Timestamp.fromMillis(Date.now() + 45 * 86400000) });
+    o.up = Date.now(); o.dirty = false; localStorage.setItem(MS_KEY, JSON.stringify(o));
+  }catch(e){}
+}
+let MS_AGG = null, MS_AGG_ERR = "", MS_AGG_LOADING = false, MS_AGG_AT = 0;
+async function msLoadAgg(force){
+  if(MS_AGG_LOADING || !favCanEdit()) return;
+  if(!force && MS_AGG && Date.now() - MS_AGG_AT < 600000) return;   /* simpan 10 menit supaya tidak membaca ulang tiap dibuka */
+  MS_AGG_LOADING = true; MS_AGG_ERR = "";
+  try{
+    const A = window.satuTitikAuth; if(!A || !A.getDb) throw new Error("belum siap");
+    const { m, db } = await A.getDb();
+    const mk = msMonth(), sn = await m.getDocs(m.query(m.collection(db, "menuStats"), m.where("mk", "==", mk), m.limit(2000)));
+    const tot = {}, usr = {}; let n = 0;
+    sn.docs.forEach(d => {
+      const c = (d.data() || {}).c; if(!c || typeof c !== "object") return; n++;
+      for(const k in c){ const v = +c[k]; if(!(v > 0) || !MENUS.some(x => x.id === k)) continue; tot[k] = (tot[k] || 0) + Math.min(MS_CAP, v); usr[k] = (usr[k] || 0) + 1; }
+    });
+    const rc = [];
+    try{
+      const rs = await m.getDocs(m.query(m.collection(db, "menuRecap"), m.orderBy("mk", "desc"), m.limit(MS_RETAIN_MONTHS)));
+      rs.docs.forEach(d => { const x = d.data() || {}; if(typeof x.mk === "string") rc.push({ mk: x.mk, n: +x.n || 0, top: Array.isArray(x.top) ? x.top : [] }); });
+    }catch(e){}
+    MS_AGG = { tot: tot, usr: usr, n: n, mk: mk, rc: rc }; MS_AGG_AT = Date.now();
+  }catch(e){ MS_AGG = null; MS_AGG_ERR = e && (e.code || e.message) ? String(e.code || e.message) : "error"; }
+  MS_AGG_LOADING = false;
+  try{ const sh = document.getElementById("favSheet"); if(sh && sh.classList.contains("on")) favList(); }catch(e){}
 }
 CATS.forEach(c => {
   const sec = document.createElement("section"), items = c.fav ? favIds().map(id => MENUS.find(m => m.id === id)).filter(Boolean) : MENUS.filter(m => m.cat === c.id).sort((a, b) => mTitle(a).localeCompare(mTitle(b), S.lang === "en" ? "en" : "id"));   /* menu tiap kategori diurutkan sesuai abjad */
@@ -3737,18 +3796,19 @@ function renderFav(){
     b.addEventListener("click", () => { location.hash = m.id; });
     grid.appendChild(b);
   });
-  for(let i = ids.length; i < FAV_MAX; i++){
+  if(favCanEdit()) for(let i = ids.length; i < FAV_MAX; i++){
     const b = document.createElement("button");
     b.type = "button"; b.className = "item empty"; b.setAttribute("aria-label", favT("edit", en));
     b.innerHTML = '<span class="plus" aria-hidden="true">+</span><span class="tx"><b>' + favT("add", en) + '</b></span>';
     b.addEventListener("click", favOpen);
     grid.appendChild(b);
   }
-  const e = $("favEdit"); if(e){ e.setAttribute("aria-label", favT("edit", en)); e.title = favT("edit", en); }
+  const e = $("favEdit"); if(e){ e.setAttribute("aria-label", favT("edit", en)); e.title = favT("edit", en); e.hidden = !favCanEdit(); e.style.display = favCanEdit() ? "" : "none"; }
   grid.querySelectorAll(".bd").forEach(x => { x.textContent = (BADGE[x.dataset.m] || BADGE_LBL)[en ? "en" : "id"]; });
 }
 let favLast = null;
 function favOpen(){
+  if(!favCanEdit()) return;
   favLast = document.activeElement;
   let sh = document.getElementById("favSheet");
   if(!sh){
@@ -3761,6 +3821,7 @@ function favOpen(){
     addEventListener("keydown", ev => { if(ev.key === "Escape" && sh.classList.contains("on")) favClose(); });
   }
   favList(); void sh.offsetWidth; sh.classList.add("on");
+  try{ msLoadAgg(); }catch(e){}
   setTimeout(() => { try{ $("fsD").focus(); }catch(e){} }, 60);
 }
 function favClose(){
@@ -3768,27 +3829,53 @@ function favClose(){
   sh.classList.remove("on"); try{ if(favLast && favLast.focus) favLast.focus(); }catch(e){}
 }
 function favList(warn){
-  const en = S.lang === "en", ids = favIds(), L = $("fsL");
-  $("fsT").textContent = favT("title", en); $("fsS").textContent = favT("sub", en);
+  const en = S.lang === "en", ids = favIds(), L = $("fsL"), dev = favCanEdit();
+  $("fsT").textContent = favT("title", en);
+  $("fsS").textContent = favT("sub", en) + (dev && MS_AGG ? " · " + MS_AGG.n + (en ? " users counted" : " pengguna dihitung") : "");
   $("fsR").textContent = favT("reset", en); $("fsD").textContent = favT("done", en);
   const cnt = $("fsC"); cnt.textContent = ids.length + " / " + FAV_MAX + (warn ? " · " + favT("max", en) : ""); cnt.classList.toggle("warn", !!warn);
   L.innerHTML = "";
+  const nf = new Intl.NumberFormat(en ? "en-US" : "id-ID");
+  const note = t => { const p = document.createElement("p"); p.style.cssText = "margin:2px 16px 12px;font-size:13px;opacity:.75"; p.textContent = t; L.appendChild(p); };
+  const mkRow = (m, extra) => {
+    const on = ids.includes(m.id), b = document.createElement("button");
+    b.type = "button"; b.className = "fsr"; b.setAttribute("role", "checkbox"); b.setAttribute("aria-checked", String(on));
+    b.innerHTML = '<span class="ic">' + (ICONS[m.id] || m.icon) + '</span><span class="nm"></span><span class="ck" aria-hidden="true">✓</span>';
+    b.querySelector(".nm").textContent = mTitle(m) + (extra ? "  ·  " + extra : "");
+    b.addEventListener("click", () => {
+      const cur = favIds();
+      if(cur.includes(m.id)) favSave(cur.filter(x => x !== m.id));
+      else if(cur.length >= FAV_MAX){ favList(true); return; }
+      else favSave(cur.concat(m.id));
+      renderFav(); const y = L.scrollTop; favList(); L.scrollTop = y;
+    });
+    return b;
+  };
+  if(dev){
+    const h0 = document.createElement("h3"); h0.textContent = (en ? "Most opened by users" : "Paling sering dibuka pengguna") + " · " + msLabel(MS_AGG ? MS_AGG.mk : msMonth(), en); L.appendChild(h0);
+    if(MS_AGG){
+      const top = MENUS.filter(m => MS_AGG.tot[m.id] > 0).sort((a, b) => MS_AGG.tot[b.id] - MS_AGG.tot[a.id]).slice(0, 10);
+      if(top.length) top.forEach(m => L.appendChild(mkRow(m, nf.format(MS_AGG.tot[m.id]) + "×, " + nf.format(MS_AGG.usr[m.id]) + (en ? " users" : " pengguna"))));
+      else note(en ? "No data yet. Only signed-in users who opened the app are counted." : "Belum ada data. Yang dihitung hanya pengguna yang masuk akun.");
+    } else if(MS_AGG_LOADING || !MS_AGG_ERR) note(en ? "Loading statistics…" : "Memuat statistik…");
+    else note((en ? "Statistics unavailable: " : "Statistik tidak tersedia: ") + MS_AGG_ERR);
+  }
+  if(dev && MS_AGG){
+    const h1 = document.createElement("h3"); h1.textContent = en ? "Monthly recap" : "Rekap bulanan"; L.appendChild(h1);
+    if(MS_AGG.rc && MS_AGG.rc.length) MS_AGG.rc.forEach(r => {
+      const p = document.createElement("p"); p.style.cssText = "margin:2px 16px 10px;font-size:13px";
+      const names = r.top.slice(0, FAV_MAX).map(t => { const mm = MENUS.find(x => x.id === (t && t.id)); return mm ? mTitle(mm) : null; }).filter(Boolean).join(", ");
+      p.textContent = msLabel(r.mk, en) + " · " + nf.format(r.n) + (en ? " users" : " pengguna") + " · " + (names || "–");
+      L.appendChild(p);
+    });
+    else note(en ? "No recap yet. The first one is made automatically on the 1st of next month." : "Belum ada rekap. Rekap pertama dibuat otomatis tiap tanggal 1 bulan berikutnya.");
+    note(en ? "Each month (server time, WIB) the top " + FAV_MAX + " menus become Featured automatically. Recaps older than " + MS_RETAIN_MONTHS + " months are deleted automatically." : "Tiap bulan (waktu server, WIB) " + FAV_MAX + " menu teratas otomatis jadi Fitur Unggulan. Rekap lebih dari " + MS_RETAIN_MONTHS + " bulan dihapus otomatis.");
+  }
   CATS.filter(c => !c.fav).forEach(c => {
     const ms = MENUS.filter(m => m.cat === c.id); if(!ms.length) return;
     const h = document.createElement("h3"); h.textContent = en ? c.titleEn : c.title; L.appendChild(h);
     ms.sort((a, b) => mTitle(a).localeCompare(mTitle(b), en ? "en" : "id")).forEach(m => {
-      const on = ids.includes(m.id), b = document.createElement("button");
-      b.type = "button"; b.className = "fsr"; b.setAttribute("role", "checkbox"); b.setAttribute("aria-checked", String(on));
-      b.innerHTML = '<span class="ic">' + (ICONS[m.id] || m.icon) + '</span><span class="nm"></span><span class="ck" aria-hidden="true">✓</span>';
-      b.querySelector(".nm").textContent = mTitle(m);
-      b.addEventListener("click", () => {
-        const cur = favIds();
-        if(cur.includes(m.id)) favSave(cur.filter(x => x !== m.id));
-        else if(cur.length >= FAV_MAX){ favList(true); return; }
-        else favSave(cur.concat(m.id));
-        renderFav(); const y = L.scrollTop; favList(); L.scrollTop = y;
-      });
-      L.appendChild(b);
+      L.appendChild(mkRow(m, dev && MS_AGG && MS_AGG.tot[m.id] ? nf.format(MS_AGG.tot[m.id]) + "×" : ""));
     });
   });
 }
@@ -3976,6 +4063,7 @@ async function infoSync(force){
   try{
     const { m, db } = await A.getDb();
     favSync(m, db);
+    try{ msUpload(m, db); }catch(e){}
     const sn = await m.getDocs(m.query(m.collection(db, "announcements"), m.orderBy("date", "desc"), m.limit(30)));
     INFO_REMOTE = sn.docs.map(d => infoClean(d.id, d.data())).filter(Boolean);
     try{ localStorage.setItem(INFO_CK, JSON.stringify(INFO_REMOTE)); }catch(e){}
@@ -3990,7 +4078,7 @@ async function infoCheckDev(){
     try{ const { m, db } = await A.getDb(); await m.getDoc(m.doc(db, "devcheck", "ping")); if(INFO_DEVUID === uid) INFO_DEV = true; }   /* berhasil dibaca = akun developer (aturan database memeriksa email); ditolak = bukan developer */
     catch(e){ if(INFO_DEVUID === uid && !(e && e.code === "permission-denied")) INFO_DEVUID = ""; }
   }
-  if(INFO_DEV !== was){ renderInfo(); try{ renderSpn(); spnSync(true); }catch(e){} }
+  if(INFO_DEV !== was){ renderInfo(); try{ renderSpn(); spnSync(true); }catch(e){} try{ renderFav(); }catch(e){} }
   try{ stVer.mark(); }catch(e){}
 }
 const infoErr = e => { const c = e && (e.code || e.message) ? String(e.code || e.message).replace(/^firestore\//, "") : "";
@@ -28601,6 +28689,7 @@ A.deleteAccount = async () => {
   if(acc) await soft(() => m.deleteDoc(m.doc(db, "accountIds", acc)));
   await soft(() => m.deleteDoc(m.doc(db, "presence", uid)));
   await soft(() => m.deleteDoc(m.doc(db, "consents", uid)));
+  await soft(() => m.deleteDoc(m.doc(db, "menuStats", uid)));
   await soft(async () => { const sn = await m.getDocs(m.query(m.collection(db, "sport_week"), m.where("uid", "==", uid))); await Promise.all(sn.docs.map(d => m.deleteDoc(d.ref))); });
   /* Feed Aktivitas Teman (menu Olahraga): aktivitas, apresiasi, dan komentar milik atau masuk ke aktivitas akun ini */
   /* Segment Leaderboard (menu Olahraga): definisi segmen dan waktu terbaik milik akun ini */
@@ -30670,7 +30759,7 @@ var STEPS = [
   { st:"h", t:L("👋 Selamat datang di Satu Titik!", "👋 Welcome to Satu Titik!"),
     d:L("Satu Titik adalah kumpulan menu praktis dalam satu aplikasi. Tutorial ini mengenalkan tombol-tombol di beranda dan isi <b>Pengaturan</b> satu per satu. Aku hanya membuka dan menutup panel, tidak ada data atau pengaturanmu yang diubah. Sekitar 3 menit.",
         "Satu Titik is a collection of handy menus in one app. This tutorial walks you through the buttons on the home screen and everything inside <b>Settings</b>. I only open and close panels; none of your data or settings are changed. About 3 minutes.") },
-  { st:"h", q:"#favEdit", t:L("⭐ Fitur Unggulan", "⭐ Featured"),
+  { st:"h", q:"#favEdit", when:function(){ var r = $("favEdit"); return !!r && !r.hidden && r.style.display !== "none"; }, t:L("⭐ Fitur Unggulan", "⭐ Featured"),
     d:L("Tiga menu di bingkai emas adalah pintasan cepatmu. Ketuk ikon <b>pensil ✎</b> ini untuk <b>mengganti sendiri</b> menu unggulanmu (maksimal 3). Ubin berisi <b>+</b> bisa diketuk untuk mengisi slot kosong, dan tombol <b>Kembalikan bawaan</b> memulihkan Turnamen, Olahraga, dan Gems Arena.",
         "The three menus in the gold frame are your quick shortcuts. Tap the <b>pencil ✎</b> icon to <b>pick your own</b> featured menus (up to 3). A tile with <b>+</b> fills an empty slot, and <b>Reset to default</b> restores Tournament, Exercise, and Gems Arena.") },
   { st:"h", q:"#rcnt", when:function(){ var r = $("rcnt"); return !!r && !r.hidden; }, t:L("Terakhir Digunakan", "Recently used"),
