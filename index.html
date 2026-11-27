@@ -3395,6 +3395,9 @@ window.stNativeAlarm = (function(){
     /* id = nomor notifikasi unik per timer; menjadwalkan ulang id yang sama otomatis menggantikan yang lama (dipakai saat rename / ganti suara) */
     service: function(){ return !!sw(); },
     stopAlarm: async function(){ var S = sw(); if(S){ try{ await S.stopAlarm(); }catch(e){} } },
+    /* petunjuk agar alarm tidak dimatikan sistem: layar baterai dan Mulai otomatis (hanya ada bila APK memiliki plugin versi terbaru) */
+    openBattery: async function(){ var S = sw(); if(S && S.openBatterySettings){ try{ await S.openBatterySettings(); return true; }catch(e){} } return false; },
+    openAutoStart: async function(){ var S = sw(); if(S && S.openAutoStart){ try{ await S.openAutoStart(); return true; }catch(e){} } return false; },
     schedule: async function(id, at, title, body, opts){
       var P = plug(), S = sw();
       if(S){
@@ -3628,14 +3631,18 @@ writeKeys(S); paintPanel();
 
 /* Alarm adzan Android: jadwalnya hanya dibuat oleh menu Jadwal Sholat. Tanpa ini, bila menu tidak dibuka (mis. setelah HP dinyalakan ulang, alarm dihapus sistem)
    jadwal bisa kosong dan adzan tidak berbunyi. Saat aplikasi dibuka, menu itu dijalankan tersembunyi sebentar hanya untuk menjadwal ulang. */
-let adzBg = null;
+let adzBg = null, adzTry = 0;
+/* Penanda "sh_schedpend" (diisi menu Jadwal Sholat saat mulai menjadwal, dikosongkan saat selesai) = ada penjadwalan yang belum tuntas
+   (menu ditutup / frame tersembunyi dibuang di tengah jalan). Selama penanda ada, adzanKeepAlive mengulang tanpa menunggu 3 jam. */
 function adzanKeepAlive(){
   try{
     if(adzBg) return;
     const n = window.stNativeAlarm; if(!(n && n.available())) return;
     if(localStorage.getItem("sh_chime") !== "true") return;
     if(document.getElementById("frame")) return;   /* menu sedang dibuka: ia menjadwal sendiri */
-    if(Date.now() - (+localStorage.getItem("sh_lastsched") || 0) < 3 * 3600000) return;
+    const pend = +localStorage.getItem("sh_schedpend") || 0;
+    if(!pend && Date.now() - (+localStorage.getItem("sh_lastsched") || 0) < 3 * 3600000) return;
+    if(Date.now() - adzTry < 5 * 60000) return;   /* percobaan terakhir gagal tuntas: jangan mengulang terus-menerus */
     const m = MENUS.find(x => x.id === "sholat"); if(!m) return;
     const f = document.createElement("iframe");
     f.setAttribute("aria-hidden", "true"); f.tabIndex = -1; f.title = "";
@@ -3643,7 +3650,12 @@ function adzanKeepAlive(){
     adzBg = f; f.srcdoc = menuSrc(m); document.body.appendChild(f);
     const t0 = Date.now(), iv = setInterval(() => {
       let done = false; try{ done = (+localStorage.getItem("sh_lastsched") || 0) > t0 || !!document.getElementById("frame"); }catch(e){}
-      if(done || Date.now() - t0 > 90000){ clearInterval(iv); try{ f.remove(); }catch(e){} adzBg = null; }
+      const opened = !!document.getElementById("frame");
+      if(done || Date.now() - t0 > 90000){
+        clearInterval(iv); try{ f.remove(); }catch(e){} adzBg = null;
+        let ok = false; try{ ok = (+localStorage.getItem("sh_lastsched") || 0) > t0; }catch(e){}
+        adzTry = ok || opened ? 0 : Date.now();
+      }
     }, 1500);
   }catch(e){ adzBg = null; }
 }
@@ -3677,6 +3689,7 @@ function closeMenu(){
   
   try{ if(window.satuTitikAds) window.satuTitikAds.onMenuClosed(); }catch(e){}
   document.title = "Satu Titik";
+  try{ setTimeout(adzanKeepAlive, 800); }catch(e){}   /* bila penjadwalan adzan terpotong karena menu ditutup cepat, selesaikan di latar */
 }
 function route(){
   const m = MENUS.find(x => x.id === location.hash.slice(1));
@@ -26555,6 +26568,12 @@ body.tutprac .tabs,body.tutprac #gps,body.tutprac #vS > .panel:nth-child(n+2){po
       <p class="err" id="adzErr" role="alert"></p>
       <p class="hint" id="sndHint"></p>
     </div>
+    <div class="panel" id="adzTipPanel" hidden>
+      <span class="label" id="sTip"></span>
+      <p class="hint" id="tipTxt" style="margin-top:0"></p>
+      <div class="row" style="margin-top:12px"><button class="btn" id="tipBat" type="button"></button><button class="btn" id="tipAuto" type="button"></button></div>
+      <p class="hint" id="tipHint"></p>
+    </div>
     <div class="panel" id="tutRow"><button class="btn" id="bTut" type="button" style="width:100%"></button></div>
   </main>
 </div>
@@ -26574,6 +26593,10 @@ body.tutprac .tabs,body.tutprac #gps,body.tutprac #vS > .panel:nth-child(n+2){po
       sndHintApp:"Di aplikasi Android, adzan tetap berbunyi walau aplikasi ditutup. Buka menu ini minimal dua minggu sekali agar jadwal diperbarui.",
       sndHintWeb:"Di browser, adzan hanya berbunyi selama menu ini terbuka. Untuk bunyi saat aplikasi ditutup, pakai aplikasi Android.",
       adzDenied:"Izin notifikasi/alarm ditolak, jadi adzan belum bisa dijadwalkan. Izinkan di pengaturan HP lalu aktifkan lagi.", adzPlayFail:"File adzan tidak bisa diputar.", adzSched:"Adzan dijadwalkan.", adzTitle:"🕌 Waktu {n}", adzBody:"Saatnya sholat {n} untuk {c}",
+      adzRemTitle:"Jadwal alarm adzan hampir habis", adzRemBody:"Jadwal adzan hanya terpasang beberapa hari lagi. Buka Satu Titik sekali agar jadwal diperbarui dan adzan tetap berbunyi.",
+      tipT:"Agar adzan tidak terlewat", tipTxt:"Beberapa HP (Xiaomi, Oppo, Vivo, Realme, dll.) menghentikan alarm aplikasi yang ditutup atau dihemat baterainya. Set baterai aplikasi ke Tanpa batasan dan izinkan Mulai otomatis, lalu coba sekali.", tipBat:"🔋 Pengaturan baterai", tipAuto:"🚀 Mulai otomatis",
+      tipFail:"Pengaturan itu tidak bisa dibuka dari aplikasi (atau APK belum versi terbaru). Buka manual: Pengaturan HP > Aplikasi > Satu Titik.",
+      tipHint:"Nama menu berbeda tiap merek. Cari Baterai, Hemat daya, atau Mulai otomatis / Autostart untuk Satu Titik. Bila adzan tetap tidak berbunyi setelah aplikasi dibuang dari Recent apps, bisa jadi HP memaksa berhenti aplikasi; buka Satu Titik sekali agar jadwal terpasang lagi.",
       qDeg:"{d}° dari Utara", qInfo:"Jarak ke Ka'bah ± {k} km dari {n}", cmp:"🧭 Aktifkan kompas", cmpOff:"Matikan kompas",
       qHint:"Putar badan sampai ikon Ka'bah tepat di atas, searah segitiga emas. Jauhkan HP dari logam dan magnet. Bila jarum tidak stabil, gerakkan HP membentuk angka 8.",
       qNoSensor:"Sensor kompas tidak tersedia di perangkat ini. Pakai sudut {d}° dari Utara (searah jarum jam) dengan kompas lain.", qDenied:"Izin sensor ditolak. Izinkan lalu coba lagi.", qWait:"Menunggu sensor…", qOk:"✔ Menghadap kiblat",
@@ -26591,6 +26614,10 @@ body.tutprac .tabs,body.tutprac #gps,body.tutprac #vS > .panel:nth-child(n+2){po
       sndHintApp:"On the Android app, the adhan still sounds when the app is closed. Open this menu at least once every two weeks to refresh the schedule.",
       sndHintWeb:"In a browser the adhan only plays while this menu is open. Use the Android app for sound while the app is closed.",
       adzDenied:"Notification/alarm permission was denied, so the adhan could not be scheduled. Allow it in your phone settings and turn it on again.", adzPlayFail:"The adhan file could not be played.", adzSched:"Adhan scheduled.", adzTitle:"🕌 {n} time", adzBody:"It is time for {n} prayer in {c}",
+      adzRemTitle:"Adhan alarm schedule is running out", adzRemBody:"The adhan schedule is only set for a few more days. Open Satu Titik once to refresh it so the adhan keeps sounding.",
+      tipT:"So you do not miss the adhan", tipTxt:"Some phones (Xiaomi, Oppo, Vivo, Realme, etc.) stop alarms of apps that were closed or are battery-restricted. Set the app battery to Unrestricted and allow Autostart, then test once.", tipBat:"🔋 Battery settings", tipAuto:"🚀 Autostart",
+      tipFail:"That setting could not be opened from the app (or the APK is not the latest). Open it manually: phone Settings > Apps > Satu Titik.",
+      tipHint:"Menu names differ by brand. Look for Battery, Power saving, or Autostart / Auto-launch for Satu Titik. If the adhan still does not sound after the app is swiped from Recent apps, the phone may be force-stopping it; open Satu Titik once to set the schedule again.",
       qDeg:"{d}° from North", qInfo:"About {k} km to the Kaaba from {n}", cmp:"🧭 Turn on compass", cmpOff:"Turn off compass",
       qHint:"Turn until the Kaaba icon is at the top, in line with the gold triangle. Keep your phone away from metal and magnets. If the needle is unstable, move the phone in a figure 8.",
       qNoSensor:"No compass sensor on this device. Use {d}° from North (clockwise) with another compass.", qDenied:"Sensor permission denied. Allow it and try again.", qWait:"Waiting for sensor…", qOk:"✔ Facing the Qibla",
@@ -26752,7 +26779,7 @@ body.tutprac .tabs,body.tutprac #gps,body.tutprac #vS > .panel:nth-child(n+2){po
   /* ===== ADZAN =====
      Android (APK): dijadwalkan ke alarm sistem lewat window.parent.stNativeAlarm (suara "adzan" = res/raw/alarm_adzan.mp3), tetap bunyi saat aplikasi ditutup.
      Web/PWA: diputar di halaman (assets/adzan.mp3) hanya selama menu terbuka. */
-  var AZ_BASE = 800000, AZ_DAYS = 14, au = null, auKey = "", lastSched = 0;
+  var AZ_BASE = 800000, AZ_DAYS = 14, AZ_SLOTS = 20, AZ_REM = AZ_BASE + 900, au = null, auKey = "", lastSched = 0;
   function nat(){ try{ var n = window.parent && window.parent.stNativeAlarm; return n && n.available() ? n : null; }catch(e){ return null; } }
   function adzVol(){ try{ return Math.max(0.1, Math.min(1, window.parent.stAlarmCfg().vol / 100)); }catch(e){ return 1; } }
   function showStop(on, txt){ $("stopBar").hidden = !on; if(on){ $("stopTxt").textContent = txt || T().adzPlaying; $("stopBtn").textContent = T().adzStopB; } }
@@ -26776,29 +26803,57 @@ body.tutprac .tabs,body.tutprac #gps,body.tutprac #vS > .panel:nth-child(n+2){po
     }catch(e){ showStop(false); if(report) $("adzErr").textContent = T().adzPlayFail; }
   }
   var schedBusy = false, schedAgain = false;
+  /* Nomor alarm per TANGGAL (bukan urutan hari dari hari ini): AZ_BASE + (nomor hari mod 20) * 10 + sholat.
+     Dengan begitu menjadwal ulang hanya menimpa alarm yang sama persis (aman diulang atau terpotong di tengah jalan).
+     Alarm lama TIDAK dibatalkan di awal; yang tidak dipakai lagi dibatalkan setelah semua jadwal baru terpasang. */
+  function azId(dt, j){ return AZ_BASE + (Math.floor(Date.UTC(dt.y, dt.m - 1, dt.d) / 86400000) % AZ_SLOTS) * 10 + j; }
   async function schedAdzan(report){
     var N = nat(); if(!N) return;
     if(schedBusy){ schedAgain = true; return; }
     schedBusy = true;
+    var P = null, my = 0;
+    try{ P = window.parent; my = P.stAdzGen = (P.stAdzGen || 0) + 1; }catch(e){}
+    function gone(){ try{ return P.stAdzGen !== my; }catch(e){ return false; } }   /* digantikan penjadwalan yang lebih baru (mis. frame tersembunyi vs menu terbuka) */
     try{
       $("adzErr").textContent = "";
-      for(var d = 0; d < AZ_DAYS + 1; d++) for(var i = 0; i < 5; i++){ try{ await N.cancel(AZ_BASE + d * 10 + i); }catch(e){} }
-      if(!chime) return;
+      sv("sh_schedpend", Date.now());
+      var keep = {}, i, d2, j, id;
+      if(!chime){
+        for(i = 0; i < AZ_SLOTS * 10; i++){ if(gone()) return; try{ await N.cancel(AZ_BASE + i); }catch(e){} }
+        try{ await N.cancel(AZ_REM); }catch(e){}
+        sv("sh_schedpend", 0); return;
+      }
       var n = locNow(), ok = true, cnt = 0, t = T(), city = locLabel();
-      for(var d2 = 0; d2 < AZ_DAYS; d2++){
+      for(d2 = 0; d2 < AZ_DAYS; d2++){
         var dt = addDays(n.y, n.m, n.d, d2), tm = timesFor(dt);
-        for(var j = 0; j < MAIN.length; j++){
+        for(j = 0; j < MAIN.length; j++){
           var k = MAIN[j], h = tm[k]; if(!adz[k] || !isFinite(h)) continue;
           var at = Date.UTC(dt.y, dt.m - 1, dt.d) + minutesOf(h, true) * 60000 - loc.tz * 3600000;
           if(at <= nowMs() + 3000) continue;
-          var r = await N.schedule(AZ_BASE + d2 * 10 + j, at, fill(t.adzTitle, {n:t.names[k]}), fill(t.adzBody, {n:t.names[k], c:city}), {snd:"adzan"});
-          if(r === false){ ok = false; break; } cnt++;
+          if(gone()) return;
+          id = azId(dt, j);
+          var r = await N.schedule(id, at, fill(t.adzTitle, {n:t.names[k]}), fill(t.adzBody, {n:t.names[k], c:city}), {snd:"adzan"});
+          if(r === false){ ok = false; break; }
+          keep[id] = 1; cnt++;
         }
         if(!ok) break;
       }
-      if(ok){ lastSched = Date.now(); sv("sh_lastsched", lastSched); }
-      if(!ok){ $("adzErr").textContent = t.adzDenied; chime = false; sv("sh_chime", false); paintSettings(); }
-      else if(report && cnt) toast(t.adzSched);
+      if(ok){
+        /* pengingat: 2-3 hari sebelum jadwal 14 hari habis (jam 09.00 setempat). Tiap penjadwalan ulang menggesernya ke depan,
+           jadi hanya muncul bila menu/aplikasi tidak dibuka sekitar 11 hari. Notifikasi biasa, tanpa suara adzan. */
+        if(cnt > 0){
+          var rd = addDays(n.y, n.m, n.d, AZ_DAYS - 3), remAt = Date.UTC(rd.y, rd.m - 1, rd.d) + 9 * 3600000 - loc.tz * 3600000;
+          if(gone()) return;
+          if(remAt > nowMs() + 3000) await N.schedule(AZ_REM, remAt, t.adzRemTitle, t.adzRemBody, {snd:"notify"});
+        }else{ try{ await N.cancel(AZ_REM); }catch(e){} }
+        /* bersihkan alarm yang tidak dipakai lagi (hari lewat, sholat dimatikan, versi lama aplikasi) */
+        for(i = 0; i < AZ_SLOTS * 10; i++){ if(keep[AZ_BASE + i]) continue; if(gone()) return; try{ await N.cancel(AZ_BASE + i); }catch(e){} }
+        lastSched = Date.now(); sv("sh_lastsched", lastSched); sv("sh_schedpend", 0);
+      }else{
+        sv("sh_schedpend", 0);
+        $("adzErr").textContent = t.adzDenied; chime = false; sv("sh_chime", false); paintSettings();
+      }
+      if(ok && report && cnt) toast(t.adzSched);
     }catch(e){}
     finally{ schedBusy = false; if(schedAgain){ schedAgain = false; schedAdzan(false); } }
   }
@@ -26906,6 +26961,8 @@ body.tutprac .tabs,body.tutprac #gps,body.tutprac #vS > .panel:nth-child(n+2){po
     [["kemenag", t.mK], ["mwl", t.mM], ["uqura", t.mU]].forEach(function(m){ var o = document.createElement("option"); o.value = m[0]; o.textContent = m[1]; if(m[0] === method) o.selected = true; s.appendChild(o); });
     $("sSnd").textContent = t.sound; $("snd").textContent = chime ? t.sndOn : t.sndOff; $("snd").setAttribute("aria-pressed", String(chime)); $("sndHint").textContent = nat() ? t.sndHintApp : t.sndHintWeb;
     $("adzTest").textContent = t.adzTest; $("adzStop").textContent = t.adzStop;
+    $("adzTipPanel").hidden = !nat();
+    $("sTip").textContent = t.tipT; $("tipTxt").textContent = t.tipTxt; $("tipBat").textContent = t.tipBat; $("tipAuto").textContent = t.tipAuto; $("tipHint").textContent = t.tipHint;
     var cb = $("adzChips"); cb.textContent = "";
     MAIN.forEach(function(k){
       var b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = t.names[k]; b.setAttribute("aria-pressed", String(!!adz[k])); b.disabled = !chime;
@@ -26943,6 +27000,9 @@ body.tutprac .tabs,body.tutprac #gps,body.tutprac #vS > .panel:nth-child(n+2){po
   $("adzTest").addEventListener("click", function(){ $("adzErr").textContent = ""; var N = nat(); if(N && N.preview){ Promise.resolve(N.preview("adzan")).then(function(ok){ if(!ok) playWeb(true); }); } else playWeb(true); });
   $("adzStop").addEventListener("click", function(){ stopWeb(); var N = nat(); if(N){ try{ if(N.stopPreview) N.stopPreview(); if(N.stopAlarm) N.stopAlarm(); }catch(e){} } });
   $("stopBtn").addEventListener("click", stopWeb);
+  function tipOpen(which){ var N = nat(); if(!N || !N[which]) return; Promise.resolve(N[which]()).then(function(ok){ if(!ok) toast(T().tipFail); }, function(){ toast(T().tipFail); }); }
+  $("tipBat").addEventListener("click", function(){ tipOpen("openBattery"); });
+  $("tipAuto").addEventListener("click", function(){ tipOpen("openAutoStart"); });
   $("cmpBtn").addEventListener("click", function(){ if(cmpOn) stopCompass(); else startCompass(); });
   window.addEventListener("storage", function(e){ if(DEMO) return; if(!e.key || e.key === "sh_lang" || e.key === "sh_fx" || e.key === "sh_loc" || e.key === "sh_method" || e.key === "sh_chime" || e.key === "sh_adz"){ readSettings(); paintAll(); } });
   document.addEventListener("visibilitychange", function(){ if(!document.hidden){ tickHero(); paintList(); if(!DEMO && chime && Date.now() - lastSched > 3 * 3600000) schedAdzan(false); } });
