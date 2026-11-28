@@ -20531,6 +20531,30 @@ function sfx(kind, vib){
     }catch(e){}
   });
 }
+/* ===== SUARA PELATIH: rekaman pendek di assets/sfx/*.mp3. Volume mengikuti menu Efek suara (Mati/Pelan/Sedang/Keras). Bila berkas tidak ada, otomatis kembali ke nada. ===== */
+const VX_G = [0, 0.4, 0.75, 1], vxEls = {}, vxBad = {};
+let vxSeq = 0;
+function vxEl(k){
+  let a = vxEls[k];
+  if(!a){ a = new Audio("assets/sfx/" + k + ".mp3"); a.preload = "auto"; a.addEventListener("error", () => { vxBad[k] = 1; }); vxEls[k] = a; }
+  return a;
+}
+function vxLoad(){ ["start", "count", "go", "rest", "next", "ten", "half", "done", "skip", "pause", "resume", "record"].forEach(k => { try{ vxEl(k); }catch(e){} }); }
+function vxStop(){ vxSeq++; Object.keys(vxEls).forEach(k => { try{ vxEls[k].pause(); vxEls[k].onended = null; }catch(e){} }); }
+/* cue: getar + suara (daftar berkas diputar berurutan). Tanpa suara (Mati / berkas hilang): nada lama dipakai. */
+function cue(kind, vib, keys){
+  const ks = Array.isArray(keys) ? keys.slice() : [keys];
+  if(!sfxLv || vxBad[ks[0]]){ sfx(kind, vib); return; }
+  try{ if(vib && navigator.vibrate) navigator.vibrate(vib); }catch(e){}
+  vxStop(); const id = vxSeq;
+  const next = () => {
+    if(id !== vxSeq || !ks.length) return;
+    const k = ks.shift(), a = vxEl(k);
+    try{ a.pause(); a.currentTime = 0; a.volume = VX_G[sfxLv]; a.onended = next; a.onerror = () => { vxBad[k] = 1; if(id === vxSeq) next(); };
+      const q = a.play(); if(q && q.catch) q.catch(() => {}); }catch(e){ next(); }
+  };
+  next();
+}
 function sfxRow(){
   const w = el("div"); w.style.cssText = "margin-top:10px;padding-top:10px;border-top:1px solid var(--line)";
   const h = el("p", "hint", "🔊 " + L("Efek suara", "Sound effects")); h.style.cssText = "margin:0 0 6px;text-align:center";
@@ -20548,9 +20572,9 @@ function gdStart(r){
   gd = {r:r, seq:q, p:0, end:n + q[0].sec * 1000, left:0, run:true, ts:n, lt:n, act:0, bp:-1};
   try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").then(l => { if(gd) gd.wl = l; else l.release(); }).catch(() => {}); }catch(e){}
   r.ex.forEach(x => { const k = GFX[x] && fxKey(GFX[x]); if(k && FXV[k]) fxLoad(k).catch(() => {}); });
-  sfx("start", 80); renderFit();
+  vxLoad(); cue("start", 80, "start"); renderFit();
 }
-function gdEnd(){ if(gd && gd.wl){ try{ gd.wl.release(); }catch(e){} } gd = null; gdUi = {}; }
+function gdEnd(){ vxStop(); if(gd && gd.wl){ try{ gd.wl.release(); }catch(e){} } gd = null; gdUi = {}; }
 function gdSave(){
   const dur = Math.round(gd.act / 1000);
   if(dur < 60) return false;
@@ -20558,11 +20582,12 @@ function gdSave(){
   a.push(r); if(!fitPut(a)){ toast(L("Penyimpanan penuh.", "Storage full.")); return false; }
   toast(L("Sesi tersimpan. ", "Session saved. ") + "≈ " + r.kc + " " + L("kkal", "kcal")); return true;
 }
-function gdAdvance(){
+function gdAdvance(skip){
   gd.p++;
-  if(gd.p >= gd.seq.length){ sfx("done", [200, 80, 200]); gdSave(); gdEnd(); if(tab === "fit" && view === "tab") renderFit(); return; }
-  gd.end = Date.now() + gd.seq[gd.p].sec * 1000; gd.bp = -1;
-  sfx(gd.seq[gd.p].ph === "work" ? "go" : "rest", gd.seq[gd.p].ph === "work" ? [200, 80, 200] : 80);
+  if(gd.p >= gd.seq.length){ cue("done", [200, 80, 200], "done"); gdSave(); gdEnd(); if(tab === "fit" && view === "tab") renderFit(); return; }
+  gd.end = Date.now() + gd.seq[gd.p].sec * 1000; gd.bp = -1; gd.cd = gd.t10 = gd.hf = 0;
+  if(gd.seq[gd.p].ph === "work") cue("go", [200, 80, 200], "go");
+  else cue("rest", 80, (skip ? ["skip"] : []).concat(["rest"], gd.seq[gd.p].sec >= 10 ? ["next"] : []));
   if(tab === "fit" && view === "tab") renderFit();
 }
 function gdStop(){
@@ -20578,7 +20603,14 @@ function gdTick(){
   if(gd.run){ gd.act += n - gd.lt; gd.lt = n;
     const rem = Math.ceil((gd.end - n) / 1000);
     if(n >= gd.end){ gdAdvance(); return; }
-    if(rem <= 3 && rem > 0 && gd.bp !== rem){ gd.bp = rem; sfx("tick", 40); } }
+    const sq = gd.seq[gd.p], left = gd.end - n;
+    /* suara: hitung mundur 3-2-1 sebelum KERJA, "sisa 10 detik", "setengah jalan" */
+    if(sfxLv && !vxBad.count && sq.ph !== "work" && !gd.cd && left <= 3850 && (sq.ph === "ready" || sq.sec >= 7)){ gd.cd = 1; cue("tick", 0, "count"); }
+    if(sq.ph === "work" && sq.sec >= 20){
+      if(!gd.hf && gd.r.ex.length >= 4 && sq.i === Math.floor((gd.r.ex.length - 1) / 2) && left <= sq.sec * 500){ gd.hf = 1; cue("set", 40, "half"); }
+      else if(!gd.t10 && rem <= 10 && rem > 8){ gd.t10 = 1; cue("tick", 40, "ten"); }
+    }
+    if(rem <= 3 && rem > 0 && gd.bp !== rem){ gd.bp = rem; if(!gd.cd) sfx("tick", 40); } }
   if(gdUi.tm && tab === "fit" && view === "tab") gdUi.tm.textContent = fmtDur(Math.max(0, Math.ceil((gd.run ? gd.end - n : gd.left) / 1000)));
 }
 function renderGd(){
@@ -20595,7 +20627,7 @@ function renderGd(){
   const mkb = (cls, txt, fn) => { const b = el("button", "btn " + cls, txt); b.type = "button"; b.onclick = fn; return b; };
   const bt = el("div"); bt.style.cssText = "display:flex;flex-direction:column;gap:10px;margin-top:14px";
   const row = el("div", "row2");
-  row.append(gd.run ? mkb("ghost", L("⏸  JEDA", "⏸  PAUSE"), () => { gd.left = gd.end - Date.now(); gd.run = false; renderFit(); }) : mkb("go", L("▶  LANJUT", "▶  RESUME"), () => { const n = Date.now(); gd.end = n + gd.left; gd.lt = n; gd.run = true; renderFit(); }), mkb("ghost", L("⏭  LEWATI", "⏭  SKIP"), () => { if(!gd.run){ gd.run = true; gd.lt = Date.now(); } gdAdvance(); }));
+  row.append(gd.run ? mkb("ghost", L("⏸  JEDA", "⏸  PAUSE"), () => { gd.left = gd.end - Date.now(); gd.run = false; cue("pause", 40, "pause"); renderFit(); }) : mkb("go", L("▶  LANJUT", "▶  RESUME"), () => { const n = Date.now(); gd.end = n + gd.left; gd.lt = n; gd.run = true; cue("resume", 40, "resume"); renderFit(); }), mkb("ghost", L("⏭  LEWATI", "⏭  SKIP"), () => { if(!gd.run){ gd.run = true; gd.lt = Date.now(); } gdAdvance(true); }));
   bt.append(row, mkb("danger", L("■  SELESAI", "■  FINISH"), gdStop)); v.append(bt);
   v.append(el("p", "hint", L("Layar dijaga tetap menyala bila perangkat mendukung. Bila menu ditutup, sesi terpandu berhenti dan tidak tersimpan.", "The screen is kept on when the device supports it. If the menu is closed, a guided session stops and is not saved.")));
   gdTick();
@@ -21241,7 +21273,7 @@ function renderFit(){
         if(e.s.length >= 30){ toast(L("Maksimal 30 set per gerakan.", "Maximum 30 sets per exercise.")); return; }
         const pr0 = fitPR(e.n, all.concat([{ex:fitEx}]));
         e.s.push([r, Math.round(k * 100) / 100]); fitDraft(); fitRestStart();
-        if(pr0 && pr0[1] > 0 && k > pr0[1]){ toast("🏆 " + L("Rekor beban baru!", "New weight record!")); sfx("pr", [100, 60, 100, 60, 200]); } else sfx("set", 40);
+        if(pr0 && pr0[1] > 0 && k > pr0[1]){ toast("🏆 " + L("Rekor beban baru!", "New weight record!")); cue("pr", [100, 60, 100, 60, 200], "record"); } else sfx("set", 40);
         renderFit();
       });
       sb.style.flex = "none"; sb.style.minHeight = "44px";
