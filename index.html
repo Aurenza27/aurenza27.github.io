@@ -20400,6 +20400,9 @@ const GR = [
   {k:"abs", t:"b", ic:"🎯", id:"Perut 6 Menit", en:"6-Minute Abs", w:30, r:15, ex:["cr","lg","bc","pl","mc","cr","lg","pl"]},
   {k:"str", t:"y", ic:"🧘", id:"Peregangan 5 Menit", en:"5-Minute Stretch", w:30, r:5, ex:["sr","nk","cs","qd","hs","cc","cp","hs"]}];
 const RN = {}; GR.forEach(r => { RN[r.k] = r; });
+const GTV = {jj:"jumping-jack",wi:"wall-sit",pu:"push-up",cr:"crunch",sq:"squat",tr:"chair-dips",pl:"plank",hk:"high-knees",lu:"alternating-lunge",bc:"bicycle-crunch",bk:"burpee",mc:"mountain-climber",js:"jump-squat",lg:"leg-raise",sr:"shoulder-roll",nk:"neck-stretch",cs:"chest-stretch",qd:"quad-stretch",hs:"hamstring-stretch",cc:"cat-cow",cp:"childs-pose"};
+/* TUTORIAL SUARA GERAKAN: assets/tutorial/<nama>.mp3 (Bahasa Indonesia). Dibacakan sekali saat gerakan pertama kali muncul di rutinitas terpandu; timer ditahan selama suara berjalan. */
+let tutOn = +load("fittut", 1) ? 1 : 0;
 /* gerakan rutinitas yang punya animasi "Cara melakukan": kode di GX -> nama di FXI */
 const GFX = {pu:"Push-up", sq:"Squat", pl:"Plank", lu:"Lunges", bc:"Bicycle crunch", cr:"Crunch", mc:"Mountain climber", jj:"Jumping jack", hk:"High knees", wi:"Wall sit", tr:"Chair dips", bk:"Burpee", js:"Jump squat", lg:"Leg raises", sr:"Shoulder rolls", nk:"Neck stretch", cs:"Chest stretch", qd:"Quad stretch", hs:"Hamstring stretch", cc:"Cat-cow", cp:"Child's pose"};
 const grName = r => r[lang === "en" ? "en" : "id"], grMin = r => Math.round((5 + r.ex.length * r.w + (r.ex.length - 1) * r.r) / 60);
@@ -20536,24 +20539,36 @@ const VX_G = [0, 0.4, 0.75, 1], vxEls = {}, vxBad = {};
 let vxSeq = 0;
 function vxEl(k){
   let a = vxEls[k];
-  if(!a){ a = new Audio("assets/sfx/" + k + ".mp3"); a.preload = "auto"; a.addEventListener("error", () => { vxBad[k] = 1; }); vxEls[k] = a; }
+  if(!a){ a = new Audio(k.indexOf("t:") === 0 ? "assets/tutorial/" + (GTV[k.slice(2)] || k.slice(2)) + ".mp3" : "assets/sfx/" + k + ".mp3"); a.preload = "auto"; a.addEventListener("error", () => { vxBad[k] = 1; }); vxEls[k] = a; }
   return a;
 }
 function vxLoad(){ ["start", "count", "go", "rest", "next", "ten", "half", "done", "skip", "pause", "resume", "record"].forEach(k => { try{ vxEl(k); }catch(e){} }); }
 function vxStop(){ vxSeq++; Object.keys(vxEls).forEach(k => { try{ vxEls[k].pause(); vxEls[k].onended = null; }catch(e){} }); }
 /* cue: getar + suara (daftar berkas diputar berurutan). Tanpa suara (Mati / berkas hilang): nada lama dipakai. */
-function cue(kind, vib, keys){
+function cue(kind, vib, keys, fin){
   const ks = Array.isArray(keys) ? keys.slice() : [keys];
-  if(!sfxLv || vxBad[ks[0]]){ sfx(kind, vib); return; }
+  if(!sfxLv || vxBad[ks[0]]){ sfx(kind, vib); if(fin) fin(); return; }
   try{ if(vib && navigator.vibrate) navigator.vibrate(vib); }catch(e){}
   vxStop(); const id = vxSeq;
   const next = () => {
-    if(id !== vxSeq || !ks.length) return;
+    if(id !== vxSeq) return;
+    if(!ks.length){ if(fin) fin(); return; }
     const k = ks.shift(), a = vxEl(k);
     try{ a.pause(); a.currentTime = 0; a.volume = VX_G[sfxLv]; a.onended = next; a.onerror = () => { vxBad[k] = 1; if(id === vxSeq) next(); };
       const q = a.play(); if(q && q.catch) q.catch(() => {}); }catch(e){ next(); }
   };
   next();
+}
+function tutRow(){
+  const w = el("div"); w.style.cssText = "margin-top:10px;padding-top:10px;border-top:1px solid var(--line)";
+  const h = el("p", "hint", "🗣️ " + L("Tutorial suara gerakan", "Exercise tutorial voice")); h.style.cssText = "margin:0 0 6px;text-align:center";
+  const c = el("div", "chips"); c.style.justifyContent = "center";
+  [[1, L("Hidup", "On")], [0, L("Mati", "Off")]].forEach(o => {
+    const b = el("button", "chip" + (tutOn === o[0] ? " on" : ""), o[1]); b.type = "button";
+    b.onclick = () => { tutOn = o[0]; save("fittut", tutOn); if(!o[0] && gd && gd.tut){ gd.tut = 0; vxStop(); } renderFit(); }; c.append(b);
+  });
+  w.append(h, c, el("p", "hint", lang === "en" ? "The tutorial voice is available in Indonesian only." : "Dibacakan sekali saat gerakan pertama kali muncul. Timer berhenti sementara selama suara berjalan. Perlu Efek suara menyala."));
+  w.lastChild.style.cssText = "margin:6px 0 0;text-align:center"; return w;
 }
 function sfxRow(){
   const w = el("div"); w.style.cssText = "margin-top:10px;padding-top:10px;border-top:1px solid var(--line)";
@@ -20572,7 +20587,22 @@ function gdStart(r){
   gd = {r:r, seq:q, p:0, end:n + q[0].sec * 1000, left:0, run:true, ts:n, lt:n, act:0, bp:-1};
   try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").then(l => { if(gd) gd.wl = l; else l.release(); }).catch(() => {}); }catch(e){}
   r.ex.forEach(x => { const k = GFX[x] && fxKey(GFX[x]); if(k && FXV[k]) fxLoad(k).catch(() => {}); });
-  vxLoad(); cue("start", 80, "start"); renderFit();
+  gd.seen = {}; vxLoad(); gdCue("start", 80, ["start"], 0); renderFit();
+}
+/* cue + tutorial suara gerakan i (bila aktif, Bahasa Indonesia, berkas ada, dan belum pernah dibacakan di sesi ini) */
+function gdCue(kind, vib, keys, i){
+  const c = gd.r.ex[i], ks = keys.slice(); let fin = null; gd.tut = 0;
+  if(tutOn && sfxLv && lang !== "en" && GTV[c] && !vxBad["t:" + c] && !gd.seen[c]){
+    gd.seen[c] = 1; gd.tut = 1; gd.tutT0 = Date.now(); ks.push("t:" + c);
+    fin = () => { if(gd){ gd.tut = 0; gd.end = Math.max(gd.end, Date.now() + 5000); } };
+  }
+  cue(kind, vib, ks, fin);
+}
+function gdReplay(){
+  if(!gd) return; const sq = gd.seq[gd.p], c = gd.r.ex[sq.i]; if(!GTV[c]) return;
+  if(!sfxLv){ toast(L("Nyalakan efek suara dulu.", "Turn sound effects on first.")); return; }
+  const hold = gd.run && sq.ph !== "work"; gd.tut = hold ? 1 : 0; gd.tutT0 = Date.now();
+  cue("tick", 0, ["t:" + c], hold ? () => { if(gd){ gd.tut = 0; gd.end = Math.max(gd.end, Date.now() + 5000); } } : null);
 }
 function gdEnd(){ vxStop(); if(gd && gd.wl){ try{ gd.wl.release(); }catch(e){} } gd = null; gdUi = {}; }
 function gdSave(){
@@ -20583,11 +20613,11 @@ function gdSave(){
   toast(L("Sesi tersimpan. ", "Session saved. ") + "≈ " + r.kc + " " + L("kkal", "kcal")); return true;
 }
 function gdAdvance(skip){
-  gd.p++;
+  gd.p++; gd.tut = 0;
   if(gd.p >= gd.seq.length){ cue("done", [200, 80, 200], "done"); gdSave(); gdEnd(); if(tab === "fit" && view === "tab") renderFit(); return; }
   gd.end = Date.now() + gd.seq[gd.p].sec * 1000; gd.bp = -1; gd.cd = gd.t10 = gd.hf = 0;
   if(gd.seq[gd.p].ph === "work") cue("go", [200, 80, 200], "go");
-  else cue("rest", 80, (skip ? ["skip"] : []).concat(["rest"], gd.seq[gd.p].sec >= 10 ? ["next"] : []));
+  else gdCue("rest", 80, (skip ? ["skip"] : []).concat(["rest"], gd.seq[gd.p].sec >= 10 ? ["next"] : []), gd.seq[gd.p].i);
   if(tab === "fit" && view === "tab") renderFit();
 }
 function gdStop(){
@@ -20600,17 +20630,17 @@ function gdStop(){
 function gdTick(){
   if(!gd) return;
   const n = Date.now();
-  if(gd.run){ gd.act += n - gd.lt; gd.lt = n;
+  if(gd.run){ const dt = n - gd.lt; gd.act += dt; gd.lt = n; if(gd.tut){ gd.end += dt; if(n - gd.tutT0 > 60000) gd.tut = 0; }
     const rem = Math.ceil((gd.end - n) / 1000);
     if(n >= gd.end){ gdAdvance(); return; }
     const sq = gd.seq[gd.p], left = gd.end - n;
     /* suara: hitung mundur 3-2-1 sebelum KERJA, "sisa 10 detik", "setengah jalan" */
-    if(sfxLv && !vxBad.count && sq.ph !== "work" && !gd.cd && left <= 3850 && (sq.ph === "ready" || sq.sec >= 7)){ gd.cd = 1; cue("tick", 0, "count"); }
+    if(sfxLv && !gd.tut && !vxBad.count && sq.ph !== "work" && !gd.cd && left <= 3850 && (sq.ph === "ready" || sq.sec >= 7)){ gd.cd = 1; cue("tick", 0, "count"); }
     if(sq.ph === "work" && sq.sec >= 20){
       if(!gd.hf && gd.r.ex.length >= 4 && sq.i === Math.floor((gd.r.ex.length - 1) / 2) && left <= sq.sec * 500){ gd.hf = 1; cue("set", 40, "half"); }
       else if(!gd.t10 && rem <= 10 && rem > 8){ gd.t10 = 1; cue("tick", 40, "ten"); }
     }
-    if(rem <= 3 && rem > 0 && gd.bp !== rem){ gd.bp = rem; if(!gd.cd) sfx("tick", 40); } }
+    if(!gd.tut && rem <= 3 && rem > 0 && gd.bp !== rem){ gd.bp = rem; if(!gd.cd) sfx("tick", 40); } }
   if(gdUi.tm && tab === "fit" && view === "tab") gdUi.tm.textContent = fmtDur(Math.max(0, Math.ceil((gd.run ? gd.end - n : gd.left) / 1000)));
 }
 function renderGd(){
@@ -20627,8 +20657,9 @@ function renderGd(){
   const mkb = (cls, txt, fn) => { const b = el("button", "btn " + cls, txt); b.type = "button"; b.onclick = fn; return b; };
   const bt = el("div"); bt.style.cssText = "display:flex;flex-direction:column;gap:10px;margin-top:14px";
   const row = el("div", "row2");
-  row.append(gd.run ? mkb("ghost", L("⏸  JEDA", "⏸  PAUSE"), () => { gd.left = gd.end - Date.now(); gd.run = false; cue("pause", 40, "pause"); renderFit(); }) : mkb("go", L("▶  LANJUT", "▶  RESUME"), () => { const n = Date.now(); gd.end = n + gd.left; gd.lt = n; gd.run = true; cue("resume", 40, "resume"); renderFit(); }), mkb("ghost", L("⏭  LEWATI", "⏭  SKIP"), () => { if(!gd.run){ gd.run = true; gd.lt = Date.now(); } gdAdvance(true); }));
-  bt.append(row, mkb("danger", L("■  SELESAI", "■  FINISH"), gdStop)); v.append(bt);
+  row.append(gd.run ? mkb("ghost", L("⏸  JEDA", "⏸  PAUSE"), () => { gd.tut = 0; gd.left = gd.end - Date.now(); gd.run = false; cue("pause", 40, "pause"); renderFit(); }) : mkb("go", L("▶  LANJUT", "▶  RESUME"), () => { const n = Date.now(); gd.end = n + gd.left; gd.lt = n; gd.run = true; cue("resume", 40, "resume"); renderFit(); }), mkb("ghost", L("⏭  LEWATI", "⏭  SKIP"), () => { if(!gd.run){ gd.run = true; gd.lt = Date.now(); } gdAdvance(true); }));
+  if(GTV[r.ex[sq.i]] && lang !== "en") bt.append(mkb("ghost", "🗣️ " + L("Dengar tutorial gerakan", "Hear exercise tutorial"), gdReplay));
+  bt.append(row, mkb("danger", L("■  SELESAI", "■  FINISH"), gdStop)); v.append(bt); v.append(tutRow());
   v.append(el("p", "hint", L("Layar dijaga tetap menyala bila perangkat mendukung. Bila menu ditutup, sesi terpandu berhenti dan tidak tersimpan.", "The screen is kept on when the device supports it. If the menu is closed, a guided session stops and is not saved.")));
   gdTick();
 }
@@ -21220,6 +21251,7 @@ function renderFit(){
       it.onclick = () => gdStart(r); go.onclick = ev => { ev.stopPropagation(); gdStart(r); };
       it.append(ic, tx, go); rp.append(it);
     });
+    rp.append(tutRow());
     v.append(rp);
   }
 
@@ -21795,7 +21827,7 @@ paint();
       L("<b>Hapus dari Jelajahi Rute</b> menghapus satu rute. Tombol <b>Hapus semua data Jelajahi Rute-ku</b> di tab Rute menghapus rute, tanda selesai, ulasan, dan laporanmu dari server. <b>Laporkan rute</b> menyembunyikan rute itu darimu dan memberi tahu pengelola.", "<b>Remove from Explore Routes</b> deletes one route. <b>Delete all my Explore Routes data</b> in the Routes tab removes your routes, completions, reviews, and reports from the server. <b>Report route</b> hides that route for you and notifies the maintainer.")]) +
     "<h3>" + L("15. Fitness (tanpa GPS)", "15. Fitness (no GPS)") + "</h3>" + li([
       L("Buka tab <b>Fitness</b>, pilih jenis (<b>Beban, Kardio, HIIT, Tanpa alat, Yoga</b>), lalu ketuk <b>MULAI</b>. Atau isi <b>durasi manual</b> (1 menit sampai 12 jam) dan ketuk <b>Simpan sesi</b>.", "Open the <b>Fitness</b> tab, pick a type (<b>Weights, Cardio, HIIT, Bodyweight, Yoga</b>), then tap <b>START</b>. Or enter a <b>manual duration</b> (1 minute to 12 hours) and tap <b>Save session</b>."),
-      L("Untuk <b>Beban</b> dan <b>Tanpa alat</b>, tambah gerakan lalu catat tiap set (repetisi × beban). <b>Volume</b> dan <b>🏆 PR</b> dihitung otomatis. <b>Ulangi sesi terakhir</b> menyalin daftar gerakan sesi sebelumnya. Pilih <b>rutinitas terpandu</b> (7 Menit Tanpa Alat, HIIT 10 Menit, Perut 6 Menit, Peregangan 5 Menit) untuk diikuti langkah demi langkah dengan timer kerja dan istirahat, suara, dan getar. Di catatan beban ada <b>templat</b> (Dada & Trisep, Kaki, dll) dan kamu bisa <b>💾 menyimpan rutinitas sendiri</b> (maksimal 10). Salah catat? Ketuk <b>✎</b> di riwayat untuk mengubah jenis, durasi, gerakan, atau set.", "For <b>Weights</b> and <b>Bodyweight</b>, add exercises and log each set (reps × weight). <b>Volume</b> and <b>🏆 PR</b> are calculated automatically. <b>Repeat last session</b> copies the exercise list from your previous session. Pick a <b>guided routine</b> (7-Minute No Equipment, 10-Minute HIIT, 6-Minute Abs, 5-Minute Stretch) to follow step by step with work and rest timers, sound, and vibration. The weight log has <b>templates</b> (Chest & Triceps, Legs, etc.) and you can <b>💾 save your own routines</b> (up to 10). Logged something wrong? Tap <b>✎</b> in the history to change the type, duration, exercises, or sets."),
+      L("Untuk <b>Beban</b> dan <b>Tanpa alat</b>, tambah gerakan lalu catat tiap set (repetisi × beban). <b>Volume</b> dan <b>🏆 PR</b> dihitung otomatis. <b>Ulangi sesi terakhir</b> menyalin daftar gerakan sesi sebelumnya. Pilih <b>rutinitas terpandu</b> (7 Menit Tanpa Alat, HIIT 10 Menit, Perut 6 Menit, Peregangan 5 Menit) untuk diikuti langkah demi langkah dengan timer kerja dan istirahat, suara, dan getar. Tutorial suara tiap gerakan dibacakan sekali saat gerakan itu pertama kali muncul (Bahasa Indonesia, bisa dimatikan). Di catatan beban ada <b>templat</b> (Dada & Trisep, Kaki, dll) dan kamu bisa <b>💾 menyimpan rutinitas sendiri</b> (maksimal 10). Salah catat? Ketuk <b>✎</b> di riwayat untuk mengubah jenis, durasi, gerakan, atau set.", "For <b>Weights</b> and <b>Bodyweight</b>, add exercises and log each set (reps × weight). <b>Volume</b> and <b>🏆 PR</b> are calculated automatically. <b>Repeat last session</b> copies the exercise list from your previous session. Pick a <b>guided routine</b> (7-Minute No Equipment, 10-Minute HIIT, 6-Minute Abs, 5-Minute Stretch) to follow step by step with work and rest timers, sound, and vibration. A voice tutorial for each exercise plays once when it first appears (Indonesian only, can be turned off). The weight log has <b>templates</b> (Chest & Triceps, Legs, etc.) and you can <b>💾 save your own routines</b> (up to 10). Logged something wrong? Tap <b>✎</b> in the history to change the type, duration, exercises, or sets."),
       L("<b>Istirahat otomatis</b> (60, 90, atau 120 detik) mulai setelah tiap set dan memberi tahu saat selesai.", "<b>Auto rest</b> (60, 90, or 120 seconds) starts after each set and alerts you when it ends."),
       L("Kalori = MET × berat badan × jam (isi berat badan di kotak yang muncul di atas tab Fitness; sebelum diisi dipakai 60 kg) (Beban 5, Kardio 7, HIIT 8, Tanpa alat 5, Yoga 2,5). Ini <b>perkiraan kasar</b>.", "Calories = MET × body weight × hours (set your weight in the box at the top of the Fitness tab; until then 60 kg is used) (Weights 5, Cardio 7, HIIT 8, Bodyweight 5, Yoga 2.5). This is a <b>rough estimate</b>."),
       L("Bila menu ditutup saat sesi berjalan, sesi dipulihkan dalam <b>keadaan jeda</b> (maksimal 24 jam) dan waktu saat menu tertutup tidak dihitung.", "If the menu closes during a session, it is restored <b>paused</b> (up to 24 hours) and time while closed is not counted."),
